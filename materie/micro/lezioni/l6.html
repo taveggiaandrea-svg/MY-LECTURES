@@ -1,0 +1,167 @@
+<article class="lesson" data-n="6" id="lezione-6" data-title="Che cosa vuole un consumatore?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 4 · Topic 4-1</p>
+  <h1>Che cosa vuole un consumatore?</h1>
+  <p class="desc">Preferenze del consumatore: panieri di due beni, curve di indifferenza e le quattro proprietà che i modelli assumono di solito.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nelle prime lezioni le alternative erano oggetti astratti: \(a\), \(b\), \(c\). Ora prendono la forma che hanno in quasi tutta la teoria economica: quantità di beni. Chi le valuta è un <strong>consumatore</strong>.</p>
+  <p>«Consumo» in economia vuol dire più che nella vita di tutti i giorni: consumi una mela quando la mangi, ma anche una camicia quando la indossi, e il lavoro del parrucchiere quando ti fai tagliare i capelli. È un buon terreno per la teoria della scelta razionale? Alla cena o ai vestiti non dedichi grandi riflessioni. Ma, come nella lezione 2, razionale non vuol dire ponderato: vuol dire che un osservatore può descrivere le scelte <em>come se</em> massimizzassero una preferenza coerente. Se il modello funziona lo decidono i dati.</p>
+  <p>Come nella prima lezione, qui parliamo solo di preferenze, senza scelte. Che cosa il consumatore compra, dati i prezzi e la sua ricchezza, è l'argomento della prossima lezione.</p>
+  <h2>Panieri</h2>
+  <p>I beni sono due. Un'alternativa è una coppia \((x_1, x_2)\) di numeri non negativi, la quantità di ciascun bene: un <strong>paniere</strong>. L'insieme delle alternative è \(\sX = \mathbb{R}^2_+\), cioè un quadrante del piano.</p>
+  <p>I beni possono essere tavoli, patate, denaro, tempo libero. Ma anche, più in astratto, due considerazioni che il consumatore tiene presenti: l'attenzione dedicata a due progetti, o il benessere proprio e quello del partner.</p>
+  <p>Parlare di \(\pi\) tavoli o di un nono di automobile ha poco senso, lo sappiamo. Trattiamo le quantità come continue per comodità: così è facile ragionare su <em>quanto</em> di un bene si è disposti a cedere per averne di più dell'altro. E i beni sono due solo per poter disegnare: quasi tutti i risultati valgono anche con un milione di beni.</p>
+  <p>Sui panieri si fanno operazioni con un significato naturale. \(x + y\) mette insieme due panieri. \(\lam x\) ne prende un multiplo. E, dati due panieri \(x\) e \(y\) e un numero \(\lam\) fra 0 e 1, il paniere \(\lam x + (1-\lam) y\) sta sul segmento che li unisce. Quest'ultima cosa ci servirà spesso.</p>
+  <figure>
+    <div class="w" id="bund"></div>
+    <figcaption>Sull'asse orizzontale la quantità del bene 1, su quello verticale la quantità del bene 2. Il punto verde acqua è il paniere \(\lam x + (1-\lam) y\): con \(\lam = 1\) coincide con \(x\), con \(\lam = 0\) con \(y\), e in mezzo scorre lungo il segmento. Trascina \(x\) e \(y\) e muovi \(\lam\).</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Sei modi di volere due beni</h2>
+  <p>Una preferenza sui panieri si disegna bene con le sue <strong>curve di indifferenza</strong>. L'insieme di indifferenza di un paniere \(a\) è l'insieme di tutti i panieri indifferenti ad \(a\). Se la preferenza ha un'utilità \(\uu\), è una curva di livello: \(\{\,y : \uu(y) = \uu(a)\,\}\). «Stessa utilità» funziona come «stessa quota» in una carta topografica. Tutte le curve insieme dividono il quadrante in gruppi disgiunti: sono le classi dell'equivalenza \(\ind\) della prima lezione.</p>
+  <p>Ecco sei consumatori diversi. Sceglierne uno ridisegna la mappa; trascina il paniere \(a\) per vedere la sua curva di indifferenza e, in azzurro, tutti i panieri buoni almeno quanto \(a\).</p>
+  <figure>
+    <div class="w" id="map1"></div>
+    <figcaption>Gli assi sono le quantità dei due beni. In grigio alcune curve di indifferenza, in azzurro quella che passa per \(a\). L'area colorata è l'insieme dei panieri \(y\) con \(y \pf a\).</figcaption>
+  </figure>
+  <p>L'ultimo caso è quello già incontrato nella prima lezione. Con preferenze lessicografiche, fra due panieri diversi uno è sempre strettamente preferito: ogni insieme di indifferenza è un punto solo, e nessuna funzione di utilità rappresenta la preferenza.</p>
+  <p>Nel resto della lezione vediamo quattro proprietà che i modelli economici assumono spesso. Per ognuna la domanda è la stessa: <span class="ask">che cosa dice sulla forma di questa mappa?</span></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Monotonia: di più è meglio</h2>
+  <p>La prima proprietà dice che i beni sono, appunto, beni.</p>
+  <p class="stmt">Una preferenza su \(\mathbb{R}^2_+\) è <strong>monotona</strong> se avere almeno altrettanto di entrambi i beni non peggiora mai, e averne di più di entrambi migliora sempre:</p>
+  <div class="eq">\[
+  \begin{aligned}
+  x_1 \ge y_1 \ \text{e}\ x_2 \ge y_2 \ &\Longrightarrow\ (x_1,x_2) \pf (y_1,y_2) \\
+  x_1 &gt; y_1 \ \text{e}\ x_2 &gt; y_2 \ &\Longrightarrow\ (x_1,x_2) \spf (y_1,y_2)
+  \end{aligned}
+  \]</div>
+  <p>Per esempio, \((3,7)\) è preferito a \((2,6)\). Rispetto a \((3,5)\) può essere preferito o indifferente, ma non peggiore.</p>
+  <p class="stmt">È <strong>fortemente monotona</strong> se basta avere di più di <em>un</em> bene, e non meno dell'altro, per stare strettamente meglio.</p>
+  <p>Ecco la stessa mappa di prima, con un elemento in più: il rettangolo tratteggiato racchiude i panieri che hanno più di entrambi i beni rispetto ad \(a\). Se la preferenza è monotona, deve stare tutto dentro l'area azzurra.</p>
+  <figure>
+    <div class="w" id="map2"></div>
+    <figcaption>I sei esempi alla prova della monotonia: il rettangolo verde tratteggiato contiene i panieri con più di entrambi i beni rispetto ad \(a\). Cambia consumatore e trascina \(a\).</figcaption>
+  </figure>
+  <figure>
+    <div class="scroll">
+    <table>
+      <thead><tr><th>Esempio</th><th class="c">Monotona?</th><th class="c">Fortemente monotona?</th></tr></thead>
+      <tbody>
+        <tr><td>Scambio costante, \(\vv_1x_1 + \vv_2x_2\)</td><td class="c">sì</td><td class="c">se \(\vv_1 \gt 0\) e \(\vv_2 \gt 0\)</td></tr>
+        <tr><td>Conta solo il bene 2</td><td class="c">sì</td><td class="c">no</td></tr>
+        <tr><td>Prima il bene 1 fino a 10, poi il bene 2</td><td class="c">sì</td><td class="c">no</td></tr>
+        <tr><td>Beni complementari</td><td class="c">sì</td><td class="c">no</td></tr>
+        <tr><td>Paniere ideale</td><td class="c">no</td><td class="c">no</td></tr>
+        <tr><td>Lessicografiche</td><td class="c">sì</td><td class="c">sì</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <figcaption>I sei esempi alla prova delle due definizioni: è la tabella delle slide.</figcaption>
+  </figure>
+  <p>Solo il paniere ideale fallisce: superato l'ideale, avere di più allontana. Fra le altre, molte sono monotone ma non fortemente: per chi vuole i due beni nelle stesse quantità, una scarpa destra in più senza la sinistra non cambia nulla.</p>
+  <p>E se una merce è un «male», come l'inquinamento? Basta ridefinirla: si misura il consumo di «assenza di inquinamento», e la monotonia torna a valere.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Continuità: niente salti</h2>
+  <p>La seconda proprietà dice che le preferenze non cambiano bruscamente: se \(x\) è preferito a \(y\), panieri vicini a \(x\) sono preferiti a panieri vicini a \(y\).</p>
+  <p class="stmt">Una preferenza su \(\mathbb{R}^2_+\) è <strong>continua</strong> se, ogni volta che \(x \spf y\), esiste un numero \(\epsi &gt; 0\) tale che \(a \spf b\) per ogni paniere \(a\) a distanza minore di \(\epsi\) da \(x\) e ogni paniere \(b\) a distanza minore di \(\epsi\) da \(y\).</p>
+  <p>Le preferenze lessicografiche non lo sono. Prendi \(x = (1,2)\) e \(y = (1,0)\): hanno la stessa quantità del bene 1, e \(x\) ha più del bene 2, quindi \(x \spf y\). Ora cerca un \(\epsi\) che funzioni.</p>
+  <figure>
+    <div class="w" id="cont4"></div>
+    <figcaption>I due cerchi arancioni hanno raggio \(\epsi\) e centro in \(x\) e in \(y\). Per quanto piccolo sia il cerchio attorno a \(x\), contiene un paniere \(a\) (in rosso) con un po' meno del bene 1, e quel paniere è peggiore di \(y\).</figcaption>
+  </figure>
+  <p>Il legame con l'utilità è stretto. Una preferenza rappresentata da una funzione di utilità continua è continua. E vale anche il contrario, con una dimostrazione più difficile: ogni preferenza continua ha una funzione di utilità continua.</p>
+  <details class="reveal"><summary>Perché un'utilità continua dà una preferenza continua</summary><div class="in">
+    <p>Sia \(\uu\) continua e \(x \spf y\), cioè \(\uu(x) \gt \uu(y)\). Dividi il distacco in tre: \(\epsi = \tfrac13(\uu(x) - \uu(y))\). Per la continuità di \(\uu\) c'è una distanza \(\delta\) tale che ogni \(a\) più vicino di \(\delta\) a \(x\) ha \(\uu(a) \gt \uu(x) - \epsi\), e ogni \(b\) più vicino di \(\delta\) a \(y\) ha \(\uu(b) \lt \uu(y) + \epsi\).</p>
+    <p>Allora \(\uu(a) \gt \uu(x) - \epsi \gt \uu(y) + \epsi \gt \uu(b)\), cioè \(a \spf b\). Nella definizione di continuità le slide chiamano \(\delta\) il numero che qui sopra, nel testo, si chiama \(\epsi\).</p>
+  </div></details>
+  <p>C'è poi una conseguenza che ricorda la lezione sulle lotterie. Se la preferenza è continua e \(a \spf b \spf c\), sul segmento fra \(a\) e \(c\) c'è un paniere indifferente a \(b\): esiste \(\lam\) fra 0 e 1 con \(\lam a + (1-\lam) c \ind b\).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Convessità: le vie di mezzo</h2>
+  <p>Cinque candidati a una carica sono allineati da sinistra a destra su un asse politico.</p>
+  <figure>
+    <svg viewBox="0 0 520 70" role="img" aria-label="Cinque candidati su una linea: D, A, C, B, E" style="max-width:30rem">
+      <line x1="30" y1="26" x2="490" y2="26" stroke="#8c8c8c" stroke-width="2"/>
+      <g font-size="20" text-anchor="middle" font-style="italic" style="font-family:var(--serif)">
+        <circle cx="60" cy="26" r="6" fill="#fff"/><text x="60" y="60">D</text>
+        <circle cx="160" cy="26" r="6" fill="#58C4DD"/><text x="160" y="60">A</text>
+        <circle cx="260" cy="26" r="6" fill="#fff"/><text x="260" y="60">C</text>
+        <circle cx="360" cy="26" r="6" fill="#58C4DD"/><text x="360" y="60">B</text>
+        <circle cx="460" cy="26" r="6" fill="#fff"/><text x="460" y="60">E</text>
+      </g>
+    </svg>
+    <figcaption>Una persona ti dice che le importa solo la posizione dei candidati su questa linea, e che preferisce A a B.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="6a"></div>
+  <p>Se andare da B fino ad A è un miglioramento, lo è anche fermarsi a metà strada, in C. Allo stesso modo la persona preferirà B a E: non ha senso che trovi migliori di B sia candidati alla sua sinistra sia candidati alla sua destra. Fra A e C, invece, non si sa: potrebbe preferire A, se pende a sinistra, o C, se C è la sua posizione favorita.</p>
+  <p><strong>L'intuizione è asimmetrica: se un cambiamento migliora, anche un cambiamento parziale migliora; se peggiora, un cambiamento parziale potrebbe anche migliorare.</strong></p>
+  <p>Sui panieri, «andare a metà strada da \(b\) verso \(a\)» è prendere un punto del segmento che li unisce.</p>
+  <p class="stmt">Una preferenza su \(\mathbb{R}^2_+\) è <strong>convessa</strong> se</p>
+  <div class="eq">\[ a \pf b \ \ \Longrightarrow\ \ \lam a + (1-\lam) b \ \pf\ b \quad \text{per ogni } \lam \in (0,1). \]</div>
+  <p class="stmt">È <strong>strettamente convessa</strong> se, quando \(a \ne b\), la conclusione vale con \(\spf\): ogni punto interno del segmento è strettamente meglio di \(b\).</p>
+  <p>Trascina i due panieri. Il segmento è verde dove i suoi punti sono buoni almeno quanto il peggiore dei due, rosso dove non lo sono.</p>
+  <figure>
+    <div class="w" id="map3"></div>
+    <figcaption>L'area azzurra è l'insieme dei panieri buoni almeno quanto il peggiore fra \(a\) e \(b\). La convessità chiede che il segmento fra i due non ne esca mai: qui è verde dove resta dentro, rosso dove esce.</figcaption>
+  </figure>
+  <p>La figura suggerisce la lettura geometrica, che è un risultato vero e proprio:</p>
+  <p class="stmt">Una preferenza è convessa se e solo se, per ogni paniere \(x^*\), l'insieme \(\{\,x : x \pf x^*\,\}\) dei panieri buoni almeno quanto \(x^*\), detto <em>insieme di contorno superiore</em> di \(x^*\), è un insieme convesso.</p>
+  <details class="reveal"><summary>La dimostrazione, nei due versi</summary><div class="in">
+    <p>Se \(\pf\) è convessa: prendi \(a\) e \(b\) nell'insieme, con \(a \pf b\). Allora \(\lam a + (1-\lam) b \pf b \pf x^*\): anche il punto intermedio sta nell'insieme.</p>
+    <p>Se tutti gli insiemi di contorno superiore sono convessi: dato \(a \pf b\), sia \(a\) sia \(b\) stanno in \(\{x : x \pf b\}\). Per convessità ci sta anche \(\lam a + (1-\lam) b\), cioè \(\lam a + (1-\lam) b \pf b\).</p>
+  </div></details>
+  <p>In termini economici la convessità è una propensione a <em>diversificare</em>: se \(x \ind y\), metà dell'uno e metà dell'altro vale almeno quanto ciascuno dei due. È un'ipotesi forte, ma centrale: come scrivono Mas-Colell, Whinston e Green nel loro manuale, la teoria economica sarebbe in seria difficoltà se questa propensione non descrivesse abbastanza bene la realtà. Non vale sempre: chi è indifferente fra un bicchiere di vino rosso e uno di bianco di rado gradisce i due mescolati (l'esempio è mio; le slide lasciano la domanda aperta).</p>
+  <p>C'è anche un criterio comodo: una preferenza rappresentata da una funzione di utilità <em>concava</em> è convessa. Non vale il contrario. La preferenza rappresentata da \(\min\{x_1,x_2\}\), che è concava, è rappresentata anche da \((\min\{x_1,x_2\})^2\), che non lo è. Ancora una volta: l'utilità è un'etichetta d'ordine, e una trasformazione crescente può cambiarne la forma senza cambiare la preferenza. Può perfino succedere che una preferenza convessa non abbia <em>nessuna</em> rappresentazione concava.</p>
+  <p>La proprietà dell'utilità che corrisponde esattamente alla convessità è più debole della concavità. Una funzione \(\uu\) è <strong>quasi-concava</strong> se \(\uu(\lam a + (1-\lam) b) \ge \min\{\uu(a), \uu(b)\}\) per ogni \(a\), \(b\) e ogni \(\lam\) fra 0 e 1: lungo un segmento non scende mai sotto il più basso dei due estremi.</p>
+  <p class="stmt"><strong>Proposizione.</strong> Se \(\pf\) è rappresentata da \(\uu\), allora \(\pf\) è convessa se e solo se \(\uu\) è quasi-concava.</p>
+  <p>Si vede confrontando le definizioni: «\(\lam a + (1-\lam) b\) è buono almeno quanto il peggiore fra \(a\) e \(b\)» è la convessità, scritta con i numeri. Le slide lasciano la dimostrazione a un esercizio.</p>
+  <p>Anche le preferenze lessicografiche sono convesse, pur non avendo curve da disegnare. Se \(a \pf b\) e \(a_1 \gt b_1\), ogni punto intermedio ha più bene 1 di \(b\), quindi è strettamente meglio. Se \(a_1 = b_1\), allora \(a_2 \ge b_2\), e il punto intermedio ha lo stesso bene 1 e non meno bene 2 di \(b\).</p>
+  <h3>Sempre meno disposti a cedere</h3>
+  <p>La convessità è legata a un'idea che in economia ha un nome: saggio marginale di sostituzione decrescente. Prendi tre panieri indifferenti fra loro,</p>
+  <div class="eq">\[ a = (10,\,10) \qquad b = (11,\,10-\beta) \qquad c = (12,\,10-\beta-\gamma). \]</div>
+  <p>Per un'unità in più del bene 1 il consumatore cede \(\beta\) unità del bene 2; per un'altra unità ancora ne cede \(\gamma\). Se la preferenza è fortemente monotona e convessa, allora \(\beta \ge \gamma\): più bene 1 ha, meno bene 2 è disposto a dare in cambio.</p>
+  <details class="reveal">
+    <summary>Perché</summary>
+    <div class="in">
+      <p>Supponi il contrario, \(\beta &lt; \gamma\). Allora \(\beta &lt; \tfrac12(\beta+\gamma)\), e il paniere \((11,\ 10 - \tfrac12(\beta+\gamma))\) ha meno bene 2 di \(b\) e altrettanto bene 1: per la monotonia forte è strettamente peggiore di \(b\).</p>
+      <p>Ma quel paniere è esattamente \(\tfrac12 a + \tfrac12 c\), il punto medio fra \(a\) e \(c\). Per la convessità è buono almeno quanto \(c\), e \(c \ind b\). Contraddizione.</p>
+    </div>
+  </details>
+</div></section>
+
+<section><div class="col">
+  <h2>Differenziabilità: curve lisce</h2>
+  <p>L'ultima proprietà chiede che le curve di indifferenza non abbiano spigoli. La definiamo solo per preferenze monotone e convesse.</p>
+  <p>L'idea: in ogni paniere \(z\) il consumatore ha in mente due numeri, \(\vv_1(z)\) e \(\vv_2(z)\), che dicono quanto vale per lui, lì, un pezzetto in più di ciascun bene. Un piccolo spostamento nella direzione \((\delta_1, \delta_2)\) è un miglioramento esattamente quando il suo valore, misurato con quei numeri, è positivo.</p>
+  <p class="stmt">Una preferenza monotona e convessa è <strong>differenziabile</strong> se per ogni paniere \(z\) esiste una coppia \((\vv_1(z), \vv_2(z)) \ne (0,0)\) di numeri non negativi, le <strong>valutazioni locali</strong> in \(z\), tale che per ogni \(\delta_1\) e \(\delta_2\)</p>
+  <div class="eq">\[ \vv_1(z)\,\delta_1 + \vv_2(z)\,\delta_2 &gt; 0 \quad\Longleftrightarrow\quad \text{esiste } \epsi &gt; 0 \text{ con } z + (\epsi\delta_1,\ \epsi\delta_2) \ \spf\ z . \]</div>
+  <p>Geometricamente, per \(z\) passa una retta che separa nettamente le direzioni che migliorano da quelle che non migliorano. Conta solo il rapporto \(\vv_1(z)/\vv_2(z)\), che dà la pendenza della retta: moltiplicare entrambe le valutazioni per lo stesso numero positivo non cambia niente.</p>
+  <figure>
+    <div class="w" id="map4"></div>
+    <figcaption>La preferenza rappresentata da \(\uu(x_1,x_2) = x_1 x_2\). La retta bianca passa per \(z\) con pendenza \(-\vv_1(z)/\vv_2(z)\). La freccia è lo spostamento \((\delta_1,\delta_2)\): verde se porta verso panieri preferiti, rossa altrimenti. Ruotala con il cursore e trascina \(z\).</figcaption>
+  </figure>
+  <p>Da dove vengono le valutazioni locali? Se la preferenza è monotona e convessa ed è rappresentata da una \(\uu\) con derivate parziali continue, allora è differenziabile, e le due derivate parziali di \(\uu\) in \(z\) sono una coppia di valutazioni locali. Per \(\uu = x_1 x_2\) si ottiene \((\vv_1(z), \vv_2(z)) = (z_2, z_1)\): è la coppia usata nella figura.</p>
+  <p>Quando la curva di indifferenza ha uno spigolo in \(z\), come per i beni complementari lungo la diagonale, di rette che lasciano sopra tutti i panieri preferiti ce n'è più d'una, e nessuna separa nel modo richiesto. Neanche le preferenze lessicografiche sono differenziabili: l'unico candidato è \((1,0)\), ma allora lo spostamento verso l'alto \((0,1)\) avrebbe valore zero, mentre in realtà migliora.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="6"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>ogni proprietà delle preferenze è una proprietà della mappa.</strong> La monotonia dice da che parte si sale, la continuità che non ci sono strappi, la convessità che le zone alte non hanno rientranze, la differenziabilità che i bordi sono lisci.</p>
+  <p>Nella prossima lezione questo consumatore riceve dei prezzi e una ricchezza, e comincia a scegliere.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

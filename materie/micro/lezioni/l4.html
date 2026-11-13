@@ -1,0 +1,96 @@
+<article class="lesson" data-n="4" id="lezione-4" data-title="Quanto vale la certezza?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 3 · Topic 3-2</p>
+  <h1>Quanto vale la certezza?</h1>
+  <p class="desc">Rischio: avversione al rischio, equivalente certo, il coefficiente di Arrow–Pratt e la dominanza stocastica fra lotterie.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 3 i premi erano oggetti qualsiasi. Qui sono somme di denaro: \(Z\) è l'insieme dei numeri reali non negativi, e ogni lotteria ha un <strong>valore atteso</strong>, \(E[\Lp] = \sum_z \Lp(z)\, z\).</p>
+  <p>Due titoli. Un'azione paga 1 euro oppure 9 euro, con la stessa probabilità. Un'obbligazione paga 5 euro di sicuro. Il valore atteso è 5 per entrambe. Quale preferisci?</p>
+  <figure>
+    <div class="w" id="ab4"></div>
+    <figcaption>Sulla linea, i pagamenti in euro dei due titoli: l'azione \(\Lp\) dà 1 o 9 con probabilità un mezzo, l'obbligazione \(\Lq = [5]\) dà 5 con certezza. Sotto, come li ordinano tre persone con atteggiamenti diversi verso il rischio.</figcaption>
+  </figure>
+  <p>Ad Alice il rischio non piace, a Bianca piace, a Carlo non importa. Hanno davanti le stesse due lotterie, con lo stesso valore atteso, e le ordinano in tre modi diversi. La lezione serve a dare un nome preciso a queste tre persone, e poi a misurare <em>quanto</em> Alice è avversa al rischio.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Tre atteggiamenti verso il rischio</h2>
+  <p>La definizione confronta ogni lotteria con una cosa sola: il suo valore atteso, ricevuto con certezza. Vale per qualunque preferenza sulle lotterie, anche non coerente con l'utilità attesa.</p>
+  <p class="stmt">Una preferenza \(\pf\) su \(L(Z)\) è <strong>avversa al rischio</strong> se \([E[\Lp]] \pf \Lp\) per ogni lotteria \(\Lp\); <strong>strettamente avversa</strong> se \([E[\Lp]] \spf \Lp\) per ogni lotteria con più di un premio possibile; <strong>neutrale al rischio</strong> se \([E[\Lp]] \ind \Lp\) per ogni \(\Lp\); <strong>amante del rischio</strong> se \(\Lp \pf [E[\Lp]]\) per ogni \(\Lp\).</p>
+  <p>Chi compra un'assicurazione paga per sostituire una lotteria con qualcosa di più vicino al suo valore atteso: un segno di avversione stretta. Chi gioca d'azzardo paga per sostituire una somma certa con una lotteria dal valore atteso più basso: le sue preferenze non sono avverse al rischio.</p>
+  <p>Due limiti della definizione. Chiede coerenza su <em>tutte</em> le lotterie, quindi le tre categorie non esauriscono i casi: la stessa persona può assicurare la casa e comprare un biglietto della lotteria, e allora non sta in nessuna. E ha poco contenuto operativo: per classificare qualcuno bisognerebbe controllare ogni lotteria contro il suo valore atteso, un compito impossibile.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Con l'utilità attesa, basta la forma di una curva</h2>
+  <p>Se la preferenza è coerente con l'utilità attesa, con funzione di Bernoulli \(\vv\), l'avversione al rischio diventa una disuguaglianza fra due numeri: l'utilità attesa della lotteria e l'utilità del suo valore atteso.</p>
+  <div class="eq">\[ \sum_z \Lp(z)\,\vv(z) \;\le\; \vv\Big(\sum_z \Lp(z)\,z\Big) = \vv(E[\Lp]) . \]</div>
+  <p>Questa è la <em>disuguaglianza di Jensen</em>, ed è la proprietà che definisce le funzioni concave: la curva sta sopra ogni sua corda.</p>
+  <figure>
+    <div class="w" id="risk"></div>
+    <figcaption>Sull'asse orizzontale il denaro, su quello verticale il valore \(\vv\). La lotteria dà \(x\) con probabilità \(\alf\) e \(y\) altrimenti. Il punto giallo, sulla curva, è l'utilità del valore atteso ricevuto con certezza; il punto verde acqua, sulla corda, è l'utilità attesa della lotteria.</figcaption>
+  </figure>
+  <p class="stmt">Con l'utilità attesa: avversione al rischio equivale a \(\vv\) concava, avversione stretta a \(\vv\) strettamente concava, neutralità a \(\vv\) lineare. Se \(\vv\) è derivabile due volte: avversione vuol dire \(\vv''(z) \le 0\) per ogni \(z\), neutralità \(\vv''(z) = 0\).</p>
+  <p>Concavità stretta vuol dire utilità marginale del denaro decrescente: un euro in più fa guadagnare meno utilità di quanta ne fa perdere un euro in meno. <strong>Per questo una scommessa alla pari, vinci un euro o perdi un euro, non vale la pena.</strong></p>
+</div></section>
+
+<section><div class="col">
+  <h2>L'equivalente certo</h2>
+  <p>Torna all'azione che paga 1 o 9. Alice è indifferente fra l'azione e una certa somma sicura \(x\); Bianca fra l'azione e \(y\); Carlo fra l'azione e \(z\). Che cosa si può dire di \(x\), \(y\) e \(z\)?</p>
+  <p class="stmt">Data una funzione di Bernoulli \(\vv\), l'<strong>equivalente certo</strong> di \(\Lp\), scritto \(\ceq(\Lp,\vv)\), è la somma di denaro che la persona considera indifferente alla lotteria: \(\vv(\ceq(\Lp,\vv)) = \sum_z \Lp(z)\,\vv(z)\).</p>
+  <p>Si costruisce in tre mosse: si prende l'utilità attesa sulla corda, sopra il valore atteso; ci si sposta in orizzontale fino alla curva; si scende sull'asse del denaro.</p>
+  <figure>
+    <div class="w" id="ce4"></div>
+    <figcaption>La stessa lotteria, 1 o 9 con probabilità un mezzo, per tre funzioni di Bernoulli. In giallo \(\vv\), in verde acqua la corda fra i due premi; il punto verde acqua è l'utilità attesa, la freccia arancione porta all'equivalente certo \(\ceq\). La figura delle slide mostra la stessa costruzione per una lotteria alla pari fra 1 e 3, con equivalente certo minore di 2.</figcaption>
+  </figure>
+  <p>I conti. Per Alice \(\ln \ceq = \tfrac12 \ln 1 + \tfrac12 \ln 9 = \ln 3\), quindi \(\ceq = 3\). Per Carlo \(\ceq = \tfrac12 \cdot 1 + \tfrac12 \cdot 9 = 5\). Per Bianca \(\ceq^2 = \tfrac12 \cdot 1 + \tfrac12 \cdot 81 = 41\), quindi \(\ceq = \sqrt{41} \approx 6{,}4\).</p>
+  <p>Alice accetta 3 euro sicuri al posto di una lotteria che in media ne vale 5: <strong>rinuncia a un po' di rendimento atteso in cambio della certezza.</strong> Vale in generale, perché \(\vv\) è crescente: \(\ceq(\Lp,\vv) \le E[\Lp]\) equivale a \(\vv(\ceq(\Lp,\vv)) \le \vv(E[\Lp])\), cioè a \(\sum_z \Lp(z)\vv(z) \le \vv(E[\Lp])\).</p>
+  <p class="stmt"><strong>Proposizione.</strong> Se \(\pf\) ha una rappresentazione con utilità attesa e funzione di Bernoulli \(\vv\) sul denaro, queste tre proprietà sono equivalenti: \(\pf\) è avversa al rischio; \(\vv\) è concava; \(\ceq(\Lp,\vv) \le E[\Lp]\) per ogni \(\Lp\).</p>
+  <div class="quiz inq" data-quiz="4a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Misurare l'avversione</h2>
+  <p>Sapere <em>se</em> una persona è avversa al rischio non basta: vogliamo sapere <em>quanto</em>. L'avversione viene dalla curvatura di \(\vv\), quindi il candidato più ovvio è la derivata seconda \(\vv''(z)\).</p>
+  <p>Ma ha un difetto. Nella lezione 3 abbiamo visto che \(k\vv + h\), con \(k \gt 0\), rappresenta le stesse preferenze di \(\vv\): e la sua derivata seconda è \(k\vv''\), un numero diverso per la stessa persona. Dividendo per \(\vv'\) il fattore \(k\) si cancella. Cambiando segno, il numero è positivo per una \(\vv\) crescente e concava.</p>
+  <p class="stmt">Il <strong>coefficiente di avversione assoluta al rischio di Arrow–Pratt</strong> in \(z\), per una \(\vv\) derivabile due volte, è \(r_A(z) = -\vv''(z)/\vv'(z)\).</p>
+  <p>Per esempio, con \(\vv(z) = \ln z\) si ha \(\vv' = 1/z\) e \(\vv'' = -1/z^2\), quindi \(r_A(z) = 1/z\). Con \(\vv(z) = \sqrt z\) viene \(r_A(z) = 1/(2z)\): la metà, a ogni livello di ricchezza. Con \(\vv(z) = z\) viene zero.</p>
+  <p>Ora si possono confrontare due persone. Quando \(\vv_2\) è, senza ambiguità, più avversa al rischio di \(\vv_1\)? Tre definizioni plausibili: \(r_A(z,\vv_2) \ge r_A(z,\vv_1)\) per ogni \(z\); \(\vv_2\) è «più concava» di \(\vv_1\), cioè \(\vv_2(z) = \varphi(\vv_1(z))\) per una \(\varphi\) crescente e concava; \(\ceq(\Lp,\vv_2) \le \ceq(\Lp,\vv_1)\) per ogni lotteria.</p>
+  <p class="stmt"><strong>Proposizione.</strong> Le tre definizioni di «più avversa al rischio» sono equivalenti.</p>
+  <figure>
+    <div class="w" id="ap4"></div>
+    <figcaption>Gli equivalenti certi della lotteria «1 o 9 alla pari» per quattro funzioni di Bernoulli, sulla linea del denaro. Più la funzione è concava, più l'equivalente certo si allontana dal valore atteso verso sinistra. Le funzioni \(\ln z\), \(z\) e \(z^2\) sono quelle delle slide; \(\sqrt z\) l'ho aggiunta per avere due avverse da confrontare.</figcaption>
+  </figure>
+  <p>Le tre definizioni si vedono tutte nel confronto fra \(\ln z\) e \(\sqrt z\): \(1/z \ge 1/(2z)\); \(\ln z = 2\ln(\sqrt z)\), e \(\varphi(t) = 2\ln t\) è crescente e concava; e l'equivalente certo scende da 4 a 3.</p>
+  <div class="quiz inq" data-quiz="4b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando una lotteria è meglio per tutti</h2>
+  <p>Finora abbiamo confrontato persone: l'atteggiamento verso il rischio è soggettivo. Ora confrontiamo lotterie, e chiediamo qualcosa di oggettivo: quando una lotteria è migliore di un'altra senza ambiguità?</p>
+  <p>Due criteri sensati. Primo: chiunque massimizzi un'utilità attesa e preferisca più denaro a meno sceglie \(\Lp\). Secondo: per ogni somma \(z\), la probabilità di ottenere almeno \(z\) è più alta con \(\Lp\) che con \(\Lq\). Per fortuna sono lo stesso criterio.</p>
+  <p class="stmt"><strong>Dominanza stocastica del primo ordine.</strong> \(\Lp\) domina stocasticamente \(\Lq\) se, per ogni funzione \(\vv\) non decrescente, \(\sum_z \Lp(z)\vv(z) \ge \sum_z \Lq(z)\vv(z)\).</p>
+  <p>Per il secondo criterio serve la <strong>funzione di ripartizione</strong> di una lotteria: \(\FF(z)\) è la probabilità di ottenere al più \(z\). Scriviamo \(\FF\) per quella di \(\Lp\) e \(\GG\) per quella di \(\Lq\).</p>
+  <p class="stmt"><strong>Proposizione.</strong> \(\Lp\) domina stocasticamente \(\Lq\) se e solo se \(\FF(z) \le \GG(z)\) per ogni \(z\).</p>
+  <p>A prima vista il verso sembra sbagliato, ma \(\FF\) più bassa vuol dire meno probabilità sui premi piccoli. L'esempio delle slide: premi 1, 10 e 100 dollari, \(\Lp = (0;\ 0{,}5;\ 0{,}5)\) e \(\Lq = (0{,}1;\ 0{,}6;\ 0{,}3)\).</p>
+  <figure>
+    <div class="w" id="fosd4"></div>
+    <figcaption>A sinistra l'esempio delle slide: la funzione di ripartizione di \(\Lp\) non supera mai quella di \(\Lq\), quindi \(\Lp\) domina. A destra l'azione e l'obbligazione dell'apertura: le due curve si incrociano, e nessuna delle due domina. L'asse orizzontale è il premio (a sinistra in scala logaritmica), quello verticale la probabilità di ottenere al più quel premio. La figura delle slide mostra due curve lisce; qui ci sono i due esempi numerici.</figcaption>
+  </figure>
+  <p>Il secondo riquadro risponde a una domanda delle slide: la dominanza stocastica non è una relazione completa. <strong>Molte coppie di lotterie non sono confrontabili</strong>, ed è proprio lì che conta l'atteggiamento verso il rischio: Alice e Bianca possono essere in disaccordo sull'azione e l'obbligazione perché nessuna delle due domina. È invece transitiva: se \(\FF \le \GG\) e \(\GG \le H\) ovunque, allora \(\FF \le H\).</p>
+  <div class="quiz inq" data-quiz="4c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="4"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>con l'utilità attesa, essere avversi al rischio, avere una funzione di Bernoulli concava e accettare meno del valore atteso pur di avere la certezza sono la stessa cosa.</strong></p>
+  <p>In tutte queste lotterie le probabilità erano note. Nella prossima lezione non lo sono più.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

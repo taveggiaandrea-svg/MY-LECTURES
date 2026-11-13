@@ -1,0 +1,157 @@
+<article class="lesson" data-n="7" id="lezione-7" data-title="Che cosa rivelano gli acquisti?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 5 · Topic 4-2</p>
+  <h1>Che cosa rivelano gli acquisti?</h1>
+  <p class="desc">Scelta del consumatore: insieme di bilancio, funzioni di domanda, statica comparata e l'assioma debole delle preferenze rivelate. Senza funzioni di utilità.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 6 il consumatore aveva preferenze sui panieri, ma non sceglieva niente. Nella lezione 2 chi sceglie era descritto da una funzione di scelta, che da ogni insieme di alternative ne prende una. Ora facciamo lo stesso percorso per il consumatore: prima le scelte, guardate da fuori, e solo nella prossima lezione le preferenze che le generano.</p>
+  <p>Comincia da qui: hai 12 da spendere, il bene 1 costa 2 e il bene 2 costa 1. Quali panieri puoi comprare?</p>
+  <h2>Che cosa ti puoi permettere</h2>
+  <p>Un consumatore non sceglie da un insieme qualsiasi. Ha una ricchezza \(\wl\) e davanti a sé due prezzi, \(\pu\) per un'unità del bene 1 e \(\pd\) per un'unità del bene 2: li raccogliamo nel vettore \(\pp = (\pu, \pd)\). Il paniere \(x = (x_1, x_2)\) costa \(\pp \cdot x = \pu x_1 + \pd x_2\), e può comprarlo se il costo non supera la ricchezza.</p>
+  <p>Due ipotesi sui prezzi. Sono tutti positivi, che si scrive \(\pp \gg 0\): un prezzo negativo vorrebbe dire essere pagati per consumare. E sono dati: il consumatore è troppo piccolo per influenzarli. È l'ipotesi di <em>price-taking</em>.</p>
+  <p class="stmt">L'<strong>insieme di bilancio</strong> (walrasiano, o concorrenziale) di un consumatore con ricchezza \(\wl\) ai prezzi \(\pp\) è</p>
+  <div class="eq">\[ \sB_{\pp,\wl} \;=\; \{\, x \in \sX \;:\; \pp \cdot x \le \wl \,\}. \]</div>
+  <p class="stmt">I panieri che costano esattamente \(\wl\) formano la <strong>retta di bilancio</strong> (con più di due beni, l'iperpiano di bilancio).</p>
+  <figure>
+    <div class="w" id="budget5"></div>
+    <figcaption>Il triangolo verde è l'insieme di bilancio, il lato più scuro la retta di bilancio. Qui il prezzo di partenza del bene 2 è 1. I primi due cursori cambiano il prezzo del bene 1 e la ricchezza; il terzo moltiplica prezzi e ricchezza per lo stesso numero \(\lam\).</figcaption>
+  </figure>
+  <p>La retta taglia gli assi in \(\wl/\pu\) e \(\wl/\pd\): è quanto compreresti di un bene spendendo tutto per quello. La sua pendenza, \(-\pu/\pd\), è lo scambio che il mercato ti offre: un'unità in più del bene 1 costa \(\pu/\pd\) unità del bene 2.</p>
+  <p>Il terzo cursore non muove niente. <strong>Moltiplicare prezzi e ricchezza per lo stesso numero positivo lascia l'insieme di bilancio identico</strong>, perché moltiplicare per \(\lam\) entrambi i lati della disuguaglianza non cambia quali panieri la soddisfano. Contano solo i rapporti.</p>
+  <div class="quiz inq" data-quiz="7a"></div>
+  <p>Due osservazioni che serviranno. L'insieme di bilancio è convesso: se puoi permetterti due panieri, puoi permetterti ogni paniere sul segmento che li unisce, perché il suo costo è una media dei due costi. E lo stesso triangolo descrive anche un consumatore senza denaro, che possiede un paniere iniziale e può scambiare un bene con l'altro a un tasso fisso.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Una regola per ogni bilancio</h2>
+  <p>Nella lezione 2 il comportamento era una funzione di scelta. Per il consumatore i problemi di scelta sono gli insiemi di bilancio, e la funzione di scelta prende un nome suo.</p>
+  <p class="stmt">Una <strong>funzione di domanda</strong> (walrasiana) \(\dx\) associa a ogni insieme di bilancio uno dei suoi panieri: \(\dx(\pp,\wl)\) è il paniere scelto ai prezzi \(\pp\) con ricchezza \(\wl\).</p>
+  <p>La definizione non dice che il consumatore massimizzi qualcosa: vale per qualunque regola di comportamento. Ecco quattro regole semplici, da provare.</p>
+  <figure>
+    <div class="w" id="rules5"></div>
+    <figcaption>La ricchezza è fissa a 12. Il punto rosa è il paniere che la regola scelta compra dall'insieme di bilancio verde. Cambia regola e muovi i due prezzi.</figcaption>
+  </figure>
+  <h3>Due proprietà desiderabili</h3>
+  <p>Raddoppiare prezzi e ricchezza non cambia l'insieme di bilancio. Se la scelta dipende solo da ciò che è acquistabile, non deve cambiare nemmeno il paniere scelto.</p>
+  <p class="stmt"><strong>Omogeneità di grado zero.</strong> \(\dx(\lam\pp, \lam\wl) = \dx(\pp,\wl)\) per ogni \(\pp\), \(\wl\) e ogni \(\lam \gt 0\).</p>
+  <p>Ha senso? Sì, se i prezzi sono solo etichette. La violerebbe chi si sente più ricco quando lo stipendio raddoppia insieme a tutti i prezzi: è la cosiddetta illusione monetaria.</p>
+  <p class="stmt"><strong>Legge di Walras.</strong> \(\pp \cdot \dx(\pp,\wl) = \wl\) per ogni \(\pp \gg 0\) e \(\wl \gt 0\): il consumatore spende tutta la sua ricchezza.</p>
+  <p>Un esempio per separarle. Prendi, per un numero \(\bet\) fra 0 e 1,</p>
+  <div class="eq">\[ \dx_1(\pp,\wl) = \frac{\pd}{\pu+\pd}\cdot\frac{\wl}{\pu}, \qquad \dx_2(\pp,\wl) = \frac{\bet\,\pu}{\pu+\pd}\cdot\frac{\wl}{\pd}. \]</div>
+  <p>Moltiplicando prezzi e ricchezza per \(\lam\), le frazioni non cambiano: l'omogeneità vale per ogni \(\bet\). La spesa totale è invece \(\wl\,(\pd + \bet\pu)/(\pu+\pd)\): è pari a \(\wl\) solo se \(\bet = 1\).</p>
+  <div class="quiz inq" data-quiz="7b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Come reagisce la domanda</h2>
+  <p>Una funzione di domanda ha tre ingressi: due prezzi e la ricchezza. Per studiarla se ne muove uno alla volta, tenendo fermi gli altri. Questo modo di ragionare si chiama <em>statica comparata</em>: si confrontano le scelte in due situazioni, senza descrivere il percorso dall'una all'altra.</p>
+  <p class="stmt">Fissati \(\pd\) e \(\wl\), la quantità domandata del bene 1 al variare del suo prezzo \(\pu\) è la <strong>funzione di domanda regolare</strong> (detta anche marshalliana, dal nome dell'economista Alfred Marshall) del bene 1. La quantità domandata del bene 2 al variare di \(\pu\) è la <strong>funzione di domanda incrociata</strong> del bene 2. Fissati i prezzi, la quantità domandata di un bene al variare di \(\wl\) è la sua <strong>funzione di Engel</strong>.</p>
+  <figure>
+    <div class="w" id="curves5"></div>
+    <figcaption>Tre fette della stessa funzione di domanda, con il prezzo del bene 2 fisso a 1. Nel primo riquadro la domanda regolare del bene 1, nel secondo la domanda incrociata del bene 2, nel terzo la funzione di Engel del bene 1. Il punto segna i valori correnti di prezzo e ricchezza.</figcaption>
+  </figure>
+  <p>Prendi il consumatore che spende una quota fissa \(\alf\) della ricchezza per il bene 1: compra \((\alf\wl/\pu,\ (1-\alf)\wl/\pd)\). La domanda regolare del bene 1 è \(\alf\wl/\pu\) e scende al crescere del prezzo. La domanda incrociata del bene 2 è costante. La funzione di Engel è una retta che sale.</p>
+  <h3>Se cambia la ricchezza</h3>
+  <p>L'<strong>effetto ricchezza</strong> sul bene \(i\) è la derivata \(\partial \dx_i(\pp,\wl)/\partial \wl\). In \((\pp,\wl)\) il bene è <strong>normale</strong> se questa derivata è \(\ge 0\), <strong>inferiore</strong> se è \(\lt 0\). Se tutti i beni sono normali ovunque, si dice che la domanda è normale. I due effetti ricchezza si raccolgono nel vettore \(D_{\wl}\dx(\pp,\wl) = (\partial \dx_1/\partial \wl,\ \partial \dx_2/\partial \wl)\).</p>
+  <p>È un'ipotesi ragionevole? Sì per i grandi aggregati, come «cibo» o «casa». Molto meno per un bene specifico: di un certo paio di scarpe economiche, diventando ricco, ne compri di meno.</p>
+  <h3>Se cambia un prezzo</h3>
+  <p>L'<strong>effetto prezzo</strong> di \(\pp_i\) sul bene \(j\) è \(\partial \dx_j(\pp,\wl)/\partial \pp_i\). Verrebbe da dire che il prezzo di un bene e la sua quantità vadano sempre in direzioni opposte, cioè \(\partial \dx_i/\partial \pp_i \le 0\): è la <em>legge della domanda</em>. Non è garantita.</p>
+  <p class="stmt">Il bene \(i\) è <strong>di Giffen</strong> in \((\pp,\wl)\) se \(\partial \dx_i(\pp,\wl)/\partial \pp_i \gt 0\): quando rincara, se ne compra di più.</p>
+  <figure>
+    <div class="w" id="paths7"></div>
+    <figcaption>A sinistra i prezzi sono fermi e la ricchezza sale: i panieri scelti tracciano il sentiero di espansione della ricchezza. A destra sono fermi \(\wl\) e \(\pu\) e scende \(\pd\): la retta ruota attorno a \(\wl/\pu\) e i panieri scelti tracciano la curva di offerta. Le due curve sono ridisegnate dalle slide: sono qualitative, non calcolate da un'utilità precisa.</figcaption>
+  </figure>
+  <p>La storia classica è quella delle patate. Un consumatore povero ne mangia molte perché sono il modo meno caro di non avere fame. Se il prezzo delle patate scende, di fatto è più ricco: può permettersi cibi migliori, e di patate ne compra <em>meno</em>. C'entra la ricchezza, non solo il prezzo: teniamolo a mente.</p>
+  <div class="quiz inq" data-quiz="7c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Si può risalire alle preferenze?</h2>
+  <p>Ora rimettiamo in gioco la razionalità, come nella lezione 2: osservo una funzione di domanda, che potrebbe venire da una regola qualsiasi, e mi chiedo se è compatibile con un consumatore che ha una preferenza e compra sempre il paniere migliore fra quelli acquistabili.</p>
+  <p class="stmt">Una funzione di domanda è <strong>razionalizzabile</strong> se esiste una relazione di preferenza monotona tale che, per ogni insieme di bilancio, il paniere indicato dalla funzione di domanda è uno dei migliori dell'insieme secondo quella preferenza.</p>
+  <p>Basta che sia <em>uno</em> dei migliori, non l'unico. Le regole di prima passano l'esame; due casi sono istruttivi. «Tutto sul bene meno caro» è razionalizzata da \(\uu = x_1 + x_2\): a chi importa solo la quantità totale conviene il bene che costa meno. «Metà della ricchezza per bene» è razionalizzata da \(\uu = x_1x_2\), come vedremo nella prossima lezione: massimizzare un prodotto sembra strano, eppure descrive una regola molto naturale.</p>
+  <p>Il test più ovvio sarebbe la proprietà α della lezione 2: restringendo l'insieme, se il prescelto è ancora disponibile resta il prescelto. Qui però serve a poco: se il paniere scelto sta sulla retta di bilancio e contiene entrambi i beni, nessun altro insieme di bilancio che lo contiene è una parte del primo, e la proprietà non ha occasione di scattare. Ci vuole un test diverso, e un esempio lo suggerisce: il consumatore che spende tutto nel bene <em>più</em> caro.</p>
+  <figure>
+    <div class="w" id="exp5"></div>
+    <figcaption>Due insiemi di bilancio con ricchezza 2: in verde quello con prezzi \((1,2)\), in viola quello con prezzi \((2,1)\). Il paniere \(a\) è scelto dal primo, \(b\) dal secondo. Cambia regola e guarda dove cadono i due panieri.</figcaption>
+  </figure>
+  <p>Con la regola del bene più caro, \(b\) sta all'interno del primo insieme, da cui viene scelto \(a\). C'è quindi un paniere acquistabile con più di entrambi i beni rispetto a \(b\); per una preferenza monotona quel paniere batte \(b\), e \(a\) è buono almeno quanto lui: \(a \spf b\). Lo stesso ragionamento sul secondo insieme dà \(b \spf a\). <strong>Nessuna preferenza monotona può razionalizzare questa regola.</strong></p>
+  <p>La regola non è assurda: ha senso se il prezzo segnala la qualità, o se piace il prestigio di ciò che è caro. L'esempio mette in luce un'ipotesi nascosta del modello: i prezzi non danno informazioni sui beni, e le preferenze non dipendono né dai prezzi né dalla ricchezza.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>L'assioma debole</h2>
+  <p>Dall'esempio si ricava una regola generale. Se qualcuno compra \(a\) quando poteva comprare \(b\), la sua scelta «rivela» che per lui \(a\) vale almeno quanto \(b\). Se \(b\) costava anche <em>meno</em> della sua ricchezza, e i beni sono desiderabili, concludiamo di più: preferisce \(a\) a \(b\).</p>
+  <p class="stmt">Data una funzione di domanda, il paniere \(a\) è <strong>rivelato buono almeno quanto</strong> \(b\) se esiste un insieme di bilancio che contiene entrambi e da cui viene scelto \(a\). È <strong>rivelato migliore</strong> di \(b\) se, in più, in quell'insieme \(b\) costa strettamente meno della ricchezza.</p>
+  <p class="stmt">Una funzione di domanda soddisfa l'<strong>assioma debole delle preferenze rivelate</strong> se non esistono due panieri \(a\) e \(b\) tali che \(a\) è rivelato buono almeno quanto \(b\) e, insieme, \(b\) è rivelato migliore di \(a\).</p>
+  <figure>
+    <div class="w" id="warp5"></div>
+    <figcaption>Due insiemi di bilancio con ricchezza 10: il verde ha prezzi \((1,2)\), il viola \((2,1)\). Il paniere \(a\) è la scelta dal verde e scorre sulla sua retta; \(b\) è la scelta dal viola. Trascinali e leggi che cosa rivela ogni scelta.</figcaption>
+  </figure>
+  <p>Questa è la formulazione del libro. Le slide usano quella del manuale di Mas-Colell, Whinston e Green, che con due beni e una domanda che spende tutta la ricchezza dice la stessa cosa, scritta con prezzi e ricchezze: se in \((\pp,\wl)\) scegli un paniere quando era acquistabile anche quello che scegli in \((\pp',\wl')\), allora in \((\pp',\wl')\) il primo non deve essere acquistabile. Altrimenti, per coerenza, lo avresti scelto ancora.</p>
+  <p class="stmt"><strong>Assioma debole (forma delle slide).</strong> Per ogni \((\pp,\wl)\) e \((\pp',\wl')\): se \(\pp \cdot \dx(\pp',\wl') \le \wl\) e \(\dx(\pp',\wl') \ne \dx(\pp,\wl)\), allora \(\pp' \cdot \dx(\pp,\wl) \gt \wl'\).</p>
+  <figure>
+    <div class="w" id="warpEx7"></div>
+    <figcaption>Gli stessi due insiemi di bilancio in cinque situazioni, come nella figura delle slide (dal manuale citato, fig. 2.F.1). \(x'\) è il paniere scelto dal bilancio verde, \(x''\) quello scelto dal viola. L'assioma è violato quando ciascuno dei due panieri era acquistabile nel bilancio da cui è stato scelto l'altro.</figcaption>
+  </figure>
+  <p class="stmt"><strong>Ogni funzione di domanda razionalizzata da una preferenza monotona soddisfa l'assioma debole.</strong></p>
+  <p>Il viceversa non vale: l'assioma debole è necessario per essere razionalizzabili, ma non sufficiente. Per i problemi di scelta generali la proprietà α era entrambe le cose. Qui la condizione sufficiente esiste, si chiama assioma forte delle preferenze rivelate, e il corso non la tratta.</p>
+  <details class="reveal">
+    <summary>Perché un consumatore razionale rispetta l'assioma</summary>
+    <div class="in">
+      <p>Supponi che \(\pf\), monotona, razionalizzi la domanda, e che \(a\) sia rivelato buono almeno quanto \(b\): allora \(a \pf b\). Supponi anche, per assurdo, che \(b\) sia rivelato migliore di \(a\): c'è un insieme di bilancio da cui viene scelto \(b\) e in cui \(a\) costa meno della ricchezza.</p>
+      <p>In quell'insieme c'è allora un paniere \(c\) con più di entrambi i beni rispetto ad \(a\). Per la monotonia \(c \spf a\). Ma da lì viene scelto \(b\), quindi \(b \pf c\). Per transitività \(b \spf a\), contro \(a \pf b\).</p>
+    </div>
+  </details>
+</div></section>
+
+<section><div class="col">
+  <h2>Un aumento di prezzo, a ricchezza compensata</h2>
+  <p>L'assioma debole ha conseguenze su come la domanda reagisce ai prezzi, ma solo per un tipo particolare di variazione. Quando un prezzo sale succedono due cose insieme: cambia il costo relativo dei beni, e il consumatore diventa più povero. Per isolare la prima, ridagli esattamente la ricchezza che serve per ricomprare il paniere di prima.</p>
+  <p class="stmt"><strong>Compensazione di Slutsky.</strong> Si parte da \((\pp,\wl)\) con scelta \(\dx(\pp,\wl)\). I prezzi diventano \(\pp'\) e la ricchezza diventa \(\wl' = \pp' \cdot \dx(\pp,\wl)\). La variazione di ricchezza è \(\Delta \wl = \Delta\pp \cdot \dx(\pp,\wl)\), con \(\Delta \pp = \pp' - \pp\).</p>
+  <figure>
+    <div class="w" id="slut7"></div>
+    <figcaption>Un consumatore che spende metà della ricchezza per bene, con prezzi \((1,1)\) e ricchezza 12, sceglie \(a = (6,6)\). Il prezzo del bene 1 sale a 2 e la ricchezza viene portata a \(2\cdot 6 + 1\cdot 6 = 18\): la nuova retta passa per \(a\) ed è più ripida. La nuova scelta è \(b = (4{,}5;\,9)\).</figcaption>
+  </figure>
+  <p>Il tratto rosso della nuova retta sta dentro il vecchio insieme di bilancio. Un paniere scelto lì sarebbe stato acquistabile quando è stato scelto \(a\); ma \(a\) è acquistabile adesso. L'assioma debole lo vieta: la nuova scelta sta a sinistra di \(a\).</p>
+  <p class="stmt"><strong>Proposizione.</strong> Se \(\dx\) è omogenea di grado zero e soddisfa la legge di Walras, allora soddisfa l'assioma debole se e solo se, per ogni variazione compensata da \((\pp,\wl)\) a \((\pp',\wl') = (\pp', \pp'\cdot \dx(\pp,\wl))\),</p>
+  <div class="eq">\[ (\pp' - \pp) \cdot [\,\dx(\pp',\wl') - \dx(\pp,\wl)\,] \;\le\; 0, \]</div>
+  <p class="stmt">con disuguaglianza stretta quando \(\dx(\pp',\wl') \ne \dx(\pp,\wl)\).</p>
+  <p>In breve \(\Delta \pp \cdot \Delta \dx \le 0\): a ricchezza compensata, prezzi e quantità si muovono in direzioni opposte. È la <strong>legge della domanda compensata</strong>. Nella figura \(\Delta\pp = (1, 0)\) e \(\Delta \dx = (-1{,}5;\ 3)\): il prodotto è \(-1{,}5\). Se cambia un prezzo solo, per esempio \(\Delta \pp_1 \lt 0\), la disuguaglianza dice \(\Delta \pp_1\, \Delta \dx_1 \lt 0\), cioè \(\Delta \dx_1 \gt 0\).</p>
+  <details class="reveal">
+    <summary>Perché l'assioma debole implica la disuguaglianza</summary>
+    <div class="in">
+      <p>Supponi \(\dx(\pp',\wl') \ne \dx(\pp,\wl)\) e scrivi il lato sinistro come \(\pp' \cdot [\dx(\pp',\wl') - \dx(\pp,\wl)] - \pp \cdot [\dx(\pp',\wl') - \dx(\pp,\wl)]\).</p>
+      <p>Il primo pezzo è zero: per la legge di Walras \(\pp'\cdot \dx(\pp',\wl') = \wl'\), e per come è fatta la compensazione \(\pp' \cdot \dx(\pp,\wl) = \wl'\).</p>
+      <p>Per il secondo: \(\dx(\pp,\wl)\) è acquistabile in \((\pp',\wl')\), quindi per l'assioma debole \(\dx(\pp',\wl')\) non è acquistabile in \((\pp,\wl)\): \(\pp \cdot \dx(\pp',\wl') \gt \wl = \pp \cdot \dx(\pp,\wl)\). Il secondo pezzo è positivo, e va sottratto.</p>
+      <p>Le slide omettono il verso opposto (è nel manuale di Mas-Colell, Whinston e Green, capitolo 2) e dicono che non è materia d'esame.</p>
+    </div>
+  </details>
+  <p>E la legge della domanda senza compensazione? <strong>L'assioma debole non basta.</strong> Insieme a omogeneità e legge di Walras equivale alla legge della domanda <em>compensata</em>, non a quella ordinaria: tolta la compensazione torna in gioco l'impoverimento, ed è lì che nascono i beni di Giffen.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La razionalità alla prova dei dati</h2>
+  <p>Le persone vere rispettano l'assioma? Due economisti, Timothy Beatty e Ian Crawford, lo hanno controllato nel 2011 sui consumi di 3 134 famiglie spagnole fra il 1985 e il 1997, presi da un'indagine pubblica. I dati non riguardano singoli beni ma aggregati, come «cibo».</p>
+  <p>Primo risultato: il 95,7% delle famiglie supera il test di razionalità. Sembra un trionfo, e altri studi trovano lo stesso per allevatori di New York, consumatori danesi, bambini e scimmie cappuccine. Ma gli autori fanno un passo in più: simulano al computer famiglie finte, con gli stessi insiemi di bilancio, che comprano a caso.</p>
+  <figure>
+    <div class="w" id="bc7"></div>
+    <figcaption>Sopra: quota di famiglie che supera il test, vere e simulate (Beatty e Crawford, 2011; 3 134 famiglie, Spagna 1985–1997). Le slide dicono che la quota delle famiglie simulate è «solo il 4,5% più bassa»: la barra la mostra come 4,5 punti in meno. Sotto: perché succede.</figcaption>
+  </figure>
+  <p>Anche chi sceglie a caso supera quasi sempre il test. Il motivo è nei dati: i prezzi cambiano poco e i redditi molto, quindi gli insiemi di bilancio sono quasi sempre uno dentro l'altro. E <strong>quando un insieme di bilancio contiene l'altro, qualunque coppia di scelte sulle rispettive rette rispetta l'assioma</strong>: il test non ha modo di fallire.</p>
+  <p>Che cosa se ne ricava? Che leggere i dati con questa teoria funziona, ma dice poco sulla «vera» razionalità delle persone. Allora perché non usare un modello di scelta casuale? Perché l'approccio economico permette di attribuire preferenze alle persone, e con quelle di valutare quanto bene il mercato le soddisfa: è ciò che serve per ragionare di politiche pubbliche. Resta il dubbio che le preferenze attribuite siano davvero quelle rivelate dalle scelte. Ma è difficile dire con che cos'altro lavorare.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="7"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>anche senza conoscere le preferenze, la coerenza delle scelte lascia una traccia: a ricchezza compensata, un prezzo più alto non fa mai comprare di più.</strong></p>
+  <p>Nella prossima lezione torna la funzione di utilità: come si trova, dati prezzi e ricchezza, il paniere migliore.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

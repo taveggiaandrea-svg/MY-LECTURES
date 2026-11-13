@@ -1,0 +1,184 @@
+<article class="lesson" data-n="8" id="lezione-8" data-title="Come si trova il paniere migliore?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 5 · Topic 4-3</p>
+  <h1>Come si trova il paniere migliore?</h1>
+  <p class="desc">Domanda del consumatore: massimo dell'utilità, saggio marginale di sostituzione, utilità indiretta, minimo della spesa e domanda compensata.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 7 abbiamo guardato le scelte da fuori, senza funzioni di utilità. Ora l'utilità torna in gioco: il consumatore ha una preferenza monotona e continua, rappresentata da una funzione di utilità continua \(\uu\), e da ogni insieme di bilancio prende il paniere migliore.</p>
+  <p>Comincia tu. Il bene 1 costa 2, il bene 2 costa 1, e hai 20 da spendere. Le tue preferenze sono quelle rappresentate da \(\uu = x_1 x_2\), già viste nella lezione 6. Trascina il paniere lungo la retta e cerca il migliore.</p>
+  <figure>
+    <div class="w" id="open5"></div>
+    <figcaption>Gli assi sono le quantità dei due beni. Il triangolo verde contiene i panieri che puoi permetterti, e sul suo lato obliquo spendi tutto. La curva azzurra è la curva di indifferenza del paniere \(z\); l'area verde acqua raccoglie i panieri acquistabili e migliori di \(z\).</figcaption>
+  </figure>
+  <p>Finché l'area verde acqua esiste, c'è qualcosa di meglio che puoi comprare. Sparisce in un punto solo, dove la curva tocca la retta senza attraversarla. <strong>Scegliere, per un consumatore, è cercare il punto più alto della mappa dentro un triangolo.</strong></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il problema del consumatore</h2>
+  <p class="stmt">Dati prezzi \(\pp \gg 0\) e ricchezza \(\wl \gt 0\), il <strong>problema di massimizzazione dell'utilità</strong> (UMP, dall'inglese <em>utility maximization problem</em>) è</p>
+  <div class="eq">\[ \max_{x \ge 0} \ \uu(x) \quad \text{con il vincolo} \quad \pp \cdot x \le \wl . \]</div>
+  <p>Un esempio da fare a mano: \(\max x_1x_2\) con \(2x_1 + x_2 \le 4\). La soluzione è \(x^* = (1, 2)\), con \(\uu(x^*) = 2\). Dal problema escono quindi due oggetti: il paniere ottimo e il valore massimo dell'utilità. Li studiamo uno per volta.</p>
+  <p>Prima, però: una soluzione c'è sempre?</p>
+  <p class="stmt"><strong>Proposizione (esistenza).</strong> Se \(\pp \gg 0\) e \(\uu\) è continua, l'UMP ha una soluzione.</p>
+  <details class="reveal"><summary>Perché una soluzione esiste</summary><div class="in">
+    <p>Con prezzi tutti positivi l'insieme di bilancio è limitato e chiuso. In \(\mathbb{R}^2\) un insieme limitato e chiuso è compatto, e una funzione continua ha sempre un massimo su un insieme compatto.</p>
+  </div></details>
+  <p>Le proprietà della lezione 6 dicono altre due cose. Se la preferenza è <em>strettamente convessa</em>, la soluzione è al più una: con due soluzioni diverse, il loro punto medio sarebbe acquistabile e strettamente migliore di entrambe. Se è <em>monotona</em>, ogni soluzione sta sulla retta di bilancio.</p>
+  <figure>
+    <div class="w" id="opt5"></div>
+    <figcaption>La ricchezza è 12. In grigio le curve di indifferenza, in azzurro quella che passa per la soluzione, in rosa la soluzione del problema del consumatore. Cambia consumatore e prezzi.</figcaption>
+  </figure>
+  <p>Con i beni complementari, \(\uu = \min\{x_1,x_2\}\), la soluzione ha sempre quantità uguali dei due beni: \(x_1 = x_2 = \wl/(\pu+\pd)\). È unica, anche se questa preferenza è convessa ma non strettamente: la convessità stretta basta per l'unicità, ma non è necessaria.</p>
+  <p>Con l'utilità lineare \(\uu = x_1 + x_2\), i beni sostituti, al consumatore importa solo la quantità totale: compra soltanto il bene meno caro. <strong>Quando i due prezzi coincidono, ogni paniere della retta di bilancio è una soluzione.</strong></p>
+  <div class="quiz inq" data-quiz="8a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>La domanda che ne esce</h2>
+  <p>La regola che a ogni \((\pp,\wl)\) associa l'insieme dei panieri ottimi dell'UMP si chiama <strong>corrispondenza di domanda walrasiana</strong>, e si scrive \(\dx(\pp,\wl)\). Quando il paniere ottimo è sempre uno solo è una <strong>funzione di domanda walrasiana</strong>: la funzione di domanda della lezione 7, ora con un'origine precisa.</p>
+  <p class="stmt"><strong>Proposizione.</strong> Se \(\uu\) è continua e rappresenta una preferenza monotona, la domanda walrasiana è omogenea di grado zero, \(\dx(\lam\pp,\lam\wl) = \dx(\pp,\wl)\) per ogni \(\lam \gt 0\), e soddisfa la legge di Walras, \(\pp \cdot x = \wl\) per ogni \(x \in \dx(\pp,\wl)\).</p>
+  <p>Nella lezione 7 erano due ipotesi. <strong>Qui sono conseguenze.</strong></p>
+  <details class="reveal"><summary>Le due dimostrazioni</summary><div class="in">
+    <p><em>Omogeneità.</em> \(\sB_{\lam\pp,\lam\wl} = \{x : \lam\pp\cdot x \le \lam\wl\} = \{x : \pp \cdot x \le \wl\} = \sB_{\pp,\wl}\). Stesso insieme, stesso problema, stesse soluzioni. Non serve nessuna ipotesi su \(\uu\).</p>
+    <p><em>Legge di Walras, per assurdo.</em> Supponi \(\pp \cdot x \lt \wl\) per un \(x\) ottimo. Allora esiste un \(\epsi \gt 0\) abbastanza piccolo perché \(y = (x_1 + \epsi, x_2 + \epsi)\) costi ancora meno di \(\wl\). Per la monotonia \(y \spf x\): \(x\) non era ottimo.</p>
+  </div></details>
+  <h3>L'esempio da sapere a memoria: Cobb–Douglas</h3>
+  <p>Con \(\uu(x_1,x_2) = x_1^{\alf} x_2^{1-\alf}\), per un \(\alf\) fra 0 e 1, la soluzione è</p>
+  <div class="eq">\[ \dx_1(\pp,\wl) = \frac{\alf\,\wl}{\pu}, \qquad \dx_2(\pp,\wl) = \frac{(1-\alf)\,\wl}{\pd}. \]</div>
+  <p>La spesa per ciascun bene è una quota fissa della ricchezza, \(\alf\) e \(1-\alf\), qualunque siano i prezzi. Con \(\alf = 1/2\) è la regola «metà per bene» della lezione 7, e il caso \(\uu = x_1x_2\) dell'apertura dà lo stesso paniere: è una trasformazione crescente di \(x_1^{1/2}x_2^{1/2}\).</p>
+  <details class="reveal"><summary>Da dove viene la formula</summary><div class="in">
+    <p>Per la legge di Walras il vincolo vale con l'uguale, quindi \(x_2 = (\wl - \pu x_1)/\pd\). Sostituendo, e togliendo la costante \(\pd^{-(1-\alf)}\) che non sposta il massimo, resta da massimizzare \(x_1^{\alf}(\wl - \pu x_1)^{1-\alf}\) in una sola variabile.</p>
+    <p>Derivata uguale a zero: \(\alf x_1^{\alf-1}(\wl-\pu x_1)^{1-\alf} = \pu (1-\alf)\, x_1^{\alf}(\wl-\pu x_1)^{-\alf}\). Semplificando, \(\alf(\wl - \pu x_1) = (1-\alf)\pu x_1\), cioè \(x_1 = \alf\wl/\pu\). Il resto della ricchezza, \((1-\alf)\wl\), va nel bene 2.</p>
+  </div></details>
+  <div class="quiz inq" data-quiz="8b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando lo scambio non conviene più</h2>
+  <p>Per le utilità differenziabili c'è un modo più diretto di trovare la soluzione. Chiama \(\uu_1(x)\) e \(\uu_2(x)\) le <em>utilità marginali</em>: le derivate di \(\uu\) rispetto alla quantità di ciascun bene, cioè quanto sale l'utilità per un pezzetto in più di quel bene.</p>
+  <p class="stmt">In un paniere \(x\) con \(\uu_2(x) \gt 0\), il <strong>saggio marginale di sostituzione</strong> è \(\mrs(x) = \uu_1(x)/\uu_2(x)\): quante unità del bene 2 vale, per il consumatore, un'unità del bene 1.</p>
+  <p>È anche la pendenza, cambiata di segno, della curva di indifferenza che passa per \(x\). Lungo la curva l'utilità non cambia, quindi \(\uu_1(x)\,dx_1 + \uu_2(x)\,dx_2 = 0\), da cui \(-dx_2/dx_1 = \uu_1(x)/\uu_2(x)\). È lo stesso rapporto fra valutazioni locali della lezione 6.</p>
+  <p>Il mercato ha il suo tasso di scambio, \(\pu/\pd\). Se in un paniere i due numeri sono diversi, c'è uno scambio che conviene. Torna alla figura di apertura, ora con i due numeri a confronto.</p>
+  <figure>
+    <div class="w" id="mrs5"></div>
+    <figcaption>La stessa figura dell'apertura: prezzi 2 e 1, ricchezza 20, \(\uu = x_1x_2\). La retta bianca passa per \(z\) con pendenza \(-\mrs(z)\); la retta di bilancio ha pendenza \(-\pu/\pd\). Trascina \(z\) finché le due rette coincidono.</figcaption>
+  </figure>
+  <p>Quando \(\mrs(z) \lt \pu/\pd\), il bene 1 vale per te meno di quanto costa: conviene cederne un po' in cambio di bene 2. Quando \(\mrs(z) \gt \pu/\pd\), conviene il contrario. La soluzione è dove nessuno dei due scambi conviene.</p>
+  <p class="stmt"><strong>Proposizione.</strong> Sia \(\uu\) differenziabile, la preferenza monotona, \(x^*\) una soluzione dell'UMP con \(\uu_2(x^*) \gt 0\). Se \(x^*_1 \gt 0\) e \(x^*_2 \gt 0\), allora \(\mrs(x^*) = \pu/\pd\). Se \(x^*_1 = 0\), allora \(\mrs(x^*) \le \pu/\pd\). Se \(x^*_2 = 0\), allora \(\mrs(x^*) \ge \pu/\pd\).</p>
+  <details class="reveal"><summary>La dimostrazione: l'utilità lungo la retta di bilancio</summary><div class="in">
+    <p>Per la monotonia \(x^*\) sta sulla retta di bilancio. Percorri la retta usando come variabile la quantità \(t\) del bene 1, e guarda l'utilità: \(g(t) = \uu\big(t,\ (\wl - \pu t)/\pd\big)\), per \(0 \le t \le \wl/\pu\). Il punto \(t^* = x^*_1\) massimizza \(g\), e \(g'(t) = \uu_1 - (\pu/\pd)\,\uu_2\).</p>
+    <p><em>Soluzione interna.</em> Se \(0 \lt t^* \lt \wl/\pu\), la derivata nel massimo è zero: \(\uu_1(x^*) = (\pu/\pd)\,\uu_2(x^*)\). Dividendo per \(\uu_2(x^*) \gt 0\) si ottiene \(\mrs(x^*) = \pu/\pd\).</p>
+    <p><em>Angoli.</em> Se \(x_1^* = 0\) il massimo è nell'estremo sinistro: spostandosi di poco a destra \(g\) non può salire, quindi la derivata da destra è \(\le 0\), cioè \(\mrs(x^*) \le \pu/\pd\). Se \(x_2^* = 0\) il massimo è nell'estremo destro: la derivata da sinistra è \(\ge 0\), cioè \(\mrs(x^*) \ge \pu/\pd\).</p>
+  </div></details>
+  <p>Con la Cobb–Douglas \(\mrs = \alf x_2/((1-\alf)x_1)\). Uguagliandolo a \(\pu/\pd\) si ottiene \((1-\alf)\,\pu x_1 = \alf\,\pd x_2\): le due spese stanno fra loro come \(\alf\) e \(1-\alf\). Insieme alla retta di bilancio ridà le formule di prima, senza derivare niente.</p>
+  <div class="quiz inq" data-quiz="8c"></div>
+  <h3>Quando si finisce in un angolo</h3>
+  <p>Le due disuguaglianze servono quando la soluzione sta su un asse. Se \(x^*_1 = 0\), il consumatore vorrebbe forse cedere altro bene 1, ma non ne ha: per questo lì l'uguaglianza può fallire. Un esempio è \(\uu = x_1 + \sqrt{x_2}\), per cui \(\mrs(x_1,x_2) = 2\sqrt{x_2}\).</p>
+  <figure>
+    <div class="w" id="corner5"></div>
+    <figcaption>Il consumatore con \(\uu = x_1 + \sqrt{x_2}\), ricchezza 6 e prezzo del bene 2 pari a 1. In grigio le curve di indifferenza, in rosa la soluzione. Alza il prezzo del bene 1 e guarda la soluzione scivolare verso l'asse verticale.</figcaption>
+  </figure>
+  <p>Finché il bene 1 non è troppo caro la soluzione è interna e \(\mrs = \pu/\pd\). Oltre una certa soglia il consumatore spende tutto nel bene 2, e <strong>nell'angolo resta solo una disuguaglianza: \(\mrs(x^*) \le \pu/\pd\).</strong></p>
+  <details class="reveal">
+    <summary>Da dove vengono le formule di questo esempio</summary>
+    <div class="in">
+      <p>Lungo la retta di bilancio, andando verso più bene 1 e meno bene 2, \(\mrs = 2\sqrt{x_2}\) scende dal valore \(2\sqrt{\wl/\pd}\), che ha nel punto \((0, \wl/\pd)\), fino a 0.</p>
+      <p>Se \(2\sqrt{\wl/\pd} \ge \pu/\pd\), da qualche parte lungo la retta vale \(2\sqrt{x_2^*} = \pu/\pd\), cioè \(x_2^* = \pu^2/(4\pd^2)\). Il resto della ricchezza va nel bene 1: \(x_1^* = \wl/\pu - \pu/(4\pd)\).</p>
+      <p>Se invece \(2\sqrt{\wl/\pd} \le \pu/\pd\), il saggio marginale di sostituzione è sotto il rapporto fra i prezzi lungo tutta la retta, e la soluzione è \((0, \wl/\pd)\). Nella figura, con \(\wl = 6\) e \(\pd = 1\), la soglia è \(\pu = 2\sqrt{6} \approx 4{,}9\).</p>
+    </div>
+  </details>
+  <p>Il saggio marginale di sostituzione dice anche quando un bene è normale, nel senso della lezione 7.</p>
+  <p class="stmt">Sia la preferenza monotona, convessa e differenziabile. Se \(\mrs(x_1,x_2)\) è crescente in \(x_2\) per ogni valore di \(x_1\), allora per un consumatore razionale il bene 1 è normale. (È un risultato del libro; le slide non lo riportano.)</p>
+  <details class="reveal">
+    <summary>Perché basta guardare il saggio marginale di sostituzione</summary>
+    <div class="in">
+      <p>Fissa i prezzi e fai salire la ricchezza da \(\wl\) a \(\wl'\). Sia \(a\) la soluzione di partenza, e sia \(a'\) il paniere sulla nuova retta di bilancio con la stessa quantità di bene 1 di \(a\): sta proprio sopra \(a\), con più bene 2.</p>
+      <p>Per ipotesi \(\mrs(a') \gt \mrs(a)\). Se \(a\) contiene entrambi i beni, \(\mrs(a)\) è pari al rapporto fra i prezzi. In \(a'\), quindi, il bene 1 vale per il consumatore più di quanto costa: conviene spostarsi lungo la nuova retta verso più bene 1. La nuova soluzione \(b\) ha \(b_1 \gt a_1\).</p>
+    </div>
+  </details>
+</div></section>
+
+<section><div class="col">
+  <h2>Quanto si sta bene, dati prezzi e ricchezza</h2>
+  <p>Il secondo oggetto che esce dall'UMP è il valore del massimo.</p>
+  <p class="stmt">La <strong>funzione di utilità indiretta</strong> \(\vv(\pp,\wl)\) è l'utilità raggiunta nell'ottimo: \(\vv(\pp,\wl) = \uu(x^*)\) per qualunque \(x^* \in \dx(\pp,\wl)\).</p>
+  <p>Si chiama «indiretta» perché dipende dai panieri solo attraverso prezzi e ricchezza. Per la Cobb–Douglas basta sostituire la domanda nell'utilità:</p>
+  <div class="eq">\[ \vv(\pp,\wl) = \left(\frac{\alf\wl}{\pu}\right)^{\!\alf} \left(\frac{(1-\alf)\wl}{\pd}\right)^{\!1-\alf} = \frac{\alf^{\alf}(1-\alf)^{1-\alf}}{\pu^{\alf}\,\pd^{1-\alf}}\;\wl . \]</div>
+  <p class="stmt"><strong>Proposizione.</strong> Se \(\uu\) è continua e rappresenta una preferenza monotona, \(\vv\) è omogenea di grado zero in \((\pp,\wl)\), strettamente crescente in \(\wl\) e non crescente in \(\pu\) e in \(\pd\).</p>
+  <p>L'idea è quella che ti aspetti. Moltiplicare prezzi e ricchezza per lo stesso \(\lam \gt 0\) non cambia l'insieme di bilancio, quindi nemmeno il massimo. Più ricchezza, o un prezzo più basso, allargano l'insieme: il massimo non può scendere. Con più ricchezza sale strettamente, perché diventa acquistabile un paniere con un po' di più di entrambi i beni, che per la monotonia è strettamente migliore. Nella formula Cobb–Douglas si vede a occhio: \(\wl\) sta sopra, i prezzi sotto.</p>
+  <p>Una differenza da ricordare. La domanda \(\dx(\pp,\wl)\) non dipende da quale utilità si usa per rappresentare la preferenza. <strong>L'utilità indiretta sì</strong>: se al posto di \(\uu\) si usa \(f(\uu)\), con \(f\) crescente, al posto di \(\vv\) si ottiene \(f(\vv)\).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Lo stesso problema, rovesciato</h2>
+  <p>L'UMP chiede: con questa ricchezza, qual è l'utilità più alta che posso raggiungere? Si può fare la domanda al contrario: per raggiungere questa utilità, qual è la ricchezza minima che mi serve?</p>
+  <p class="stmt">Dati \(\pp \gg 0\) e un livello di utilità \(\ub\), il <strong>problema di minimizzazione della spesa</strong> (EMP, <em>expenditure minimization problem</em>) è</p>
+  <div class="eq">\[ \min_{x \ge 0} \ \pp \cdot x \quad \text{con il vincolo} \quad \uu(x) \ge \ub . \]</div>
+  <p>Obiettivo e vincolo si scambiano i ruoli, ma lo scopo è lo stesso: usare bene il potere d'acquisto. Riprendi l'esempio di prima e rovescialo: \(\min 2x_1 + x_2\) con \(x_1x_2 \ge 2\).</p>
+  <figure>
+    <div class="w" id="dual8"></div>
+    <figcaption>Prezzi \((2,1)\) e \(\uu = x_1x_2\). A sinistra la retta di bilancio è fissa (ricchezza 4) e si cerca la curva di indifferenza più alta che la tocca. A destra è fissa la curva (utilità 2) e si cerca la retta di spesa più bassa che la tocca. Il punto è lo stesso, \((1, 2)\).</figcaption>
+  </figure>
+  <p class="stmt"><strong>Proposizione (dualità).</strong> Sia \(\uu\) continua, la preferenza monotona e \(\pp \gg 0\). Se \(x^*\) è ottimo nell'UMP con ricchezza \(\wl \gt 0\), allora è ottimo nell'EMP con utilità richiesta \(\uu(x^*)\), e la spesa minima è proprio \(\wl\). Se \(x^*\) è ottimo nell'EMP con utilità richiesta \(\ub \gt \uu(0)\), allora è ottimo nell'UMP con ricchezza \(\pp \cdot x^*\), e l'utilità massima è proprio \(\ub\).</p>
+  <div class="quiz inq" data-quiz="8d"></div>
+  <h3>Domanda compensata e funzione di spesa</h3>
+  <p>Anche dall'EMP escono due oggetti, paralleli a quelli dell'UMP. L'insieme dei panieri ottimi è la <strong>domanda hicksiana</strong>, o <strong>compensata</strong>, \(\hh(\pp,\ub)\) (dal nome dell'economista John Hicks). Il valore del minimo è la <strong>funzione di spesa</strong> \(\ee(\pp,\ub) = \pp \cdot x^*\), definita per \(\pp \gg 0\) e \(\ub \gt \uu(0)\).</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th></th><th>Massimo dell'utilità</th><th>Minimo della spesa</th></tr></thead>
+    <tbody>
+      <tr><td>Paniere ottimo</td><td>\(\dx(\pp,\wl)\): omogenea di grado 0 in \((\pp,\wl)\); si spende tutto, \(\pp\cdot x = \wl\)</td><td>\(\hh(\pp,\ub)\): omogenea di grado 0 in \(\pp\); nessuna utilità in eccesso, \(\uu(x) = \ub\)</td></tr>
+      <tr><td>Valore</td><td>\(\vv(\pp,\wl)\): omogenea di grado 0; strettamente crescente in \(\wl\), non crescente nei prezzi</td><td>\(\ee(\pp,\ub)\): omogenea di grado 1 in \(\pp\); strettamente crescente in \(\ub\), non decrescente nei prezzi</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Raddoppiare i prezzi non cambia quale paniere è il meno caro, ma raddoppia il conto: per questo \(\hh\) è omogenea di grado zero e \(\ee\) di grado uno.</p>
+  <details class="reveal"><summary>Le dimostrazioni delle proprietà di \(\hh\) ed \(\ee\)</summary><div class="in">
+    <p><em>\(\hh\) omogenea di grado 0.</em> Minimizzare \(\lam\pp\cdot x\) o \(\pp \cdot x\) sullo stesso insieme \(\{x : \uu(x) \ge \ub\}\) dà gli stessi panieri.</p>
+    <p><em>Nessuna utilità in eccesso.</em> Se un \(x\) ottimo avesse \(\uu(x) \gt \ub\), prendi \(x' = \lam x\) con \(\lam \lt 1\) vicino a 1: per continuità \(\uu(x') \ge \ub\), e \(x'\) costa meno di \(x\). Contraddizione.</p>
+    <p><em>\(\ee\) omogenea di grado 1.</em> Lo stesso \(x^*\) è ottimo ai prezzi \(\pp\) e \(\lam\pp\), quindi \(\ee(\lam\pp,\ub) = \lam\pp\cdot x^* = \lam\,\ee(\pp,\ub)\).</p>
+    <p><em>\(\ee\) crescente in \(\ub\).</em> Se non lo fosse, ci sarebbero \(u' \lt u''\) con \(\ee(\pp,u') \ge \ee(\pp,u'')\), cioè \(\pp\cdot x' \ge \pp\cdot x''\) per i rispettivi ottimi. Rimpicciolendo di poco \(x''\) si ottiene un paniere che dà ancora più di \(u'\) e costa meno di \(x'\): \(x'\) non era ottimo.</p>
+    <p><em>\(\ee\) non decrescente nei prezzi.</em> Se \(\pp''\) ha il primo prezzo più alto di \(\pp'\) e il secondo uguale, e \(x''\) è ottimo a \(\pp''\), allora \(\ee(\pp'',\ub) = \pp''\cdot x'' \ge \pp'\cdot x'' \ge \ee(\pp',\ub)\).</p>
+  </div></details>
+  <p>Per la Cobb–Douglas \(x_1^{\alf}x_2^{1-\alf}\):</p>
+  <div class="eq">\[ \hh_1(\pp,\ub) = \left[\frac{\alf\,\pd}{(1-\alf)\,\pu}\right]^{1-\alf}\!\ub, \qquad \hh_2(\pp,\ub) = \left[\frac{(1-\alf)\,\pu}{\alf\,\pd}\right]^{\alf}\!\ub, \qquad \ee(\pp,\ub) = \alf^{-\alf}(1-\alf)^{\alf-1}\,\pu^{\alf}\pd^{1-\alf}\,\ub . \]</div>
+  <details class="reveal"><summary>Da dove vengono queste formule</summary><div class="in">
+    <p>Nell'ottimo non c'è utilità in eccesso, quindi \(x_1^{\alf}x_2^{1-\alf} = \ub\), cioè \(x_2 = \ub^{1/(1-\alf)}\,x_1^{-\alf/(1-\alf)}\). Resta da minimizzare \(\pu x_1 + \pd\,\ub^{1/(1-\alf)}\,x_1^{-\alf/(1-\alf)}\) in una variabile.</p>
+    <p>Derivata uguale a zero: \(\pu = \pd\,\ub^{1/(1-\alf)}\,\tfrac{\alf}{1-\alf}\,x_1^{-1/(1-\alf)}\), da cui \(x_1^{1/(1-\alf)} = \tfrac{\alf\,\pd}{(1-\alf)\,\pu}\,\ub^{1/(1-\alf)}\). Elevando alla \(1-\alf\) si ottiene \(\hh_1\); sostituendo nel vincolo, \(\hh_2\); e \(\ee = \pu\hh_1 + \pd\hh_2\).</p>
+    <p>Le proprietà si controllano a occhio: in \(\hh\) i prezzi compaiono solo nel rapporto \(\pd/\pu\) (grado zero), in \(\ee\) con esponenti che sommano a uno (grado uno), e \(\ee\) cresce con \(\ub\) e con ciascun prezzo. Allo stesso modo, nella domanda walrasiana compaiono solo \(\wl/\pu\) e \(\wl/\pd\), e la spesa totale è \(\alf\wl + (1-\alf)\wl = \wl\).</p>
+  </div></details>
+  <p>Attenzione: sulle slide la costante di \(\ee\) è scritta \(\alf^{\alf}(1-\alf)^{\alf-1}\), senza il meno nel primo esponente. È un refuso: con \(\alf = 1/2\) e prezzi \((1,1)\) la domanda compensata è \((\ub,\ub)\) e costa \(2\ub\), come dà la formula qui sopra, mentre quella delle slide darebbe \(\ub\).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Due modi di compensare</h2>
+  <p>Le due domande sono legate da due identità:</p>
+  <div class="eq">\[ \hh(\pp,\ub) = \dx(\pp,\ \ee(\pp,\ub)), \qquad \dx(\pp,\wl) = \hh(\pp,\ \vv(\pp,\wl)). \]</div>
+  <p>La prima dice perché \(\hh\) si chiama compensata. Quando i prezzi cambiano, \(\hh(\pp,\ub)\) è ciò che il consumatore comprerebbe se la sua ricchezza venisse aggiustata quanto basta per restare all'utilità \(\ub\). È la <strong>compensazione di Hicks</strong>: \(\Delta \wl_{\text{Hicks}} = \ee(\pp',\ub) - \wl\). La domanda walrasiana tiene ferma la ricchezza in denaro e lascia variare l'utilità; quella hicksiana fa il contrario.</p>
+  <figure>
+    <div class="w" id="hicks8"></div>
+    <figcaption>Un consumatore con \(\uu = x_1x_2\), prezzi \((1,1)\) e ricchezza 12 sceglie \((6,6)\), con utilità 36. Il prezzo del bene 2 sale a 4. Senza compensazione compra \((6;\,1{,}5)\). Con la compensazione di Hicks la ricchezza sale a \(\ee(\pp',36) = 24\) e compra \((12, 3)\): di nuovo sulla curva di utilità 36. La figura delle slide è qualitativa; i numeri di questa sono miei.</figcaption>
+  </figure>
+  <p>Nella lezione 7 la compensazione era quella di Slutsky: abbastanza ricchezza per ricomprare il vecchio <em>paniere</em>, qui \(1\cdot 6 + 4 \cdot 6 = 30\). Quella di Hicks ridà la vecchia <em>utilità</em>, e ne bastano 24.</p>
+  <p class="stmt"><strong>Proposizione (legge della domanda compensata).</strong> Se \(\uu\) è continua, la preferenza monotona e \(\hh(\pp,\ub)\) contiene un solo paniere per ogni \(\pp \gg 0\), allora per ogni \(\pp'\) e \(\pp''\)</p>
+  <div class="eq">\[ (\pp'' - \pp') \cdot [\,\hh(\pp'',\ub) - \hh(\pp',\ub)\,] \;\le\; 0 . \]</div>
+  <p>Per la domanda compensata l'effetto del proprio prezzo non è mai positivo. Nella figura: \(\Delta\pp = (0, 3)\), \(\Delta\hh = (6, -3)\), prodotto \(-9\). <strong>Per la domanda walrasiana lo stesso enunciato è falso</strong>: è lì che vivono i beni di Giffen.</p>
+  <details class="reveal"><summary>La dimostrazione in due righe</summary><div class="in">
+    <p>\(\hh(\pp'',\ub)\) è il modo meno caro, ai prezzi \(\pp''\), di raggiungere \(\ub\): \(\pp''\cdot \hh(\pp'',\ub) \le \pp''\cdot \hh(\pp',\ub)\). Allo stesso modo \(\pp'\cdot \hh(\pp'',\ub) \ge \pp'\cdot \hh(\pp',\ub)\).</p>
+    <p>Sottraendo la seconda dalla prima si ottiene la disuguaglianza dell'enunciato.</p>
+  </div></details>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="8"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>il consumatore razionale compra il paniere in cui il suo tasso di scambio personale incontra quello del mercato, e lo stesso paniere risolve due problemi: il massimo dell'utilità e il minimo della spesa.</strong></p>
+  <p>Fin qui un individuo solo. Nella prossima lezione sono tanti, e vogliono le stesse cose.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

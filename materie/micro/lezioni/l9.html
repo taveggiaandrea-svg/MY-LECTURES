@@ -1,0 +1,194 @@
+<article class="lesson" data-n="9" id="lezione-9" data-title="Chi si prende la caverna migliore?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 8 · Topic 5-1</p>
+  <h1>Chi si prende la caverna migliore?</h1>
+  <p class="desc">La giungla: un'economia senza proprietà, dove le case vanno a chi è più forte. Equilibrio, dittatura seriale e stabilità di Pareto.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Fin qui c'era un solo individuo: che cosa preferisce, che cosa sceglie, che cosa compra. Da questa lezione gli individui sono tanti e vogliono le stesse cose. Serve una regola che dica chi ottiene che cosa.</p>
+  <p>La prima regola che studiamo è la più brutale: la forza. Partiamo da un gioco fatto in aula.</p>
+  <h2>Quattro giocatori, quattro caverne</h2>
+  <p>Ci sono quattro giocatori, numerati da 1 a 4, e quattro caverne: A, B, C, D. In ogni caverna sta una persona sola. Il più forte è 1, poi 2, poi 3, poi 4. La regola è una: chi vuole una caverna occupata da uno più debole se la prende, e l'altro esce senza discutere.</p>
+  <p>Ognuno ha la sua classifica delle caverne, e chiunque preferisce una caverna qualsiasi a restare senza. Si parte con 1 in D, 2 in A, 3 in C e 4 in B, che scriviamo \((D, A, C, B)\): le caverne dei giocatori 1, 2, 3, 4, in quest'ordine.</p>
+  <figure>
+    <div class="w" id="jun0"></div>
+    <figcaption>Ogni colonna è un giocatore, con le caverne dalla preferita (in alto) all'ultima. In rosa la caverna che occupa alla partenza. Sopra la casella rosa ci sono le caverne che preferirebbe: rosse se può prenderle, perché chi le occupa è più debole.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="9a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Due partite, lo stesso finale</h2>
+  <p>A ogni turno un moderatore decide chi muove, senza guardare la forza. Chi è di turno controlla le caverne che può prendere, cioè quelle vuote e quelle dei più deboli: se una è meglio della sua situazione ci va, altrimenti passa. Chi viene sfrattato resta fuori e aspetta il suo turno.</p>
+  <p>La forza decide <em>a chi</em> puoi togliere la caverna, non <em>quando</em> tocca a te. Niente scambi, niente pagamenti.</p>
+  <figure>
+    <div class="w" id="junPlay"></div>
+    <figcaption>Ogni riga è lo stato dopo una mossa: in quale caverna sta ciascun giocatore e chi è rimasto fuori. In aula metà dei gruppi partiva da \((D, A, C, B)\) e metà da \((A, B, D, C)\). L'ordine dei turni qui è uno dei tanti possibili: l'ho scelto io.</figcaption>
+  </figure>
+  <p>Le due partite si fermano nello stesso punto, \((B, D, A, C)\), e si fermano per lo stesso motivo: <strong>nessuno può più prendersi una caverna che preferisce alla sua</strong>.</p>
+  <p>Due partite non dimostrano niente: non sappiamo ancora se ogni sequenza di turni finisce lì, né se un punto del genere esiste sempre. Per saperlo serve un modello.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il modello: una società, poi una giungla</h2>
+  <p>Una <strong>società</strong> è fatta di tre cose: un insieme finito \(\sN\) di individui, un insieme finito \(\sH\) di case con tanti elementi quanti sono gli individui, e per ogni individuo \(i\) una preferenza stretta \(\spf_i\) sulle case. Stretta vuol dire che nessuno è indifferente fra due case.</p>
+  <p class="stmt"><strong>Società.</strong> \(\langle \sN, \sH, (\pf_i)_{i \in \sN} \rangle\), con \(\sN\) e \(\sH\) finiti e della stessa grandezza e ogni \(\pf_i\) stretta.</p>
+  <p>Ogni casa ospita una persona sola, ogni persona occupa una casa sola, e tutti preferiscono una casa qualsiasi a restare senza. Il nostro gioco è una società con \(\sN = \{1,2,3,4\}\) e \(\sH = \{A,B,C,D\}\): per esempio \(B \spf_1 C \spf_1 D \spf_1 A\).</p>
+  <p>Un'<strong>assegnazione</strong> è una funzione che dà una casa a ogni individuo. Un'<strong>allocazione</strong> è un'assegnazione in cui ogni casa va a un individuo solo. La differenza è tutta qui.</p>
+  <figure>
+    <div class="w" id="junAssign"></div>
+    <figcaption>A sinistra gli individui, a destra le case; una linea dice a chi è assegnata ciascuna casa. Un'assegnazione può dare la stessa casa a due persone; un'allocazione no.</figcaption>
+  </figure>
+  <p>Che cosa decide l'allocazione? Le preferenze contano, ma non bastano: se due vogliono la stessa casa serve altro. Qui l'altro è il potere. Fra due individui qualsiasi uno è più forte dell'altro, e non ci sono pareggi.</p>
+  <p>Scriviamo \(i \pw j\) per dire che \(i\) è più forte di \(j\), e quindi può prendergli la casa. La relazione \(\pw\) è completa, transitiva e antisimmetrica: mette gli individui in fila, dal più forte al più debole.</p>
+  <p class="stmt"><strong>Giungla.</strong> \(\langle \sN, \sH, (\pf_i)_{i \in \sN}, \pw \rangle\): una società più una relazione di potere \(\pw\) su \(\sN\), completa, transitiva e antisimmetrica.</p>
+  <p>Quattro cose da tenere a mente sul modello. Il potere non è solo fisico: può essere anzianità, status, capacità di persuadere. Non esistono proprietà né diritti. L'esito di uno scontro è certo, quindi lo scontro non avviene: il più debole se ne va sapendo che perderebbe. E prendersi una casa non costa niente.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando la giungla si ferma</h2>
+  <p>In un modello, un equilibrio è un esito stabile rispetto alle forze che il modello considera. Qui la forza è una sola: prendersi la casa di uno più debole. Quindi un'allocazione è stabile quando nessuno preferisce alla propria una casa che può ottenere.</p>
+  <p class="stmt"><strong>Equilibrio.</strong> Un'allocazione \(\aA^*\) è un equilibrio della giungla se non esistono due individui \(i\) e \(j\) con \(i \pw j\) e \(\aA^*(j) \spf_i \aA^*(i)\).</p>
+  <p>A parole: nessuno preferisce alla casa che occupa, \(\aA^*(i)\), la casa \(\aA^*(j)\) di uno più debole. Invidiare la casa di uno più forte è permesso: non la si può prendere.</p>
+  <figure>
+    <div class="w" id="junEq"></div>
+    <figcaption>Stesse preferenze, due allocazioni. A sinistra la partenza del gioco: quattro caselle rosse in tre colonne, cioè tre individui che possono migliorare. A destra il punto in cui le partite si sono fermate: nessuna casella rossa.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="9b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Un equilibrio c'è sempre</h2>
+  <p>Per trovarlo non serve giocare. Il giocatore 1 può finire altrove che in B? No: è la sua preferita e può toglierla a chiunque. Tolta B, il giocatore 2 prende la migliore fra le rimaste, che è D. E così via.</p>
+  <p>Questa procedura si chiama <strong>dittatura seriale</strong>. Si fissa un ordine degli individui, \(i_1, i_2, \dots, i_n\). Il primo riceve la casa che preferisce fra tutte. Ogni individuo successivo \(i_k\) riceve la casa che preferisce fra quelle non ancora assegnate, cioè in \(\sH \setminus \{h_1, \dots, h_{k-1}\}\).</p>
+  <figure>
+    <div class="w" id="junSerial"></div>
+    <figcaption>La dittatura seriale nell'ordine di forza \(1 \pw 2 \pw 3 \pw 4\). Ogni colonna è la classifica di un individuo; le case barrate sono già state prese. Il risultato è \((B, D, A, C)\).</figcaption>
+  </figure>
+  <p class="stmt"><strong>Proposizione (esistenza).</strong> In ogni giungla, l'allocazione generata dalla dittatura seriale nell'ordine dato da \(\pw\) è un equilibrio.</p>
+  <details class="reveal"><summary>Perché è un equilibrio</summary><div class="in">
+    <p>Le case sono tante quante gli individui, quindi la procedura dà una casa a tutti. Nessuna casa è data due volte, quindi il risultato è un'allocazione.</p>
+    <p>La casa di ciascuno è la migliore, per lui, fra quelle non assegnate ai più forti. Le case dei più deboli sono tutte fra queste: quindi nessuno preferisce la casa di uno più debole alla propria.</p>
+  </div></details>
+</div></section>
+
+<section><div class="col">
+  <h2>E ce n'è uno solo</h2>
+  <p>Potrebbe esserci un secondo equilibrio, diverso da quello della dittatura seriale? Con preferenze strette, no.</p>
+  <p class="stmt"><strong>Proposizione (unicità).</strong> Ogni giungla ha un unico equilibrio.</p>
+  <details class="reveal"><summary>La dimostrazione, per assurdo</summary><div class="in">
+    <p>Numeriamo gli individui dal più forte, \(1 \pw 2 \pw \dots \pw n\), e supponiamo che \(\aA\) e \(\aB\) siano due equilibri diversi. Sia \(i^*\) il più forte fra gli individui che ricevono case diverse: \(\aA(i) = \aB(i)\) per ogni \(i \lt i^*\), e \(\aA(i^*) \ne \aB(i^*)\).</p>
+    <figure>
+      <div class="w" id="junUniq"></div>
+      <figcaption>Le due righe sono le allocazioni \(\aA\) e \(\aB\). Fino a \(i^*-1\) coincidono. La casa che \(i^*\) ha in \(\aA\) finisce, in \(\aB\), a un individuo \(j\) più debole; quella che ha in \(\aB\) finisce, in \(\aA\), a un individuo \(k\) più debole.</figcaption>
+    </figure>
+    <p>In \(\aA\) la casa \(\aB(i^*)\) non può essere di uno più forte di \(i^*\), perché quelli hanno le stesse case nelle due allocazioni. È quindi di un certo \(k\) più debole. Poiché \(\aA\) è un equilibrio, \(\aA(i^*) \spf_{i^*} \aA(k) = \aB(i^*)\).</p>
+    <p>Lo stesso ragionamento su \(\aB\): la casa \(\aA(i^*)\) è di un \(j\) più debole, e quindi \(\aB(i^*) \spf_{i^*} \aB(j) = \aA(i^*)\). Le due conclusioni si contraddicono.</p>
+  </div></details>
+  <p>Due avvertenze. L'equilibrio è un concetto statico: dice dove ci si ferma, non come ci si arriva. Che il gioco a turni, da qualunque partenza, converga all'equilibrio è una cosa in più da dimostrare, lasciata a un esercizio.</p>
+  <p>E l'ipotesi di preferenze strette è essenziale. Con due individui e due case, se 1 è indifferente fra A e B, sia \((A, B)\) sia \((B, A)\) sono equilibri: 1 non preferisce <em>strettamente</em> la casa dell'altro, e 2 non ha nessuno sotto di sé.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Stesse caverne, senza la forza</h2>
+  <p>Cambiamo la regola. Giocatori, caverne e preferenze restano gli stessi, ma ora è un <strong>clan</strong>: un'allocazione viene sostituita da un'altra solo se sono tutti d'accordo, cioè nessuno ci perde e almeno uno ci guadagna. Si riparte da \((D, A, C, B)\).</p>
+  <p>Primo round: sono ammessi solo scambi fra due giocatori.</p>
+  <figure>
+    <div class="w" id="clanSwap"></div>
+    <figcaption>I sei scambi a due possibili da \((D, A, C, B)\). Per ogni giocatore: la caverna che lascia, quella che riceve e se per lui è un guadagno. In ogni riga almeno uno dei due ci perde: nessuno scambio viene accettato.</figcaption>
+  </figure>
+  <p>Secondo round: valgono anche le proposte che coinvolgono tre o quattro giocatori.</p>
+  <figure>
+    <div class="w" id="clanCycle"></div>
+    <figcaption>Una rotazione a tre: ciascuno passa nella caverna del giocatore verso cui punta la freccia. Il giocatore 4 non si muove, e chi non si muove non blocca la proposta. Il risultato è \((C, D, A, B)\).</figcaption>
+  </figure>
+  <p>Da \((C, D, A, B)\) non si va oltre. I giocatori 3 e 4 hanno già la caverna preferita, quindi non si possono spostare. Restano 1 e 2 con C e D: scambiandole, 1 passerebbe a una caverna che gli piace meno.</p>
+  <div class="quiz inq" data-quiz="9c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Stabilità di Pareto</h2>
+  <p>Il gioco del clan suggerisce un secondo criterio di stabilità: un'allocazione regge se non esiste un'altra allocazione che tutti accetterebbero al suo posto.</p>
+  <p class="stmt"><strong>Dominanza di Pareto.</strong> L'allocazione \(\aB\) domina nel senso di Pareto l'allocazione \(\aA\) se \(\aB(i) \pf_i \aA(i)\) per ogni \(i \in \sN\) e \(\aB(i) \spf_i \aA(i)\) per almeno un \(i\).</p>
+  <p class="stmt"><strong>Stabilità di Pareto.</strong> Un'allocazione è Pareto stabile se nessuna allocazione la domina nel senso di Pareto.</p>
+  <figure>
+    <div class="w" id="parDom"></div>
+    <figcaption>Per ogni individuo, la posizione nella sua classifica della casa ricevuta in \(\aA\) (cerchio vuoto) e in \(\aB\) (cerchio pieno). Tre frecce verso l'alto e nessuna verso il basso: \(\aB\) domina \(\aA\).</figcaption>
+  </figure>
+  <p>«Pareto ottimale», «Pareto efficiente» e «Pareto stabile» sono tre nomi della stessa cosa. Nella definizione il potere non compare: è una fonte di instabilità diversa dalla forza.</p>
+  <p>C'è un'ipotesi nascosta: che un miglioramento di Pareto, quando esiste, venga fatto. Non è scontato. Se \(\aB\) e un'altra allocazione \(c\) dominano entrambe \(\aA\), ma il gruppo litiga su quale scegliere, la trattativa può bloccarsi e si resta in \(\aA\).</p>
+  <p class="stmt"><strong>Proposizione.</strong> Per ogni società e ogni ordine degli individui, l'allocazione generata dalla dittatura seriale è Pareto stabile.</p>
+  <details class="reveal"><summary>Perché nessuna allocazione la domina</summary><div class="in">
+    <p>Sia \(\aA\) l'allocazione della dittatura seriale nell'ordine \(i_1, \dots, i_n\), e supponiamo che \(\aB\) la domini. Con preferenze strette, \(\aB(i) \pf_i \aA(i)\) vuol dire: stessa casa, oppure una strettamente migliore.</p>
+    <p>Prendiamo il primo individuo dell'ordine, \(i_r\), che riceve case diverse nelle due allocazioni: per lui \(\aB(i_r) \spf_{i_r} \aA(i_r)\). Chi lo precede ha le stesse case in \(\aA\) e in \(\aB\), quindi \(\aB(i_r)\) non è una di quelle: era ancora libera quando toccava a \(i_r\). Ma allora la procedura gli avrebbe dato \(\aB(i_r)\), o di meglio, e non \(\aA(i_r)\). Contraddizione.</p>
+    <p>Sulle slide lo spazio della dimostrazione è vuoto: questa è quella del libro (Proposizione 8.3).</p>
+  </div></details>
+</div></section>
+
+<section><div class="col">
+  <h2>Forza e accordo a confronto</h2>
+  <p>Abbiamo due nozioni: l'equilibrio è immune all'uso della forza, la stabilità di Pareto è immune a una riallocazione su cui tutti concordano. Come si parlano?</p>
+  <p class="stmt"><strong>Proposizione.</strong> L'equilibrio di ogni giungla è Pareto stabile.</p>
+  <p>Bastano tre righe. L'equilibrio è unico. È quello della dittatura seriale nell'ordine di forza. E l'allocazione di una dittatura seriale è Pareto stabile. <strong>Nella giungla la forza non spreca niente</strong>: non c'è modo di far stare meglio qualcuno senza togliere a un altro.</p>
+  <p>Il contrario non vale. Guarda l'esito del clan con gli occhi della giungla.</p>
+  <figure>
+    <div class="w" id="clanEnvy"></div>
+    <figcaption>L'esito del clan, \((C, D, A, B)\), con la forza \(1 \pw 2 \pw 3 \pw 4\). Ci sono due caselle rosse: sia 1 sia 2 preferiscono B, che è del più debole 4, e possono prenderla. Le slide citano il caso di 1. L'allocazione è Pareto stabile ma non è un equilibrio della giungla.</figcaption>
+  </figure>
+  <figure>
+    <div class="w" id="parCmp"></div>
+    <figcaption>Dall'esito della giungla a quello del clan: 1 scende, 4 sale, 2 e 3 ricevono la stessa caverna. Nessuna delle due allocazioni domina l'altra.</figcaption>
+  </figure>
+  <div class="scroll">
+  <table>
+    <thead><tr><th></th><th>Esito della giungla \((B, D, A, C)\)</th><th>Esito del clan \((C, D, A, B)\)</th></tr></thead>
+    <tbody>
+      <tr><td>Equilibrio della giungla?</td><td class="c">Sì</td><td class="c">No</td></tr>
+      <tr><td>Pareto stabile?</td><td class="c">Sì</td><td class="c">Sì</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>La stabilità di Pareto, quindi, non sceglie un'allocazione sola e non dice niente sull'equità. Esclude soltanto i miglioramenti che non costano niente a nessuno.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="9"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Il corso fin qui</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Lezione</th><th>Concetto</th><th>Idea</th><th>Formula</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1</td><td>Preferenza</td><td>Relazione completa e transitiva</td><td>\(x \pf y\)</td></tr>
+      <tr><td class="c">1</td><td>Utilità</td><td>Numeri che rispettano l'ordine; contano solo i confronti</td><td>\(x \pf y \iff \uu(x) \ge \uu(y)\)</td></tr>
+      <tr><td class="c">2</td><td>Funzione di scelta</td><td>Un'alternativa per ogni menu</td><td>\(\cf(\sA) \in \sA\)</td></tr>
+      <tr><td class="c">2</td><td>Proprietà α</td><td>Chi vince in un menu vince nei menu più piccoli; equivale a razionalizzabile</td><td>\(\cf(\sA) \in \sB \subset \sA \Rightarrow \cf(\sB) = \cf(\sA)\)</td></tr>
+      <tr><td class="c">3</td><td>Lotteria</td><td>Probabilità sui premi</td><td>\(\Lp = (\Lp_1, \dots, \Lp_K)\)</td></tr>
+      <tr><td class="c">3</td><td>Utilità attesa</td><td>Equivale a continuità più indipendenza</td><td>\(\UU(\Lp) = \sum_z \Lp(z)\vv(z)\)</td></tr>
+      <tr><td class="c">4</td><td>Avversione al rischio</td><td>Il valore atteso certo vale almeno quanto la lotteria</td><td>\(\vv\) concava; \(\ceq(\Lp,\vv) \le E[\Lp]\)</td></tr>
+      <tr><td class="c">4</td><td>Arrow–Pratt</td><td>Quanto è curva \(\vv\), in un numero</td><td>\(r_A(z) = -\vv''(z)/\vv'(z)\)</td></tr>
+      <tr><td class="c">4</td><td>Dominanza stocastica</td><td>Meglio per chiunque preferisca di più a di meno</td><td>\(\FF(z) \le \GG(z)\) per ogni \(z\)</td></tr>
+      <tr><td class="c">5</td><td>Utilità attesa soggettiva</td><td>Le probabilità le mette chi decide</td><td>\(\sum_{\omega} \ppi(\omega)\,\vv(\af(\omega))\)</td></tr>
+      <tr><td class="c">6</td><td>Monotonia</td><td>Di più è meglio</td><td>\(x_i \gt y_i\) per \(i=1,2 \Rightarrow x \spf y\)</td></tr>
+      <tr><td class="c">6</td><td>Convessità</td><td>Le vie di mezzo non peggiorano; utilità quasi-concava</td><td>\(a \pf b \Rightarrow \lam a + (1-\lam) b \pf b\)</td></tr>
+      <tr><td class="c">7</td><td>Insieme di bilancio</td><td>I panieri che ci si può permettere</td><td>\(\pu x_1 + \pd x_2 \le \wl\)</td></tr>
+      <tr><td class="c">7</td><td>Legge di Walras</td><td>Si spende tutto</td><td>\(\pp \cdot \dx(\pp,\wl) = \wl\)</td></tr>
+      <tr><td class="c">7</td><td>Assioma debole</td><td>Le scelte non si contraddicono</td><td>\(\pp \cdot \dx(\pp',\wl') \le \wl\) e \(\dx(\pp',\wl') \ne \dx(\pp,\wl) \Rightarrow \pp' \cdot \dx(\pp,\wl) \gt \wl'\)</td></tr>
+      <tr><td class="c">7</td><td>Legge della domanda compensata</td><td>A ricchezza compensata, prezzo e quantità vanno in direzioni opposte</td><td>\(\Delta \pp \cdot \Delta \dx \le 0\)</td></tr>
+      <tr><td class="c">8</td><td>Massimo dell'utilità</td><td>Il paniere migliore fra quelli acquistabili</td><td>\(\mrs(x^*) = \pu/\pd\)</td></tr>
+      <tr><td class="c">8</td><td>Minimo della spesa</td><td>Il modo meno caro di arrivare a un'utilità data</td><td>\(\ee(\pp,\ub) = \pp \cdot \hh(\pp,\ub)\)</td></tr>
+      <tr><td class="c">8</td><td>Dualità</td><td>I due problemi hanno la stessa soluzione</td><td>\(\hh(\pp,\ub) = \dx(\pp, \ee(\pp,\ub))\)</td></tr>
+      <tr><td class="c">9</td><td>Equilibrio della giungla</td><td>Nessuno preferisce la casa di uno più debole; esiste ed è unico</td><td>mai \(i \pw j\) e \(\aA(j) \spf_i \aA(i)\)</td></tr>
+      <tr><td class="c">9</td><td>Stabilità di Pareto</td><td>Nessun cambiamento accettato da tutti</td><td>nessuna \(\aB\) domina \(\aA\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>nella giungla l'equilibrio si trova facendo scegliere gli individui dal più forte al più debole; è l'unico, ed è Pareto stabile, ma non è l'unica allocazione Pareto stabile.</strong></p>
+  <p>Nella prossima lezione, l'economia di scambio: al posto della forza ci sono i prezzi.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

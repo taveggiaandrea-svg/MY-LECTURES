@@ -1,0 +1,69 @@
+<article class="lesson" data-n="5" id="lezione-5" data-title="E se le probabilità non le conosce nessuno?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 3 · Topic 3-3</p>
+  <h1>E se le probabilità non le conosce nessuno?</h1>
+  <p class="desc">Utilità attesa soggettiva: stati del mondo, atti e probabilità che stanno nella testa di chi decide.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nelle lezioni 3 e 4 una lotteria arrivava con le sue probabilità già scritte. È una buona descrizione del SuperEnalotto: chi spende 2 euro per una giocata ha 1 probabilità su 622 614 630 di centrare il jackpot e circa 1 su 20 di vincere un premio qualsiasi. Sono numeri oggettivi, che chiunque può calcolare.</p>
+  <p>Ora pensa a una corsa con tre cavalli. Chi punta 2 euro sul cavallo A non ha per forza 1 probabilità su 3 di vincere: dipende dai cavalli, e nessuno ha una tabella da consultare. Le probabilità non si osservano. <strong>Per scommesse così le lotterie non bastano: non sapremmo quali numeri scriverci.</strong></p>
+  <p>Serve un oggetto diverso, che descriva la scommessa senza nominare le probabilità. Si chiama <em>atto</em>, e per definirlo bisogna prima elencare che cosa può succedere.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Gli stati del mondo</h2>
+  <p>Tre cavalli: Ace, Bolt e Challenger, cioè A, B e C. Escludendo i pari merito, la corsa può finire in sei modi, uno per ogni ordine d'arrivo.</p>
+  <p class="stmt">Gli <strong>stati del mondo</strong> sono un elenco di tutti i modi in cui la situazione può risolversi: esaustivo (uno di loro si verifica) ed esclusivo (mai due insieme). L'insieme degli stati si scrive \(\sO\).</p>
+  <p class="stmt">Un <strong>atto</strong> è un'azione definita dal premio che dà in ciascuno stato del mondo: una funzione \(\af : \sO \to Z\).</p>
+  <p>Due atti di esempio. L'atto \(\af\) è una scommessa di 10 euro alla pari su Ace: se Ace vince incassi 10 euro, altrimenti ne perdi 10. L'atto \(\ag\) è una scommessa di 10 euro su Challenger, data 2 a 1: se Challenger vince incassi 20 euro, altrimenti ne perdi 10.</p>
+  <figure>
+    <div class="w" id="states5"></div>
+    <figcaption>Ogni riga è uno stato del mondo: un ordine d'arrivo. Le due colonne di destra sono i due atti: per ogni stato, quanti euro si vincono o si perdono. Un atto è tutta la sua colonna.</figcaption>
+  </figure>
+  <p>Nota che nella tabella non compare nessuna probabilità. Un atto dice che cosa ottieni <em>se</em> succede una certa cosa, non quanto è probabile che succeda.</p>
+  <div class="quiz inq" data-quiz="5a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Come si sceglie fra due atti</h2>
+  <p>La teoria dell'<strong>utilità attesa soggettiva</strong> (SEU, <em>subjective expected utility</em>) descrive chi sceglie così, in quattro passi. Assegna a ogni stato del mondo la probabilità che <em>lui</em> gli attribuisce. Assegna a ogni premio un'utilità. Calcola l'utilità attesa di ogni atto con quelle probabilità e quelle utilità. Sceglie l'atto con l'utilità attesa più alta.</p>
+  <p>Chiama \(\ppi(\omega)\) la probabilità che la persona attribuisce allo stato \(\omega\), e \(\vv\) la sua funzione di Bernoulli. Per i due atti:</p>
+  <div class="eq">\[ \begin{aligned}
+  \UU(\af) &= [\ppi(ABC)+\ppi(ACB)]\,\vv(10) + [\ppi(BAC)+\ppi(BCA)]\,\vv(-10) + [\ppi(CAB)+\ppi(CBA)]\,\vv(-10) \\[.3em]
+  \UU(\ag) &= [\ppi(ABC)+\ppi(ACB)]\,\vv(-10) + [\ppi(BAC)+\ppi(BCA)]\,\vv(-10) + [\ppi(CAB)+\ppi(CBA)]\,\vv(20)
+  \end{aligned} \]</div>
+  <p>La prima parentesi è la probabilità che vinca Ace, la seconda che vinca Bolt, la terza che vinca Challenger. Se \(\vv\) è lineare, cioè la persona è neutrale al rischio, il confronto si riduce a una frazione: \(\af\) è preferito a \(\ag\) quando</p>
+  <div class="eq">\[ \frac{\ppi(ABC)+\ppi(ACB)}{\ppi(CAB)+\ppi(CBA)} \;\ge\; \frac{3}{2}, \]</div>
+  <p>cioè quando, secondo lui, la probabilità che vinca Ace è almeno una volta e mezza quella che vinca Challenger.</p>
+  <details class="reveal"><summary>Da dove viene il 3/2</summary><div class="in">
+    <p>Chiama \(a\), \(b\), \(c\) le probabilità che vincano Ace, Bolt e Challenger, con \(a + b + c = 1\), e prendi \(\vv(z) = z\). Allora \(\UU(\af) = 10a - 10(b+c) = 20a - 10\) e \(\UU(\ag) = 20c - 10(a+b) = 30c - 10\).</p>
+    <p>\(\UU(\af) \ge \UU(\ag)\) equivale a \(20a \ge 30c\), cioè \(a/c \ge 3/2\).</p>
+  </div></details>
+  <figure>
+    <div class="w" id="seu5"></div>
+    <figcaption>Ogni punto del triangolo è una convinzione sulle probabilità di vittoria dei tre cavalli: più è vicino a un vertice, più quel cavallo è ritenuto favorito. La retta separa chi sceglie \(\af\) da chi sceglie \(\ag\), per una persona neutrale al rischio. Dario ed Elena hanno la stessa \(\vv\) e scelgono in modo diverso solo perché credono cose diverse. I due personaggi e le loro probabilità sono un mio esempio.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="5b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>La definizione, e che cosa cambia rispetto all'utilità attesa</h2>
+  <p class="stmt">Siano \(Z\) un insieme di premi, \(\sO\) un insieme finito di stati del mondo e \(\sF\) l'insieme di tutti gli atti \(\af : \sO \to Z\). Una preferenza \(\pf\) su \(\sF\) ha una <strong>rappresentazione con utilità attesa soggettiva</strong> se esistono una funzione di utilità \(\vv : Z \to \mathbb{R}\) e una funzione di probabilità \(\ppi : \sO \to [0,1]\), con \(\sum_{\omega \in \sO} \ppi(\omega) = 1\), tali che</p>
+  <div class="eq">\[ \af \pf \ag \iff \sum_{\omega \in \sO} \ppi(\omega)\,\vv(\af(\omega)) \;\ge\; \sum_{\omega \in \sO} \ppi(\omega)\,\vv(\ag(\omega)). \]</div>
+  <p>Metti le due formule una sotto l'altra:</p>
+  <div class="eq">\[ \UU(\Lp) = \sum_{z \in Z} \Lp(z)\,\vv(z) \qquad\qquad \UU(\af) = \sum_{\omega \in \sO} \ppi(\omega)\,\vv(\af(\omega)) \]</div>
+  <p>Nella prima le probabilità \(\Lp(z)\) fanno parte dell'alternativa: sono date, uguali per tutti. Due persone possono scegliere diversamente solo perché hanno \(\vv\) diverse. Nella seconda le probabilità \(\ppi\) fanno parte della <em>persona</em>, come \(\vv\). <strong>Con l'utilità attesa soggettiva due persone possono scegliere diversamente perché valutano diversamente i premi, oppure perché credono cose diverse sul mondo.</strong></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="5"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>quando le probabilità non sono scritte da nessuna parte, la teoria le mette dentro chi decide, accanto alla sua utilità.</strong></p>
+  <p>Con la prossima lezione l'incertezza esce di scena e le alternative prendono una forma precisa: quantità di due beni.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

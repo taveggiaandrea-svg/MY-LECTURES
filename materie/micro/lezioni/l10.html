@@ -1,0 +1,90 @@
+<article class="lesson" data-n="10" id="lezione-10" data-title="A che prezzo si scambia?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 10 · Topic 5-2</p>
+  <h1>A che prezzo si scambia?</h1>
+  <p class="desc">L'economia di scambio: dotazioni, prezzi, equilibrio concorrenziale e il primo teorema dell'economia del benessere.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 9 le case andavano al più forte, o si spostavano solo con il consenso di tutti. Ora le persone possiedono qualcosa e lo scambiano sul mercato, a prezzi uguali per tutti.</p>
+  <h2>Mele e banane su un'isola</h2>
+  <p>Su un'isola vivono Ann e Bob. Ann ha 6 mele, Bob ha 6 banane; i beni sono divisibili. Le loro preferenze sono Cobb–Douglas, già viste nella lezione 8: Ann ha \(\uu_1 = x_1^{2/3}x_2^{1/3}\), Bob ha \(\uu_2 = x_1^{1/3}x_2^{2/3}\), dove \(x_1\) sono mele e \(x_2\) banane.</p>
+  <p>Un moderatore annuncia un tasso \(r\): una mela vale \(r\) banane, cioè i prezzi sono \((r, 1)\). Ognuno sceglie il paniere migliore che può permettersi a quel tasso. Se le due richieste insieme si possono soddisfare con le 6 mele e le 6 banane che ci sono, lo scambio si fa; altrimenti si annuncia un altro tasso.</p>
+  <p>Con la Cobb–Douglas si spende una quota fissa della ricchezza su ogni bene. La ricchezza di Ann è il valore delle sue mele, \(6r\); quella di Bob è 6. Quindi Ann chiede \((4,\ 2r)\) e Bob chiede \((2/r,\ 4)\).</p>
+  <figure>
+    <div class="w" id="edge10"></div>
+    <figcaption>La scatola di Edgeworth: il lato orizzontale sono le 6 mele, quello verticale le 6 banane. Le quantità di Ann si leggono dall'angolo in basso a sinistra, quelle di Bob dall'angolo in alto a destra, quindi ogni punto della scatola è un modo di dividere tutto fra i due. Il punto bianco è la dotazione; la retta passa per lì con pendenza \(-r\). Nel primo riquadro, con \(r = 2\), i due chiedono punti diversi; nel secondo, con \(r = 1\), lo stesso punto.</figcaption>
+  </figure>
+  <p>Con \(r = 2\) Ann vuole 4 mele e Bob una: in tutto 5, ne avanza una. Di banane ne vogliono 8, ma sono 6. Con \(r = 1\) Ann chiede \((4, 2)\), Bob \((2, 4)\): le richieste sommano esattamente a \((6, 6)\). <strong>Ann cede due mele per due banane, e nessuno dei due vorrebbe fare diversamente a quel prezzo.</strong></p>
+  <p>Due condizioni, quindi: ognuno sceglie il meglio che può permettersi, e le scelte si possono realizzare tutte insieme. Mettersi semplicemente d'accordo per scambiare non basterebbe a garantire la prima.</p>
+  <div class="quiz inq" data-quiz="10a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Il modello</h2>
+  <p class="stmt">Un'<strong>economia di scambio</strong> \(\langle \sN, (\pf_i)_{i\in \sN}, e\rangle\) è fatta di un insieme finito \(\sN\) di individui; per ognuno una preferenza \(\pf_i\) monotona e continua sui panieri di \(\mathbb{R}^2_+\); e una <strong>dotazione iniziale</strong> \(e\), che assegna a ogni individuo il paniere \(e(i)\) che possiede, con una quantità totale positiva di entrambi i beni.</p>
+  <p class="stmt">Un <strong>sistema di prezzi</strong> è una coppia \(\pp = (\pu, \pd)\) di numeri non negativi, non entrambi nulli. L'insieme di bilancio di \(i\) è \(B(\pp, e(i)) = \{x \in \mathbb{R}^2_+ : \pp\cdot x \le \pp\cdot e(i)\}\).</p>
+  <p>La differenza con le lezioni 7 e 8 è una sola, ma pesa. Lì la ricchezza \(\wl\) era data. Qui ognuno possiede un paniere, e la sua ricchezza è il valore di quel paniere: \(\wl_i(\pp) = \pp \cdot e(i)\). <strong>Cambiare i prezzi cambia insieme le ragioni di scambio e la ricchezza di ciascuno.</strong> Nel gioco, ai prezzi \((r,1)\), Ann vale \(6r\) e Bob 6. E la dotazione è sempre acquistabile: chiunque può non scambiare.</p>
+  <p>I prezzi si possono leggere in due modi. Come prezzi in moneta: ognuno vende quello che ha e con il ricavato compra. Oppure come ragioni di scambio: con \(\pd \gt 0\), un'unità del bene 1 si scambia con \(\pu/\pd\) unità del bene 2. In entrambi i casi \(\pp\) e \(\lam \pp\), con \(\lam \gt 0\), sono lo stesso sistema di prezzi.</p>
+  <p class="stmt">Un'<strong>assegnazione</strong> dà un paniere a ogni individuo. Un'<strong>allocazione</strong> è un'assegnazione \(\aA\) che distribuisce esattamente ciò che c'è: \(\sum_i \aA(i) = \sum_i e(i)\).</p>
+  <h2>L'equilibrio concorrenziale</h2>
+  <p class="stmt">Un <strong>equilibrio concorrenziale</strong> è una coppia \((\pp, \aA)\), con \(\pp\) un sistema di prezzi e \(\aA\) un'assegnazione, tale che: per ogni individuo \(i\), \(\aA(i)\) è ottimo secondo \(\pf_i\) in \(B(\pp, e(i))\) (<em>ottimalità</em>); e \(\aA\) è un'allocazione (<em>realizzabilità</em>). Un'allocazione è di equilibrio se esiste un \(\pp\) che la rende tale.</p>
+  <p>Quando \((\pp,\aA)\) <em>non</em> è un equilibrio? O qualcuno non sceglie il suo paniere migliore, o per almeno un bene la quantità richiesta in totale è diversa da quella disponibile. Se \((\pp,\aA)\) è un equilibrio, lo è anche \((\lam\pp, \aA)\): raddoppiare i prezzi non cambia nessun insieme di bilancio.</p>
+  <p>In equilibrio tutti vedono gli stessi prezzi, e ognuno sceglie come se la sua scelta non li toccasse. È un'ipotesi ragionevole quando gli individui sono tanti; con due soli, come nel gioco, è una finzione utile.</p>
+  <div class="quiz inq" data-quiz="10b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Basta guardare un mercato</h2>
+  <p>Nel gioco abbiamo imposto che il mercato delle mele tornasse, e quello delle banane è tornato da solo: con \(r = 1\), \(2r + 4 = 6\). Non è un caso.</p>
+  <p class="stmt"><strong>Proposizione.</strong> Siano \(\pu, \pd \gt 0\) e sia \(\aA\) un'assegnazione in cui ognuno spende esattamente il valore della propria dotazione, \(\pp \cdot \aA(i) = \pp\cdot e(i)\). Se per un bene la somma delle quantità assegnate è pari alla somma delle dotazioni, lo stesso vale per l'altro bene.</p>
+  <details class="reveal"><summary>La dimostrazione</summary><div class="in">
+    <p>Sommando \(\pp\cdot \aA(i) = \pp \cdot e(i)\) su tutti gli individui e raccogliendo i due beni: \(\pu\big(\sum_i \aA_1(i) - \sum_i e_1(i)\big) = -\pd\big(\sum_i \aA_2(i) - \sum_i e_2(i)\big)\). Con entrambi i prezzi positivi, una parentesi è zero se e solo se lo è l'altra.</p>
+  </div></details>
+  <p>Per calcolare un equilibrio, quindi, basta trovare un prezzo a cui un mercato torna. Con \(L\) beni vale lo stesso: se tutti spendono tutta la ricchezza e \(L - 1\) mercati tornano, torna anche l'ultimo, purché il suo prezzo sia positivo.</p>
+  <h3>Un esercizio delle slide</h3>
+  <p>Stesse utilità, ma dotazioni \(e(1) = (1, 0)\) ed \(e(2) = (0, 100)\), con \(\pd = 1\). Le domande di mele sono \(2/3\) per l'individuo 1 e \(100/(3\pu)\) per il 2. Il mercato delle mele torna se \(2/3 + 100/(3\pu) = 1\), cioè \(\pu = 100\). L'allocazione di equilibrio è \(\aA(1) = (2/3,\ 100/3)\) e \(\aA(2) = (1/3,\ 200/3)\). La mela, rarissima, vale cento banane: nel gioco ne valeva una.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Un equilibrio esiste sempre?</h2>
+  <p>Fissiamo \(\pd = 1\) e chiamiamo \(\dd^i(\pu)\) la domanda di bene 1 dell'individuo \(i\) ai prezzi \((\pu, 1)\). La <strong>domanda in eccesso</strong> di bene 1 è quanto si chiede in più di quello che c'è: \(\zd(\pu) = \sum_i \big[\dd^i(\pu) - e_1(i)\big]\).</p>
+  <p class="stmt"><strong>Proposizione (esistenza).</strong> Supponi che ogni \(\dd^i\) sia continua; che per \(\pu\) abbastanza basso ognuno chieda più bene 1 di quanto ne possiede; e che per \(\pu\) abbastanza alto ognuno ne chieda meno. Allora l'economia ha un equilibrio concorrenziale.</p>
+  <p>L'idea è il teorema dei valori intermedi della lezione 3. \(\zd\) è continua, positiva per prezzi bassi e negativa per prezzi alti: da qualche parte vale zero. A quel prezzo \(\pu^*\) il mercato del bene 1 torna, e per la proposizione di prima torna anche l'altro. L'ottimalità vale per costruzione, perché ognuno sta scegliendo la sua domanda.</p>
+  <figure>
+    <div class="w" id="z10"></div>
+    <figcaption>La domanda in eccesso di mele nel gioco, al variare del prezzo relativo \(r\). Quella di Ann è sempre \(4 - 6 = -2\), quella di Bob è sempre \(2/r - 0\), positiva. La somma, \(2/r - 2\), passa per zero in \(r = 1\).</figcaption>
+  </figure>
+  <p>Il gioco soddisfa le ipotesi? No: Ann non chiede mai più mele di quante ne ha, e Bob non ne chiede mai meno. Eppure un equilibrio c'è. <strong>Le ipotesi sono sufficienti, non necessarie</strong>; e sono forti, perché insieme alla continuità garantiscono già che la domanda in eccesso totale attraversi lo zero.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La mano invisibile non spreca</h2>
+  <p class="stmt"><strong>Proposizione.</strong> Ogni allocazione di equilibrio concorrenziale di un'economia di scambio è Pareto stabile.</p>
+  <p>È il <strong>primo teorema fondamentale dell'economia del benessere</strong>: in equilibrio non esiste un'altra allocazione che faccia stare meglio qualcuno senza far stare peggio nessuno. La «mano invisibile», l'immagine con cui Adam Smith descriveva il mercato che coordina interessi privati, è efficiente nel senso di Pareto della lezione 9.</p>
+  <details class="reveal"><summary>La dimostrazione</summary><div class="in">
+    <p>Sia \((\pp,\aA)\) un equilibrio e supponi che un'allocazione \(y\) lo domini: \(y(i) \pf_i \aA(i)\) per tutti, \(y(j) \spf_j \aA(j)\) per qualcuno.</p>
+    <p>Per ogni \(i\), \(\pp\cdot y(i) \ge \pp\cdot e(i)\). Se no, aggiungendo un pochino di entrambi i beni a \(y(i)\) si otterrebbe un paniere ancora acquistabile, strettamente migliore di \(y(i)\) per la monotonia, e quindi di \(\aA(i)\): contro l'ottimalità. Per \(j\) vale anzi \(\pp\cdot y(j) \gt \pp\cdot e(j)\), altrimenti \(y(j)\), che è strettamente migliore, sarebbe stato acquistabile.</p>
+    <p>Sommando: \(\pp\cdot \sum_i y(i) \gt \pp\cdot \sum_i e(i)\). Ma \(y\) è un'allocazione, quindi \(\sum_i y(i) = \sum_i e(i)\) e i due valori sono uguali. Contraddizione.</p>
+  </div></details>
+  <p>Una conseguenza: se la dotazione iniziale non è Pareto stabile, ogni equilibrio comporta degli scambi. Il contrario non vale: che in equilibrio ci sia scambio non implica che la dotazione non fosse Pareto stabile. Se ognuno ha \(\uu_i = x_1 + x_2\), con \(e(1) = (1,0)\) ed \(e(2) = (0,1)\), la dotazione è già Pareto stabile (la somma delle utilità è sempre 2). Eppure ai prezzi \((1,1)\) scambiarsi i panieri è un equilibrio: ognuno resta indifferente, e lo scambio avviene lo stesso.</p>
+  <h3>Quando non vale: le esternalità</h3>
+  <p>Il teorema dipende da un'ipotesi: ognuno si cura solo del proprio paniere. Se il consumo di uno tocca il benessere di un altro, c'è un'<strong>esternalità</strong>, e il risultato può cadere.</p>
+  <p>Due individui, dotazioni \((1,0)\) e \((0,1)\). Il primo è danneggiato dal consumo di bene 2 del secondo: la sua utilità è \(\aA_1(1) + \aA_2(1) - 2\aA_2(2)\). Il secondo ha utilità \(2\aA_1(2) + 3\aA_2(2)\). Se ciascuno prende come dato il consumo dell'altro, i prezzi \((1,1)\) senza scambi sono un equilibrio. Ma l'allocazione con \(b(1) = (0;\ 0{,}5)\) e \(b(2) = (1;\ 0{,}5)\) è preferita da entrambi.</p>
+  <div class="quiz inq" data-quiz="10c"></div>
+  <h3>Dalla giungla al mercato</h3>
+  <p>Nella giungla il potere decideva chi prendeva che cosa, e la dittatura seriale dava l'unico equilibrio. Nel mercato ognuno possiede una dotazione e sceglie ai prezzi comuni, e l'equilibrio chiede in più che i mercati tornino. In entrambi i modelli gli equilibri sono Pareto stabili. In nessuno dei due questo dice che l'esito sia equo, né che le allocazioni Pareto stabili siano tutte uguali.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="10"></div>
+</div></section>
+
+<section><div class="col">
+  <div class="examend"><b>Fine del programma del primo parziale</b>Qui finisce la materia del primo parziale: le lezioni 1–10, cioè le slide dal Topic 1 al Topic 5-2 compreso. Le lezioni 11 e 12 (teoria dei giochi, Topic 6) sono oltre.</div>
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>in un equilibrio concorrenziale ognuno sceglie il meglio ai prezzi comuni e i mercati tornano; e senza esternalità il risultato è Pareto stabile.</strong></p>
+  <p>Fin qui ognuno sceglieva prendendo il mondo come dato. Con la teoria dei giochi le scelte degli altri diventano parte del problema.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

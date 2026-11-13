@@ -1,0 +1,222 @@
+<article class="lesson" data-n="1" id="lezione-1" data-title="Ma che cosa vuol dire «preferire»?">
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 1 · Topic 1</p>
+  <h1>Ma che cosa vuol dire «preferire»?</h1>
+  <p class="desc">Preferenze e utilità: come si descrive, in un modello, l'atteggiamento di una persona verso un insieme di alternative.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Qui sotto ci sono tre alternative, \(a\), \(b\) e \(c\). Pensa a tre pacchetti vacanza, o a tre appartamenti. Ti chiedo soltanto di confrontarle a due a due. Prova a cambiare le risposte.</p>
+  <figure>
+    <div class="w" id="hero"></div>
+    <figcaption>Tre confronti a coppie. Non tutte le combinazioni di risposte descrivono qualcuno che «ha delle preferenze» nel senso che useremo.</figcaption>
+  </figure>
+  <p>Rispondere a una domanda alla volta è facilissimo. Eppure le risposte di partenza, prese insieme, hanno un problema: \(a\) batte \(b\), \(b\) batte \(c\), e \(c\) batte \(a\). Qual è la migliore delle tre? Non c'è.</p>
+  <p><strong>Confrontare due cose è banale; restare coerenti su tutti i confronti non lo è.</strong> Questa lezione serve a dire con precisione che cosa significa «coerenti», e a capire quando un elenco di confronti si può riassumere con dei numeri.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Un questionario, non un sentimento</h2>
+  <p>La prima metà del corso studia un individuo solo che decide. L'ipotesi è che lo faccia in modo <strong>razionale</strong>, ma la parola qui ha un senso più stretto di quello di tutti i giorni. Non vuol dire «logico» o «sensato»: una scelta è razionale se è la migliore <em>secondo le preferenze di chi sceglie</em>. Quali siano quelle preferenze è affare suo. L'economia non giudica i gusti.</p>
+  <p>Potremmo descrivere una persona in mille modi: lo status sociale, l'esperienza, perfino la struttura del cervello. La teoria economica ne sceglie uno solo, le sue <strong>preferenze</strong> sulle alternative, e non si chiede da dove vengano.</p>
+  <p>Le preferenze sono un atteggiamento mentale e non hanno bisogno di una scelta per esistere. Puoi preferire un quadro a un altro in un museo che non visiterai mai, o avere un'opinione su come avresti voluto vivere tremila anni fa.</p>
+  <p>Nella vita diciamo «preferisco \(a\) a \(b\)», ma anche «adoro \(a\) e detesto \(b\)». Il modello tiene solo le frasi del primo tipo: <strong>conta l'ordine, non l'intensità.</strong></p>
+  <p>Un modo comodo di pensarci: le preferenze sono le risposte a un questionario che, per ogni coppia \((x,y)\), chiede quale di tre frasi ti descrive meglio. Non serve che la persona ci pensi davvero: contano le risposte che darebbe se dovesse compilarlo.</p>
+  <p>Immagina di essere al ristorante con il menu in mano. Fra mapo tofu e hotpot, quale preferisci? Le risposte possibili sono tre: il primo, il secondo, oppure «per me pari sono». Si può andare avanti così per ogni coppia di piatti, e alla fine si ha un elenco di risposte.</p>
+  <figure>
+    <div class="scroll">
+    <table>
+      <thead><tr><th>Risposta</th><th>Si scrive</th><th class="c">\(x \pf y\)?</th><th class="c">\(y \pf x\)?</th></tr></thead>
+      <tbody>
+        <tr><td>Preferisco \(x\) a \(y\)</td><td>\(x \spf y\)</td><td class="c">sì</td><td class="c">no</td></tr>
+        <tr><td>Per me \(x\) e \(y\) sono ugualmente desiderabili</td><td>\(x \ind y\)</td><td class="c">sì</td><td class="c">sì</td></tr>
+        <tr><td>Preferisco \(y\) a \(x\)</td><td>\(y \spf x\)</td><td class="c">no</td><td class="c">sì</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <figcaption>Le tre risposte si codificano con una sola relazione: \(x \pf y\) si legge «\(x\) è desiderabile almeno quanto \(y\)».</figcaption>
+  </figure>
+  <p>Il simbolo \(\pf\) è una <strong>relazione binaria</strong>: per ogni coppia ordinata dice se vale oppure no, come «minore di» fra i numeri (\(3&lt;5\) vale, \(7&lt;1\) no). Altre relazioni binarie: «è amico di», «è fratello o sorella di», «è genitore di» fra le persone; fra i numeri reali, perfino «\(y = x^2\)», che vale per la coppia \((2,4)\) e non per \((4,2)\). Le altre due relazioni che ci servono si ricavano da \(\pf\):</p>
+  <div class="eq">\[
+  x \ind y \ \text{ se } \ x \pf y \text{ e } y \pf x
+  \qquad\qquad
+  x \spf y \ \text{ se } \ x \pf y \text{ ma non } y \pf x
+  \]</div>
+  <p>\(\ind\) è l'<em>indifferenza</em>, \(\spf\) la <em>preferenza stretta</em>.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Due regole per chiamarla preferenza</h2>
+  <p>Non ogni relazione binaria merita il nome di preferenza. Le chiediamo due cose.</p>
+  <p>La prima: la persona risponde a tutte le domande. Lo chiediamo anche quando \(x\) e \(y\) sono la stessa alternativa, cioè \(x \pf x\). Il questionario questa domanda non la fa; la assumiamo perché è il senso stesso di «almeno quanto».</p>
+  <p class="stmt"><strong>Completezza.</strong> Per ogni \(x\) e \(y\) in \(\sX\) vale \(x \pf y\) oppure \(y \pf x\), o entrambe.</p>
+  <p>Una relazione in cui ogni elemento è in relazione con sé stesso, \(x \pf x\) per ogni \(x\), si dice <strong>riflessiva</strong>.</p>
+  <div class="quiz inq" data-quiz="1b"></div>
+  <p>La seconda è quella che il questionario di apertura metteva alla prova: le risposte devono incastrarsi.</p>
+  <p class="stmt"><strong>Transitività.</strong> Per ogni \(x\), \(y\), \(z\) in \(\sX\): se \(x \pf y\) e \(y \pf z\), allora \(x \pf z\).</p>
+  <p><strong>Una relazione di preferenza su \(\sX\) è una relazione binaria completa e transitiva.</strong> Le due regole sono indipendenti: qui sotto la relazione è scritta come una tabella di sì e di no, e puoi violarne una senza toccare l'altra.</p>
+  <figure>
+    <div class="w" id="relgrid"></div>
+    <figcaption>Ogni casella risponde alla domanda «l'alternativa della riga è desiderabile almeno quanto quella della colonna?». Tocca una casella per cambiare la risposta. La diagonale è fissa sul sì, perché ogni alternativa vale almeno quanto sé stessa.</figcaption>
+  </figure>
+  <p>La completezza chiede almeno un sì per ogni coppia. La transitività <em>restringe</em> le risposte ammesse: se hai detto «\(x\) almeno quanto \(y\)» e «\(y\) almeno quanto \(z\)», su \(x\) e \(z\) non sei più libero.</p>
+  <p>Ne segue che anche \(\ind\) e \(\spf\) sono transitive. Per \(\ind\) si vede subito: se \(x \ind y\) e \(y \ind z\), valgono \(x \pf y\), \(y \pf z\) e le loro inverse; la transitività di \(\pf\) dà \(x \pf z\) e \(z \pf x\), cioè \(x \ind z\).</p>
+  <div class="quiz inq" data-quiz="1a"></div>
+  <p>L'indifferenza è poi riflessiva (\(x \ind x\)) e simmetrica (se \(x \ind y\) allora \(y \ind x\)). Una relazione riflessiva, simmetrica e transitiva si chiama <strong>relazione di equivalenza</strong>, e divide sempre l'insieme in gruppi disgiunti. Qui i gruppi sono gli <strong>insiemi di indifferenza</strong>: dentro un gruppo tutto è ugualmente desiderabile, fra gruppi diversi no.</p>
+  <h3>Simmetrica, antisimmetrica</h3>
+  <p>Due proprietà che torneranno. Una relazione \(R\) è <strong>simmetrica</strong> se da \(x R y\) segue sempre \(y R x\). È <strong>antisimmetrica</strong> se, per \(x\) e \(y\) diversi, \(x R y\) esclude \(y R x\). Non sono l'una il contrario dell'altra: una relazione può averle entrambe, o nessuna.</p>
+  <figure>
+    <div class="scroll">
+    <table>
+      <thead><tr><th>Relazione</th><th class="c">Simmetrica?</th><th class="c">Antisimmetrica?</th></tr></thead>
+      <tbody>
+        <tr><td>«è fratello o sorella di», fra persone</td><td class="c">sì</td><td class="c">no</td></tr>
+        <tr><td>«è genitore di», fra persone; \(\ge\) fra numeri</td><td class="c">no</td><td class="c">sì</td></tr>
+        <tr><td>«è uguale a»</td><td class="c">sì</td><td class="c">sì</td></tr>
+        <tr><td>una preferenza \(\pf\) con \(a \spf b\) e \(b \ind c\)</td><td class="c">no</td><td class="c">no</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <figcaption>Le quattro combinazioni possibili. Le slide pongono le quattro domande senza dare le risposte: gli esempi della tabella sono miei. Nell'ultima riga \(a \spf b\) rompe la simmetria, e \(b \ind c\) con \(b \ne c\) rompe l'antisimmetria.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Da dove potrebbero venire le preferenze?</h2>
+  <p>Nei modelli le preferenze sono un dato. Possiamo però immaginare come una persona se le forma, e chiederci: <span class="ask">il procedimento produce sempre una relazione di preferenza?</span> Tre procedimenti sì, due no.</p>
+  <h3>Tre procedimenti che funzionano</h3>
+  <p><strong>Funzione di valore.</strong> La persona assegna a ogni alternativa un numero \(\vv(x)\) e pone \(x \pf y\) quando \(\vv(x) \ge \vv(y)\). È completa perché due numeri si confrontano sempre, ed è transitiva perché lo è \(\ge\).</p>
+  <p><strong>Distanza da un ideale.</strong> Una delle alternative è quella ideale, e \(d(x)\) misura quanto \(x\) ne dista: \(x \pf y\) quando \(d(x) \le d(y)\). È il caso precedente con \(\vv(x) = -d(x)\).</p>
+  <p><strong>Preferenze lessicografiche.</strong> Due criteri, \(\pf_1\) e \(\pf_2\), ciascuno completo e transitivo. Il primo comanda, il secondo rompe i pareggi. Per un computer: prima la memoria e, a parità di memoria, la risoluzione dello schermo.</p>
+  <div class="eq">\[
+  x \pf y \ \text{ se } \ x \spf_1 y \ \ \text{ oppure } \ \ \big(x \ind_1 y \ \text{ e } \ x \pf_2 y\big)
+  \]</div>
+  <h3>Due che possono fallire</h3>
+  <p>Ora la persona ha in testa tre criteri, ciascuno un ordinamento di \(a\), \(b\), \(c\) senza pareggi, e deve metterli insieme. Due regole naturali: \(x \pf y\) se <em>tutti</em> i criteri sono d'accordo (unanimità), oppure se lo è la <em>maggioranza</em>. Cambia i criteri e la regola.</p>
+  <figure>
+    <div class="w" id="cond"></div>
+    <figcaption>Ogni criterio è un ordinamento senza pareggi di \(a\), \(b\), \(c\). Una freccia va dall'alternativa preferita a quella battuta. Con i tre criteri di partenza la maggioranza gira in tondo: è il paradosso di Condorcet, dal nome del matematico francese che lo descrisse nel Settecento.</figcaption>
+  </figure>
+  <p>Le due regole falliscono in modi opposti. L'<strong>unanimità</strong> è sempre transitiva, ma può non essere completa: basta che due criteri siano in disaccordo su una coppia. La <strong>maggioranza</strong> è sempre completa, ma può non essere transitiva.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Ma noi siamo davvero transitivi?</h2>
+  <p>La transitività sembra ovvia, e chi viene colto in fallo di solito si imbarazza e corregge. È facile, però, costruire una situazione in cui quasi tutti sbagliano.</p>
+  <p>Gli autori del libro hanno messo online un questionario lungo e faticoso: 36 confronti fra nove pacchetti vacanza, ciascuno descritto da città, qualità dell'hotel, qualità del cibo e prezzo.</p>
+  <figure>
+    <div class="bars">
+      <div class="bar"><span>Nessuna violazione</span><i style="--w:15%"></i><b>15%</b></div>
+      <div class="bar"><span>Almeno una</span><i style="--w:85%"></i><b>85%</b></div>
+    </div>
+    <figcaption>Circa 1.300 risposte, ad aprile 2018. Una violazione è una terna di alternative con risposte incompatibili con la transitività. Per partecipante, la mediana è di 6 terne e la media di 9,5.</figcaption>
+  </figure>
+  <p>Il caso più istruttivo riguarda tre pacchetti. I primi due sono <em>lo stesso</em> weekend a Parigi, con le caratteristiche elencate in ordine diverso; il terzo è un weekend diverso. Quasi tutti si dichiarano indifferenti fra i primi due. Eppure un quarto dei partecipanti viola la transitività su questa terna, perché confronta il terzo pacchetto in modo diverso a seconda di quale descrizione ha davanti.</p>
+  <p>Le risposte coerenti, invece, seguono spesso una regola semplice: guardare una sola caratteristica, oppure dare priorità a una e usarne un'altra per i pareggi, come nelle preferenze lessicografiche. Le regole semplici si applicano con più costanza.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Dai confronti ai numeri</h2>
+  <p>Una preferenza è un oggetto ingombrante. Con 100 alternative le coppie da confrontare sono \(100 \cdot 99 / 2 = 4950\): l'elenco delle risposte diventa lunghissimo. Sarebbe più comodo dare a ogni alternativa un numero, più alto quanto più è gradita: «\(\uu(\text{mapo tofu}) = 5\), \(\uu(\text{hotpot}) = 2\)» per dire che il mapo tofu è preferito all'hotpot.</p>
+  <p>Lavorare con una relazione è scomodo; con una funzione è molto più facile. Quando una funzione di valore riproduce esattamente una relazione di preferenza, la chiamiamo <strong>funzione di utilità</strong>.</p>
+  <p class="stmt">La funzione \(\uu : \sX \to \mathbb{R}\) <strong>rappresenta</strong> \(\pf\) se</p>
+  <div class="eq">\[ x \pf y \quad\Longleftrightarrow\quad \uu(x) \ge \uu(y). \]</div>
+  <p>Attenzione al verso della frase. Non stiamo dicendo che la persona calcola numeri: diciamo che le sue preferenze <em>possono essere descritte</em> da numeri.</p>
+  <p>Un esempio. Su \(\{a,b,c,d\}\) le preferenze sono \(a \spf b \ind c \spf d\). La funzione con \(\uu(a)=5\), \(\uu(b)=\uu(c)=-1\), \(\uu(d)=-17\) le rappresenta. I valori in sé non contano; conta solo chi sta sopra chi. Allo stesso modo, se Marco fra tre cocktail ha \(\text{Old Fashioned} \spf \text{Margarita} \spf \text{Mojito}\), una sua utilità è \(3, 2, 1\); un'altra è \(100, 7, 0\).</p>
+  <p><span class="ask">Si può sempre fare?</span> Se le alternative sono in numero finito, sì. E la dimostrazione è una ricetta.</p>
+  <h3>Togli i peggiori, un gradino alla volta</h3>
+  <p>Chiamiamo <strong>minimale</strong> un'alternativa \(x\) tale che \(y \pf x\) per ogni \(y\), e <strong>massimale</strong> una per cui \(x \pf y\) per ogni \(y\). In un insieme finito ne esiste sempre almeno una di ciascun tipo.</p>
+  <p>Allora: prendi le minimali e assegna loro \(\uu = 1\). Toglile. Fra quelle rimaste prendi le minimali: \(\uu = 2\). Continua finché l'insieme si svuota. Rispondi al questionario e guarda la scala che si forma.</p>
+  <figure>
+    <div class="w" id="build"></div>
+    <figcaption>Ogni gradino \(M_k\) è un insieme di indifferenza, e l'utilità di un'alternativa è il numero del passo in cui viene tolta.</figcaption>
+  </figure>
+  <details class="reveal">
+    <summary>Perché la scala rappresenta davvero la preferenza</summary>
+    <div class="in">
+      <p>Chiama \(Y_{k-1}\) ciò che resta prima del passo \(k\), e \(M_k\) le sue minimali, a cui va \(\uu = k\). Bisogna mostrare che \(a \pf b\) se e solo se \(\uu(a) \ge \uu(b)\).</p>
+      <p>Se \(\uu(a) = \uu(b)\), le due alternative sono entrambe minimali nello stesso insieme: \(a \pf b\) e \(b \pf a\), cioè \(a \ind b\). Se \(\uu(a) \gt \uu(b)\), quando viene tolta \(b\) c'è ancora \(a\): \(b\) è minimale lì, quindi \(a \pf b\); e \(a\) non lo è, quindi non vale \(b \pf a\). Dunque \(a \spf b\).</p>
+    </div>
+  </details>
+  <details class="reveal">
+    <summary>Perché esiste sempre una minimale</summary>
+    <div class="in">
+      <p>Per induzione sul numero \(n\) di alternative: si controlla il caso con una sola alternativa, poi si mostra che se il risultato vale con \(n-1\) alternative vale anche con \(n\). Con \(n=1\) l'unica alternativa è minimale. Supponi che il risultato valga per \(n-1\). Scegli una \(y\) qualsiasi e sia \(x\) minimale nell'insieme senza \(y\). Se \(y \pf x\), allora \(x\) è minimale in tutto l'insieme. Altrimenti \(x \pf y\); ma ogni altra \(z\) soddisfa \(z \pf x\), quindi per transitività \(z \pf y\), e la minimale è \(y\).</p>
+      <p>Le slide fanno lo stesso ragionamento per la massimale, con i versi scambiati: se \(x \pf y\) la massimale resta \(x\); altrimenti \(y \spf x\), e poiché \(x \pf z\) per ogni altra \(z\), per transitività \(y \pf z\).</p>
+      <p>Su insiemi infiniti non è più garantito: una relazione di preferenza può non avere né un minimo né un massimo. Per esempio «\(x \pf y\) se \(x \ge y\)» su tutti i numeri reali: di ogni numero ce n'è uno più grande e uno più piccolo.</p>
+    </div>
+  </details>
+  <h3>Un cinema</h3>
+  <p>Una sala ha le file numerate a partire dallo schermo e le colonne da sinistra a destra. Una spettatrice ha preferenze lessicografiche sui posti: prima di tutto vuole stare il più indietro possibile; a parità di fila, il più a sinistra possibile, vicino all'uscita.</p>
+  <figure>
+    <div class="w" id="cinemaLeg"></div>
+    <div class="cinema">
+      <div class="screen">schermo</div>
+      <div class="seats" id="seats"></div>
+      <div class="axisnote"><span>colonna 1, uscita</span><span>colonna 10</span></div>
+    </div>
+    <div class="out" id="seatOut" aria-live="polite"></div>
+    <div class="w" id="cinemaPlay"></div>
+    <figcaption>Dieci file da dieci posti, con la prima fila in alto, vicino allo schermo. Premi play per vedere la ricetta al lavoro: a ogni passo toglie il posto peggiore fra i rimasti e gli assegna il numero del passo. Alla fine, più un posto è luminoso, più è preferito. Tocca un posto per leggere la sua utilità.</figcaption>
+  </figure>
+  <p>Nessuna coppia di posti è indifferente, quindi ogni gradino contiene un posto solo. Il primo a essere tolto è quello in fila 1, ultima colonna; l'ultimo è quello in ultima fila, colonna 1. Con \(r(x)\) la fila e \(c(x)\) la colonna, in questa sala da 10 colonne il risultato è \(\uu(x) = 10\,r(x) - c(x) + 1\). Nella sala del libro, 40 file per 50 colonne, la stessa ricetta dà</p>
+  <div class="eq">\[ \uu(x) = 50\,r(x) - c(x) + 1 , \]</div>
+  <p>con utilità che vanno da 1 a 2.000.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando i numeri non bastano</h2>
+  <p>Anche su insiemi infiniti molte preferenze hanno un'utilità. Sui numeri reali non negativi, «\(x \pf y\) se \(x \ge y\)» è rappresentata da \(\uu(x) = x\).</p>
+  <p>Non tutte, però. Prendi come alternative i punti del quadrato unitario, \((x_1, x_2)\) con entrambe le coordinate fra 0 e 1, e preferenze lessicografiche: comanda la prima coordinata, la seconda rompe i pareggi. Per esempio \((0{,}3;\,0{,}1) \spf (0{,}2;\,0{,}9) \spf (0{,}2;\,0{,}8)\).</p>
+  <figure>
+    <div class="w" id="sqLeg"></div>
+    <svg class="sq" id="sq" viewBox="0 0 340 340" role="img" aria-label="Quadrato unitario con l'insieme delle alternative preferite al punto z"></svg>
+    <label class="sl"><span>prima coordinata \(z_1\)</span><input type="range" id="z1" min="0" max="1" step="0.01" value="0.45"><span class="v" id="z1v"></span></label>
+    <label class="sl"><span>seconda coordinata \(z_2\)</span><input type="range" id="z2" min="0" max="1" step="0.01" value="0.4"><span class="v" id="z2v"></span></label>
+    <figcaption>Sull'asse orizzontale la prima coordinata, su quello verticale la seconda. In azzurro le alternative preferite a \(z\): tutto ciò che sta alla sua destra, più il tratto verticale sopra \(z\). Il tratto tratteggiato sotto \(z\) è escluso. Trascina il punto.</figcaption>
+  </figure>
+  <p>Guarda la linea verticale che passa per \(z\). Un passo piccolissimo a destra batte qualunque salto in alto. C'è un «muro» così per ogni valore di \(x_1\), ed è questo a rendere impossibile mettere tutti i punti in fila sulla retta dei numeri.</p>
+  <details class="reveal">
+    <summary>L'idea della dimostrazione (non è materia d'esame)</summary>
+    <div class="in">
+      <p>Supponi che una \(\uu\) esista. Per ogni \(x\) in \([0,1]\) vale \((x,1) \spf (x,0)\), quindi \(\uu(x,1) &gt; \uu(x,0)\): a ogni \(x\) corrisponde un intervallo non vuoto di numeri. Se \(a &gt; b\), allora \((a,0) \spf (b,1)\), quindi gli intervalli di \(a\) e di \(b\) non si toccano.</p>
+      <p>In ogni intervallo c'è un numero razionale. Scegliendone uno per ciascun \(x\) si ottiene una funzione che manda punti diversi di \([0,1]\) in razionali diversi. Ma i razionali sono numerabili, cioè si possono mettere in un elenco uno dopo l'altro, mentre i punti di \([0,1]\) no: sono «di più». È un risultato classico, dimostrato da Cantor con il suo argomento diagonale. Una funzione così, quindi, non può esistere.</p>
+    </div>
+  </details>
+</div></section>
+
+<section><div class="col">
+  <h2>Quante utilità vanno bene?</h2>
+  <p>Se una \(\uu\) rappresenta le preferenze, ce ne sono moltissime altre. Riprendi l'esempio con \(\uu(a)=5\), \(\uu(b)=\uu(c)=-1\), \(\uu(d)=-17\) e applica una funzione \(f\) ai valori.</p>
+  <figure>
+    <div class="grp"><div class="pick">Scegli la funzione \(f\) da applicare</div><div class="ctl" id="fbtns"></div></div>
+    <div class="w" id="trLeg"></div>
+    <svg id="tr" viewBox="0 0 640 210" role="img" aria-label="Valori di u e di w = f(u) per le quattro alternative"></svg>
+    <div class="out" id="trOut" aria-live="polite"></div>
+    <figcaption>Sulla riga in alto i valori di \(\uu\) per le quattro alternative, su quella in basso i valori di \(\ww = f(\uu)\). Una linea collega ogni alternativa a sé stessa. Se le linee non si incrociano, l'ordine è lo stesso.</figcaption>
+  </figure>
+  <p class="stmt">Se \(f\) è crescente, cioè \(f(s) &gt; f(t)\) ogni volta che \(s &gt; t\), e \(\uu\) rappresenta \(\pf\), allora anche \(\ww(x) = f(\uu(x))\) rappresenta \(\pf\).</p>
+  <p>La ragione sta in una riga: \(\ww(x) \ge \ww(y)\) se e solo se \(f(\uu(x)) \ge f(\uu(y))\), se e solo se \(\uu(x) \ge \uu(y)\), se e solo se \(x \pf y\).</p>
+  <p>Un esempio che tornerà spesso è l'utilità <em>Cobb–Douglas</em> sulle coppie di numeri non negativi, \(\uu(x,y) = x^{\alf} y^{1-\alf}\) con \(\alf\) fra 0 e 1. La stessa preferenza è rappresentata dal suo logaritmo, \(\alf \ln x + (1-\alf)\ln y\); dalla sua radice quadrata, \(x^{\alf/2}y^{(1-\alf)/2}\); dal suo cubo, \(x^{3\alf}y^{3-3\alf}\). Tre formule diverse, un solo ordinamento.</p>
+  <p><strong>Un'utilità è un'etichetta d'ordine, non una misura.</strong> Dire che \(\uu(a)\) è «il doppio» di \(\uu(b)\) non significa niente, in linea con la decisione iniziale di ignorare l'intensità.</p>
+  <h3>Una scala che dice solo l'ordine</h3>
+  <p>I geologi usano da due secoli una scala fatta così: la scala di Mohs della durezza dei minerali. Un minerale ha un numero più alto di un altro se lo graffia. Nient'altro.</p>
+  <figure>
+    <div class="w" id="mohs"></div>
+    <figcaption>La scala di Mohs: dieci minerali di riferimento in ordine di durezza. Ognuno graffia tutti quelli alla sua sinistra. I numeri dicono l'ordine: non dicono che il diamante sia «dieci volte» più duro del talco, né che il passo da 9 a 10 sia grande quanto quello da 1 a 2.</figcaption>
+  </figure>
+  <p>Non è l'unico modo di intendere l'utilità. Per Jeremy Bentham, nel 1789, era una misura oggettiva del benessere: «La natura ha posto l'umanità sotto il governo di due padroni sovrani, il dolore e il piacere», e il principio di utilità approva o disapprova ogni azione secondo la sua tendenza ad aumentare o diminuire la felicità di chi ne è toccato. È l'interpretazione <em>edonica</em>: \(\uu(\text{mapo tofu}) = 5\) e \(\uu(\text{hotpot}) = 2\) vorrebbero dire 5 e 2 unità di piacere, e un mapo tofu varrebbe più di due hotpot.</p>
+  <p>Gli economisti oggi non la pensano così: l'utilità è <strong>ordinale</strong>, e nemmeno le <em>differenze</em> di utilità hanno significato. Prendi \(\uu(x) = x\) e i numeri \(1\), \(0\), \(3/2\), \(1\): la differenza \(\uu(1) - \uu(0) = 1\) è più grande di \(\uu(3/2) - \uu(1) = 1/2\). Applica \(f(t) = t^3\), che è crescente: ora la prima differenza è \(1\) e la seconda \(27/8 - 1 = 19/8\). Il confronto si è rovesciato, senza che le preferenze siano cambiate.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="1"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>una preferenza è un elenco coerente di confronti, e un'utilità è solo un modo comodo di scriverlo con dei numeri.</strong></p>
+  <p>Fin qui abbiamo descritto che cosa una persona <em>pensa</em> delle alternative. Nella prossima lezione guardiamo che cosa <em>fa</em>, e quando le due descrizioni si possono collegare.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

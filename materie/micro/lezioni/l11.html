@@ -1,0 +1,92 @@
+<article class="lesson" data-n="11" id="lezione-11" data-title="Come si scrive un gioco?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Watson, capitoli 1–3 · Topic 6-1</p>
+  <p class="examtag">Oltre il programma del primo parziale</p>
+  <h1>Come si scrive un gioco?</h1>
+  <p class="desc">Introduzione alla teoria dei giochi: forma estesa, insiemi di informazione, strategie come piani completi, forma normale.</p>
+</div></section>
+
+<section><div class="col">
+  <div class="examend"><b>Dopo il primo parziale</b>Questa lezione e la prossima non sono nel programma del primo parziale, che si chiude con la lezione 10 (Topic 5-2).</div>
+  <p>La prima metà del corso era teoria delle decisioni: un individuo da solo davanti a un problema. La seconda è teoria dei giochi, che si può chiamare <em>teoria delle decisioni interattive</em>. Da qui il testo di riferimento cambia: è <em>Strategy</em> di Joel Watson (terza edizione).</p>
+  <p>La teoria dei giochi analizza il comportamento di individui che interagiscono. Il tratto decisivo è l'<strong>interdipendenza</strong>: le conseguenze di ciò che fa uno dipendono da ciò che fanno gli altri. È la situazione degli scacchi o del poker, per questo si parla di «giochi» e di «giocatori». Chi è consapevole dell'interazione cerca di anticipare le mosse altrui: <strong>questa è l'essenza del pensiero strategico.</strong></p>
+  <p>La teoria serve a tre cose: dà un linguaggio comune per parlare di situazioni strategiche, una disciplina per costruirne modelli chiari e rigorosi, e un modo di seguire fino in fondo le conseguenze logiche delle ipotesi sul comportamento. Il resto del corso la sviluppa in quattro blocchi: rappresentazioni e ipotesi di base (questo topic), giochi statici, giochi dinamici, informazione.</p>
+  <p>Per descrivere un gioco servono sempre cinque cose: chi gioca; che cosa può fare ciascuno; che cosa sa quando agisce; come le azioni portano agli esiti; e che cosa preferisce ciascuno fra gli esiti. I giochi non cooperativi si scrivono in due forme: la <strong>forma estesa</strong> e la <strong>forma normale</strong>, o strategica.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La forma estesa: un albero</h2>
+  <p>Due imprese vendono lo stesso prodotto e scelgono ciascuna un prezzo alto (\(H\)) o basso (\(L\)). Prima sceglie l'impresa 1; l'impresa 2 vede la sua scelta e poi sceglie. Se entrambe scelgono \(H\) si dividono il mercato e guadagnano 1 milione ciascuna. Se una sceglie \(H\) e l'altra \(L\), quella col prezzo basso prende tutto il mercato e guadagna 2, l'altra 0. Se entrambe scelgono \(L\), 0,5 ciascuna.</p>
+  <p>Il gioco si disegna come un albero. Ai <strong>nodi decisionali</strong> qualcuno sceglie, e c'è scritto chi; i <strong>rami</strong> sono le azioni possibili; ai <strong>nodi terminali</strong> il gioco finisce, e c'è scritto il vettore dei payoff, prima quello del giocatore 1 e poi quello del 2. Ogni nodo terminale corrisponde a un solo <em>cammino</em> dalla radice: fra cammini e nodi terminali c'è una corrispondenza uno a uno.</p>
+  <p>Ora cambia una cosa sola: le due imprese scelgono senza conoscere la scelta dell'altra, e la scoprono solo alla fine. L'albero è lo stesso, ma l'impresa 2 non sa in quale dei suoi due nodi si trova. Lo si indica con una linea tratteggiata.</p>
+  <figure>
+    <div class="w" id="price11"></div>
+    <figcaption>Il gioco dei prezzi in due versioni. Nel primo riquadro l'impresa 2 osserva la scelta dell'impresa 1: ha due insiemi di informazione, e per distinguerli le sue azioni nel nodo di destra (dopo \(L\)) hanno l'apice. Nel secondo non la osserva: la linea tratteggiata unisce i suoi due nodi in un solo insieme di informazione. Payoff in milioni: in rosa l'impresa 1, in azzurro l'impresa 2.</figcaption>
+  </figure>
+  <p class="stmt">Un <strong>insieme di informazione</strong> è un gruppo di nodi decisionali dello stesso giocatore che lui non sa distinguere quando deve scegliere. Ogni nodo decisionale sta in un insieme di informazione, anche da solo. Un giocatore con \(x\) insiemi di informazione deve specificare \(x\) scelte, una per ciascuno, anche per quelli che nel corso del gioco potrebbero non essere raggiunti.</p>
+  <div class="quiz inq" data-quiz="11a"></div>
+  <h3>Sasso, carta, forbici</h3>
+  <p>Due giocatori contano fino a tre e mostrano insieme sasso (\(R\)), carta (\(P\)) o forbici (\(S\)). Il sasso batte le forbici, le forbici battono la carta, la carta batte il sasso; stessa figura, pareggio. Chi vince prende 1, chi perde −1, il pareggio dà 0.</p>
+  <figure>
+    <div class="w" id="rps11"></div>
+    <figcaption>Sasso, carta, forbici in forma estesa. Il giocatore 2 sceglie senza sapere che cosa ha scelto il giocatore 1: i suoi tre nodi stanno in un solo insieme di informazione. Per ogni foglia, il payoff del giocatore 1 in rosa e quello del 2 in azzurro.</figcaption>
+  </figure>
+  <p>Chi sta alla radice? Quando le scelte sono simultanee non importa: si può mettere alla radice il giocatore 2 e il gioco descritto è lo stesso. <strong>L'ordine dei nodi nell'albero non è l'ordine del tempo, ma di ciò che si sa.</strong></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Strategie: piani completi</h2>
+  <p class="stmt">Una <strong>strategia</strong> è un piano d'azione completo e contingente: dice che cosa il giocatore farebbe in ciascuno dei suoi insiemi di informazione.</p>
+  <p>È uno dei concetti più importanti della teoria, e il più insidioso. Nel gioco dei prezzi sequenziale, una strategia dell'impresa 2 dice che prezzo sceglie se l'impresa 1 ha scelto \(H\) <em>e</em> che prezzo sceglie se ha scelto \(L\). Si scrive mettendo in fila le etichette: \(HL'\) vuol dire «alto dopo alto, basso dopo basso». Le strategie dell'impresa 2 sono quattro: \(HH'\), \(HL'\), \(LH'\), \(LL'\).</p>
+  <p class="stmt">Lo <strong>spazio delle strategie</strong> \(\sS_i\) è l'insieme di tutte le strategie del giocatore \(i\); una sua strategia si scrive \(s_i \in \sS_i\). Un <strong>profilo di strategie</strong> è un vettore \(s = (s_1, \dots, s_n)\) con una strategia per giocatore. L'insieme dei profili è il prodotto cartesiano \(\sS = \sS_1 \times \cdots \times \sS_n\), e \(s_{-i}\) indica il profilo senza la strategia di \(i\).</p>
+  <p>Per esempio, nel gioco dei prezzi sequenziale \(\sS_1 = \{H, L\}\) e \(\sS_2 = \{HH', HL', LH', LL'\}\); un profilo è \((L, LH')\). Se \(\sS_1 = \{A, B\}\) e \(\sS_2 = \{X, Y\}\), allora \(\sS = \{(A,X), (A,Y), (B,X), (B,Y)\}\).</p>
+  <h3>Perché anche le mosse che non farai</h3>
+  <p>Un altro gioco delle slide. Il giocatore 1 sceglie fra uscire (\(O\)) ed entrare (\(I\)). Se entra, il giocatore 2 sceglie fra \(O\) e \(I\). Se entra anche lui, il giocatore 1 sceglie di nuovo, fra \(A\) e \(B\).</p>
+  <figure>
+    <div class="w" id="tree11"></div>
+    <figcaption>Il gioco con tre decisioni. Due payoff vengono dalle slide, \(\uu_1(OA, O) = 2\) e \(\uu_1(IA, I) = 4\); gli altri non sono nel testo delle slide che ho, e li ho presi dalla figura corrispondente del libro di Watson (fig. 3.1): vanno controllati sulla figura delle slide. Le strategie del giocatore 1 sono quattro, perché il piano deve dire che cosa farebbe al secondo nodo anche se esce subito.</figcaption>
+  </figure>
+  <p>Perché non bastano tre strategie, \(O\), \(IA\) e \(IB\)? Perché il piano deve essere completo. Le ragioni sono due. La prima: per decidere, il giocatore 2 deve chiedersi che cosa farebbe il giocatore 1 al suo secondo nodo; quindi deve formarsi una convinzione su quella scelta, anche se il giocatore 1 intende uscire. La seconda: si sbaglia. Se ti lascio scritto solo «scegli \(O\)» e tu per errore entri, e il giocatore 2 entra a sua volta, ti ritrovi senza istruzioni.</p>
+  <div class="quiz inq" data-quiz="11b"></div>
+  <h3>Strategie che sono funzioni</h3>
+  <p>Due persone decidono quanto versare per un progetto benefico, che riesce solo se in tutto si arriva ad almeno 900. Ognuna ha 600 disponibili. Prima il giocatore 1 sceglie il suo contributo \(x \in [0, 600]\); il giocatore 2 lo vede e sceglie \(y \in [0, 600]\).</p>
+  <p>Allora \(\sS_1 = [0, 600]\). Il giocatore 2 ha un insieme di informazione per <em>ogni</em> valore di \(x\) che può osservare, e una sua strategia deve dire che cosa fa in ciascuno: è una funzione, \(\sS_2 = \{s_2 \mid s_2 : [0,600] \to [0,600]\}\).</p>
+  <figure>
+    <div class="w" id="charity11"></div>
+    <figcaption>Due strategie del giocatore 2, fra infinite. Una strategia non è un numero: è un'intera curva, che a ogni contributo osservato \(x\) associa il proprio \(y\). Le due curve sono esempi miei.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>La forma normale</h2>
+  <p>Un profilo di strategie descrive tutta la partita: partendo dalla radice e seguendo le azioni che le strategie prescrivono si arriva a un nodo terminale, e quindi a un vettore di payoff. Ogni profilo \(s\) determina così un payoff \(\uu_i(s)\) per ogni giocatore. Se nel gioco ci sono mosse del caso, un profilo dà una distribuzione sui nodi terminali, e \(\uu_i(s)\) è il payoff atteso.</p>
+  <p class="stmt">Un <strong>gioco in forma normale</strong> (o strategica) è fatto di un insieme di giocatori \(\{1, \dots, n\}\), degli spazi di strategie \(\sS_1, \dots, \sS_n\) e delle funzioni di payoff \(\uu_1, \dots, \uu_n\), con \(\uu_i : \sS \to \mathbb{R}\).</p>
+  <p>Con due giocatori e strategie in numero finito si scrive come una matrice: righe per le strategie del giocatore 1, colonne per quelle del 2, e in ogni cella il vettore dei payoff di quel profilo.</p>
+  <figure>
+    <div class="w" id="nf11"></div>
+    <figcaption>Il gioco con tre decisioni in forma normale. Ogni cella si ottiene seguendo l'albero: per esempio \((IA, I)\) porta a «entra, entra, \(A\)». Le righe \(OA\) e \(OB\) sono identiche, perché uscendo subito la seconda scelta non conta. Payoff come nella figura dell'albero.</figcaption>
+  </figure>
+  <p>Dalla forma estesa alla forma normale c'è una sola strada. Al contrario no: <strong>giochi in forma estesa diversi possono avere la stessa forma normale.</strong> Il gioco dei prezzi simultaneo dà la stessa matrice sia che alla radice si metta l'impresa 1, sia l'impresa 2.</p>
+  <figure>
+    <div class="w" id="nfp11"></div>
+    <figcaption>Le due versioni del gioco dei prezzi in forma normale. Nel primo riquadro quella sequenziale: l'impresa 2 ha quattro strategie. Nel secondo quella simultanea: ne ha due.</figcaption>
+  </figure>
+  <h3>I giochi classici</h3>
+  <p>Alcune matrici 2×2 tornano così spesso da avere un nome. Le useremo per tutto il resto del corso.</p>
+  <figure>
+    <div class="w" id="classic11"></div>
+    <figcaption>Sei giochi classici in forma normale, con i payoff del libro di Watson (fig. 3.4): le slide li elencano in una figura che non ho in forma testuale, quindi i numeri vanno controllati. In ogni cella il payoff del giocatore di riga in rosa, quello del giocatore di colonna in azzurro.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="11"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>una strategia è un piano completo, che dice che cosa fare in ogni insieme di informazione, anche in quelli che il piano stesso evita.</strong></p>
+  <p>Nella prossima lezione: che cosa pensa un giocatore delle strategie altrui, e come lo si mette in numeri.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

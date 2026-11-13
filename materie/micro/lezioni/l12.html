@@ -1,0 +1,107 @@
+<article class="lesson" data-n="12" id="lezione-12" data-title="Che cosa crede un giocatore?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Watson, capitoli 4–5 · Topic 6-2 e 6-3</p>
+  <p class="examtag">Oltre il programma del primo parziale</p>
+  <h1>Che cosa crede un giocatore?</h1>
+  <p class="desc">Convinzioni, strategie miste e payoff atteso; poi le ipotesi generali della teoria: razionalità, conoscenza comune, realismo.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 11 un gioco era un albero o una matrice. Ora entriamo nella testa di chi gioca. Prendi la battaglia dei sessi: tu sei il giocatore 1, io il 2. Se sei sicuro che sceglierò \(B\), che cosa scegli? E se sei sicuro che sceglierò \(A\)? E se non sei sicuro di niente?</p>
+  <figure>
+    <div class="w" id="bos12"></div>
+    <figcaption>La battaglia dei sessi, con i payoff del libro di Watson (vedi la lezione 11). Nel secondo riquadro il payoff del giocatore 1 da ciascuna sua strategia, al variare della probabilità \(q\) che lui attribuisce alla scelta \(A\) del giocatore 2. Le due rette si incrociano in \(q = 1/3\).</figcaption>
+  </figure>
+  <p>Se sei sicuro di \(B\), scegli \(B\) (1 contro 0). Se sei sicuro di \(A\), scegli \(A\) (2 contro 0). In mezzo dipende da quanto credi all'una o all'altra: \(A\) ti dà in media \(2q\), \(B\) ti dà \(1 - q\), e conviene \(A\) quando \(q \gt 1/3\); a \(q = 1/3\) è indifferente. <strong>La tua scelta dipende da che cosa credi della scelta altrui.</strong></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Convinzioni</h2>
+  <p class="stmt">Una <strong>convinzione</strong> (in inglese <em>belief</em>) del giocatore \(i\) è una distribuzione di probabilità \(\bel_{-i} \in \Delta \sS_{-i}\) sulle strategie degli altri giocatori. \(\Delta \sS_{-i}\) è l'insieme di tutte queste distribuzioni.</p>
+  <p>Che cosa vuol dire \(\bel_{-1} = (1/3,\ 2/3)\), con le azioni nell'ordine \((A, B)\)? Non che il giocatore 1 pensi che l'altro tiri una moneta. Vuol dire che è incerto su che cosa farà l'altro, e misura la sua incertezza con delle probabilità. La convinzione può anche essere sbagliata: si può essere certi di \(A\) e vedersi arrivare \(B\). È quindi una probabilità <em>soggettiva</em>, come le \(\ppi\) della lezione 5. Nella battaglia dei sessi \((1/3, 2/3)\) è proprio il punto in cui il giocatore 1 è indifferente fra \(A\) e \(B\).</p>
+  <p>Le strategie non devono essere poche. Nel gioco «chi dice il numero più grande» i due giocatori annunciano insieme un numero fra 0 e 1; vince il più grande (1), perde l'altro (−1), parità 0. Qui \(\sS_i = [0,1]\). Una convinzione del giocatore 1 è per esempio «l'altro dice un numero a caso, uniforme fra 0 e 1»; l'insieme di tutte le sue convinzioni, \(\Delta \sS_{-1}\), è l'insieme di tutte le distribuzioni di probabilità su \([0,1]\).</p>
+  <h2>Strategie miste</h2>
+  <p>Parente della convinzione è la strategia mista: scegliere una strategia a caso, con probabilità decise in anticipo. Per esempio tirare una moneta e giocare \(A\) se esce testa, \(B\) se esce croce.</p>
+  <p class="stmt">Una <strong>strategia mista</strong> del giocatore \(i\) è una distribuzione di probabilità \(\sig_i \in \Delta \sS_i\) sulle sue strategie.</p>
+  <p>La differenza è di prospettiva. \(\sig_i\) descrive che cosa faccio <em>io</em>, randomizzando davvero. \(\bel_{-i}\) descrive che cosa <em>credo</em> degli altri.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il payoff atteso</h2>
+  <p>Con una strategia mista e una convinzione, ogni cella della matrice ha una probabilità: quella della mia riga per quella della colonna dell'altro. Il payoff atteso è la media dei payoff, pesata con queste probabilità.</p>
+  <div class="eq">\[ \uu_i(\sig_i, \bel_{-i}) \;=\; \sum_{s_i \in \sS_i}\ \sum_{s_{-i} \in \sS_{-i}} \sig_i(s_i)\, \bel_{-i}(s_{-i})\, \uu_i(s_i, s_{-i}). \]</div>
+  <figure>
+    <div class="w" id="eu12"></div>
+    <figcaption>I tre casi delle slide, nella battaglia dei sessi. In ogni matrice l'intensità di una cella è il suo peso \(\sig_1(s_1)\,\bel_{-1}(s_2)\); il numero rosa è il payoff del giocatore 1. Sotto, la somma pesata.</figcaption>
+  </figure>
+  <p>È utilità attesa o utilità attesa soggettiva? La strategia mista è una lotteria vera, con probabilità oggettive, ma la convinzione sugli altri è soggettiva. Per questo la teoria dei giochi descrive un giocatore razionale come uno che <strong>massimizza il suo payoff atteso soggettivo</strong>, come nella lezione 5.</p>
+  <div class="quiz inq" data-quiz="12a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Le ipotesi della teoria</h2>
+  <h3>Razionalità</h3>
+  <p>L'ipotesi di fondo: se un giocatore sa che la sua azione decide quale di vari esiti si verificherà, sceglie quella che porta all'esito che preferisce. Con l'incertezza sulle scelte altrui, vuol dire massimizzare il payoff atteso soggettivo.</p>
+  <p>È un'ipotesi debole, nel senso che accoglie qualunque preferenza coerente. Non vuol dire che i giocatori vogliano solo soldi, anche se nel corso lo si assume spesso. Se a qualcuno importa dell'equità, della reputazione o del benessere altrui, basta metterlo nei payoff: <strong>la teoria accoglie ogni preferenza che si possa rappresentare con dei numeri.</strong></p>
+  <h3>Conoscenza comune</h3>
+  <p>L'analisi tradizionale chiede che i giocatori abbiano una comprensione condivisa del gioco: conoscono l'albero o la matrice, e sanno che nel corso della partita non potranno distinguere i nodi di uno stesso insieme di informazione. «Condivisa» però è vago.</p>
+  <p class="stmt">Un fatto \(F\) è <strong>conoscenza comune</strong> se ogni giocatore sa \(F\), ogni giocatore sa che gli altri sanno \(F\), ogni giocatore sa che ogni altro sa che lui sa \(F\), e così via, all'infinito.</p>
+  <p>Si assume che il gioco sia conoscenza comune: è come se, prima di giocare, i giocatori si sedessero attorno a un tavolo con il gioco disegnato sopra. La differenza fra «tutti sanno» e «è conoscenza comune» sembra sottile. Un enigma delle slide mostra che non lo è.</p>
+  <h3>L'isola degli occhi azzurri</h3>
+  <p>Su un'isola vivono 1000 persone; 100 hanno gli occhi azzurri, 900 castani, ma nessuno conosce questi numeri. Ognuno vede gli occhi di tutti gli altri ma non i propri, e parlarne è proibito. Chi scopre il colore dei propri occhi deve, il giorno dopo a mezzogiorno, compiere un rito davanti a tutti (nelle slide è un rito molto drastico). Tutti sono perfettamente logici e devoti, e questo è conoscenza comune.</p>
+  <p>Un giorno uno straniero con gli occhi azzurri, ospite molto stimato, ringrazia la tribù e commenta: «che strano vedere un'altra persona con gli occhi azzurri, da queste parti». Che effetto ha questa gaffe?</p>
+  <figure>
+    <div class="w" id="eyes12"></div>
+    <figcaption>Il ragionamento per induzione con 1, 2 e 3 persone dagli occhi azzurri. Ogni colonna è un'isola; ogni riga, un giorno dopo l'annuncio. In azzurro il giorno in cui compiono il rito, a mezzogiorno: l'hanno capito la sera prima. La soluzione non è nelle slide, che pongono solo la domanda: è quella standard dell'enigma.</figcaption>
+  </figure>
+  <p>Lo straniero non ha detto niente che qualcuno non sapesse: ognuno vede almeno 99 persone con gli occhi azzurri. Ma ora «c'è almeno una persona con gli occhi azzurri» è diventato conoscenza comune. Con un'unica persona dagli occhi azzurri, lei capirebbe subito di essere lei, e il primo giorno compirebbe il rito. Con due, ciascuna aspetta: se il primo giorno a mezzogiorno l'altra non compie il rito, vuol dire che vede qualcuno con gli occhi azzurri, e quel qualcuno è lei; il secondo giorno lo compiono entrambe. Con 100, il ragionamento si ripete: <strong>al centesimo giorno tutte e 100 le persone dagli occhi azzurri compiono il rito insieme.</strong></p>
+  <details class="reveal"><summary>Perché senza l'annuncio non succede niente</summary><div class="in">
+    <p>Prima dell'annuncio ognuno sa che ci sono persone con gli occhi azzurri, ma l'induzione non può partire. Il caso «una sola persona» si regge su un fatto che quella persona, non vedendo nessuno con gli occhi azzurri, non conoscerebbe. Ognuno sa, ma non sa che gli altri sanno che gli altri sanno… fino a 100 livelli. L'annuncio pubblico aggiunge proprio questi livelli.</p>
+  </div></details>
+  <div class="quiz inq" data-quiz="12b"></div>
+  <h3>Quanto è realistico tutto questo?</h3>
+  <p>La teoria standard assume giocatori sofisticati, capaci di qualunque calcolo serva a massimizzare il payoff. In realtà il comportamento a volte si allontana da questo ideale, e lo fa in modo sistematico. A volte i giocatori non hanno una comprensione condivisa del gioco; a volte una distorsione cognitiva altera le loro convinzioni; a volte non sanno fare i calcoli necessari; a volte non capiscono fino in fondo quanto siano razionali gli altri.</p>
+  <p>Non ci si aspetta che i modelli siano previsioni perfette: la domanda giusta è quanto bene approssimano la realtà. Dove l'approssimazione è scarsa la teoria può avere un ruolo normativo, aiutando le persone a capire meglio la situazione e a scegliere strategie migliori. Dal lato descrittivo, può servire arricchirla con limiti reali alla razionalità.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Dove si va da qui</h2>
+  <p>La teoria dei giochi ha due parti: costruire <em>concetti di soluzione</em>, che dicono con precisione che cosa vuol dire giocare razionalmente; e applicarli a esempi concreti. I prossimi topic introducono i concetti principali.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Topic</th><th>Giochi</th><th>Concetti di soluzione</th><th>L'idea in una riga</th></tr></thead>
+    <tbody>
+      <tr><td class="c">7</td><td>Statici, in forma normale</td><td>Razionalizzabilità; equilibrio di Nash</td><td>Ognuno si forma una convinzione e massimizza il payoff atteso, con razionalità e gioco conoscenza comune; in un equilibrio di Nash ogni strategia è la miglior risposta alle altre</td></tr>
+      <tr><td class="c">8</td><td>Dinamici, in forma estesa</td><td>Induzione a ritroso; equilibrio perfetto nei sottogiochi; una variante per la contrattazione</td><td>La razionalità si chiede in ogni insieme di informazione, non solo all'inizio</td></tr>
+      <tr><td class="c">9</td><td>Con mosse del caso (informazione)</td><td>Razionalizzabilità bayesiana; equilibrio di Nash bayesiano; equilibrio bayesiano perfetto</td><td>Gli stessi concetti, quando una parte del gioco la decide la natura</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="12"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Le ultime tre lezioni</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Lezione</th><th>Concetto</th><th>Idea</th><th>Formula</th></tr></thead>
+    <tbody>
+      <tr><td class="c">10</td><td>Equilibrio concorrenziale</td><td>Ognuno sceglie il meglio ai prezzi comuni e i mercati tornano</td><td>\(\aA(i)\) ottimo in \(B(\pp, e(i))\); \(\sum_i \aA(i) = \sum_i e(i)\)</td></tr>
+      <tr><td class="c">10</td><td>Primo teorema del benessere</td><td>Senza esternalità, ogni equilibrio è Pareto stabile</td><td>nessuna \(y\) domina \(\aA\)</td></tr>
+      <tr><td class="c">11</td><td>Strategia</td><td>Piano completo: un'azione per ogni insieme di informazione</td><td>\(s_i \in \sS_i\), \(\sS = \sS_1 \times \cdots \times \sS_n\)</td></tr>
+      <tr><td class="c">11</td><td>Forma normale</td><td>Giocatori, strategie, payoff dei profili</td><td>\(\uu_i : \sS \to \mathbb{R}\)</td></tr>
+      <tr><td class="c">12</td><td>Convinzione e strategia mista</td><td>Probabilità su ciò che fanno gli altri; probabilità su ciò che faccio io</td><td>\(\bel_{-i} \in \Delta \sS_{-i}\), \(\sig_i \in \Delta \sS_i\)</td></tr>
+      <tr><td class="c">12</td><td>Payoff atteso</td><td>Media dei payoff pesata con mista e convinzione</td><td>\(\sum \sig_i(s_i)\,\bel_{-i}(s_{-i})\,\uu_i(s_i,s_{-i})\)</td></tr>
+      <tr><td class="c">12</td><td>Conoscenza comune</td><td>Tutti sanno, tutti sanno che tutti sanno, all'infinito</td><td></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>un giocatore razionale sceglie la strategia migliore date le sue convinzioni sugli altri, e la teoria assume che il gioco, e questa razionalità, siano conoscenza comune.</strong></p>
+  <p>Il prossimo topic usa queste idee per prevedere come si gioca: razionalizzabilità ed equilibrio di Nash.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

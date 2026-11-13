@@ -1,0 +1,161 @@
+<article class="lesson" data-n="2" id="lezione-2" data-title="Che cosa rende razionale una scelta?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 2 · Topic 2</p>
+  <h1>Che cosa rende razionale una scelta?</h1>
+  <p class="desc">Scelta: come si descrive il comportamento di una persona, e quando lo si può leggere come la ricerca del meglio.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione precedente abbiamo descritto un atteggiamento mentale. Una relazione di preferenza \(\pf\) è completa e transitiva; su un insieme finito si può sempre riassumere con una funzione di utilità \(\uu\), unica solo a meno di trasformazioni crescenti.</p>
+  <p>Ora cambiamo oggetto. Lasciamo la testa della persona e guardiamo che cosa <em>fa</em>.</p>
+  <h2>Descrivere il comportamento</h2>
+  <p>Immagina una lavoratrice che cerca lavoro. Descrivere il suo comportamento non vuol dire soltanto dire quale posto prenderebbe se li avesse tutti a disposizione, ma che cosa sceglierebbe da <em>qualunque</em> sottoinsieme di offerte.</p>
+  <p class="stmt">Un <strong>problema di scelta</strong> è un sottoinsieme non vuoto \(\sA\) di \(\sX\). Una <strong>funzione di scelta</strong> \(\cf\) associa a ogni problema \(\sA\) un solo elemento \(\cf(\sA)\) di \(\sA\). In simboli \(\cf : 2^{\sX} \setminus \{\emptyset\} \to \sX\), dove \(2^{\sX}\) è l'insieme di tutti i sottoinsiemi di \(\sX\).</p>
+  <p>Occhio alla lettera \(c\): in rosa è la funzione di scelta \(\cf\), in bianco resta l'alternativa \(c\). Fin qui le preferenze non compaiono. Il legame usuale in economia è l'ipotesi di <strong>razionalità</strong>: la persona ha una relazione di preferenza su \(\sX\), sa quali alternative ha davanti, e sceglie la migliore fra quelle. Se le preferenze hanno un'utilità \(\uu\), si comporta come se risolvesse</p>
+  <div class="eq">\[ \max \,\{\, \uu(x) : x \in \sA \,\}. \]</div>
+  <p>«Razionale» qui non dice nulla sul <em>contenuto</em> delle preferenze. Chi sceglie sempre l'alternativa che gli procura più dolore è razionale in questo senso. E c'è un secondo punto: da fuori, la preferenza \(\pf\) non la vediamo. Vediamo solo le scelte.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>«Come se»</h2>
+  <p>Quasi nessuno massimizza consapevolmente una relazione di preferenza. La giustificazione standard è più modesta: il comportamento può spesso essere descritto <em>come se</em> lo facesse. Non serve nemmeno che la persona sappia di avere una relazione di preferenza.</p>
+  <p>L'immagine classica è dell'economista Milton Friedman (1953): per prevedere i colpi di un campione di biliardo funziona benissimo l'ipotesi che giochi «come se conoscesse le complicate formule matematiche» delle traiettorie e le calcolasse in un lampo. Non perché lo faccia davvero, ma perché, se non arrivasse in qualche modo allo stesso risultato, non sarebbe un campione.</p>
+  <p class="stmt">Una funzione di scelta è <strong>razionalizzabile</strong> se esiste una relazione di preferenza tale che, per ogni problema \(\sA\), \(\cf(\sA)\) è l'alternativa migliore in \(\sA\).</p>
+  <p>«La migliore» va letto come <em>l'unica</em> migliore. Se bastasse «una delle migliori», qualunque funzione di scelta sarebbe razionalizzata dalla preferenza in cui tutto è indifferente, e la definizione non direbbe più niente.</p>
+  <p>Con tre alternative i problemi con almeno due elementi sono quattro. Decidi tu che cosa sceglie la persona in ciascuno. I tre esempi già pronti sono quelli delle slide: uno è razionalizzabile, due no.</p>
+  <figure>
+    <div class="w" id="choice"></div>
+    <figcaption>Ogni riga è un problema di scelta: tocca l'alternativa che la persona sceglie da quell'insieme. Con tre alternative le funzioni di scelta possibili sono \(2\cdot2\cdot2\cdot3 = 24\). Solo 6 sono razionalizzabili, una per ogni modo di ordinare \(a\), \(b\), \(c\).</figcaption>
+  </figure>
+  <p>Se dalle coppie esce \(a\) contro \(b\), \(b\) contro \(c\) e \(c\) contro \(a\), una preferenza che razionalizzi dovrebbe avere \(a \spf b\), \(b \spf c\) e \(c \spf a\), contro la transitività. È lo stesso giro in tondo della prima lezione, visto dal lato del comportamento.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Tre procedure che sfuggono</h2>
+  <h3>La mediana</h3>
+  <p>Le alternative sono ordinate da sinistra a destra, come candidati su un asse politico. La persona sceglie sempre quella centrale fra le disponibili; se sono in numero pari, la più a sinistra delle due centrali. Togli e rimetti alternative.</p>
+  <figure>
+    <div class="w" id="median"></div>
+    <figcaption>I pallini pieni sono le alternative disponibili, l'anello rosa è la scelta. Tocca un pallino per togliere o rimettere un'alternativa. Da tutte e cinque sceglie \(a_3\). Da \(\{a_3,a_4,a_5\}\) sceglie \(a_4\), benché \(a_3\) sia ancora lì.</figcaption>
+  </figure>
+  <p>Nessuna preferenza può razionalizzarla: servirebbero insieme \(a_3 \spf a_4\) e \(a_4 \spf a_3\). Eppure un criterio c'è: «preferisco stare al centro». Solo che non si esprime come preferenza sulle alternative, ma sulle <em>posizioni</em> (la mediana, una a sinistra della mediana, una a destra…). Ridefinite così le alternative, il comportamento torna razionalizzabile.</p>
+  <h3>Bistecca e salmone</h3>
+  <p>Un esempio di Luce e Raiffa, due studiosi di teoria delle decisioni. Un cliente entra in un ristorante di una città che non conosce. Il cameriere propone salmone a 2,50 dollari o bistecca a 4. In un ristorante di prima categoria prenderebbe la bistecca; qui, non sapendo dove si trova, ordina il salmone. Poco dopo il cameriere torna: ci sono anche lumache e cosce di rana, a 4,50 dollari. Il cliente le detesta entrambe, ma risponde: «Benissimo, allora prendo la bistecca».</p>
+  <div class="quiz inq" data-quiz="2a"></div>
+  <p>La spiegazione ragionevole è che la «bistecca» non è lo stesso piatto nei due casi: lumache e rane nel menu segnalano una cucina di livello. Con cinque alternative il comportamento torna razionalizzabile: bistecca di alta qualità \(\spf\) salmone \(\spf\) bistecca di bassa qualità \(\spf\) lumache \(\spf\) cosce di rana.</p>
+  <p>Dietro una funzione di scelta c'è un'ipotesi nascosta: <strong>un'alternativa è la stessa cosa in ogni insieme in cui compare.</strong> L'esempio tratta come identiche due opzioni diverse.</p>
+  <h3>La festa</h3>
+  <p>\(A\), \(B_1\) e \(B_2\) organizzano una festa ciascuno, e si può andare a una sola. \(B_1\) e \(B_2\) sono entrambi buoni amici dell'invitata, ma fra loro c'è tensione. Invitata da \(A\) e \(B_1\), va da \(B_1\). Invitata da tutti e tre, va da \(A\), per non offendere uno dei due amici. Anche qui il significato di scegliere \(B_1\) dipende da chi altro ha invitato.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il test: la proprietà α</h2>
+  <p>I tre esempi falliscono allo stesso modo. Si sceglie qualcosa da un insieme grande; poi l'insieme si restringe, la cosa scelta è ancora disponibile, e la scelta cambia.</p>
+  <p class="stmt"><strong>Proprietà α.</strong> Per ogni \(\sA\) e \(\sB\) con \(\sB \subset \sA \subseteq \sX\): se \(\cf(\sA) \in \sB\), allora \(\cf(\sB) = \cf(\sA)\).</p>
+  <p>Chi vince un torneo, se rigioca contro una parte degli stessi avversari, vince ancora. Detto altrimenti: togliere da \(\sA\) alcune alternative <em>non</em> scelte non deve cambiare la scelta. Per questo la proprietà si chiama anche <strong>indipendenza dalle alternative irrilevanti</strong>.</p>
+  <div class="quiz inq" data-quiz="2b"></div>
+  <p><strong>Questa proprietà è esattamente ciò che separa le funzioni di scelta razionalizzabili dalle altre.</strong></p>
+  <p class="stmt">Ogni funzione di scelta razionalizzabile soddisfa la proprietà α. E se \(\sX\) è finito, ogni funzione di scelta che soddisfa la proprietà α è razionalizzabile.</p>
+  <p>Il primo verso è immediato: se \(\cf(\sA)\) è almeno buona quanto ogni elemento di \(\sA\), lo è anche rispetto a ogni elemento di \(\sB\), che di \(\sA\) è una parte.</p>
+  <p>Il secondo è di nuovo una ricetta, parente di quella dell'utilità ma dall'alto. Chiama \(a_1 = \cf(\sX)\). Toglilo, e chiama \(a_2\) la scelta da ciò che resta. Poi \(a_3\), e così via. La preferenza \(a_1 \spf a_2 \spf \dots \spf a_n\) razionalizza \(\cf\). Infatti, in un problema \(\sA\) qualsiasi il migliore è il primo della lista che sta in \(\sA\), diciamo \(a_m\). L'insieme \(\sA\) è contenuto in \(\{a_m, a_{m+1}, \dots, a_n\}\), da cui si sceglie \(a_m\); per la proprietà α, \(\cf(\sA) = a_m\).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Accontentarsi</h2>
+  <p>Una datrice di lavoro deve assumere. Fa i colloqui in ordine alfabetico e si ferma al primo candidato abbastanza buono. Se nessuno lo è, prende l'ultimo.</p>
+  <p>Formalmente ci sono una funzione \(\vv\) che misura la qualità, un <strong>livello di aspirazione</strong> \(\vs\) e un ordine \(O\) in cui esaminare le alternative. Da \(\sA\) si sceglie la prima alternativa nell'ordine con \(\vv \ge \vs\); se non ce ne sono, l'ultima di \(\sA\).</p>
+  <figure>
+    <div class="grp"><div class="pick">Scegli quali candidati sono disponibili</div><div class="ctl" id="satAvail"></div></div>
+    <div class="w" id="satLeg"></div>
+    <svg id="sat" viewBox="0 0 640 270" role="img" aria-label="Valutazioni dei candidati e livello di aspirazione"></svg>
+    <label class="sl"><span>aspirazione \(\vs\)</span><input type="range" id="vstar" min="-3" max="4" step="0.5" value="0"><span class="v" id="vstarv"></span></label>
+    <div class="out" id="satOut" aria-live="polite"></div>
+    <figcaption>Quattro candidati esaminati in ordine alfabetico; l'altezza di ogni barra è la sua valutazione: \(\vv(a)=-1\), \(\vv(b)=-2\), \(\vv(c)=1\), \(\vv(d)=3\). Sposta la soglia e togli candidati.</figcaption>
+  </figure>
+  <p>Non sembra massimizzazione: con soglia 0 viene scelto \(c\) anche se \(d\) vale di più. Eppure ogni funzione di scelta di questo tipo (in inglese <em>satisficing</em>) è razionalizzabile.</p>
+  <p>La preferenza che la razionalizza si costruisce così: in cima le alternative soddisfacenti, nell'ordine \(O\); sotto quelle insoddisfacenti, nell'ordine <em>inverso</em>. È quella che la figura mostra. Se in \(\sA\) c'è un'alternativa soddisfacente, la migliore è la prima soddisfacente nell'ordine; se non c'è, la migliore è l'ultima nell'ordine. In entrambi i casi è \(\cf(\sA)\).</p>
+  <p><strong>Razionalizzabile non vuol dire che la persona massimizzi davvero qualcosa.</strong> Vuol dire che un osservatore non può distinguerla da qualcuno che lo fa.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La pompa di denaro</h2>
+  <p>Un argomento usato spesso a difesa della razionalità: chi non è razionalizzabile può essere spremuto. Prendi qualcuno che da \(\{a,b\}\) sceglie \(a\), da \(\{b,c\}\) sceglie \(b\) e da \(\{a,c\}\) sceglie \(c\). Qualunque oggetto abbia in mano, ce n'è un altro per cui è disposto a pagare qualcosa pur di fare cambio. Diciamo almeno un dollaro (un euro, nella versione delle slide).</p>
+  <figure>
+    <div class="w" id="pump"></div>
+    <figcaption>Ogni freccia è uno scambio che la persona accetta: accanto c'è l'insieme da cui sceglie e quanto paga. Parte con \(a\) in mano, in alto, e dopo tre scambi ha di nuovo \(a\), con tre dollari in meno. Il giro può ripetersi all'infinito.</figcaption>
+  </figure>
+  <p>Il trucco funziona con qualunque funzione che violi la proprietà α. Se \(\cf(\sA) \in \sB \subset \sA\) e \(\cf(\sB) \ne \cf(\sA)\), parti da \(\cf(\sA)\). Offri di cambiarlo con un elemento di \(\sB\), e la persona passa a \(\cf(\sB)\). Offri di cambiarlo con un elemento di \(\sA\), e torna a \(\cf(\sA)\). Si può ripetere a piacere.</p>
+  <p>L'argomento regge solo se la vittima non si accorge di essere sfruttata. Quanto sia convincente, il libro lo lascia giudicare a te.</p>
+  <div class="quiz inq" data-quiz="2c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Che cosa fanno davvero le persone</h2>
+  <p>Molta ricerca mostra che il comportamento umano a volte non è razionale nel senso definito qui. Ecco tre esperimenti classici, con i risultati raccolti online dagli autori fra studenti di tutto il mondo.</p>
+  <h3>Effetto attenzione</h3>
+  <p>La fotocamera A ha valutazione media 9,1 e 6 megapixel; la B ha 8,3 e 9 megapixel. A un altro gruppo si aggiunge la C, con 8,1 e 7 megapixel: peggiore di B su entrambe le dimensioni.</p>
+  <figure>
+    <div class="bars">
+      <h4>Scelta fra A e B</h4>
+      <div class="bar"><span>Fotocamera A</span><i style="--w:48%"></i><b>48%</b></div>
+      <div class="bar"><span>Fotocamera B</span><i style="--w:52%"></i><b>52%</b></div>
+      <h4>Scelta fra A, B e C</h4>
+      <div class="bar"><span>Fotocamera A</span><i style="--w:30%"></i><b>30%</b></div>
+      <div class="bar"><span>Fotocamera B</span><i style="--w:68%"></i><b>68%</b></div>
+      <div class="bar"><span>Fotocamera C</span><i style="--w:2%"></i><b>2%</b></div>
+    </div>
+    <figcaption>Circa 1.300 partecipanti per domanda. Quasi nessuno sceglie C, ma la sua presenza sposta molte scelte da A a B.</figcaption>
+  </figure>
+  <p>Per una parte dei partecipanti è una violazione della proprietà α: B viene scelta dall'insieme grande ma non dalla coppia. Due spiegazioni possibili: C attira l'attenzione su B, che la domina; oppure dominare C fornisce una <em>ragione</em> per scegliere B che A non ha.</p>
+  <h3>Effetto di presentazione</h3>
+  <p>Bisogna far girare una di due roulette. Ogni colore ha una probabilità e un premio in dollari.</p>
+  <figure>
+    <div class="scroll">
+    <table>
+      <thead><tr><th></th><th class="n">Bianco</th><th class="n">Rosso</th><th class="n">Verde</th><th class="n">Giallo</th></tr></thead>
+      <tbody>
+        <tr><td>Roulette A</td><td class="n">90% · 0</td><td class="n">6% · 45</td><td class="n">1% · 30</td><td class="n">3% · −15</td></tr>
+        <tr><td>Roulette B</td><td class="n">90% · 0</td><td class="n">7% · 45</td><td class="n">1% · −10</td><td class="n">2% · −15</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="scroll">
+    <table>
+      <thead><tr><th></th><th class="n">Bianco</th><th class="n">Rosso</th><th class="n">Nero</th><th class="n">Verde</th><th class="n">Giallo</th></tr></thead>
+      <tbody>
+        <tr><td>Roulette C</td><td class="n">90% · 0</td><td class="n">6% · 45</td><td class="n">1% · 30</td><td class="n">1% · −15</td><td class="n">2% · −15</td></tr>
+        <tr><td>Roulette D</td><td class="n">90% · 0</td><td class="n">6% · 45</td><td class="n">1% · 45</td><td class="n">1% · −10</td><td class="n">2% · −15</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="bars">
+      <div class="bar"><span>Scelgono A su B</span><i style="--w:51%"></i><b>51%</b></div>
+      <div class="bar"><span>Scelgono D su C</span><i style="--w:93%"></i><b>93%</b></div>
+    </div>
+    <figcaption>Circa 4.000 partecipanti per la prima coppia. C è la roulette A con il Giallo spezzato in due colori; D è la B con il Rosso spezzato in due.</figcaption>
+  </figure>
+  <p>D domina C: colore per colore non è mai peggiore. Ma A e C sono la stessa roulette, e così B e D. Quindi circa metà dei partecipanti risponde in modo diverso allo stesso problema, a seconda di come è scritto. Fra A e B molti semplificano «cancellando» i colori simili e guardano solo il Verde, dove A è molto meglio; fra C e D la dominanza salta all'occhio.</p>
+  <h3>Contabilità mentale</h3>
+  <p>Prima situazione: hai comprato un biglietto da 40 dollari per uno spettacolo e, arrivato a teatro, scopri di averlo perso. Ne compri un altro? Seconda situazione: stai per comprare il biglietto e scopri di aver perso 40 dollari in contanti. Lo compri lo stesso?</p>
+  <figure>
+    <div class="bars">
+      <div class="bar"><span>Perso il biglietto</span><i style="--w:65%"></i><b>65%</b></div>
+      <div class="bar"><span>Persi 40 dollari</span><i style="--w:79%"></i><b>79%</b></div>
+    </div>
+    <figcaption>Quota di chi comprerebbe il biglietto. Circa 1.200 partecipanti nella prima situazione e un numero simile, di persone diverse, nella seconda.</figcaption>
+  </figure>
+  <p>Le due opzioni sono identiche nei due casi: avere 80 dollari in meno e vedere lo spettacolo, oppure 40 in meno e non vederlo. Nel primo caso, però, molti mettono in conto al biglietto 80 dollari e lo trovano troppo caro; nel secondo trattano i 40 persi come una faccenda separata.</p>
+  <p>Il secondo e il terzo esperimento colpiscono un'ipotesi ancora più a monte della proprietà α: che la scelta dipenda dall'insieme delle alternative, e non dal modo in cui è descritto.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="2"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>le preferenze non si osservano, le scelte sì, e la proprietà α dice quando dalle scelte si può risalire a una preferenza.</strong> L'ipotesi di razionalità è il ponte fra i due oggetti.</p>
+  <p>Finora ogni alternativa era un esito certo. Nella prossima lezione un'alternativa diventa una lotteria.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

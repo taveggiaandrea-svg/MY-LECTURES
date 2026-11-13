@@ -1,0 +1,178 @@
+<article class="lesson" data-n="3" id="lezione-3" data-title="Come si sceglie quando l'esito è incerto?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Capitolo 3 · Topic 3-1</p>
+  <h1>Come si sceglie quando l'esito è incerto?</h1>
+  <p class="desc">Preferenze in condizioni di incertezza: lotterie, continuità, indipendenza e utilità attesa.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Prima di cominciare, due domande. Rispondi d'istinto: non c'è una risposta giusta, e più avanti ci torniamo.</p>
+  <figure>
+    <div class="w" id="allaisQ"></div>
+    <figcaption>Due scelte fra lotterie in denaro. Tieni a mente che cosa hai risposto.</figcaption>
+  </figure>
+  <p>Nelle due lezioni precedenti le alternative erano oggetti qualsiasi, e una persona razionale sceglieva la migliore secondo una relazione di preferenza. Qui studiamo un caso particolare dello stesso modello: alternative il cui esito è casuale. Un biglietto che fa vincere un'auto con probabilità 0,001 e niente altrimenti. Una vacanza con cielo grigio con probabilità 0,3 e sole con probabilità 0,7. Ma anche un'azione in borsa, un percorso di studi, un piatto in un ristorante mai provato: di nessuno sai in anticipo come andrà a finire.</p>
+  <p>Le chiamiamo <strong>lotterie</strong>. La domanda della lezione è: fra i tantissimi modi di avere preferenze sulle lotterie, quali sono ragionevoli, e che forma hanno?</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Lotterie</h2>
+  <p>Si parte da un insieme \(Z\) di <strong>premi</strong>. Una lotteria dice con quale probabilità si ottiene ciascun premio.</p>
+  <p class="stmt">Una <strong>lotteria</strong> su \(Z\) è una funzione \(\Lp\) che assegna una probabilità \(\Lp(z) &gt; 0\) a un numero finito di premi e 0 a tutti gli altri, con somma 1. Il <strong>supporto</strong> di \(\Lp\), scritto \(\operatorname{supp}(\Lp)\), è l'insieme dei premi con probabilità positiva.</p>
+  <p>Un po' di notazione. \(L(Z)\) è l'insieme di tutte le lotterie su \(Z\). \([z]\) è la lotteria che dà il premio \(z\) con certezza. E la lotteria che dà \(z_k\) con probabilità \(\alf_k\), per \(k = 1, \dots, K\), si scrive</p>
+  <div class="eq">\[ \alf_1 \cdot z_1 \,\oplus\, \alf_2 \cdot z_2 \,\oplus \cdots \oplus\, \alf_K \cdot z_K . \]</div>
+  <p>Con due soli premi, una lotteria è una coppia di numeri non negativi con somma 1: un punto su un segmento. Con tre premi è un punto di un triangolo, i cui vertici sono i tre premi certi. È il disegno che useremo per tutta la lezione.</p>
+  <figure>
+    <div class="w" id="simOne"></div>
+    <figcaption>Ogni punto del triangolo è una lotteria sui tre premi \(a\), \(b\), \(c\): più il punto è vicino a un vertice, più quel premio è probabile; su un lato, il premio del vertice opposto ha probabilità zero. Le barre mostrano le tre probabilità. Trascina \(\Lp\).</figcaption>
+  </figure>
+  <p>Dal punto di vista della prima lezione non cambia nulla: l'insieme \(\sX\) delle alternative è \(L(Z)\), e cerchiamo relazioni di preferenza su di esso.</p>
+  <p>Quando i premi sono in un ordine fissato, una lotteria si scrive anche come vettore di probabilità, \((\alf_1, \dots, \alf_K)\). Con i premi «Ferrari» e «niente», il biglietto che dà la Ferrari una volta su due è \((0{,}5;\ 0{,}5)\), e \(L(Z)\) è tutto il segmento delle coppie non negative con somma 1. Una lotteria come \([z]\), che non ha niente di casuale, si dice <em>degenere</em>.</p>
+  <p>Confrontare lotterie non è banale. Le slide aprono con questa scelta: quale delle tre prenderesti?</p>
+  <figure>
+    <div class="w" id="three3"></div>
+    <figcaption>Tre lotterie in dollari. Ogni barra è lunga 1: la larghezza di un tratto è la probabilità del premio scritto dentro. A destra il valore atteso, che le slide non riportano e ho calcolato io. La terza ha il valore atteso più alto, ma anche più esiti possibili; la seconda ha più di una probabilità su quattro di non dare nulla.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Tre modi di confrontare lotterie</h2>
+  <p>Ecco tre persone con idee molto diverse.</p>
+  <p><strong>La pessimista.</strong> Ha una preferenza stretta sui premi e valuta ogni lotteria dal premio <em>peggiore</em> che può uscire. Preferisce \(\Lp\) a \(\Lq\) se il peggior premio possibile di \(\Lp\) è migliore del peggior premio possibile di \(\Lq\).</p>
+  <p><strong>Buoni e cattivi.</strong> Divide i premi in due gruppi, buoni e cattivi, e guarda solo la probabilità totale \(G(\Lp)\) che esca un premio buono: \(\Lp \pf \Lq\) se \(G(\Lp) \ge G(\Lq)\).</p>
+  <p><strong>Meno esiti possibili.</strong> Non le importa quale premio esce; vuole solo prepararsi al minor numero possibile di eventualità. Preferisce la lotteria con il supporto più piccolo: \(\Lp \pf \Lq\) se \(|\operatorname{supp}(\Lp)| \le |\operatorname{supp}(\Lq)|\).</p>
+  <p>Nella figura i premi sono tre, con \(a\) migliore di \(b\) e \(b\) migliore di \(c\); i premi buoni sono \(a\) e \(b\). Trascina le due lotterie.</p>
+  <figure>
+    <div class="w" id="simRules"></div>
+    <figcaption>Le lotterie \(\Lp\) (verde acqua) e \(\Lq\) (viola) nel triangolo di prima; la tabella dice come le confronta ciascuna delle tre persone. Trascina i due punti.</figcaption>
+  </figure>
+  <p>Un confronto con numeri precisi, dalle slide. I premi sono 100, 10 e 1 dollaro; l'unico premio «buono» è 100. Prendi \(\Lp = (0{,}9;\ 0;\ 0{,}1)\) e \(\Lq = (0{,}5;\ 0{,}5;\ 0)\).</p>
+  <figure>
+    <div class="scroll">
+    <table>
+      <thead><tr><th></th><th>Che cosa guarda</th><th class="c">in \(\Lp\)</th><th class="c">in \(\Lq\)</th><th class="c">Preferisce</th></tr></thead>
+      <tbody>
+        <tr><td>La pessimista</td><td>il premio peggiore possibile</td><td class="c">1</td><td class="c">10</td><td class="c">\(\Lq\)</td></tr>
+        <tr><td>Buoni e cattivi</td><td>la probabilità di un premio buono</td><td class="c">0,9</td><td class="c">0,5</td><td class="c">\(\Lp\)</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <figcaption>Le stesse due lotterie, due verdetti opposti.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="3b"></div>
+  <p>Le preferenze sulle lotterie possono avere infinite altre forme. Per mettere ordine, descriviamo due proprietà plausibili e poi cerchiamo <em>tutte</em> le preferenze che le soddisfano.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Prima proprietà: continuità</h2>
+  <p>Prendi tre premi con \([a] \spf [b] \spf [c]\) e mescola il migliore e il peggiore: \(\alf \cdot a \oplus (1-\alf) \cdot c\). Con \(\alf = 1\) la miscela è \([a]\), meglio di \([b]\). Con \(\alf = 0\) è \([c]\), peggio di \([b]\). Muovendo \(\alf\) con continuità da 1 a 0, da qualche parte dovremmo incontrare un punto di indifferenza. È la stessa idea del teorema dei valori intermedi: una funzione continua su \([0,1]\) assume tutti i valori compresi fra quello in 0 e quello in 1. Detto in un altro modo: piccoli cambiamenti nelle probabilità non rovesciano di colpo l'ordine fra due lotterie.</p>
+  <p class="stmt"><strong>Continuità.</strong> Per ogni terna di premi con \([a] \spf [b] \spf [c]\) esiste un numero \(\alf\), con \(0 &lt; \alf &lt; 1\), tale che \([b] \ind \alf \cdot a \oplus (1-\alf) \cdot c\).</p>
+  <figure>
+    <div class="w" id="cont3"></div>
+    <figcaption>Il segmento contiene tutte le miscele di \(a\) e \(c\): all'estremo sinistro \([c]\), a quello destro \([a]\). Il punto è la miscela con peso \(\alf\) su \(a\), confrontata con \(b\) certo. Muovi \(\alf\) e cambia persona.</figcaption>
+  </figure>
+  <p>La pessimista non è continua: finché \(c\) può uscire, anche con probabilità minuscola, la miscela per lei vale quanto \(c\), e \([b]\) resta strettamente migliore. Le altre due preferenze soddisfano la continuità in modo banale, perché per loro non esistono tre premi in ordine stretto.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Seconda proprietà: indipendenza</h2>
+  <p>Per enunciarla serve un'idea in più. Immagina un'incertezza in due tempi: prima si estrae <em>quale lotteria</em> giocare, poi la si gioca. Il risultato complessivo è di nuovo una lotteria sui premi.</p>
+  <p class="stmt">La <strong>lotteria composta</strong> \(\alf_1 \cdot \Lp_1 \oplus \cdots \oplus \alf_K \cdot \Lp_K\) dà ogni premio \(z\) con probabilità \(\sum_k \alf_k\, \Lp_k(z)\).</p>
+  <p>L'esempio del libro: i premi sono vittoria, pareggio e sconfitta (\(W\), \(D\), \(L\)), con \(\Lp = 0{,}6 \cdot W \oplus 0{,}4 \cdot L\) e \(\Lq = 0{,}2 \cdot W \oplus 0{,}3 \cdot D \oplus 0{,}5 \cdot L\).</p>
+  <figure>
+    <div class="w" id="comp3"></div>
+    <figcaption>Ogni barra è una lotteria: la larghezza di ciascun tratto è la probabilità di vittoria (\(W\)), pareggio (\(D\)) o sconfitta (\(L\)). La terza barra è la lotteria composta \(\alf \cdot \Lp \oplus (1-\alf) \cdot \Lq\): ogni probabilità è la media pesata delle due.</figcaption>
+  </figure>
+  <p>L'esempio delle slide, con i premi 100, 10 e 1 dollaro: \(\Lp = \tfrac12 \cdot [100] \oplus \tfrac12 \cdot [1] = (\tfrac12, 0, \tfrac12)\) e \(\Lq = [10]\). La lotteria composta che porta a \(\Lp\) o a \(\Lq\) alla pari è \(\tfrac12 \cdot \Lp \oplus \tfrac12 \cdot \Lq = (\tfrac14, \tfrac12, \tfrac14)\).</p>
+  <div class="quiz inq" data-quiz="3a"></div>
+  <p>Ora la proprietà. Prendi una lotteria e sostituisci uno dei suoi premi, \(z_k\), con una lotteria fra \(a\) e \(b\). Tutto il resto è identico. Sembra naturale confrontare il prima e il dopo guardando solo il pezzo che è cambiato.</p>
+  <p class="stmt"><strong>Indipendenza.</strong> Per ogni lotteria \(\alf_1 \cdot z_1 \oplus \cdots \oplus \alf_K \cdot z_K\) e ogni \(\bet \cdot a \oplus (1-\bet) \cdot b\):</p>
+  <div class="eq">\[
+  \begin{aligned}
+  &[z_k] \ \pf\ \bet \cdot a \oplus (1-\bet)\cdot b \\[.3em]
+  &\qquad\Longleftrightarrow \\[.3em]
+  &\alf_1 \cdot z_1 \oplus \cdots \oplus \alf_k \cdot z_k \oplus \cdots \oplus \alf_K \cdot z_K \\
+  &\qquad \pf\ \ \alf_1 \cdot z_1 \oplus \cdots \oplus \alf_k \cdot \big(\bet \cdot a \oplus (1-\bet)\cdot b\big) \oplus \cdots \oplus \alf_K \cdot z_K
+  \end{aligned}
+  \]</div>
+  <p>In breve: se si mescolano due lotterie con una terza, l'ordine fra le due miscele non dipende da quale terza si è usata. Pensa a una moneta. Se esce testa giochi \(L\) in un caso e \(L'\) nell'altro; se esce croce giochi \(L''\) in entrambi i casi. Con croce le due miscele sono identiche, quindi dovrebbe decidere solo il confronto fra \(L\) e \(L'\).</p>
+  <p>Perché \(L''\) dovrebbe essere irrilevante? Perché non la «consumi» insieme a \(L\): la ottieni <em>al posto</em> di \(L\). Con i panieri di beni è diverso: quanto ti piace lo zucchero dipende da quanto caffè hai, perché li consumi insieme. Qui un esito esclude l'altro. Per questo l'indipendenza è il cuore della teoria delle scelte in condizioni di incertezza, e non ha un analogo nella teoria del consumatore.</p>
+  <p>Chi la rispetta, fra le tre persone di prima?</p>
+  <p><strong>La pessimista no.</strong> Con \([a] \spf [b]\), confronta \(0{,}6 \cdot a \oplus 0{,}4 \cdot b\) con \([b]\), che si può scrivere \(0{,}6 \cdot b \oplus 0{,}4 \cdot b\). Le due lotterie differiscono solo nel premio che esce con probabilità 0,6, quindi l'indipendenza vuole la prima strettamente migliore. Per la pessimista sono indifferenti: il premio peggiore è \(b\) in entrambe. È la situazione di partenza della figura con il triangolo.</p>
+  <p><strong>Meno esiti possibili no.</strong> Per lei \([a] \ind [b]\), eppure \(0{,}5 \cdot a \oplus 0{,}5 \cdot b\) è peggio di \([b]\).</p>
+  <p><strong>Buoni e cattivi sì.</strong> Sostituire \(z_k\) cambia \(G\) esattamente di \(\alf_k\) volte la differenza fra \(G([z_k])\) e \(G\) della lotteria sostituita, quindi i due confronti hanno sempre lo stesso segno.</p>
+  <p>Una prima conseguenza dell'indipendenza: se \([a] \spf [b]\), fra due lotterie che danno solo \(a\) o \(b\) è migliore quella che dà \(a\) con più probabilità.</p>
+  <p class="stmt"><strong>Monotonia.</strong> Se \(\pf\) soddisfa l'indipendenza e \([a] \spf [b]\), allora \(\alf &gt; \bet\) se e solo se \(\alf \cdot a \oplus (1-\alf) \cdot b \ \spf\ \bet \cdot a \oplus (1-\bet) \cdot b\).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Utilità attesa</h2>
+  <p>Ecco il tipo di preferenze più usato in economia. La persona attacca a ogni premio \(z\) un numero \(\vv(z)\), e valuta una lotteria con la media dei numeri dei premi, pesata con le probabilità.</p>
+  <p class="stmt">Una relazione di preferenza su \(L(Z)\) è <strong>coerente con l'utilità attesa</strong> se esiste una funzione \(\vv : Z \to \mathbb{R}\) tale che la preferenza è rappresentata da</p>
+  <div class="eq">\[ \UU(\Lp) \;=\; \sum_{z \in Z} \Lp(z)\, \vv(z). \]</div>
+  <p>La funzione \(\vv\) si chiama <strong>funzione di Bernoulli</strong>. Nota i due livelli: \(\vv\) dà numeri ai premi, \(\UU\) dà numeri alle lotterie.</p>
+  <figure>
+    <div class="w" id="simEU"></div>
+    <figcaption>Lo stesso triangolo, con \(\vv(a) = 1\), \(\vv(c) = 0\) e \(\vv(b)\) deciso da te. Le linee gialle uniscono lotterie con la stessa utilità attesa: sono rette parallele, perché \(\UU\) è lineare nelle probabilità.</figcaption>
+  </figure>
+  <p>Guarda la linea più spessa, quella che parte dal vertice \(b\). Arriva sul lato fra \(a\) e \(c\) nel punto \(\vv(b) \cdot a \oplus (1 - \vv(b)) \cdot c\): è la miscela indifferente a \([b]\) che la continuità promette.</p>
+  <p>Le due proprietà e l'utilità attesa sono, in effetti, la stessa cosa.</p>
+  <p class="stmt">Una preferenza coerente con l'utilità attesa soddisfa continuità e indipendenza. Viceversa, se i premi sono in numero finito, ogni preferenza su \(L(Z)\) che soddisfa continuità e indipendenza è coerente con l'utilità attesa.</p>
+  <details class="reveal">
+    <summary>Perché l'utilità attesa soddisfa le due proprietà</summary>
+    <div class="in">
+      <p><em>Continuità.</em> \(\UU([z]) = \vv(z)\), quindi \([a] \spf [b] \spf [c]\) vuol dire \(\vv(a) \gt \vv(b) \gt \vv(c)\). Esiste allora un \(\alf\) fra 0 e 1 con \(\alf\vv(a) + (1-\alf)\vv(c) = \vv(b)\): per quel valore la miscela e \([b]\) hanno la stessa utilità attesa.</p>
+      <p><em>Indipendenza.</em> Le utilità attese delle due lotterie grandi differiscono solo nel termine con peso \(\alf_k\): da una parte \(\alf_k\vv(z_k)\), dall'altra \(\alf_k(\bet\vv(a) + (1-\bet)\vv(b))\). La prima è almeno grande quanto la seconda esattamente quando \(\vv(z_k) \ge \bet\vv(a) + (1-\bet)\vv(b)\), cioè quando \([z_k] \pf \bet\cdot a \oplus (1-\bet)\cdot b\).</p>
+    </div>
+  </details>
+  <details class="reveal">
+    <summary>Come si costruisce \(\vv\)</summary>
+    <div class="in">
+      <p>Chiama \(M\) il premio migliore e \(m\) il peggiore, e supponi \([M] \spf [m]\). Per la continuità, per ogni premio \(z\) esiste un numero \(\vv(z)\) tale che \([z] \ind \vv(z) \cdot M \oplus (1 - \vv(z)) \cdot m\); per la monotonia è unico. È la stessa lettura della linea spessa nella figura.</p>
+      <p>Ora prendi una lotteria \(\Lp\) qualsiasi e sostituisci, uno alla volta, ogni premio \(z\) con la sua miscela equivalente di \(M\) e \(m\). Per l'indipendenza, applicata una volta per premio, la persona resta indifferente. Alla fine ha in mano una lotteria con due soli premi, che dà \(M\) con probabilità \(\sum_z \Lp(z)\,\vv(z)\).</p>
+      <p>Fra lotterie di questo tipo, per la monotonia, vince quella che dà \(M\) con più probabilità. Quindi confrontare \(\Lp\) e \(\Lq\) equivale a confrontare \(\sum_z \Lp(z)\vv(z)\) e \(\sum_z \Lq(z)\vv(z)\).</p>
+      <p>Se invece \([M] \ind [m]\), la persona è indifferente fra tutte le lotterie, e va bene \(\vv(z) = 0\) per ogni premio.</p>
+    </div>
+  </details>
+  <p>Quanto è unica \(\vv\)? Meno dell'utilità della prima lezione, ma non del tutto. Se \(\vv\) è una funzione di Bernoulli per certe preferenze, lo è anche \(\ww(z) = k\,\vv(z) + h\) per ogni \(k &gt; 0\) e ogni \(h\). E vale il viceversa: due funzioni di Bernoulli per le stesse preferenze sono sempre legate così. Una trasformazione crescente qualsiasi, qui, non basta più.</p>
+  <p>Perché l'utilità attesa è così usata? Per due ragioni. Una è tecnica: con l'utilità attesa i conti sono facili, senza sono molto difficili. L'altra è normativa: ragionare in modo sistematico su alternative rischiose è difficile, e chi pensa che le proprie scelte <em>dovrebbero</em> rispettare l'indipendenza può usare il teorema come guida per decidere.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La teoria alla prova: il paradosso di Allais</h2>
+  <p>Torniamo alle due domande dell'inizio.</p>
+  <figure>
+    <div class="w" id="allaisR"></div>
+    <figcaption>Le risposte di 7.932 studenti alle stesse due domande, raccolte online dagli autori del libro: ogni barra è la quota che ha scelto quella coppia.</figcaption>
+  </figure>
+  <p>Scriviamo le quattro lotterie con la nostra notazione: \(L_1 = 0{,}2 \cdot [4000] \oplus 0{,}8 \cdot [0]\), \(R_1 = 0{,}25 \cdot [3000] \oplus 0{,}75 \cdot [0]\), \(L_2 = 0{,}8 \cdot [4000] \oplus 0{,}2 \cdot [0]\) e \(R_2 = [3000]\). Ora nota che</p>
+  <div class="eq">\[ L_1 = 0{,}25 \cdot L_2 \oplus 0{,}75 \cdot [0] \qquad\quad R_1 = 0{,}25 \cdot R_2 \oplus 0{,}75 \cdot [0]. \]</div>
+  <p>La prima domanda è la seconda, «diluita» con tre quarti di probabilità di non vincere nulla. Per l'indipendenza, chi preferisce \(L_2\) a \(R_2\) deve preferire \(L_1\) a \(R_1\), e viceversa. Si vede bene con i numeri: fissa \(\vv(0) = 0\) e \(\vv(4000) = 1\), e muovi \(\vv(3000)\).</p>
+  <figure>
+    <div class="w" id="allaisEU"></div>
+    <figcaption>Le barre sono le utilità attese delle quattro lotterie. Qualunque valore si dia a \(\vv(3000)\), i due confronti si ribaltano nello stesso punto: 0,8.</figcaption>
+  </figure>
+  <p>Fra chi ha una preferenza stretta, quindi, solo chi risponde \(L_1\) e \(L_2\), oppure \(R_1\) e \(R_2\), può essere descritto dall'utilità attesa: circa il 51% dei partecipanti. La coppia più comune, \(L_1\) e \(R_2\), è in conflitto con la teoria. Questo conflitto è il <strong>paradosso di Allais</strong>. Chi risponde così non ha niente che non va (fra loro ci sono gli autori del libro).</p>
+  <p>Una spiegazione per \(R_2\): 1.000 dollari in più non valgono il rischio di perdere la certezza di 3.000. Davanti a \(L_1\) e \(R_1\), invece, molti ragionano diversamente: le probabilità 0,25 e 0,2 sembrano simili, i premi 4.000 e 3.000 no; si ignorano le prime e si guarda ai secondi.</p>
+  <h3>La versione originale</h3>
+  <p>L'esperimento prende il nome dall'economista Maurice Allais, e nella sua forma originale ha tre premi: 2 500 000, 500 000 e 0. Scriviamo ogni lotteria come vettore di probabilità sui tre premi, in quest'ordine. Prima scelta: \(A_1 = (0, 1, 0)\) oppure \(A_1' = (0{,}10;\ 0{,}89;\ 0{,}01)\). Seconda scelta: \(A_2 = (0;\ 0{,}11;\ 0{,}89)\) oppure \(A_2' = (0{,}10;\ 0;\ 0{,}90)\). Sulle slide si chiamano \(L_1, L_1', L_2, L_2'\).</p>
+  <figure>
+    <div class="w" id="allaisO"></div>
+    <figcaption>Le quattro lotterie come barre di probabilità. Le scelte più comuni sono \(A_1\) nella prima coppia e \(A_2'\) nella seconda. Guarda che cosa cambia fra le due coppie: in entrambe le lotterie una fetta di 0,89 passa dal premio da 500 000 al premio da zero. La parte comune cambia, il resto no.</figcaption>
+  </figure>
+  <p>Chi sceglie così è razionale? Sì, nel senso delle prime due lezioni: \(A_1 \spf A_1' \spf A_2' \spf A_2\) è una preferenza come un'altra. È coerente con l'utilità attesa? No. Con \(\vv_1, \vv_2, \vv_3\) le utilità dei tre premi, \(A_1 \spf A_1'\) vuol dire \(0{,}11\,\vv_2 \gt 0{,}10\,\vv_1 + 0{,}01\,\vv_3\), e \(A_2' \spf A_2\) vuol dire esattamente il contrario.</p>
+  <p>Davanti al paradosso si può reagire in quattro modi. Dire che chi sbaglia dovrebbe correggersi: scegliere nell'incertezza richiede riflessione, e l'indipendenza è un principio a cui tornare. Dire che conta poco, perché riguarda probabilità vicine a 0 e a 1. Cambiare gli oggetti della scelta, come fa la teoria del rimpianto, che non guarda solo alla lotteria finale. Oppure tenere le lotterie e sostituire l'indipendenza con qualcosa di più debole.</p>
+  <p>Risultati come questo hanno prodotto molte teorie alternative. Negli esperimenti, il comportamento di molte persone è incoerente con ciascuna di esse: ogni teoria sembra adattarsi, al più, ad alcune persone in alcuni contesti.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="3"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>l'utilità attesa non è un'ipotesi su come si calcola, ma la conseguenza di due proprietà, continuità e indipendenza.</strong> E l'indipendenza è proprio quella che le persone, davanti alle domande di Allais, tendono a violare.</p>
+  <p>Nella prossima lezione i premi diventano somme di denaro, e possiamo chiederci che cosa vuol dire temere il rischio.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>
