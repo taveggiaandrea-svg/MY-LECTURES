@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>30416 Big Data and Databases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&display=swap">
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/style.css">
+<script>try{if(localStorage.getItem('tema')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <a class="name" href="../" title="All subjects"><span class="home">Le mie lezioni</span><span class="rest"> · Big Data</span></a>
+  <div class="right">
+  <nav aria-label="Lessons">
+    <a href="#lezione-1" data-go="1">1 · Timeline</a>
+    <a href="#lezione-2" data-go="2">2 · Tables</a>
+    <a href="#lezione-3" data-go="3">3 · Joins</a>
+    <a href="#lezione-4" data-go="4">4 · NoSQL</a>
+  </nav>
+  <button class="tog" id="tog" type="button"></button>
+  </div>
+</header>
+<main>
+<!-- ===================== LEZIONE 1 ===================== -->
+<article class="lesson" data-n="1" id="lezione-1" data-title="Why can't we just query the operational database?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 1 · A. Rezzani, slides</p>
+  <h1>Why can't we just query the operational database?</h1>
+  <p class="desc">The data analytics timeline: from printed reports on operational systems to data warehouses, OLAP, predictive analytics and Big Data platforms.</p>
+</div></section>
+
+<section><div class="col">
+  <p>A company sells through one system and keeps in touch with its clients through another. Both store customers. Ask both the same simple questions and look at what comes back.</p>
+  <figure>
+    <div class="w" id="b1src"></div>
+    <figcaption>Two tables built on this page from the course customers. The first panel is the sales system (an ERP, software for sales and accounting), the second the customer management system (a CRM, software that tracks contacts with customers); both are explained below. Red cells mark two of the disagreements, a different spelling of Milan and an old address kept next to the new one; Roma and Rome, LONDON and London are of the same kind. Grey rows are the two records of Mary Jane.</figcaption>
+  </figure>
+  <p>Nobody made a mistake. Each system was built for its own job, by its own team, with its own conventions. The trouble appears only when you use the data for something they were not designed for: analysis across the whole company.</p>
+  <p>The lecture starts from an informal vocabulary, refined in lesson 2. A <strong>database</strong> is a set of tables and other objects. A <strong>table</strong>, also called a relation, is a set of records defined by a list of <strong>fields</strong> (columns), each with a name and a data type. A <strong>record</strong> is one horizontal line of a table: the values of all the fields for one thing, such as one customer.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Five phases, each one fixing the last</h2>
+  <p>The lecture tells the history of data analysis as five phases. Each adds a layer on top of the previous ones.</p>
+  <figure>
+    <div class="w" id="b1time"></div>
+    <figcaption>The lecture's timeline, redrawn. Each phase adds one layer to the company's data stack (the colored bar) and changes the kind of report it can produce (the line under the year). The rest of the lesson walks through the phases in order.</figcaption>
+  </figure>
+  <p>From the 1980s, the <strong>RDBMS</strong> (relational database management system, the software that stores and manages tables) and <strong>SQL</strong> (Structured Query Language, used to ask tables questions) made it possible to produce reports automatically. They were static, mostly printed, and every query ran on the <strong>operational databases</strong>.</p>
+  <p>An operational database stores the day-to-day activity of a company in real time: every order, invoice and payment. It sits under applications such as an <strong>ERP</strong> (enterprise resource planning: software for accounting, procurement and production, for example SAP or Oracle JD Edwards) and a <strong>CRM</strong> (customer relationship management: software that tracks every interaction with customers and prospects, for example Salesforce).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>What a report is, at three heights</h2>
+  <p>A <strong>report</strong> is a document that organizes information in narrative, graphic or tabular form, prepared ad hoc, periodically or as required; put simply, the formatted result of database queries that contains useful data for decision making. The lecture distinguishes three kinds by how much they aggregate and how often they are produced.</p>
+  <figure>
+    <div class="w" id="b1rep"></div>
+    <figcaption>The six sales of the course scripts, seen as three reports. The operational one keeps every sale plus daily subtotals (grey rows); the tactical one keeps only the daily totals; the strategic one squeezes the period into a single line. Amount is quantity times price.</figcaption>
+  </figure>
+  <p><strong>The higher a report sits in the company, the more it aggregates and the less often it is produced.</strong> Operational reports are daily and mix detail with totals; tactical ones are daily or weekly; strategic ones summarize the company's situation weekly or monthly.</p>
+  <div class="quiz inq" data-quiz="1a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Why analysis on operational databases goes wrong</h2>
+  <p>The lecture lists three problems. The first figure showed one of them: the same data live in more than one system, so formats differ (Milano or Milan) and versions differ (an old address next to the new one).</p>
+  <p>The other two come from design. Operational databases are built for fast inserts and updates of single records, not for reading millions of rows at once. And reports compete with transactions for the same machine: a heavy report slows down the people entering orders, and vice versa.</p>
+  <figure>
+    <div class="w" id="b1load"></div>
+    <figcaption>An illustrative model, not lecture data. Each bar is the time needed to save one incoming order, in milliseconds (ms). In the first panel no report is running; in the second, eight reports run on the same server and the bars turn red above 15 ms; in the third the same eight reports run on a separate copy.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="1b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>A separate database just for analysis</h2>
+  <p>From the 1990s companies built an analytical database next to the operational ones: the <strong>data warehouse</strong> (DWH). At first it was a mere copy, which solved the performance problem. Later the data from different sources were integrated, made consistent, cleansed and reorganized into the <strong>dimensional model</strong>, which lesson 2 opens up.</p>
+  <p>Data reach the warehouse through <strong>ETL</strong>: extract the data from the operational sources, transform them by applying business rules and data quality checks, load them into the warehouse. The same acronym also names the software tools that do it.</p>
+  <figure>
+    <div class="w" id="b1etl"></div>
+    <figcaption>The two systems of the first figure after ETL. The first column is the staging area, where records are copied as they are; the second shows them transformed and sorted by person, with one record discarded by a business rule; the third is the warehouse, one record per real customer with a new key (yellow). Lines show which records merge.</figcaption>
+  </figure>
+  <p>The two business rules used here, how names are written and which source wins when ERP and CRM disagree, are examples chosen for this page. Every company writes its own.</p>
+  <p>Because its data are integrated from all sources and cleansed, the warehouse is called the <strong>single source of truth</strong>. <strong>A data warehouse is designed to support business decisions</strong>, by letting you consolidate, analyze and report data at different levels of aggregation.</p>
+  <p>It is also the starting point of <strong>Business Intelligence</strong> (BI): the technologies, applications and practices for collecting, integrating, analyzing and presenting business information, with the purpose of better decisions. The BI process runs extract, cleanse, transform and integrate, load the warehouse, then analyze and disseminate. In the lecture's diagram of a BI system, the operational sources (CRM, ERP and legacy systems, older software still in use) feed ETL and a staging area, then the relational warehouse, then a <strong>semantic layer</strong> such as OLAP (which presents data in business terms, so users need not know the tables), then the client tools people use.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Asking questions without writing SQL</h2>
+  <p>A warehouse still has to be queried in SQL, and the user must know its tables and how they relate. From the late 1990s, <strong>OLAP</strong> (online analytical processing) engines removed that barrier. They replace tables with multidimensional structures and store data together with <strong>metadata</strong>, data about the data, such as how tables connect.</p>
+  <p>So the user no longer needs to know the relationships, and OLAP answers aggregate questions (sums, averages, counts) much faster than a relational database. It is a technology for data discovery: unlimited report viewing, complex analytical calculations, analysis along any dimension. The lecture describes the OLAP client as a huge pivot table over the whole warehouse, used by drag and drop.</p>
+  <figure>
+    <div class="w" id="b1olap"></div>
+    <figcaption>The course sales as a cube with three dimensions (city, product, date), like the cube in the lecture's slide, cut into one slice per date: each filled cell holds the quantity sold for that combination. Next to the slices, one pivot of the cube: dates added up, cities on the rows, products on the columns.</figcaption>
+  </figure>
+  <p>Every choice of rows and columns is one view of the same cube. This is the <strong>dynamic report</strong> of phase 3, as opposed to the static, printed report of phases 1 and 2.</p>
+  <div class="quiz inq" data-quiz="1c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>From what happened to what will happen</h2>
+  <p>Warehouse and OLAP both look backwards. From around 2000 companies increasingly wanted to predict future events, such as next month's sales or the cost of energy. A new term appeared, <strong>data mining</strong>: discovering hidden patterns in large data sets that the business can exploit, for customer segmentation, market basket analysis (which products are bought together), churn analysis (who is about to leave), campaign targeting or demand forecasting.</p>
+  <p>This splits analytics in two. <strong>Descriptive analytics</strong> summarizes raw data so humans can read it, and describes the past: static reports and BI belong here. <strong>Predictive analytics</strong> estimates how likely a future outcome is, using statistics, machine learning and data mining on current and historical facts.</p>
+  <figure>
+    <div class="w" id="b1fc"></div>
+    <figcaption>Simulated monthly sales, not lecture data. The solid line is the known past, which can only be described. After today, a simple model projects the next six months (dashed), with a shaded band for its uncertainty.</figcaption>
+  </figure>
+  <p><strong>Machine learning</strong>, in the lecture's words, is the science of getting computers to act without being explicitly programmed. Data mining borrows from it, from artificial intelligence, from statistics and from database systems; today predictive analytics is largely a modern name for data mining.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Data too big for the old tools</h2>
+  <p>From around 2012 people started talking about <strong>Big Data</strong>. The usual definition lists three features, the three Vs: <strong>volume</strong> (potentially huge, such as every card transaction or every reading of an industrial sensor), <strong>velocity</strong> (fast data arriving continuously, as from Internet of Things sensors) and <strong>variety</strong>.</p>
+  <p>The lecture prefers a sharper definition: Big Data are data that we cannot analyze, or that it is not convenient to analyze, with traditional tools such as relational databases. The main tools for them are <strong>Hadoop</strong>, a distributed file system plus computation engine whose many tools cover the whole data life cycle, from ingestion to presentation, and <strong>Spark</strong>, a fast distributed computation engine more oriented to analysis; both get their own lectures later.</p>
+  <p>Variety needs a closer look. <strong>Structured</strong> data fit conveniently in a table, like ERP data. <strong>Unstructured</strong> data do not, like the text of a post or an image from medical equipment. Most data called unstructured are actually <strong>semi-structured</strong>.</p>
+  <figure>
+    <div class="w" id="b1post"></div>
+    <figcaption>The same social media post as you see it (first panel) and as it is stored (second panel). White parts are key/value pairs that would fit a table column; grey italic parts are free content with no fixed structure.</figcaption>
+  </figure>
+  <p>A note on the slides: one slide defines unstructured data as data that "can be conveniently put into a table". It is a typo for "cannot", as lesson 4 states correctly.</p>
+  <p>In the 2020s the trend topics are Big Data again (new versions of Hadoop and Spark), predictive analytics and <strong>cloud computing</strong>: renting platforms (PaaS, platform as a service) or raw infrastructure (IaaS, infrastructure as a service) instead of buying servers, with resources that scale at low prices. Traditional sources such as ERPs and CRMs now keep a deeper level of detail, and new sources keep arriving: scientific and medical equipment, distributed control systems in plants, high frequency trading, social media, Internet of Things devices.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="1"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>each phase moved analysis one step further away from the operational databases</strong>, first onto a copy, then onto integrated data, then into cubes, predictive models and distributed platforms.</p>
+  <p>Lesson 2 opens the box: what a relational database really is, and why the operational database and the warehouse are designed in opposite ways.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
+<!-- ===================== LEZIONE 2 ===================== -->
+<article class="lesson" data-n="2" id="lezione-2" data-title="What exactly is a table?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 2 · A. Rezzani, slides and SQL scripts</p>
+  <h1>What exactly is a table?</h1>
+  <p class="desc">Relational databases, keys and integrity, normal forms, OLTP versus data warehouse, and the first SQL statements.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 1 used an informal vocabulary: a database is a set of tables, a table a set of records, a record a line of values. It also left a promise: operational databases and data warehouses are designed in opposite ways. This lesson keeps it.</p>
+  <h2>A table that says no</h2>
+  <p>These are the two tables of the course scripts: five customers and six sales. Each sale stores the number of its customer, not the name.</p>
+  <div class="scroll"><table><thead><tr><th class="n" style="color:var(--yellow)">customer_id</th><th>first_name</th><th>last_name</th><th>city</th></tr></thead><tbody>
+    <tr><td class="n">1</td><td>marco</td><td>rossi</td><td>milan</td></tr><tr><td class="n">2</td><td>john</td><td>doe</td><td>london</td></tr><tr><td class="n">3</td><td>mark</td><td>smith</td><td>liverpool</td></tr><tr><td class="n">4</td><td>mary</td><td>jane</td><td>london</td></tr><tr><td class="n">5</td><td>mario</td><td>bianchi</td><td>rome</td></tr></tbody></table></div>
+  <div class="scroll"><table><thead><tr><th class="n" style="color:var(--yellow)">sales_id</th><th>sales_date</th><th class="n" style="color:var(--pink)">customer_id</th><th>product_name</th><th class="n">quantity</th><th class="n">price</th></tr></thead><tbody>
+    <tr><td class="n">1</td><td>2018-09-01</td><td class="n">1</td><td>xyz</td><td class="n">5</td><td class="n">1.50</td></tr><tr><td class="n">2</td><td>2018-09-01</td><td class="n">2</td><td>abc</td><td class="n">2</td><td class="n">2.00</td></tr>
+    <tr><td class="n">3</td><td>2018-09-02</td><td class="n">3</td><td>xyz</td><td class="n">10</td><td class="n">1.50</td></tr><tr><td class="n">4</td><td>2018-09-02</td><td class="n">4</td><td>abc</td><td class="n">4</td><td class="n">2.00</td></tr>
+    <tr><td class="n">5</td><td>2018-09-03</td><td class="n">1</td><td>abc</td><td class="n">2</td><td class="n">2.20</td></tr><tr><td class="n">6</td><td>2018-09-03</td><td class="n">2</td><td>xyz</td><td class="n">3</td><td class="n">1.50</td></tr></tbody></table></div>
+  <p>Now try to add four new sales. A spreadsheet would take all of them. A relational database does not.</p>
+  <figure>
+    <div class="w" id="b2ins"></div>
+    <figcaption>Four attempted inserts into Sales, each shown under the last existing sale. The new row is green if the database accepts it and red if it refuses it; the cell that breaks a rule is outlined. The rules are explained in the next sections.</figcaption>
+  </figure>
+  <p>The table carries rules about what it may contain, and the database enforces them on every insert. Those rules are the subject of the first half of this lesson.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>From informal to formal</h2>
+  <p>A <strong>relational database</strong> is made of logical units called tables, or relations. It follows the relational model of data proposed by the computer scientist E. F. Codd in 1970, and its data are accessed with SQL. The software that runs it is the <strong>RDBMS</strong> (relational database management system).</p>
+  <p>An RDBMS stores data in tables, lets you create new databases and their structures, lets you query and modify data with SQL, keeps vast amounts of data for a long time, recovers the database after failures, errors or misuse, and controls access by many users at once.</p>
+  <p>A table is defined by its <strong>metadata</strong> (data about the data, as in lesson 1): a name (Customers), one or more columns (customer_id, first_name, last_name, city) and a <strong>primary key</strong>, the column whose value identifies each row. Each <strong>field</strong> has a name, a <strong>data type</strong> (string, number, date, boolean or binary) and a <strong>NULL constraint</strong> that says whether it may be left empty; NULL means no value. A <strong>record</strong>, also called row or tuple, holds the values for a single entity, such as one customer.</p>
+  <p>Text comes in two main types: <code>CHAR(n)</code> always has length n, <code>VARCHAR(n)</code> has variable length, at most n. Dates use <code>DATE</code>, <code>DATETIME</code> or <code>TIME</code>. Numbers are integers (<code>INT</code>, and in MySQL a family from <code>TINYINT</code>, 1 byte, to <code>BIGINT</code>, 8 bytes), floating point (<code>FLOAT</code>) or fixed decimals: <code>DECIMAL(precision, scale)</code> has precision digits in total, scale of them after the point.</p>
+  <figure>
+    <div class="w" id="b2types"></div>
+    <figcaption>In the first panel, the storage table shown in the lecture's slide on data types: four values stored as CHAR(4) and as VARCHAR(4), with the bytes each one takes (a dot is a padding space). In the second, three numbers tested against DECIMAL(5,2): three digits before the point, two after.</figcaption>
+  </figure>
+  <p>CHAR wastes space on short values but has a fixed size; VARCHAR saves space and pays one extra byte to record the length. A value longer than 4 characters is cut to 4 in both, as in the slide's last row.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Three kinds of integrity</h2>
+  <p>The <span class="k-yellow">primary key</span> constraint guarantees that records are unique: insert a duplicate value and the RDBMS returns an error, as in the first panel of the opening figure. This protects <strong>entity integrity</strong>: no duplicate rows.</p>
+  <p>Sales does not repeat each customer's name and city; it stores only <code>customer_id</code>, the customer's primary key. Nothing stops you from typing a customer that does not exist, unless you declare a <span class="k-pink">foreign key</span>: a constraint linking Sales.customer_id to Customers.customer_id. A foreign key field can be NULL, or it must contain a value found in the linked primary key. This is <strong>referential integrity</strong>, at work in the second and fourth panels.</p>
+  <p>Data types and NULL constraints protect <strong>domain integrity</strong>: all values of a column belong to the same domain. A <span class="k-orange">CHECK constraint</span> adds any other rule, such as quantity &gt; 0 (third panel). The lecture's full table declares all three:</p>
+<pre class="code">CREATE TABLE Sales (
+    sales_id     INT  <span class="k-yellow">PRIMARY KEY</span> NOT NULL,
+    sales_date   DATE,
+    customer_id  INT  <span class="k-pink">REFERENCES Customers (customer_id)</span>,
+    product_name VARCHAR(50),
+    quantity     INT  <span class="k-orange">CHECK (quantity &gt; 0)</span>,
+    price        DECIMAL(7, 2)
+);</pre>
+  <p><strong>Keys and constraints turn a table from a grid of cells into a set of rows that cannot contradict its own rules.</strong> <code>DROP TABLE Sales;</code> deletes both the data and the definition; the lecture drops Sales first, then Customers.</p>
+  <div class="quiz inq" data-quiz="2a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Why some searches are instant</h2>
+  <p>A database holds other objects besides tables: views (saved queries that behave like tables), procedures and functions (saved pieces of SQL code) and <strong>indexes</strong>. An index is a data structure that speeds up retrieval, like the index of a book. Without one, the RDBMS must scan the entire table even to return a single record.</p>
+  <figure>
+    <div class="w" id="b2idx"></div>
+    <figcaption>The same 64 customers, looking for customer 37. In the first panel the rows are stored in arrival order and the scan reads them one by one (grey) until it finds the row (green). In the second an index keeps the ids sorted, and each step halves the range left to search.</figcaption>
+  </figure>
+  <p>The lecture gives only the book analogy. The halving search is one simple way an index can work, added here for illustration; real RDBMS use tree structures built on the same idea.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Where errors creep in: normalization</h2>
+  <p><strong>Normalization</strong> organizes data by decomposing tables, to eliminate redundancy and the anomalies it causes in inserts, updates and deletes. Its rules are the <strong>normal forms</strong>: first, second, third, Boyce-Codd, fourth and more; the course covers only the first and the third.</p>
+  <p>The lecture's first example is a customer table with a duplicate record and two non-<strong>atomic</strong> fields: Name holds first and last name, Address holds street, city and country. Finding the customers in New York is awkward, because the city is buried inside a longer text.</p>
+  <div class="scroll"><table><thead><tr><th>Name</th><th>Address</th></tr></thead><tbody><tr><td>John Doe</td><td>5th street, New York, USA</td></tr><tr><td>Dave Johns</td><td>25th street, New York, USA</td></tr><tr><td>Dave Johns</td><td>25th street, New York, USA</td></tr></tbody></table></div>
+  <div class="scroll"><table><thead><tr><th class="n" style="color:var(--yellow)">Customer_code</th><th>First name</th><th>Last name</th><th>Street</th><th>City</th><th>Country</th></tr></thead><tbody><tr><td class="n">1</td><td>John</td><td>Doe</td><td>5th Street</td><td>New York</td><td>USA</td></tr><tr><td class="n">2</td><td>Dave</td><td>Johns</td><td>25th Street</td><td>New York</td><td>USA</td></tr></tbody></table></div>
+  <p class="stmt"><strong>First normal form.</strong> Every column holds a single atomic value of one domain, column names are unique, and records are unique, guaranteed by a primary key.</p>
+  <p>The second table above is in first normal form, and <code>WHERE City = 'New York'</code> now just works. The lecture's second example is an employee table that repeats the department's name and phone for every employee.</p>
+  <p class="stmt"><strong>Third normal form.</strong> The table is in first normal form and has no <strong>transitive dependency</strong>: no column depends on another non-key column instead of on the primary key.</p>
+  <figure>
+    <div class="w" id="b2anom"></div>
+    <figcaption>The same three employees stored in two ways, after the same hurried change: one UPDATE that sets the new Finance phone on a single row. In the first panel the phone lived in three rows and now disagrees with itself (red); in the second it lives once, in Department, and every employee reaches it through dep_id (pink).</figcaption>
+  </figure>
+  <p><strong>Normalization stores every fact once, so it cannot disagree with itself.</strong> Department name and phone depend on the department code, not on the employee: that transitive dependency is what the split removes.</p>
+  <div class="quiz inq" data-quiz="2b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Two databases, two shapes</h2>
+  <p><strong>OLTP</strong> (online transaction processing) databases are the transaction oriented, operational ones of lesson 1. They are fully normalized: many tables, few columns each, no redundancy. Normalization prevents errors in inserts, updates and deletes; the price is that a report must put many tables back together.</p>
+  <p>A data warehouse is analysis oriented, and its goal is a simple model for the analyst. It has two kinds of tables. <strong>Dimensions</strong> hold all the attributes of a business entity (customer, product, shop) and are denormalized, in first normal form. <strong>Fact tables</strong> hold the <span class="k-blue">measures</span> (quantities, values, counts) and references to the dimensions, and are in third normal form.</p>
+  <figure>
+    <div class="w" id="b2shape"></div>
+    <figcaption>The lecture's two example schemas of the same retail business, redrawn with table names only. The orange path is what the question "quantity sold by continent and product category" must join in each design: in the first panel ten tables, in the second three.</figcaption>
+  </figure>
+  <p>Each dimension row gets a progressive number created by ETL, the <span class="k-yellow">surrogate key</span> (or DWH key), while the original key of the source system, the <strong>business key</strong>, is kept as an ordinary column. The fact table points to the dimensions through the surrogate keys.</p>
+  <figure>
+    <div class="w" id="b2star"></div>
+    <figcaption>A small warehouse built from the course sales: three dimensions and the fact table. The highlighted sale is read through its keys: each pink key in the fact row picks the highlighted dimension row with the same yellow surrogate key (2, 5 and 2). Surrogate keys follow the load order, so they differ from the business keys.</figcaption>
+  </figure>
+  <p>ETL takes care of integrity in the warehouse, so a DWH generally has no foreign keys and often no primary keys. ETL also generates the surrogate keys, applies business rules, integrates sources and checks data quality.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>A language that says what, not how</h2>
+  <p>SQL is <strong>domain specific</strong>: it only applies to databases. It is <strong>declarative</strong>: you describe the result you want, not the algorithm, and a component of the RDBMS called the <strong>optimizer</strong> chooses how to get it. Every RDBMS also adds procedural instructions such as IF and WHILE in its own dialect: T-SQL in Microsoft SQL Server, PL/SQL in Oracle, SQL PL in IBM DB2, SQL/PSM in MySQL.</p>
+  <p>Why learn it in a Big Data course? Because most Big Data and NoSQL tools (the non relational databases of lesson 4) speak it: Hive in Hadoop uses HiveQL, HBase can be queried through Phoenix, Spark has Spark SQL, Cassandra has the CQL dialect, and many tools also offer ODBC drivers, a standard way for programs to connect to a database.</p>
+  <p>SQL statements fall into four sublanguages: <strong>DQL</strong> (data query language) to query, <strong>DDL</strong> (data definition language) to create tables and other objects, <strong>DCL</strong> (data control language) to grant users permissions, <strong>DML</strong> (data manipulation language) to insert, update and delete. A <strong>query</strong> retrieves data and starts with SELECT. A <strong>statement</strong> modifies data or structure, or controls the program flow. A <strong>clause</strong> is a part of either, such as WHERE. An <strong>expression</strong> returns a value, such as <code>price*quantity</code>, and a <span class="k-orange">predicate</span> is a logical condition, such as <code>city = 'Milan'</code>.</p>
+  <p>In DDL, <code>CREATE TABLE name (column_specification, ...)</code> lists each column with its data type and, optionally, primary key, NULL, REFERENCES and CHECK specifications, as in the Sales table above. In DML, INSERT adds a record, listing the columns or giving values for all of them in order; INSERT … SELECT adds all the rows returned by a query:</p>
+<pre class="code">INSERT INTO customers VALUES (1, 'john', 'doe', 'london');
+INSERT INTO customers SELECT id, first_name, last_name, city FROM temp_customers;</pre>
+  <p>UPDATE changes values with SET, DELETE removes records. Both accept a WHERE clause, and that is where the classic mistake hides.</p>
+  <figure>
+    <div class="w" id="b2dml"></div>
+    <figcaption>The two customers of the course script on UPDATE and DELETE. The first panel is the starting table; the second and third run, in order, the script's DELETE and UPDATE, each limited by an orange predicate; the fourth runs the same UPDATE on the starting table with the WHERE clause forgotten. Changed rows are highlighted.</figcaption>
+  </figure>
+  <p><strong>Without WHERE, UPDATE and DELETE act on every row of the table.</strong></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Asking questions: SELECT</h2>
+  <p>A SELECT query is built from up to six clauses, always written in this order.</p>
+  <div class="scroll"><table><thead><tr><th>Clause</th><th>Role</th></tr></thead><tbody>
+    <tr><td><code>SELECT</code> select list</td><td>which columns to return</td></tr><tr><td><code>FROM</code> table source</td><td>which tables to query</td></tr>
+    <tr><td><code>WHERE</code> search condition</td><td>filters rows with a predicate</td></tr><tr><td><code>GROUP BY</code> group list</td><td>arranges rows into groups (lesson 3)</td></tr>
+    <tr><td><code>HAVING</code> search condition</td><td>filters groups (lesson 3)</td></tr><tr><td><code>ORDER BY</code> order list</td><td>sorts the result</td></tr></tbody></table></div>
+  <p>The select list can contain scalar expressions, computed once per row with the operators + (add, or concatenate text), -, *, / and % (modulo), and named with an <strong>alias</strong> after AS. It can use built in functions: YEAR, MONTH and DAY extract parts of a date (not in SQLite), TRIM removes spaces at both ends, UPPER and LOWER change case, ABS and ROUND work on numbers. DISTINCT removes duplicate rows, since SQL results are not guaranteed to be unique; <code>SELECT DISTINCT YEAR(sales_date), customer_id FROM Sales</code> lists each customer once per year. ORDER BY imposes an order, since none is guaranteed otherwise.</p>
+  <p>In WHERE the predicate can use the comparisons =, &gt;, &lt;, &gt;=, &lt;= and LIKE (text matching), the logical operators AND, OR and NOT, and parentheses. CASE works as IF THEN ELSE, returning the value of the first condition that is true:</p>
+<pre class="code">SELECT *,
+  CASE WHEN <span class="k-orange">city = 'milan'</span> THEN 'Italy'
+       WHEN <span class="k-orange">city IN ('liverpool', 'london')</span> THEN 'UK'
+       ELSE 'N/A'
+  END AS Country
+FROM Customers;</pre>
+  <div class="quiz inq" data-quiz="2d"></div>
+  <figure>
+    <div class="w" id="b2case"></div>
+    <figcaption>The CASE query on the five course customers. Each row is shaded by the branch that produced its Country: lighter for the first WHEN, darker for the second, none for ELSE; the orange column names the branch. CASE stops at the first condition that is true, so the order of the WHEN lines matters when conditions overlap.</figcaption>
+  </figure>
+<pre class="code">SELECT sales_date, product_name, quantity, <span class="k-blue">price * quantity AS amount</span>
+FROM Sales
+WHERE <span class="k-orange">product_name = 'xyz'</span>
+ORDER BY quantity DESC;</pre>
+  <figure>
+    <div class="w" id="b2sel"></div>
+    <figcaption>The query above on the course Sales table, one step at a time. In the first table WHERE keeps the rows where the predicate is true (the others fade); in the second the select list keeps four columns and computes amount; in the third ORDER BY sorts by quantity, largest first.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="2c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="2"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>a relational table is a set of rows with rules attached</strong>. Keys and constraints keep it consistent, normalization keeps every fact in one place, and the warehouse bends those rules on purpose to make analysis simple.</p>
+  <p>Lesson 3 puts tables back together: joins, groups, subqueries and window functions.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
+<!-- ===================== LEZIONE 3 ===================== -->
+<article class="lesson" data-n="3" id="lezione-3" data-title="How do you combine two tables?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 3 · A. Rezzani, slides and SQL scripts</p>
+  <h1>How do you combine two tables?</h1>
+  <p class="desc">Advanced SQL: UNION, joins, missing values, grouping and summarizing, subqueries and analytical functions.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 2 ended with normalized tables: every fact stored once, in its own table. The price is that answers are scattered. A sale knows its buyer only by number; the name sits in another table. This lesson puts the pieces back together.</p>
+  <h2>Who bought what?</h2>
+  <p>These are the lecture's two tables. Buyers has a name and a <span class="k-yellow">buyer_id</span>; sales has a <span class="k-pink">buyer_id</span>, a product id and a quantity. You want one result with the buyer's name next to each quantity. The most naive way is to pair every buyer with every sale.</p>
+  <figure>
+    <div class="w" id="b3cart"></div>
+    <figcaption>Every buyer (rows) crossed with every sale (columns): the cartesian product, 4 × 5 = 20 pairs. Each cell compares the two buyer ids; the orange cells are the pairs where they are equal, the condition a join writes after the keyword ON.</figcaption>
+  </figure>
+  <p>The <strong>cartesian product</strong> is all the possible combinations of rows of two tables, the intermediate result of the FROM clause; the slide's own example crosses 3 names (Davis, Funk, King) with 3 products into 9 rows. It is the starting point of every join, and in SQL queries it is usually not what you want: most pairs match a buyer with someone else's sale.</p>
+  <p class="stmt"><strong>Join.</strong> A join puts the columns of two tables side by side, matching rows with a predicate. A <strong>CROSS JOIN</strong> returns the whole cartesian product. An <strong>INNER JOIN</strong> keeps only the pairs where the <span class="k-orange">ON</span> predicate is true. An <strong>outer join</strong> also preserves the rows of a designated table and fills the missing side with <span class="k-purple">NULL</span>: LEFT keeps every row of the first table, RIGHT every row of the second, FULL both.</p>
+<pre class="code">SELECT buyer_name, sales.buyer_id, qty
+FROM buyers LEFT OUTER JOIN sales
+  ON <span class="k-orange">buyers.buyer_id = sales.buyer_id</span>;</pre>
+  <figure>
+    <div class="w" id="b3joins"></div>
+    <figcaption>The four joins on the same data. One sale from a buyer 9, who is not in buyers, is added on this page: in the lecture's data every sale has a valid buyer, so RIGHT and FULL would equal INNER and LEFT. Purple NULLs mark the rows kept without a partner.</figcaption>
+  </figure>
+  <p><strong>An outer join is an inner join plus the rows that found no partner, padded with NULL.</strong> Lucy Thin bought nothing: she disappears from INNER and RIGHT, and survives with NULLs in LEFT and FULL.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Stacking instead of matching: UNION</h2>
+  <p>A join adds columns. <strong>UNION</strong> adds rows: it combines the results of two or more SELECT statements with the same columns, one under the other, and removes duplicate rows. <strong>UNION ALL</strong> does the same but keeps the duplicates. The course script uses t1 = {(1, 'a'), (2, 'b')} and t2 = {(1, 'a'), (3, 'c')}.</p>
+  <figure>
+    <div class="w" id="b3union"></div>
+    <figcaption>The two operators on t1 and t2 of the course script 07.union.sql. Grey labels say which table each row comes from. The row (1, 'a') is in both tables: UNION keeps it once, UNION ALL twice.</figcaption>
+  </figure>
+  <p>A practical note added on this page: removing duplicates means comparing rows, which costs work, so when the two results cannot overlap UNION ALL gives the same rows faster.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>When a value is missing</h2>
+  <p>The outer joins produced NULLs, and SQL treats them in a special way. With no missing values a predicate is TRUE or FALSE: 5 &gt; 2 is TRUE. With missing values there is a third outcome, <span class="k-purple">UNKNOWN</span>: comparing NULL to anything, another NULL included, gives UNKNOWN.</p>
+  <figure>
+    <div class="w" id="b3null"></div>
+    <figcaption>First, five comparisons and their outcome. Then the course Customers left joined with Sales (script 08.joins.sql): Bianchi has no sales, so his sale columns are NULL. The last two columns evaluate two predicates on every row; WHERE keeps only the rows where a predicate is TRUE.</figcaption>
+  </figure>
+  <p><strong>Query filters (ON, WHERE, HAVING) keep only TRUE, so UNKNOWN rows are silently dropped.</strong> That is why you test for missing values with <code>IS NULL</code> or <code>IS NOT NULL</code>, never with <code>= NULL</code>. The function <code>COALESCE(x, 'N/A')</code> replaces a NULL with a value of your choice: in the lecture's query on this left join, Bianchi's row shows product 'N/A' and quantity 0 instead of two NULLs.</p>
+  <div class="quiz inq" data-quiz="3a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>From rows to groups</h2>
+  <p>An <strong>aggregate function</strong> turns many rows into one value: SUM, MIN, MAX, AVG, COUNT, and the standard deviations and variances STDEV, STDEVP, VAR, VARP. They return a single value with no column name, can be used in SELECT, HAVING and ORDER BY, and ignore NULLs, except <code>COUNT(*)</code>, which counts rows. Alone they summarize the whole table; with <strong>GROUP BY</strong> they summarize each group, one output row per unique combination of the grouping columns.</p>
+  <figure>
+    <div class="w" id="b3group"></div>
+    <figcaption>The lecture's picture of how GROUP BY works, redrawn with the rows the slide shows. The first table is the orders; WHERE keeps the rows of customers 30097 and 30098 (the others fade); GROUP BY gathers them into one group per customer; COUNT(*) turns each group into one row.</figcaption>
+  </figure>
+  <p>The order matters. WHERE filters <strong>rows</strong> before aggregation, and after GROUP BY the detail rows are lost: only the groups remain. To filter <strong>groups</strong> you need a clause that runs after GROUP BY and can test an aggregate: <span class="k-orange">HAVING</span>.</p>
+  <p>The next examples use the course's OrdersDB script: a Customer table (Anders, Trujillo, Moreno), an Orders table with OrderDate, CustomerId and TotalAmount, an OrderItem table with the quantity of each product in each order, and a Product table. Without GROUP BY, <code>SELECT SUM(i.quantity), COUNT(*) FROM OrderItem i</code> returns one row: 240 units over 16 items. Grouped by product, it returns one row per product: Chai 48 units in 5 items, Chang 71 in 4, Aniseed Syrup 56 in 4, Chef Anton's Cajun Seasoning 65 in 3.</p>
+<pre class="code">SELECT p.productname, <span class="k-blue">SUM(i.quantity)</span> TotalQt, <span class="k-blue">COUNT(*)</span> nr_of_sales
+FROM OrderItem i JOIN Product p ON p.id = i.productid
+GROUP BY p.productname
+HAVING <span class="k-orange">SUM(i.quantity) &gt; 60</span>;</pre>
+  <figure>
+    <div class="w" id="b3having"></div>
+    <figcaption>Total quantity per product in the OrderItem table of the course database (Cajun is Chef Anton's Cajun Seasoning; Gumbo Mix has no items, so it forms no group). The orange line is HAVING SUM &gt; 60. In the first panel all items count; in the second WHERE quantity &gt; 10 removes the small items before the sums.</figcaption>
+  </figure>
+  <p>With no WHERE, only Chang (71) and Chef Anton's Cajun Seasoning (65) pass HAVING, the lecture's result. <code>COUNT(DISTINCT customerid)</code> on Orders counts different values instead of rows: 2, since only Anders and Trujillo placed orders.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>A query inside a query</h2>
+  <p>A <strong>subquery</strong> is a query nested in another. Its result is passed to the outer query, which uses it like an expression. A subquery can return one value (scalar), a list, or a whole table. It is <strong>self-contained</strong> if it does not depend on the outer query, and <strong>correlated</strong> if it uses values from the outer query's current row.</p>
+<pre class="code">WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders)                     -- self-contained
+WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders o2
+                     WHERE o2.customerid = <span class="k-orange">o.customerid</span>)              -- correlated</pre>
+  <figure>
+    <div class="w" id="b3subq"></div>
+    <figcaption>The two queries of the lecture on the course orders. In the first panel the inner query runs once and returns a single date. In the second it runs once per order, for that order's customer: its result is shown as a column. Green rows are those where the order date equals the inner result.</figcaption>
+  </figure>
+  <p>The self-contained version answers "who placed the last order", one row. The correlated version answers "when did each customer place their last order", one row per customer. With <code>EXISTS</code> a subquery becomes an existence test: it is TRUE if the subquery returns at least one row, FALSE otherwise. In the course database <code>WHERE EXISTS (SELECT * FROM Orders o WHERE o.customerid = c.id)</code> returns Anders and Trujillo, and <code>NOT EXISTS</code> returns Moreno, the customer with no orders.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Aggregating without losing the rows</h2>
+  <p>GROUP BY collapses rows. <strong>Analytical functions</strong> compute over groups of rows but keep every row, adding the result as a new column. They use the <span class="k-teal">OVER</span> clause, made of PARTITION BY, which splits the rows into partitions (one per customer, say), and ORDER BY, which orders the rows inside each partition.</p>
+  <p>On top of that you can set a <span class="k-teal">window</span>: which rows around the current one enter the calculation. <code>UNBOUNDED PRECEDING</code> starts at the first row of the partition, <code>n PRECEDING</code> n rows before the current one, <code>CURRENT ROW</code> at the current row; <code>n FOLLOWING</code> and <code>UNBOUNDED FOLLOWING</code> look ahead.</p>
+  <figure>
+    <div class="w" id="b3win"></div>
+    <figcaption>Four functions on the orders of the lecture's examples, partitioned by customer. ROW_NUMBER numbers each customer's orders from the largest; LAG(TotalAmount, 1, 0) copies the previous amount (arrows), or 0 if there is none; the last two panels mark in teal the window used for one row.</figcaption>
+  </figure>
+  <p>The moving average uses <code>AVG(TotalAmount) OVER (PARTITION BY customerid ORDER BY OrderDate ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)</code>. Anders has two orders on 5 July, and the slide lists 1813 before 670.8; this page keeps that order. For his third order, 670.8, the window holds his first three orders:</p>
+  <div class="eq">\[ \frac{440 + 1813 + 670.8}{3} = 974.6 \]</div>
+  <p>The running total uses SUM from <code>UNBOUNDED PRECEDING</code>. <code>SUM(TotalAmount) OVER ()</code>, with nothing in the brackets, puts the grand total 13595.5 on every row; <code>OVER (PARTITION BY customerid)</code> puts each customer's total instead, 4066.8 for Anders and 9528.7 for Trujillo. With ROW_NUMBER ordered by TotalAmount descending, keeping rn = 1 finds each customer's largest order. <code>LEAD</code> works like LAG but looks n rows ahead.</p>
+  <div class="quiz inq" data-quiz="3b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="3"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>joins and unions rebuild what normalization split, GROUP BY collapses rows into groups, and window functions compute over groups while keeping every row.</strong></p>
+  <p>Lesson 4 leaves the single relational server behind: what changes when the data no longer fit in one machine or in one table.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
+<!-- ===================== LEZIONE 4 ===================== -->
+<article class="lesson" data-n="4" id="lezione-4" data-title="What if one machine is not enough?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 4 · A. Rezzani, slides</p>
+  <h1>What if one machine is not enough?</h1>
+  <p class="desc">The Big Data toolbox: distributed systems, NoSQL databases, ACID and BASE, columnar compression, graph and vector databases.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lessons 2 and 3 lived inside one relational database on one server. Lesson 1 already named the limit: Big Data are data we cannot analyze, or cannot analyze at a reasonable cost, with a traditional RDBMS. Recall the three Vs: volume, velocity and variety. Unstructured data have no fields or columns and cannot conveniently go into a table: documents (Word, Excel, PowerPoint, PDF), images, e-mails, Web 2.0 content (blog posts, forums, wikis). For huge amounts of data, unstructured data and distributed calculations, does a system exist that is also easy to use? This lesson starts the answer.</p>
+  <h2>Many small machines instead of one big one</h2>
+  <p>For huge amounts of data you need more than one machine: a <strong>distributed system</strong> that splits the data among its servers and computes on all of them at once. A <strong>node</strong> is a single server, a <strong>rack</strong> is a case holding a bunch of servers, and a <strong>cluster</strong> is a collection of servers, in one or more racks, that behaves as if it were a single machine.</p>
+  <figure>
+    <div class="w" id="b4clus"></div>
+    <figcaption>An illustrative model, not lecture data: a 10 TB table split into 40 blocks of 0.25 TB (white squares) spread over the nodes of a cluster, each node reading one block in 30 minutes. Each panel shows the racks, the active nodes and the time the busiest node needs.</figcaption>
+  </figure>
+  <p>This is <strong>horizontal scalability</strong>: you add servers to gain computing power and storage, instead of buying a bigger one. Unstructured data add a second need, systems that work with non tabular structures; complex calculations such as machine learning add a third, doing them in a distributed way. And all of it should stay easy for the final user.</p>
+  <p>The two main tools are <strong>Hadoop</strong>, a complete Big Data platform (lesson 5), and <strong>Spark</strong>, a high-performance calculation engine (lessons 6 and 7). This lesson covers the third kind of tool: NoSQL databases.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>What NoSQL gives up</h2>
+  <p><strong>NoSQL databases</strong> deviate from the rules of relational databases. They are distributed, mostly open source, horizontally scalable and <strong>schema free</strong>: there is no table definition, and they can host data whose structure varies from record to record. Their programming interface is simple, and most of them end up offering an SQL interface anyway.</p>
+  <p>What they generally do not guarantee are the ACID properties of <strong>transactions</strong>. A transaction is a set of commands, reads or changes, that must run with all or nothing logic. Take a transfer of 100 euro from account A to account B: a withdrawal and a deposit, and you never want only one of them (this example is added on this page).</p>
+  <p class="stmt"><strong>ACID.</strong> The slide names the four properties; the one-line meanings are added here. <strong>Atomicity</strong>: all or nothing. <strong>Consistency</strong>: the database moves from one valid state to another. <strong>Isolation</strong>: concurrent transactions do not see each other's half-done work. <strong>Durability</strong>: once confirmed, a change survives failures.</p>
+  <p>Giving up ACID can look like a serious flaw that breeds inconsistencies. Many NoSQL systems follow the <strong>BASE</strong> model instead: <strong>basically available</strong> (the application always answers), <strong>soft state</strong> (it does not have to be consistent at every moment), <strong>eventual consistency</strong> (it becomes consistent once modifications stop).</p>
+  <figure>
+    <div class="w" id="b4base"></div>
+    <figcaption>One customer record kept on three nodes, at three moments. In the first panel a change of address reaches node 1; in the second a reader asks node 3 before the change has travelled and gets the old value; in the third replication has caught up. Red boxes hold an outdated value; arrows are replication messages.</figcaption>
+  </figure>
+  <p><strong>BASE trades a moment of inconsistency for an answer that always comes.</strong> As an example added here: for a like counter that is a good deal, for a bank balance it is not, which is one reason relational databases did not disappear.</p>
+  <div class="quiz inq" data-quiz="4a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Four ways to store one customer</h2>
+  <p>NoSQL is a family, not a product. The lecture groups it into four types by how they represent data.</p>
+  <figure>
+    <div class="w" id="b4models"></div>
+    <figcaption>The four NoSQL models, with the tools the lecture names for each. The key-value panel is the slide's sample customer, Mary Smith from Liverpool; the document panel is the slide's sample document, John Doe from London. The column and graph panels are added on this page, reusing Mary Smith, to show how those models differ.</figcaption>
+  </figure>
+  <p>A <strong>key-value store</strong> keeps sets of key-value pairs, with four basic operations: add, remove, modify, find. A <strong>document database</strong> refines it: each record is a document in JSON or XML (two text formats that write data as labeled, nestable fields), which carries both metadata (the keys) and data (the values), with no schema constraints. A <strong>column-oriented</strong> database, derived from Bigtable (Google's distributed storage system), organizes data by column and lets each row hold a variable number of columns. A <strong>graph database</strong> stores nodes and the relationships between them, with a flexible schema.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Why store by column?</h2>
+  <p>Organising data by column instead of by row is not exclusive to NoSQL: Oracle Exadata, the SQL Server column store index, SAP HANA and in-memory OLAP engines such as Power Pivot use it too. Its strengths are not wasting space when a value does not exist for a column and, often, a high degree of compression: a column holds values of one type, frequently repeated.</p>
+  <p>The lecture shows two algorithms. The first is <strong>dictionary encoding</strong>: list the distinct values once, in a dictionary, and replace each value with its position in the list. With \(\kk\) distinct values each code needs</p>
+  <div class="eq">\[ \text{bits per code} = \lceil \log_2 \kk \rceil \]</div>
+  <p>where the brackets mean rounding up; the slide shows the case of 4 values and 2 bits, the general formula is added here. The lecture's Year column has \(\kk = 4\) distinct years, so 2 bits per value: 00, 01, 10, 11.</p>
+  <figure>
+    <div class="w" id="b4dict"></div>
+    <figcaption>The lecture's dictionary encoding slide, redrawn. The Year column becomes a column of 2 bit codes plus a dictionary of its 4 distinct values; dashed lines connect each year to its code.</figcaption>
+  </figure>
+  <p>The second is <strong>run-length encoding</strong>: replace each run of identical consecutive values with one triple (value, initial position, count). On the slide a Year column of 1,999 rows becomes four triples: (0, 1, 549), (1, 550, 450), (2, 1000, 500), (3, 1500, 500). The Customer column next to it, sorted within each year, starts (1, 1, 4), (2, 5, 3), and for 2010 (1, 550, 2), (2, 552, 2).</p>
+  <figure>
+    <div class="w" id="b4rle"></div>
+    <figcaption>A column of 24 year codes (0 to 3) read in order, row by row. In the first panel the column is unsorted and the triples below it are many; in the second the same values are sorted and four triples are enough. Shades of grey stand for the four codes.</figcaption>
+  </figure>
+  <p><strong>Run-length encoding compresses most when there are many identical values and the column is sorted.</strong> In the column stores of the NoSQL world, data are kept as key/value (or column/value) pairs grouped under a unique key, which the slide calls the primary key, so each row can hold values for any subset of columns.</p>
+  <p><strong>HBase</strong> is the Apache column-oriented database inspired by Bigtable. It belongs to the Hadoop ecosystem and stores its data on HDFS, Hadoop's file system (lesson 5). It can be queried in SQL through Apache Phoenix (open source, a subset of ANSI SQL, the standard version of the language), Hive (part of the Hadoop ecosystem) or Splice Machine (a commercial product with standard SQL and transactions, suited to OLTP, the transactional use of lesson 2). The slide also shows HBase's own shell, where a scan or get command reads rows by key.</p>
+  <div class="quiz inq" data-quiz="4b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>When the relationships are the data</h2>
+  <p>In mathematics a <strong>graph</strong> is a set of nodes (vertices) connected by edges. Graph databases are designed to represent and navigate graphs efficiently, with no rigid schema.</p>
+  <figure>
+    <div class="w" id="b4pg"></div>
+    <figcaption>The lecture's property graph slide, redrawn: three nodes (an employee, a company, a city) and two directed relationships. Grey text lists the properties as key/value pairs; the HAS_CEO relationship carries a property of its own.</figcaption>
+  </figure>
+  <p class="stmt"><strong>Property graph.</strong> Nodes are containers of properties; properties are key/value pairs; relationships (edges) connect nodes and, in some implementations, carry properties too. Nodes represent objects (nouns), relationships represent actions (verbs) and have a direction.</p>
+  <p>The lecture's example is <strong>Neo4j</strong>, an open source graph database with ACID transactions, scalability to billions of nodes and excellent performance when traversing nodes. It is reached through a Java API (a programming interface), a console or a web interface, and queried in its own language, <strong>Cypher</strong>. The lecture's demo first shows all the nodes and relationships of a sample movie database, then asks for the films directed by one person, with all their actors.</p>
+<pre class="code">MATCH (d:Person {name: 'Ava Reyes'})-[:DIRECTED]-&gt;(m:Movie)&lt;-[:ACTED_IN]-(a:Person)
+RETURN m.title, a.name</pre>
+  <figure>
+    <div class="w" id="b4trav"></div>
+    <figcaption>The same kind of question on a small graph of people and films; names and titles are invented. The orange edges and nodes are the pattern matched by the query above: two films by Ava Reyes and their three actors.</figcaption>
+  </figure>
+  <p>In a relational database the same question joins people to a directing table to films, and films back to people through an acting table. A graph database follows the edges directly, which is the node traversal the lecture lists among Neo4j's strengths.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Searching by meaning: vector databases</h2>
+  <p>An <strong>embedding</strong> is a numerical vector produced by a machine learning model from a piece of content: a text, an image, a sound, a product. Every object becomes a vector of the same length (768 numbers in the lecture's example), and the model learns the coordinates so that similar meanings land close together. The single numbers matter less than where a vector sits relative to the others.</p>
+  <p>A <strong>vector database</strong> stores these vectors, with an id and metadata such as source, category or date, and is optimized to find the vectors closest to a query. Closeness is measured by Euclidean distance, by the dot product or by <strong>cosine similarity</strong>, which looks only at the angle between two vectors. For a query vector \(\qv\) and a stored vector \(\vb\), it divides their dot product (the sum of the products of matching coordinates) by the product of their lengths:</p>
+  <div class="eq">\[ \cos(\qv,\vb) = \frac{\qv \cdot \vb}{\lVert \qv \rVert \, \lVert \vb \rVert} \]</div>
+  <figure>
+    <div class="w" id="b4vec"></div>
+    <figcaption>Invented positions in two dimensions, to make the idea visible; real embeddings have hundreds of dimensions. Drag the orange query point: the three stored vectors with the highest cosine similarity turn blue, joined to the origin by dashed lines, and are listed with their score.</figcaption>
+  </figure>
+  <p>Typical uses are semantic search (content with a similar meaning even without the same words), recommendations, and <strong>RAG</strong> (retrieval augmented generation) for language models: retrieving the most relevant documents to pass to a generative model. To stay fast with millions or billions of vectors these databases use <strong>ANN indexes</strong> (approximate nearest neighbor; HNSW and IVF are two common types), which explore only a promising part of the space and may trade a little accuracy for speed. HNSW (hierarchical navigable small world) builds a layered graph of neighbors; IVF (inverted file) groups vectors into clusters and searches only the closest ones.</p>
+  <p>The lecture's simplified flow has five steps: content (a text or an image) goes through the embedding model, becomes a record with id, vector and metadata, such as <code>{"id": "doc_42", "vector": [0.12, -0.81, …], "metadata": {"source": "slide.pdf"}}</code>, enters the ANN index, and is found by a similarity search that returns the top k neighbors, ranked by score. These databases handle millions or billions of vectors, with updates, deletions and persistence on disk or in the cloud.</p>
+  <figure>
+    <div class="w" id="b4flow"></div>
+    <figcaption>The lecture's simplified flow of a vector database, redrawn: ingestion, embedding, record, index, search. The original text can sit in the metadata or in a separate store; the query follows the same embedding step before the search.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="4"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Lessons 1 to 4 at a glance</h2>
+  <div class="scroll"><table><thead><tr><th>Lesson</th><th>Concept</th><th>Idea to keep</th><th>In one line</th></tr></thead><tbody>
+    <tr><td>1</td><td>Data warehouse and ETL</td><td>Analysis moves off the operational systems onto integrated, cleansed data</td><td>Extract, Transform, Load</td></tr>
+    <tr><td>1</td><td>OLAP</td><td>Dimensions plus metadata: pivot without knowing the tables</td><td>cube → pivot</td></tr>
+    <tr><td>1</td><td>Descriptive and predictive</td><td>Describe the past, or estimate the likelihood of future outcomes</td><td>reports versus models</td></tr>
+    <tr><td>2</td><td>Keys and integrity</td><td>Primary key: entity; foreign key: referential; types and CHECK: domain</td><td><code>REFERENCES Customers (customer_id)</code></td></tr>
+    <tr><td>2</td><td>Normal forms</td><td>Atomic values (first), no transitive dependencies (third)</td><td>one fact, one place</td></tr>
+    <tr><td>2</td><td>OLTP and DWH</td><td>Normalized for writes; facts and denormalized dimensions for reads</td><td>surrogate key ≠ business key</td></tr>
+    <tr><td>3</td><td>Joins and UNION</td><td>Joins add columns, UNION adds rows</td><td><code>LEFT JOIN … ON a.id = b.id</code></td></tr>
+    <tr><td>3</td><td>NULL</td><td>Comparisons with NULL are UNKNOWN, and filters drop them</td><td><code>IS NULL</code>, <code>COALESCE</code></td></tr>
+    <tr><td>3</td><td>GROUP BY and HAVING</td><td>WHERE filters rows before grouping, HAVING filters groups after</td><td><code>HAVING SUM(q) &gt; 60</code></td></tr>
+    <tr><td>3</td><td>Window functions</td><td>Aggregate over a partition and a window, keeping every row</td><td><code>OVER (PARTITION BY … ORDER BY …)</code></td></tr>
+    <tr><td>4</td><td>NoSQL and BASE</td><td>Distributed, schema free, eventually consistent</td><td>available first, consistent later</td></tr>
+    <tr><td>4</td><td>Columnar compression</td><td>Dictionary codes and runs shrink repeated, sorted values</td><td>\(\lceil \log_2 \kk \rceil\) bits per code</td></tr>
+    <tr><td>4</td><td>Graph and vector databases</td><td>Traverse relationships; search by similarity of embeddings</td><td>\(\cos(\qv,\vb)\)</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>NoSQL databases give up a fixed schema and strict consistency to spread data across many machines</strong>, and each family reshapes the data around the questions it must answer fastest.</p>
+  <p>The course continues with Hadoop and its ecosystem in lesson 5, then Spark.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
+</main>
+<footer><div class="col">
+  <p>Study rework of the course material of <em>30416 Big Data and Databases</em>, Bocconi University, academic year 2026/2027 (course director L. Molteni). Slides by A. Rezzani: lesson 1, <em>The data analytics timeline: from mainframes to predictive analytics</em>; lesson 2, <em>Querying a relational database: the SQL language part I</em>; lesson 3, <em>Querying a relational database: the SQL language part II</em>; lesson 4, <em>The big data toolbox: NoSQL databases, distributed computation and Hadoop</em>.</p>
+  <p>Datasets come from the course SQL scripts: lesson 2 (SQL Basics, PK and FK), lesson 3 (07.union.sql, 08.joins.sql and the OrdersDB scripts) and from the tables shown in the slides. Further readings suggested in lesson 1: R. Kimball and M. Ross, <em>The Data Warehouse Toolkit</em>, 3rd edition; <em>Fundamentals of Business Intelligence</em>, Springer. Course textbooks: P. Wilton and J. W. Colby, <em>Beginning SQL</em>, Wrox, 2005; N. Dasgupta, <em>Practical Big Data Analytics</em>, Packt, 2018.</p>
+  <p>Definitions, examples and numbers are those of the slides and scripts; text and figures are rewritten. Examples marked as illustrative, simulated or added on this page are not in the slides. Personal study use only: do not share.</p>
+</div></footer>
+<script src="../assets/katex/katex.min.js"></script>
+<script src="../assets/katex/contrib/auto-render.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

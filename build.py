@@ -21,8 +21,8 @@ FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
          '&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&display=swap">\n')
 THEME = "<script>try{if(localStorage.getItem('tema')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>\n"
 
-def head(title, up):
-    return ('<!DOCTYPE html>\n<html lang="it">\n<head>\n<meta charset="utf-8">\n'
+def head(title, up, lang='it'):
+    return ('<!DOCTYPE html>\n<html lang="' + lang + '">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
             '<meta name="robots" content="noindex, nofollow">\n'
             '<title>' + html.escape(title) + '</title>\n' + FONTS +
@@ -54,7 +54,7 @@ def build_subject(mid):
     for n in nums:
         body += '<!-- ===================== LEZIONE %d ===================== -->\n' % n + rd('materie', mid, 'lezioni', 'l%d.html' % n)
     body += rd('materie', mid, 'foot.html')
-    page = (head(meta['titolo'], '../') + body +
+    page = (head(meta['titolo'], '../', meta.get('lingua', 'it')) + body +
             '<script src="../assets/katex/katex.min.js"></script>\n'
             '<script src="../assets/katex/contrib/auto-render.min.js"></script>\n'
             '<script src="app.js"></script>\n</body>\n</html>\n')

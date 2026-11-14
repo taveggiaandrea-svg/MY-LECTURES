@@ -14,11 +14,11 @@ shared/core.js       colori, macro KaTeX, funzioni di base, quiz, player, compon
 shared/boot.js       riquadri neri, tema, navigazione fra le lezioni, montaggio pigro
 shared/home.js       tema della pagina iniziale
 materie/<id>/
-  materia.json       titolo, breve, descrizione, fonte, ordine nella pagina iniziale, numero della miniatura
+  materia.json       titolo, breve, descrizione, fonte, ordine nella pagina iniziale, numero della miniatura, lingua (facoltativa, "it" se manca)
   top.html           barra superiore della materia (il nome porta alla pagina iniziale) e apertura di <main>
   lezioni/lN.html    una lezione per file: <article class="lesson" data-n="N" id="lezione-N" data-title="...">
   foot.html          chiusura di <main> e piè di pagina con le fonti
-  js/macro.js        (facoltativo) macro KaTeX della materia: Object.assign(MAC,{...})
+  js/macro.js        (facoltativo) macro KaTeX della materia: Object.assign(MAC,{...}); per una materia in un'altra lingua anche Object.assign(UI,{...}) con i testi fissi dell'interfaccia
   js/thumbs.js       miniature: THUMB[n] = SVG 108x72
   js/lN.js           INIT[N]=function(){...} per le figure; QZ['Na']=()=>[...] per i quiz
 build.py             costruisce site/ (pagina iniziale + una pagina per materia)

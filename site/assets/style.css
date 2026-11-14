@@ -233,3 +233,9 @@ footer .col{gap:.6rem}
   .top .name{display:block;font-size:.95rem;flex:none;margin-right:0;min-width:max-content;padding-right:.5rem}.top .name .rest{display:none}.top.solo .name{font-size:1.2rem}}
 main>section.hero{background:var(--hero);padding-block:3.2rem}
 @media (max-width:560px){.top.solo .name{margin-right:auto}}
+
+/* Codice (SQL e simili) nelle materie che ne hanno bisogno */
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.86em}
+pre.code{margin:0;background:var(--track);padding:1rem 1.2rem;overflow-x:auto;line-height:1.6;font:400 .9rem/1.6 ui-monospace,'SF Mono',Menlo,Consolas,monospace;position:relative}
+pre.code .kw{color:var(--theme)}
+.stage code{color:#fff}

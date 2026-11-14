@@ -45,6 +45,9 @@ function renderMath(root){
       if(m){const w=document.createElement('span');w.style.whiteSpace='nowrap';k.parentNode.insertBefore(w,k);w.append(k,m[0]);n.nodeValue=n.nodeValue.slice(m[0].length)}}
   });
 }
+/* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
+const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
+  prev:'Lezione precedente',next:'Lezione successiva',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro'};
 const $=s=>document.querySelector(s);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e};
 const btn=(label,html)=>{const b=el('button','btn');b.type='button';if(html)b.innerHTML=label;else b.textContent=label;return b};
@@ -75,14 +78,14 @@ function player(host,dur,onFrame){
   const IC={play:'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></svg>',
     pause:'<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6.5 5h4v14h-4zM13.5 5h4v14h-4z" fill="currentColor"/></svg>'};
   const bar=el('div','player'),b=el('button','',IC.play),tm=el('span','tm'),sc=el('input');
-  b.type='button';b.setAttribute('aria-label','Riproduci');
-  sc.type='range';sc.min=0;sc.max=dur;sc.step=0.01;sc.value=0;sc.setAttribute('aria-label','Posizione nell\'animazione');
+  b.type='button';b.setAttribute('aria-label',UI.play);
+  sc.type='range';sc.min=0;sc.max=dur;sc.step=0.01;sc.value=0;sc.setAttribute('aria-label',UI.seek);
   bar.append(b,tm,sc);host.append(bar);
   let pos=0,raf=null,last=0;const f=x=>{const s=Math.floor(x+1e-6);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
   function show(){sc.value=pos;tm.textContent=f(pos)+' / '+f(dur);onFrame(pos)}
-  function stop(){if(raf){cancelAnimationFrame(raf);raf=null}b.innerHTML=IC.play;b.setAttribute('aria-label','Riproduci')}
+  function stop(){if(raf){cancelAnimationFrame(raf);raf=null}b.innerHTML=IC.play;b.setAttribute('aria-label',UI.play)}
   function tick(ts){if(!last)last=ts;pos=Math.min(dur,pos+Math.min(0.1,(ts-last)/1000));last=ts;show();if(pos>=dur){raf=null;stop()}else raf=requestAnimationFrame(tick)}
-  function play(){if(pos>=dur)pos=0;last=0;b.innerHTML=IC.pause;b.setAttribute('aria-label','Pausa');raf=requestAnimationFrame(tick)}
+  function play(){if(pos>=dur)pos=0;last=0;b.innerHTML=IC.pause;b.setAttribute('aria-label',UI.pause);raf=requestAnimationFrame(tick)}
   b.addEventListener('click',()=>raf?stop():play());
   sc.addEventListener('input',()=>{stop();pos=+sc.value;show()});
   show();return {stop,play,seek(k){stop();pos=k;show()}};
@@ -91,12 +94,12 @@ function player(host,dur,onFrame){
 function quiz(root,qs){
   qs.forEach(q=>{
     const box=el('div','q');box.append(el('p','',q.q));
-    const opts=el('div','opts'),fb=el('div','fb'),chk=btn('Verifica');chk.classList.add('solid','chk');fb.setAttribute('aria-live','polite');
+    const opts=el('div','opts'),fb=el('div','fb'),chk=btn(UI.check);chk.classList.add('solid','chk');fb.setAttribute('aria-live','polite');
     let sel=null;
     const bsq=q.o.map((t,i)=>{const b=btn(t,true);b.onclick=()=>{sel=i;bsq.forEach((x,j)=>{press(x,j===i);x.classList.remove('right','wrong')});fb.innerHTML=''};opts.append(b);return b});
-    chk.onclick=()=>{if(sel===null){fb.innerHTML='Scegli prima una risposta.';return}
+    chk.onclick=()=>{if(sel===null){fb.innerHTML=UI.pickFirst;return}
       press(bsq[sel],false);bsq[sel].classList.add(sel===q.a?'right':'wrong');
-      fb.innerHTML=sel===q.a?'<b>Esatto.</b> '+q.e:'<b>Non proprio.</b> '+q.h};
+      fb.innerHTML=sel===q.a?'<b>'+UI.right+'</b> '+q.e:'<b>'+UI.wrong+'</b> '+q.h};
     box.append(opts,chk,fb);root.append(box);
   });
 }
@@ -2190,7 +2193,7 @@ document.querySelectorAll('figure').forEach(f=>{
   const moon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>';
   const sun='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
   function paint(){const light=root.getAttribute('data-theme')==='light';
-    b.innerHTML=light?moon:sun;b.setAttribute('aria-label',light?'Passa al tema scuro':'Passa al tema chiaro')}
+    b.innerHTML=light?moon:sun;b.setAttribute('aria-label',light?UI.toDark:UI.toLight)}
   b.onclick=()=>{const light=root.getAttribute('data-theme')==='light';
     root.setAttribute('data-theme',light?'dark':'light');
     try{localStorage.setItem('tema',light?'dark':'light')}catch(e){}paint()};
@@ -2204,7 +2207,7 @@ lessons.forEach(l=>{
   const n=+l.dataset.n,nav=l.querySelector('.navend');if(!nav)return;
   const card=(m,cls,lab)=>{const t=lessons[m-1].dataset.title;
     return '<a class="'+cls+'" href="#lezione-'+m+'" data-go="'+m+'"><span class="th" aria-hidden="true">'+(THUMB[m]||'')+'</span><span class="tx"><small>'+lab+'</small>'+m+' · '+t+'</span></a>'};
-  nav.innerHTML=(n>1?card(n-1,'prev','Lezione precedente'):'')+(n<LAST?card(n+1,'next','Lezione successiva'):'');
+  nav.innerHTML=(n>1?card(n-1,'prev',UI.prev):'')+(n<LAST?card(n+1,'next',UI.next):'');
 });
 function show(n,scroll){
   lessons.forEach(l=>{l.hidden=+l.dataset.n!==n});

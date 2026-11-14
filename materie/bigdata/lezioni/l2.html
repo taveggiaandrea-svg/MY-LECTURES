@@ -1,0 +1,156 @@
+<article class="lesson" data-n="2" id="lezione-2" data-title="What exactly is a table?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 2 · A. Rezzani, slides and SQL scripts</p>
+  <h1>What exactly is a table?</h1>
+  <p class="desc">Relational databases, keys and integrity, normal forms, OLTP versus data warehouse, and the first SQL statements.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 1 used an informal vocabulary: a database is a set of tables, a table a set of records, a record a line of values. It also left a promise: operational databases and data warehouses are designed in opposite ways. This lesson keeps it.</p>
+  <h2>A table that says no</h2>
+  <p>These are the two tables of the course scripts: five customers and six sales. Each sale stores the number of its customer, not the name.</p>
+  <div class="scroll"><table><thead><tr><th class="n" style="color:var(--yellow)">customer_id</th><th>first_name</th><th>last_name</th><th>city</th></tr></thead><tbody>
+    <tr><td class="n">1</td><td>marco</td><td>rossi</td><td>milan</td></tr><tr><td class="n">2</td><td>john</td><td>doe</td><td>london</td></tr><tr><td class="n">3</td><td>mark</td><td>smith</td><td>liverpool</td></tr><tr><td class="n">4</td><td>mary</td><td>jane</td><td>london</td></tr><tr><td class="n">5</td><td>mario</td><td>bianchi</td><td>rome</td></tr></tbody></table></div>
+  <div class="scroll"><table><thead><tr><th class="n" style="color:var(--yellow)">sales_id</th><th>sales_date</th><th class="n" style="color:var(--pink)">customer_id</th><th>product_name</th><th class="n">quantity</th><th class="n">price</th></tr></thead><tbody>
+    <tr><td class="n">1</td><td>2018-09-01</td><td class="n">1</td><td>xyz</td><td class="n">5</td><td class="n">1.50</td></tr><tr><td class="n">2</td><td>2018-09-01</td><td class="n">2</td><td>abc</td><td class="n">2</td><td class="n">2.00</td></tr>
+    <tr><td class="n">3</td><td>2018-09-02</td><td class="n">3</td><td>xyz</td><td class="n">10</td><td class="n">1.50</td></tr><tr><td class="n">4</td><td>2018-09-02</td><td class="n">4</td><td>abc</td><td class="n">4</td><td class="n">2.00</td></tr>
+    <tr><td class="n">5</td><td>2018-09-03</td><td class="n">1</td><td>abc</td><td class="n">2</td><td class="n">2.20</td></tr><tr><td class="n">6</td><td>2018-09-03</td><td class="n">2</td><td>xyz</td><td class="n">3</td><td class="n">1.50</td></tr></tbody></table></div>
+  <p>Now try to add four new sales. A spreadsheet would take all of them. A relational database does not.</p>
+  <figure>
+    <div class="w" id="b2ins"></div>
+    <figcaption>Four attempted inserts into Sales, each shown under the last existing sale. The new row is green if the database accepts it and red if it refuses it; the cell that breaks a rule is outlined. The rules are explained in the next sections.</figcaption>
+  </figure>
+  <p>The table carries rules about what it may contain, and the database enforces them on every insert. Those rules are the subject of the first half of this lesson.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>From informal to formal</h2>
+  <p>A <strong>relational database</strong> is made of logical units called tables, or relations. It follows the relational model of data proposed by the computer scientist E. F. Codd in 1970, and its data are accessed with SQL. The software that runs it is the <strong>RDBMS</strong> (relational database management system).</p>
+  <p>An RDBMS stores data in tables, lets you create new databases and their structures, lets you query and modify data with SQL, keeps vast amounts of data for a long time, recovers the database after failures, errors or misuse, and controls access by many users at once.</p>
+  <p>A table is defined by its <strong>metadata</strong> (data about the data, as in lesson 1): a name (Customers), one or more columns (customer_id, first_name, last_name, city) and a <strong>primary key</strong>, the column whose value identifies each row. Each <strong>field</strong> has a name, a <strong>data type</strong> (string, number, date, boolean or binary) and a <strong>NULL constraint</strong> that says whether it may be left empty; NULL means no value. A <strong>record</strong>, also called row or tuple, holds the values for a single entity, such as one customer.</p>
+  <p>Text comes in two main types: <code>CHAR(n)</code> always has length n, <code>VARCHAR(n)</code> has variable length, at most n. Dates use <code>DATE</code>, <code>DATETIME</code> or <code>TIME</code>. Numbers are integers (<code>INT</code>, and in MySQL a family from <code>TINYINT</code>, 1 byte, to <code>BIGINT</code>, 8 bytes), floating point (<code>FLOAT</code>) or fixed decimals: <code>DECIMAL(precision, scale)</code> has precision digits in total, scale of them after the point.</p>
+  <figure>
+    <div class="w" id="b2types"></div>
+    <figcaption>In the first panel, the storage table shown in the lecture's slide on data types: four values stored as CHAR(4) and as VARCHAR(4), with the bytes each one takes (a dot is a padding space). In the second, three numbers tested against DECIMAL(5,2): three digits before the point, two after.</figcaption>
+  </figure>
+  <p>CHAR wastes space on short values but has a fixed size; VARCHAR saves space and pays one extra byte to record the length. A value longer than 4 characters is cut to 4 in both, as in the slide's last row.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Three kinds of integrity</h2>
+  <p>The <span class="k-yellow">primary key</span> constraint guarantees that records are unique: insert a duplicate value and the RDBMS returns an error, as in the first panel of the opening figure. This protects <strong>entity integrity</strong>: no duplicate rows.</p>
+  <p>Sales does not repeat each customer's name and city; it stores only <code>customer_id</code>, the customer's primary key. Nothing stops you from typing a customer that does not exist, unless you declare a <span class="k-pink">foreign key</span>: a constraint linking Sales.customer_id to Customers.customer_id. A foreign key field can be NULL, or it must contain a value found in the linked primary key. This is <strong>referential integrity</strong>, at work in the second and fourth panels.</p>
+  <p>Data types and NULL constraints protect <strong>domain integrity</strong>: all values of a column belong to the same domain. A <span class="k-orange">CHECK constraint</span> adds any other rule, such as quantity &gt; 0 (third panel). The lecture's full table declares all three:</p>
+<pre class="code">CREATE TABLE Sales (
+    sales_id     INT  <span class="k-yellow">PRIMARY KEY</span> NOT NULL,
+    sales_date   DATE,
+    customer_id  INT  <span class="k-pink">REFERENCES Customers (customer_id)</span>,
+    product_name VARCHAR(50),
+    quantity     INT  <span class="k-orange">CHECK (quantity &gt; 0)</span>,
+    price        DECIMAL(7, 2)
+);</pre>
+  <p><strong>Keys and constraints turn a table from a grid of cells into a set of rows that cannot contradict its own rules.</strong> <code>DROP TABLE Sales;</code> deletes both the data and the definition; the lecture drops Sales first, then Customers.</p>
+  <div class="quiz inq" data-quiz="2a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Why some searches are instant</h2>
+  <p>A database holds other objects besides tables: views (saved queries that behave like tables), procedures and functions (saved pieces of SQL code) and <strong>indexes</strong>. An index is a data structure that speeds up retrieval, like the index of a book. Without one, the RDBMS must scan the entire table even to return a single record.</p>
+  <figure>
+    <div class="w" id="b2idx"></div>
+    <figcaption>The same 64 customers, looking for customer 37. In the first panel the rows are stored in arrival order and the scan reads them one by one (grey) until it finds the row (green). In the second an index keeps the ids sorted, and each step halves the range left to search.</figcaption>
+  </figure>
+  <p>The lecture gives only the book analogy. The halving search is one simple way an index can work, added here for illustration; real RDBMS use tree structures built on the same idea.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Where errors creep in: normalization</h2>
+  <p><strong>Normalization</strong> organizes data by decomposing tables, to eliminate redundancy and the anomalies it causes in inserts, updates and deletes. Its rules are the <strong>normal forms</strong>: first, second, third, Boyce-Codd, fourth and more; the course covers only the first and the third.</p>
+  <p>The lecture's first example is a customer table with a duplicate record and two non-<strong>atomic</strong> fields: Name holds first and last name, Address holds street, city and country. Finding the customers in New York is awkward, because the city is buried inside a longer text.</p>
+  <div class="scroll"><table><thead><tr><th>Name</th><th>Address</th></tr></thead><tbody><tr><td>John Doe</td><td>5th street, New York, USA</td></tr><tr><td>Dave Johns</td><td>25th street, New York, USA</td></tr><tr><td>Dave Johns</td><td>25th street, New York, USA</td></tr></tbody></table></div>
+  <div class="scroll"><table><thead><tr><th class="n" style="color:var(--yellow)">Customer_code</th><th>First name</th><th>Last name</th><th>Street</th><th>City</th><th>Country</th></tr></thead><tbody><tr><td class="n">1</td><td>John</td><td>Doe</td><td>5th Street</td><td>New York</td><td>USA</td></tr><tr><td class="n">2</td><td>Dave</td><td>Johns</td><td>25th Street</td><td>New York</td><td>USA</td></tr></tbody></table></div>
+  <p class="stmt"><strong>First normal form.</strong> Every column holds a single atomic value of one domain, column names are unique, and records are unique, guaranteed by a primary key.</p>
+  <p>The second table above is in first normal form, and <code>WHERE City = 'New York'</code> now just works. The lecture's second example is an employee table that repeats the department's name and phone for every employee.</p>
+  <p class="stmt"><strong>Third normal form.</strong> The table is in first normal form and has no <strong>transitive dependency</strong>: no column depends on another non-key column instead of on the primary key.</p>
+  <figure>
+    <div class="w" id="b2anom"></div>
+    <figcaption>The same three employees stored in two ways, after the same hurried change: one UPDATE that sets the new Finance phone on a single row. In the first panel the phone lived in three rows and now disagrees with itself (red); in the second it lives once, in Department, and every employee reaches it through dep_id (pink).</figcaption>
+  </figure>
+  <p><strong>Normalization stores every fact once, so it cannot disagree with itself.</strong> Department name and phone depend on the department code, not on the employee: that transitive dependency is what the split removes.</p>
+  <div class="quiz inq" data-quiz="2b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Two databases, two shapes</h2>
+  <p><strong>OLTP</strong> (online transaction processing) databases are the transaction oriented, operational ones of lesson 1. They are fully normalized: many tables, few columns each, no redundancy. Normalization prevents errors in inserts, updates and deletes; the price is that a report must put many tables back together.</p>
+  <p>A data warehouse is analysis oriented, and its goal is a simple model for the analyst. It has two kinds of tables. <strong>Dimensions</strong> hold all the attributes of a business entity (customer, product, shop) and are denormalized, in first normal form. <strong>Fact tables</strong> hold the <span class="k-blue">measures</span> (quantities, values, counts) and references to the dimensions, and are in third normal form.</p>
+  <figure>
+    <div class="w" id="b2shape"></div>
+    <figcaption>The lecture's two example schemas of the same retail business, redrawn with table names only. The orange path is what the question "quantity sold by continent and product category" must join in each design: in the first panel ten tables, in the second three.</figcaption>
+  </figure>
+  <p>Each dimension row gets a progressive number created by ETL, the <span class="k-yellow">surrogate key</span> (or DWH key), while the original key of the source system, the <strong>business key</strong>, is kept as an ordinary column. The fact table points to the dimensions through the surrogate keys.</p>
+  <figure>
+    <div class="w" id="b2star"></div>
+    <figcaption>A small warehouse built from the course sales: three dimensions and the fact table. The highlighted sale is read through its keys: each pink key in the fact row picks the highlighted dimension row with the same yellow surrogate key (2, 5 and 2). Surrogate keys follow the load order, so they differ from the business keys.</figcaption>
+  </figure>
+  <p>ETL takes care of integrity in the warehouse, so a DWH generally has no foreign keys and often no primary keys. ETL also generates the surrogate keys, applies business rules, integrates sources and checks data quality.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>A language that says what, not how</h2>
+  <p>SQL is <strong>domain specific</strong>: it only applies to databases. It is <strong>declarative</strong>: you describe the result you want, not the algorithm, and a component of the RDBMS called the <strong>optimizer</strong> chooses how to get it. Every RDBMS also adds procedural instructions such as IF and WHILE in its own dialect: T-SQL in Microsoft SQL Server, PL/SQL in Oracle, SQL PL in IBM DB2, SQL/PSM in MySQL.</p>
+  <p>Why learn it in a Big Data course? Because most Big Data and NoSQL tools (the non relational databases of lesson 4) speak it: Hive in Hadoop uses HiveQL, HBase can be queried through Phoenix, Spark has Spark SQL, Cassandra has the CQL dialect, and many tools also offer ODBC drivers, a standard way for programs to connect to a database.</p>
+  <p>SQL statements fall into four sublanguages: <strong>DQL</strong> (data query language) to query, <strong>DDL</strong> (data definition language) to create tables and other objects, <strong>DCL</strong> (data control language) to grant users permissions, <strong>DML</strong> (data manipulation language) to insert, update and delete. A <strong>query</strong> retrieves data and starts with SELECT. A <strong>statement</strong> modifies data or structure, or controls the program flow. A <strong>clause</strong> is a part of either, such as WHERE. An <strong>expression</strong> returns a value, such as <code>price*quantity</code>, and a <span class="k-orange">predicate</span> is a logical condition, such as <code>city = 'Milan'</code>.</p>
+  <p>In DDL, <code>CREATE TABLE name (column_specification, ...)</code> lists each column with its data type and, optionally, primary key, NULL, REFERENCES and CHECK specifications, as in the Sales table above. In DML, INSERT adds a record, listing the columns or giving values for all of them in order; INSERT … SELECT adds all the rows returned by a query:</p>
+<pre class="code">INSERT INTO customers VALUES (1, 'john', 'doe', 'london');
+INSERT INTO customers SELECT id, first_name, last_name, city FROM temp_customers;</pre>
+  <p>UPDATE changes values with SET, DELETE removes records. Both accept a WHERE clause, and that is where the classic mistake hides.</p>
+  <figure>
+    <div class="w" id="b2dml"></div>
+    <figcaption>The two customers of the course script on UPDATE and DELETE. The first panel is the starting table; the second and third run, in order, the script's DELETE and UPDATE, each limited by an orange predicate; the fourth runs the same UPDATE on the starting table with the WHERE clause forgotten. Changed rows are highlighted.</figcaption>
+  </figure>
+  <p><strong>Without WHERE, UPDATE and DELETE act on every row of the table.</strong></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Asking questions: SELECT</h2>
+  <p>A SELECT query is built from up to six clauses, always written in this order.</p>
+  <div class="scroll"><table><thead><tr><th>Clause</th><th>Role</th></tr></thead><tbody>
+    <tr><td><code>SELECT</code> select list</td><td>which columns to return</td></tr><tr><td><code>FROM</code> table source</td><td>which tables to query</td></tr>
+    <tr><td><code>WHERE</code> search condition</td><td>filters rows with a predicate</td></tr><tr><td><code>GROUP BY</code> group list</td><td>arranges rows into groups (lesson 3)</td></tr>
+    <tr><td><code>HAVING</code> search condition</td><td>filters groups (lesson 3)</td></tr><tr><td><code>ORDER BY</code> order list</td><td>sorts the result</td></tr></tbody></table></div>
+  <p>The select list can contain scalar expressions, computed once per row with the operators + (add, or concatenate text), -, *, / and % (modulo), and named with an <strong>alias</strong> after AS. It can use built in functions: YEAR, MONTH and DAY extract parts of a date (not in SQLite), TRIM removes spaces at both ends, UPPER and LOWER change case, ABS and ROUND work on numbers. DISTINCT removes duplicate rows, since SQL results are not guaranteed to be unique; <code>SELECT DISTINCT YEAR(sales_date), customer_id FROM Sales</code> lists each customer once per year. ORDER BY imposes an order, since none is guaranteed otherwise.</p>
+  <p>In WHERE the predicate can use the comparisons =, &gt;, &lt;, &gt;=, &lt;= and LIKE (text matching), the logical operators AND, OR and NOT, and parentheses. CASE works as IF THEN ELSE, returning the value of the first condition that is true:</p>
+<pre class="code">SELECT *,
+  CASE WHEN <span class="k-orange">city = 'milan'</span> THEN 'Italy'
+       WHEN <span class="k-orange">city IN ('liverpool', 'london')</span> THEN 'UK'
+       ELSE 'N/A'
+  END AS Country
+FROM Customers;</pre>
+  <div class="quiz inq" data-quiz="2d"></div>
+  <figure>
+    <div class="w" id="b2case"></div>
+    <figcaption>The CASE query on the five course customers. Each row is shaded by the branch that produced its Country: lighter for the first WHEN, darker for the second, none for ELSE; the orange column names the branch. CASE stops at the first condition that is true, so the order of the WHEN lines matters when conditions overlap.</figcaption>
+  </figure>
+<pre class="code">SELECT sales_date, product_name, quantity, <span class="k-blue">price * quantity AS amount</span>
+FROM Sales
+WHERE <span class="k-orange">product_name = 'xyz'</span>
+ORDER BY quantity DESC;</pre>
+  <figure>
+    <div class="w" id="b2sel"></div>
+    <figcaption>The query above on the course Sales table, one step at a time. In the first table WHERE keeps the rows where the predicate is true (the others fade); in the second the select list keeps four columns and computes amount; in the third ORDER BY sorts by quantity, largest first.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="2c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="2"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>a relational table is a set of rows with rules attached</strong>. Keys and constraints keep it consistent, normalization keeps every fact in one place, and the warehouse bends those rules on purpose to make analysis simple.</p>
+  <p>Lesson 3 puts tables back together: joins, groups, subqueries and window functions.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>

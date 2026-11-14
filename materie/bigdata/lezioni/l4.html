@@ -1,0 +1,128 @@
+<article class="lesson" data-n="4" id="lezione-4" data-title="What if one machine is not enough?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 4 · A. Rezzani, slides</p>
+  <h1>What if one machine is not enough?</h1>
+  <p class="desc">The Big Data toolbox: distributed systems, NoSQL databases, ACID and BASE, columnar compression, graph and vector databases.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lessons 2 and 3 lived inside one relational database on one server. Lesson 1 already named the limit: Big Data are data we cannot analyze, or cannot analyze at a reasonable cost, with a traditional RDBMS. Recall the three Vs: volume, velocity and variety. Unstructured data have no fields or columns and cannot conveniently go into a table: documents (Word, Excel, PowerPoint, PDF), images, e-mails, Web 2.0 content (blog posts, forums, wikis). For huge amounts of data, unstructured data and distributed calculations, does a system exist that is also easy to use? This lesson starts the answer.</p>
+  <h2>Many small machines instead of one big one</h2>
+  <p>For huge amounts of data you need more than one machine: a <strong>distributed system</strong> that splits the data among its servers and computes on all of them at once. A <strong>node</strong> is a single server, a <strong>rack</strong> is a case holding a bunch of servers, and a <strong>cluster</strong> is a collection of servers, in one or more racks, that behaves as if it were a single machine.</p>
+  <figure>
+    <div class="w" id="b4clus"></div>
+    <figcaption>An illustrative model, not lecture data: a 10 TB table split into 40 blocks of 0.25 TB (white squares) spread over the nodes of a cluster, each node reading one block in 30 minutes. Each panel shows the racks, the active nodes and the time the busiest node needs.</figcaption>
+  </figure>
+  <p>This is <strong>horizontal scalability</strong>: you add servers to gain computing power and storage, instead of buying a bigger one. Unstructured data add a second need, systems that work with non tabular structures; complex calculations such as machine learning add a third, doing them in a distributed way. And all of it should stay easy for the final user.</p>
+  <p>The two main tools are <strong>Hadoop</strong>, a complete Big Data platform (lesson 5), and <strong>Spark</strong>, a high-performance calculation engine (lessons 6 and 7). This lesson covers the third kind of tool: NoSQL databases.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>What NoSQL gives up</h2>
+  <p><strong>NoSQL databases</strong> deviate from the rules of relational databases. They are distributed, mostly open source, horizontally scalable and <strong>schema free</strong>: there is no table definition, and they can host data whose structure varies from record to record. Their programming interface is simple, and most of them end up offering an SQL interface anyway.</p>
+  <p>What they generally do not guarantee are the ACID properties of <strong>transactions</strong>. A transaction is a set of commands, reads or changes, that must run with all or nothing logic. Take a transfer of 100 euro from account A to account B: a withdrawal and a deposit, and you never want only one of them (this example is added on this page).</p>
+  <p class="stmt"><strong>ACID.</strong> The slide names the four properties; the one-line meanings are added here. <strong>Atomicity</strong>: all or nothing. <strong>Consistency</strong>: the database moves from one valid state to another. <strong>Isolation</strong>: concurrent transactions do not see each other's half-done work. <strong>Durability</strong>: once confirmed, a change survives failures.</p>
+  <p>Giving up ACID can look like a serious flaw that breeds inconsistencies. Many NoSQL systems follow the <strong>BASE</strong> model instead: <strong>basically available</strong> (the application always answers), <strong>soft state</strong> (it does not have to be consistent at every moment), <strong>eventual consistency</strong> (it becomes consistent once modifications stop).</p>
+  <figure>
+    <div class="w" id="b4base"></div>
+    <figcaption>One customer record kept on three nodes, at three moments. In the first panel a change of address reaches node 1; in the second a reader asks node 3 before the change has travelled and gets the old value; in the third replication has caught up. Red boxes hold an outdated value; arrows are replication messages.</figcaption>
+  </figure>
+  <p><strong>BASE trades a moment of inconsistency for an answer that always comes.</strong> As an example added here: for a like counter that is a good deal, for a bank balance it is not, which is one reason relational databases did not disappear.</p>
+  <div class="quiz inq" data-quiz="4a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Four ways to store one customer</h2>
+  <p>NoSQL is a family, not a product. The lecture groups it into four types by how they represent data.</p>
+  <figure>
+    <div class="w" id="b4models"></div>
+    <figcaption>The four NoSQL models, with the tools the lecture names for each. The key-value panel is the slide's sample customer, Mary Smith from Liverpool; the document panel is the slide's sample document, John Doe from London. The column and graph panels are added on this page, reusing Mary Smith, to show how those models differ.</figcaption>
+  </figure>
+  <p>A <strong>key-value store</strong> keeps sets of key-value pairs, with four basic operations: add, remove, modify, find. A <strong>document database</strong> refines it: each record is a document in JSON or XML (two text formats that write data as labeled, nestable fields), which carries both metadata (the keys) and data (the values), with no schema constraints. A <strong>column-oriented</strong> database, derived from Bigtable (Google's distributed storage system), organizes data by column and lets each row hold a variable number of columns. A <strong>graph database</strong> stores nodes and the relationships between them, with a flexible schema.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Why store by column?</h2>
+  <p>Organising data by column instead of by row is not exclusive to NoSQL: Oracle Exadata, the SQL Server column store index, SAP HANA and in-memory OLAP engines such as Power Pivot use it too. Its strengths are not wasting space when a value does not exist for a column and, often, a high degree of compression: a column holds values of one type, frequently repeated.</p>
+  <p>The lecture shows two algorithms. The first is <strong>dictionary encoding</strong>: list the distinct values once, in a dictionary, and replace each value with its position in the list. With \(\kk\) distinct values each code needs</p>
+  <div class="eq">\[ \text{bits per code} = \lceil \log_2 \kk \rceil \]</div>
+  <p>where the brackets mean rounding up; the slide shows the case of 4 values and 2 bits, the general formula is added here. The lecture's Year column has \(\kk = 4\) distinct years, so 2 bits per value: 00, 01, 10, 11.</p>
+  <figure>
+    <div class="w" id="b4dict"></div>
+    <figcaption>The lecture's dictionary encoding slide, redrawn. The Year column becomes a column of 2 bit codes plus a dictionary of its 4 distinct values; dashed lines connect each year to its code.</figcaption>
+  </figure>
+  <p>The second is <strong>run-length encoding</strong>: replace each run of identical consecutive values with one triple (value, initial position, count). On the slide a Year column of 1,999 rows becomes four triples: (0, 1, 549), (1, 550, 450), (2, 1000, 500), (3, 1500, 500). The Customer column next to it, sorted within each year, starts (1, 1, 4), (2, 5, 3), and for 2010 (1, 550, 2), (2, 552, 2).</p>
+  <figure>
+    <div class="w" id="b4rle"></div>
+    <figcaption>A column of 24 year codes (0 to 3) read in order, row by row. In the first panel the column is unsorted and the triples below it are many; in the second the same values are sorted and four triples are enough. Shades of grey stand for the four codes.</figcaption>
+  </figure>
+  <p><strong>Run-length encoding compresses most when there are many identical values and the column is sorted.</strong> In the column stores of the NoSQL world, data are kept as key/value (or column/value) pairs grouped under a unique key, which the slide calls the primary key, so each row can hold values for any subset of columns.</p>
+  <p><strong>HBase</strong> is the Apache column-oriented database inspired by Bigtable. It belongs to the Hadoop ecosystem and stores its data on HDFS, Hadoop's file system (lesson 5). It can be queried in SQL through Apache Phoenix (open source, a subset of ANSI SQL, the standard version of the language), Hive (part of the Hadoop ecosystem) or Splice Machine (a commercial product with standard SQL and transactions, suited to OLTP, the transactional use of lesson 2). The slide also shows HBase's own shell, where a scan or get command reads rows by key.</p>
+  <div class="quiz inq" data-quiz="4b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>When the relationships are the data</h2>
+  <p>In mathematics a <strong>graph</strong> is a set of nodes (vertices) connected by edges. Graph databases are designed to represent and navigate graphs efficiently, with no rigid schema.</p>
+  <figure>
+    <div class="w" id="b4pg"></div>
+    <figcaption>The lecture's property graph slide, redrawn: three nodes (an employee, a company, a city) and two directed relationships. Grey text lists the properties as key/value pairs; the HAS_CEO relationship carries a property of its own.</figcaption>
+  </figure>
+  <p class="stmt"><strong>Property graph.</strong> Nodes are containers of properties; properties are key/value pairs; relationships (edges) connect nodes and, in some implementations, carry properties too. Nodes represent objects (nouns), relationships represent actions (verbs) and have a direction.</p>
+  <p>The lecture's example is <strong>Neo4j</strong>, an open source graph database with ACID transactions, scalability to billions of nodes and excellent performance when traversing nodes. It is reached through a Java API (a programming interface), a console or a web interface, and queried in its own language, <strong>Cypher</strong>. The lecture's demo first shows all the nodes and relationships of a sample movie database, then asks for the films directed by one person, with all their actors.</p>
+<pre class="code">MATCH (d:Person {name: 'Ava Reyes'})-[:DIRECTED]-&gt;(m:Movie)&lt;-[:ACTED_IN]-(a:Person)
+RETURN m.title, a.name</pre>
+  <figure>
+    <div class="w" id="b4trav"></div>
+    <figcaption>The same kind of question on a small graph of people and films; names and titles are invented. The orange edges and nodes are the pattern matched by the query above: two films by Ava Reyes and their three actors.</figcaption>
+  </figure>
+  <p>In a relational database the same question joins people to a directing table to films, and films back to people through an acting table. A graph database follows the edges directly, which is the node traversal the lecture lists among Neo4j's strengths.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Searching by meaning: vector databases</h2>
+  <p>An <strong>embedding</strong> is a numerical vector produced by a machine learning model from a piece of content: a text, an image, a sound, a product. Every object becomes a vector of the same length (768 numbers in the lecture's example), and the model learns the coordinates so that similar meanings land close together. The single numbers matter less than where a vector sits relative to the others.</p>
+  <p>A <strong>vector database</strong> stores these vectors, with an id and metadata such as source, category or date, and is optimized to find the vectors closest to a query. Closeness is measured by Euclidean distance, by the dot product or by <strong>cosine similarity</strong>, which looks only at the angle between two vectors. For a query vector \(\qv\) and a stored vector \(\vb\), it divides their dot product (the sum of the products of matching coordinates) by the product of their lengths:</p>
+  <div class="eq">\[ \cos(\qv,\vb) = \frac{\qv \cdot \vb}{\lVert \qv \rVert \, \lVert \vb \rVert} \]</div>
+  <figure>
+    <div class="w" id="b4vec"></div>
+    <figcaption>Invented positions in two dimensions, to make the idea visible; real embeddings have hundreds of dimensions. Drag the orange query point: the three stored vectors with the highest cosine similarity turn blue, joined to the origin by dashed lines, and are listed with their score.</figcaption>
+  </figure>
+  <p>Typical uses are semantic search (content with a similar meaning even without the same words), recommendations, and <strong>RAG</strong> (retrieval augmented generation) for language models: retrieving the most relevant documents to pass to a generative model. To stay fast with millions or billions of vectors these databases use <strong>ANN indexes</strong> (approximate nearest neighbor; HNSW and IVF are two common types), which explore only a promising part of the space and may trade a little accuracy for speed. HNSW (hierarchical navigable small world) builds a layered graph of neighbors; IVF (inverted file) groups vectors into clusters and searches only the closest ones.</p>
+  <p>The lecture's simplified flow has five steps: content (a text or an image) goes through the embedding model, becomes a record with id, vector and metadata, such as <code>{"id": "doc_42", "vector": [0.12, -0.81, …], "metadata": {"source": "slide.pdf"}}</code>, enters the ANN index, and is found by a similarity search that returns the top k neighbors, ranked by score. These databases handle millions or billions of vectors, with updates, deletions and persistence on disk or in the cloud.</p>
+  <figure>
+    <div class="w" id="b4flow"></div>
+    <figcaption>The lecture's simplified flow of a vector database, redrawn: ingestion, embedding, record, index, search. The original text can sit in the metadata or in a separate store; the query follows the same embedding step before the search.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="4"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Lessons 1 to 4 at a glance</h2>
+  <div class="scroll"><table><thead><tr><th>Lesson</th><th>Concept</th><th>Idea to keep</th><th>In one line</th></tr></thead><tbody>
+    <tr><td>1</td><td>Data warehouse and ETL</td><td>Analysis moves off the operational systems onto integrated, cleansed data</td><td>Extract, Transform, Load</td></tr>
+    <tr><td>1</td><td>OLAP</td><td>Dimensions plus metadata: pivot without knowing the tables</td><td>cube → pivot</td></tr>
+    <tr><td>1</td><td>Descriptive and predictive</td><td>Describe the past, or estimate the likelihood of future outcomes</td><td>reports versus models</td></tr>
+    <tr><td>2</td><td>Keys and integrity</td><td>Primary key: entity; foreign key: referential; types and CHECK: domain</td><td><code>REFERENCES Customers (customer_id)</code></td></tr>
+    <tr><td>2</td><td>Normal forms</td><td>Atomic values (first), no transitive dependencies (third)</td><td>one fact, one place</td></tr>
+    <tr><td>2</td><td>OLTP and DWH</td><td>Normalized for writes; facts and denormalized dimensions for reads</td><td>surrogate key ≠ business key</td></tr>
+    <tr><td>3</td><td>Joins and UNION</td><td>Joins add columns, UNION adds rows</td><td><code>LEFT JOIN … ON a.id = b.id</code></td></tr>
+    <tr><td>3</td><td>NULL</td><td>Comparisons with NULL are UNKNOWN, and filters drop them</td><td><code>IS NULL</code>, <code>COALESCE</code></td></tr>
+    <tr><td>3</td><td>GROUP BY and HAVING</td><td>WHERE filters rows before grouping, HAVING filters groups after</td><td><code>HAVING SUM(q) &gt; 60</code></td></tr>
+    <tr><td>3</td><td>Window functions</td><td>Aggregate over a partition and a window, keeping every row</td><td><code>OVER (PARTITION BY … ORDER BY …)</code></td></tr>
+    <tr><td>4</td><td>NoSQL and BASE</td><td>Distributed, schema free, eventually consistent</td><td>available first, consistent later</td></tr>
+    <tr><td>4</td><td>Columnar compression</td><td>Dictionary codes and runs shrink repeated, sorted values</td><td>\(\lceil \log_2 \kk \rceil\) bits per code</td></tr>
+    <tr><td>4</td><td>Graph and vector databases</td><td>Traverse relationships; search by similarity of embeddings</td><td>\(\cos(\qv,\vb)\)</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>NoSQL databases give up a fixed schema and strict consistency to spread data across many machines</strong>, and each family reshapes the data around the questions it must answer fastest.</p>
+  <p>The course continues with Hadoop and its ecosystem in lesson 5, then Spark.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>

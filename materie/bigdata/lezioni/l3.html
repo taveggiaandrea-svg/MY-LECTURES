@@ -1,0 +1,106 @@
+<article class="lesson" data-n="3" id="lezione-3" data-title="How do you combine two tables?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 3 · A. Rezzani, slides and SQL scripts</p>
+  <h1>How do you combine two tables?</h1>
+  <p class="desc">Advanced SQL: UNION, joins, missing values, grouping and summarizing, subqueries and analytical functions.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 2 ended with normalized tables: every fact stored once, in its own table. The price is that answers are scattered. A sale knows its buyer only by number; the name sits in another table. This lesson puts the pieces back together.</p>
+  <h2>Who bought what?</h2>
+  <p>These are the lecture's two tables. Buyers has a name and a <span class="k-yellow">buyer_id</span>; sales has a <span class="k-pink">buyer_id</span>, a product id and a quantity. You want one result with the buyer's name next to each quantity. The most naive way is to pair every buyer with every sale.</p>
+  <figure>
+    <div class="w" id="b3cart"></div>
+    <figcaption>Every buyer (rows) crossed with every sale (columns): the cartesian product, 4 × 5 = 20 pairs. Each cell compares the two buyer ids; the orange cells are the pairs where they are equal, the condition a join writes after the keyword ON.</figcaption>
+  </figure>
+  <p>The <strong>cartesian product</strong> is all the possible combinations of rows of two tables, the intermediate result of the FROM clause; the slide's own example crosses 3 names (Davis, Funk, King) with 3 products into 9 rows. It is the starting point of every join, and in SQL queries it is usually not what you want: most pairs match a buyer with someone else's sale.</p>
+  <p class="stmt"><strong>Join.</strong> A join puts the columns of two tables side by side, matching rows with a predicate. A <strong>CROSS JOIN</strong> returns the whole cartesian product. An <strong>INNER JOIN</strong> keeps only the pairs where the <span class="k-orange">ON</span> predicate is true. An <strong>outer join</strong> also preserves the rows of a designated table and fills the missing side with <span class="k-purple">NULL</span>: LEFT keeps every row of the first table, RIGHT every row of the second, FULL both.</p>
+<pre class="code">SELECT buyer_name, sales.buyer_id, qty
+FROM buyers LEFT OUTER JOIN sales
+  ON <span class="k-orange">buyers.buyer_id = sales.buyer_id</span>;</pre>
+  <figure>
+    <div class="w" id="b3joins"></div>
+    <figcaption>The four joins on the same data. One sale from a buyer 9, who is not in buyers, is added on this page: in the lecture's data every sale has a valid buyer, so RIGHT and FULL would equal INNER and LEFT. Purple NULLs mark the rows kept without a partner.</figcaption>
+  </figure>
+  <p><strong>An outer join is an inner join plus the rows that found no partner, padded with NULL.</strong> Lucy Thin bought nothing: she disappears from INNER and RIGHT, and survives with NULLs in LEFT and FULL.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Stacking instead of matching: UNION</h2>
+  <p>A join adds columns. <strong>UNION</strong> adds rows: it combines the results of two or more SELECT statements with the same columns, one under the other, and removes duplicate rows. <strong>UNION ALL</strong> does the same but keeps the duplicates. The course script uses t1 = {(1, 'a'), (2, 'b')} and t2 = {(1, 'a'), (3, 'c')}.</p>
+  <figure>
+    <div class="w" id="b3union"></div>
+    <figcaption>The two operators on t1 and t2 of the course script 07.union.sql. Grey labels say which table each row comes from. The row (1, 'a') is in both tables: UNION keeps it once, UNION ALL twice.</figcaption>
+  </figure>
+  <p>A practical note added on this page: removing duplicates means comparing rows, which costs work, so when the two results cannot overlap UNION ALL gives the same rows faster.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>When a value is missing</h2>
+  <p>The outer joins produced NULLs, and SQL treats them in a special way. With no missing values a predicate is TRUE or FALSE: 5 &gt; 2 is TRUE. With missing values there is a third outcome, <span class="k-purple">UNKNOWN</span>: comparing NULL to anything, another NULL included, gives UNKNOWN.</p>
+  <figure>
+    <div class="w" id="b3null"></div>
+    <figcaption>First, five comparisons and their outcome. Then the course Customers left joined with Sales (script 08.joins.sql): Bianchi has no sales, so his sale columns are NULL. The last two columns evaluate two predicates on every row; WHERE keeps only the rows where a predicate is TRUE.</figcaption>
+  </figure>
+  <p><strong>Query filters (ON, WHERE, HAVING) keep only TRUE, so UNKNOWN rows are silently dropped.</strong> That is why you test for missing values with <code>IS NULL</code> or <code>IS NOT NULL</code>, never with <code>= NULL</code>. The function <code>COALESCE(x, 'N/A')</code> replaces a NULL with a value of your choice: in the lecture's query on this left join, Bianchi's row shows product 'N/A' and quantity 0 instead of two NULLs.</p>
+  <div class="quiz inq" data-quiz="3a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>From rows to groups</h2>
+  <p>An <strong>aggregate function</strong> turns many rows into one value: SUM, MIN, MAX, AVG, COUNT, and the standard deviations and variances STDEV, STDEVP, VAR, VARP. They return a single value with no column name, can be used in SELECT, HAVING and ORDER BY, and ignore NULLs, except <code>COUNT(*)</code>, which counts rows. Alone they summarize the whole table; with <strong>GROUP BY</strong> they summarize each group, one output row per unique combination of the grouping columns.</p>
+  <figure>
+    <div class="w" id="b3group"></div>
+    <figcaption>The lecture's picture of how GROUP BY works, redrawn with the rows the slide shows. The first table is the orders; WHERE keeps the rows of customers 30097 and 30098 (the others fade); GROUP BY gathers them into one group per customer; COUNT(*) turns each group into one row.</figcaption>
+  </figure>
+  <p>The order matters. WHERE filters <strong>rows</strong> before aggregation, and after GROUP BY the detail rows are lost: only the groups remain. To filter <strong>groups</strong> you need a clause that runs after GROUP BY and can test an aggregate: <span class="k-orange">HAVING</span>.</p>
+  <p>The next examples use the course's OrdersDB script: a Customer table (Anders, Trujillo, Moreno), an Orders table with OrderDate, CustomerId and TotalAmount, an OrderItem table with the quantity of each product in each order, and a Product table. Without GROUP BY, <code>SELECT SUM(i.quantity), COUNT(*) FROM OrderItem i</code> returns one row: 240 units over 16 items. Grouped by product, it returns one row per product: Chai 48 units in 5 items, Chang 71 in 4, Aniseed Syrup 56 in 4, Chef Anton's Cajun Seasoning 65 in 3.</p>
+<pre class="code">SELECT p.productname, <span class="k-blue">SUM(i.quantity)</span> TotalQt, <span class="k-blue">COUNT(*)</span> nr_of_sales
+FROM OrderItem i JOIN Product p ON p.id = i.productid
+GROUP BY p.productname
+HAVING <span class="k-orange">SUM(i.quantity) &gt; 60</span>;</pre>
+  <figure>
+    <div class="w" id="b3having"></div>
+    <figcaption>Total quantity per product in the OrderItem table of the course database (Cajun is Chef Anton's Cajun Seasoning; Gumbo Mix has no items, so it forms no group). The orange line is HAVING SUM &gt; 60. In the first panel all items count; in the second WHERE quantity &gt; 10 removes the small items before the sums.</figcaption>
+  </figure>
+  <p>With no WHERE, only Chang (71) and Chef Anton's Cajun Seasoning (65) pass HAVING, the lecture's result. <code>COUNT(DISTINCT customerid)</code> on Orders counts different values instead of rows: 2, since only Anders and Trujillo placed orders.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>A query inside a query</h2>
+  <p>A <strong>subquery</strong> is a query nested in another. Its result is passed to the outer query, which uses it like an expression. A subquery can return one value (scalar), a list, or a whole table. It is <strong>self-contained</strong> if it does not depend on the outer query, and <strong>correlated</strong> if it uses values from the outer query's current row.</p>
+<pre class="code">WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders)                     -- self-contained
+WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders o2
+                     WHERE o2.customerid = <span class="k-orange">o.customerid</span>)              -- correlated</pre>
+  <figure>
+    <div class="w" id="b3subq"></div>
+    <figcaption>The two queries of the lecture on the course orders. In the first panel the inner query runs once and returns a single date. In the second it runs once per order, for that order's customer: its result is shown as a column. Green rows are those where the order date equals the inner result.</figcaption>
+  </figure>
+  <p>The self-contained version answers "who placed the last order", one row. The correlated version answers "when did each customer place their last order", one row per customer. With <code>EXISTS</code> a subquery becomes an existence test: it is TRUE if the subquery returns at least one row, FALSE otherwise. In the course database <code>WHERE EXISTS (SELECT * FROM Orders o WHERE o.customerid = c.id)</code> returns Anders and Trujillo, and <code>NOT EXISTS</code> returns Moreno, the customer with no orders.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Aggregating without losing the rows</h2>
+  <p>GROUP BY collapses rows. <strong>Analytical functions</strong> compute over groups of rows but keep every row, adding the result as a new column. They use the <span class="k-teal">OVER</span> clause, made of PARTITION BY, which splits the rows into partitions (one per customer, say), and ORDER BY, which orders the rows inside each partition.</p>
+  <p>On top of that you can set a <span class="k-teal">window</span>: which rows around the current one enter the calculation. <code>UNBOUNDED PRECEDING</code> starts at the first row of the partition, <code>n PRECEDING</code> n rows before the current one, <code>CURRENT ROW</code> at the current row; <code>n FOLLOWING</code> and <code>UNBOUNDED FOLLOWING</code> look ahead.</p>
+  <figure>
+    <div class="w" id="b3win"></div>
+    <figcaption>Four functions on the orders of the lecture's examples, partitioned by customer. ROW_NUMBER numbers each customer's orders from the largest; LAG(TotalAmount, 1, 0) copies the previous amount (arrows), or 0 if there is none; the last two panels mark in teal the window used for one row.</figcaption>
+  </figure>
+  <p>The moving average uses <code>AVG(TotalAmount) OVER (PARTITION BY customerid ORDER BY OrderDate ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)</code>. Anders has two orders on 5 July, and the slide lists 1813 before 670.8; this page keeps that order. For his third order, 670.8, the window holds his first three orders:</p>
+  <div class="eq">\[ \frac{440 + 1813 + 670.8}{3} = 974.6 \]</div>
+  <p>The running total uses SUM from <code>UNBOUNDED PRECEDING</code>. <code>SUM(TotalAmount) OVER ()</code>, with nothing in the brackets, puts the grand total 13595.5 on every row; <code>OVER (PARTITION BY customerid)</code> puts each customer's total instead, 4066.8 for Anders and 9528.7 for Trujillo. With ROW_NUMBER ordered by TotalAmount descending, keeping rn = 1 finds each customer's largest order. <code>LEAD</code> works like LAG but looks n rows ahead.</p>
+  <div class="quiz inq" data-quiz="3b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="3"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>joins and unions rebuild what normalization split, GROUP BY collapses rows into groups, and window functions compute over groups while keeping every row.</strong></p>
+  <p>Lesson 4 leaves the single relational server behind: what changes when the data no longer fit in one machine or in one table.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>

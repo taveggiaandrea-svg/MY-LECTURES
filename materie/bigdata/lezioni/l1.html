@@ -1,0 +1,110 @@
+<article class="lesson" data-n="1" id="lezione-1" data-title="Why can't we just query the operational database?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 1 · A. Rezzani, slides</p>
+  <h1>Why can't we just query the operational database?</h1>
+  <p class="desc">The data analytics timeline: from printed reports on operational systems to data warehouses, OLAP, predictive analytics and Big Data platforms.</p>
+</div></section>
+
+<section><div class="col">
+  <p>A company sells through one system and keeps in touch with its clients through another. Both store customers. Ask both the same simple questions and look at what comes back.</p>
+  <figure>
+    <div class="w" id="b1src"></div>
+    <figcaption>Two tables built on this page from the course customers. The first panel is the sales system (an ERP, software for sales and accounting), the second the customer management system (a CRM, software that tracks contacts with customers); both are explained below. Red cells mark two of the disagreements, a different spelling of Milan and an old address kept next to the new one; Roma and Rome, LONDON and London are of the same kind. Grey rows are the two records of Mary Jane.</figcaption>
+  </figure>
+  <p>Nobody made a mistake. Each system was built for its own job, by its own team, with its own conventions. The trouble appears only when you use the data for something they were not designed for: analysis across the whole company.</p>
+  <p>The lecture starts from an informal vocabulary, refined in lesson 2. A <strong>database</strong> is a set of tables and other objects. A <strong>table</strong>, also called a relation, is a set of records defined by a list of <strong>fields</strong> (columns), each with a name and a data type. A <strong>record</strong> is one horizontal line of a table: the values of all the fields for one thing, such as one customer.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Five phases, each one fixing the last</h2>
+  <p>The lecture tells the history of data analysis as five phases. Each adds a layer on top of the previous ones.</p>
+  <figure>
+    <div class="w" id="b1time"></div>
+    <figcaption>The lecture's timeline, redrawn. Each phase adds one layer to the company's data stack (the colored bar) and changes the kind of report it can produce (the line under the year). The rest of the lesson walks through the phases in order.</figcaption>
+  </figure>
+  <p>From the 1980s, the <strong>RDBMS</strong> (relational database management system, the software that stores and manages tables) and <strong>SQL</strong> (Structured Query Language, used to ask tables questions) made it possible to produce reports automatically. They were static, mostly printed, and every query ran on the <strong>operational databases</strong>.</p>
+  <p>An operational database stores the day-to-day activity of a company in real time: every order, invoice and payment. It sits under applications such as an <strong>ERP</strong> (enterprise resource planning: software for accounting, procurement and production, for example SAP or Oracle JD Edwards) and a <strong>CRM</strong> (customer relationship management: software that tracks every interaction with customers and prospects, for example Salesforce).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>What a report is, at three heights</h2>
+  <p>A <strong>report</strong> is a document that organizes information in narrative, graphic or tabular form, prepared ad hoc, periodically or as required; put simply, the formatted result of database queries that contains useful data for decision making. The lecture distinguishes three kinds by how much they aggregate and how often they are produced.</p>
+  <figure>
+    <div class="w" id="b1rep"></div>
+    <figcaption>The six sales of the course scripts, seen as three reports. The operational one keeps every sale plus daily subtotals (grey rows); the tactical one keeps only the daily totals; the strategic one squeezes the period into a single line. Amount is quantity times price.</figcaption>
+  </figure>
+  <p><strong>The higher a report sits in the company, the more it aggregates and the less often it is produced.</strong> Operational reports are daily and mix detail with totals; tactical ones are daily or weekly; strategic ones summarize the company's situation weekly or monthly.</p>
+  <div class="quiz inq" data-quiz="1a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Why analysis on operational databases goes wrong</h2>
+  <p>The lecture lists three problems. The first figure showed one of them: the same data live in more than one system, so formats differ (Milano or Milan) and versions differ (an old address next to the new one).</p>
+  <p>The other two come from design. Operational databases are built for fast inserts and updates of single records, not for reading millions of rows at once. And reports compete with transactions for the same machine: a heavy report slows down the people entering orders, and vice versa.</p>
+  <figure>
+    <div class="w" id="b1load"></div>
+    <figcaption>An illustrative model, not lecture data. Each bar is the time needed to save one incoming order, in milliseconds (ms). In the first panel no report is running; in the second, eight reports run on the same server and the bars turn red above 15 ms; in the third the same eight reports run on a separate copy.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="1b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>A separate database just for analysis</h2>
+  <p>From the 1990s companies built an analytical database next to the operational ones: the <strong>data warehouse</strong> (DWH). At first it was a mere copy, which solved the performance problem. Later the data from different sources were integrated, made consistent, cleansed and reorganized into the <strong>dimensional model</strong>, which lesson 2 opens up.</p>
+  <p>Data reach the warehouse through <strong>ETL</strong>: extract the data from the operational sources, transform them by applying business rules and data quality checks, load them into the warehouse. The same acronym also names the software tools that do it.</p>
+  <figure>
+    <div class="w" id="b1etl"></div>
+    <figcaption>The two systems of the first figure after ETL. The first column is the staging area, where records are copied as they are; the second shows them transformed and sorted by person, with one record discarded by a business rule; the third is the warehouse, one record per real customer with a new key (yellow). Lines show which records merge.</figcaption>
+  </figure>
+  <p>The two business rules used here, how names are written and which source wins when ERP and CRM disagree, are examples chosen for this page. Every company writes its own.</p>
+  <p>Because its data are integrated from all sources and cleansed, the warehouse is called the <strong>single source of truth</strong>. <strong>A data warehouse is designed to support business decisions</strong>, by letting you consolidate, analyze and report data at different levels of aggregation.</p>
+  <p>It is also the starting point of <strong>Business Intelligence</strong> (BI): the technologies, applications and practices for collecting, integrating, analyzing and presenting business information, with the purpose of better decisions. The BI process runs extract, cleanse, transform and integrate, load the warehouse, then analyze and disseminate. In the lecture's diagram of a BI system, the operational sources (CRM, ERP and legacy systems, older software still in use) feed ETL and a staging area, then the relational warehouse, then a <strong>semantic layer</strong> such as OLAP (which presents data in business terms, so users need not know the tables), then the client tools people use.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Asking questions without writing SQL</h2>
+  <p>A warehouse still has to be queried in SQL, and the user must know its tables and how they relate. From the late 1990s, <strong>OLAP</strong> (online analytical processing) engines removed that barrier. They replace tables with multidimensional structures and store data together with <strong>metadata</strong>, data about the data, such as how tables connect.</p>
+  <p>So the user no longer needs to know the relationships, and OLAP answers aggregate questions (sums, averages, counts) much faster than a relational database. It is a technology for data discovery: unlimited report viewing, complex analytical calculations, analysis along any dimension. The lecture describes the OLAP client as a huge pivot table over the whole warehouse, used by drag and drop.</p>
+  <figure>
+    <div class="w" id="b1olap"></div>
+    <figcaption>The course sales as a cube with three dimensions (city, product, date), like the cube in the lecture's slide, cut into one slice per date: each filled cell holds the quantity sold for that combination. Next to the slices, one pivot of the cube: dates added up, cities on the rows, products on the columns.</figcaption>
+  </figure>
+  <p>Every choice of rows and columns is one view of the same cube. This is the <strong>dynamic report</strong> of phase 3, as opposed to the static, printed report of phases 1 and 2.</p>
+  <div class="quiz inq" data-quiz="1c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>From what happened to what will happen</h2>
+  <p>Warehouse and OLAP both look backwards. From around 2000 companies increasingly wanted to predict future events, such as next month's sales or the cost of energy. A new term appeared, <strong>data mining</strong>: discovering hidden patterns in large data sets that the business can exploit, for customer segmentation, market basket analysis (which products are bought together), churn analysis (who is about to leave), campaign targeting or demand forecasting.</p>
+  <p>This splits analytics in two. <strong>Descriptive analytics</strong> summarizes raw data so humans can read it, and describes the past: static reports and BI belong here. <strong>Predictive analytics</strong> estimates how likely a future outcome is, using statistics, machine learning and data mining on current and historical facts.</p>
+  <figure>
+    <div class="w" id="b1fc"></div>
+    <figcaption>Simulated monthly sales, not lecture data. The solid line is the known past, which can only be described. After today, a simple model projects the next six months (dashed), with a shaded band for its uncertainty.</figcaption>
+  </figure>
+  <p><strong>Machine learning</strong>, in the lecture's words, is the science of getting computers to act without being explicitly programmed. Data mining borrows from it, from artificial intelligence, from statistics and from database systems; today predictive analytics is largely a modern name for data mining.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Data too big for the old tools</h2>
+  <p>From around 2012 people started talking about <strong>Big Data</strong>. The usual definition lists three features, the three Vs: <strong>volume</strong> (potentially huge, such as every card transaction or every reading of an industrial sensor), <strong>velocity</strong> (fast data arriving continuously, as from Internet of Things sensors) and <strong>variety</strong>.</p>
+  <p>The lecture prefers a sharper definition: Big Data are data that we cannot analyze, or that it is not convenient to analyze, with traditional tools such as relational databases. The main tools for them are <strong>Hadoop</strong>, a distributed file system plus computation engine whose many tools cover the whole data life cycle, from ingestion to presentation, and <strong>Spark</strong>, a fast distributed computation engine more oriented to analysis; both get their own lectures later.</p>
+  <p>Variety needs a closer look. <strong>Structured</strong> data fit conveniently in a table, like ERP data. <strong>Unstructured</strong> data do not, like the text of a post or an image from medical equipment. Most data called unstructured are actually <strong>semi-structured</strong>.</p>
+  <figure>
+    <div class="w" id="b1post"></div>
+    <figcaption>The same social media post as you see it (first panel) and as it is stored (second panel). White parts are key/value pairs that would fit a table column; grey italic parts are free content with no fixed structure.</figcaption>
+  </figure>
+  <p>A note on the slides: one slide defines unstructured data as data that "can be conveniently put into a table". It is a typo for "cannot", as lesson 4 states correctly.</p>
+  <p>In the 2020s the trend topics are Big Data again (new versions of Hadoop and Spark), predictive analytics and <strong>cloud computing</strong>: renting platforms (PaaS, platform as a service) or raw infrastructure (IaaS, infrastructure as a service) instead of buying servers, with resources that scale at low prices. Traditional sources such as ERPs and CRMs now keep a deeper level of detail, and new sources keep arriving: scientific and medical equipment, distributed control systems in plants, high frequency trading, social media, Internet of Things devices.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="1"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>each phase moved analysis one step further away from the operational databases</strong>, first onto a copy, then onto integrated data, then into cubes, predictive models and distributed platforms.</p>
+  <p>Lesson 2 opens the box: what a relational database really is, and why the operational database and the warehouse are designed in opposite ways.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
