@@ -1,0 +1,140 @@
+<article class="lesson" data-n="2" id="lezione-2" data-title="How does an array live in memory?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 2 · L. Saglietti, handwritten notes <em>Storing arrays in memory</em>, slides and first demo</p>
+  <h1>How does an array live in memory?</h1>
+  <p class="desc">Memory as a line of bytes, the header that tells the CPU how to read them, why a Python list is an array of pointers, and how a table is flattened row by row.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 1 claimed that numpy is fast because its numbers have a fixed number of bits, and that an ndarray has one type and a fixed size. To see why those restrictions buy speed, you need a picture of where data actually sit.</p>
+  <h2>A line of bytes with no labels</h2>
+  <p>The computer must write everything it processes or stores somewhere: in the <strong>RAM</strong> (random access memory), which behaves like a linear container. It is a long row of slots of 1 <strong>byte</strong> each, where a byte is 8 bits. Every slot has a number, its <strong>address</strong>: 0, 1, 2, 3 and so on, for billions of slots, since a gigabyte (GB) is \(10^9\) bytes. All computers are organized this way nowadays.</p>
+  <p>The bits always have a state, 0 or 1, left there by past computations or by random initialization. Now the lecture's question: what is the most natural way to store a sequence of numbers, say <code>[2, 14, 3, 8]</code>, in this memory?</p>
+  <figure>
+    <div class="w" id="c2ram"></div>
+    <figcaption>Nine consecutive bytes of RAM with their addresses. The list was written into addresses 3 to 6, but the other bytes also hold bits, left over from earlier work, and each of them reads as some number too (grey, below). Nothing in the bits says where the list starts or ends. Leftover bits are simulated.</figcaption>
+  </figure>
+  <p>The notes put it plainly: there is nothing special about these bits, unless something points there.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Numbers as bits</h2>
+  <p>First, how does a number become bits? In <strong>binary representation</strong> each of the 8 positions of a byte stands for a power of 2, from \(2^7 = 128\) on the left down to \(2^0 = 1\) on the right. A number is the sum of the powers whose bit is 1. All four numbers of the list fit in one byte.</p>
+  <figure>
+    <div class="w" id="c2bin"></div>
+    <figcaption>The notes' place-value table, extended to the four numbers of the list. Each row is one byte; a yellow cell is a bit set to 1, and the number is the sum of the place values above the yellow cells. The notes work out 14 = 8 + 4 + 2.</figcaption>
+  </figure>
+  <div class="eq">\[ 14 = 0\cdot 2^7 + 0\cdot 2^6 + 0\cdot 2^5 + 0\cdot 2^4 + 1\cdot 2^3 + 1\cdot 2^2 + 1\cdot 2^1 + 0\cdot 2^0 \]</div>
+  <p>The natural idea is then to use consecutive slots of the RAM, one byte per number. But, as the opening figure shows, consecutive bytes alone don't answer two questions: where does the sequence start, and where does it end?</p>
+  <div class="quiz inq" data-quiz="2a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>The header tells the CPU how to read</h2>
+  <p>numpy's answer is a small block of information placed in front of the data, the <strong>header</strong>. It records the <span class="k-orange">length</span> of the array and the <span class="k-orange">type</span> of its elements. Your Python variable does not contain the array: it contains the address of the header. An address stored somewhere to reach something else is called a <span class="k-pink">pointer</span> (or reference, or arrow, as the notes say).</p>
+  <p>Why does the header need the type? Because the type fixes how many bytes each element takes: in a <code>uint8</code> array each element takes 1 byte, in a <code>uint32</code> array 4 bytes. The same bits read with a different type give different numbers.</p>
+  <figure>
+    <div class="w" id="c2hdr"></div>
+    <figcaption>The variable <code>a</code> (pink) points to the header (orange), followed by the data. The four data bytes are identical in the two panels. In the first, the header says uint8 and length 4, so the CPU reads four numbers of one byte each. In the second, it says uint32 and length 1, so it reads the same bytes as a single 4-byte number. Each cell shows one byte as its value from 0 to 255.</figcaption>
+  </figure>
+  <p>The second panel is added on this page; the notes only state that a uint32 element takes 4 bytes. Its number assumes the byte order of common PCs, called little endian: the first byte is the least significant, so the value is 2 + 14 · 256 + 3 · 256² + 8 · 256³ = 134,417,922.</p>
+  <p><strong>Homogeneous entries, plus the length and the type in the header: now the CPU knows how to read the content.</strong> As a consequence (spelled out here, not in the notes), element number <em>i</em> starts exactly <em>i</em> times the element size after the start of the data, so the CPU can compute where it is instead of searching for it.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Could a list use the same trick?</h2>
+  <p>A Python list could be stored the same way: a header, then the values side by side. The notes show two reasons why it would not work, both coming from what lists allow.</p>
+  <p><strong>Flexible assignment.</strong> In a list you can replace <code>3</code> with <code>3**100</code>. That number needs many more bits (159 of them, so 20 bytes, a count added here), so everything after it would have to move to make room. The cost would be O(<em>N</em>), read "order <em>N</em>": proportional to the length <em>N</em> of the list. You want O(1): a constant cost, whatever the length. <strong>Flexible type.</strong> You can also replace <code>3</code> with the string <code>"a"</code>. How would the program know how to interpret those bits?</p>
+  <p>Python's solution adds a layer: a list is an array of pointers, 64 bits each, and every pointer leads to an object stored elsewhere, with its own small header saying what it is (an <code>int</code>, a <code>str</code>, and so on).</p>
+  <figure>
+    <div class="w" id="c2list"></div>
+    <figcaption>Replacing 3 with 3**100, redrawn from the notes. In the first panel, the compact layout: the new value needs 20 bytes, so 8 and every later entry must shift right (red). In the second, Python's list: an array of pointers (pink), each leading to an object with its own type. The new value is written somewhere else and only one pointer changes; the old object (faded) is no longer reached.</figcaption>
+  </figure>
+  <p>The price: <strong>fetching an element of a list takes two jumps</strong>, one to the array of pointers and one to the object, while assignment becomes O(1): write the new content somewhere else and update the pointer. The type travels with each object, so any mix of types is allowed.</p>
+  <p>The notes end with a last argument for fixed types. In int64 + float64, as in 1 + 2.5, the CPU must first convert the integer to a float; in 1.0 + 2.5 it adds directly. Same result, but not the same operation. When every element has the same type, the operation is known once for all of them.</p>
+  <div class="quiz inq" data-quiz="2b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>A table in a line</h2>
+  <p>The RAM is 1-dimensional, but a matrix such as <code>[[1, 2, 5], [3, 14, 7]]</code> is 2-dimensional. The notes first show a possible way that is <em>not</em> how numpy does it: store each row as a separate vector, and link them with an array of pointers. This is indeed similar to how Python stores a list of lists: one more layer of pointers. numpy instead groups all the data in contiguous slots behind a single header, which now needs more information.</p>
+  <figure>
+    <div class="w" id="c2two"></div>
+    <figcaption>The notes' two layouts of the same 2 × 3 matrix. In the first panel each row is a separate vector with its own header, reached through an array of pointers, like a list of lists. In the second, numpy's layout: one header with the type, the size (total number of entries), the number of dimensions and the shape, then all six values in a row.</figcaption>
+  </figure>
+  <p>The <span class="k-orange">shape</span> is (number of rows, number of columns), here (2, 3); in general it is a tuple with one entry per dimension. One question remains: in what order are the six values written?</p>
+  <p><strong>Row-major order</strong> goes row by row: the whole first row, then the second. C, C++ and Python (numpy's default) use it. <strong>Column-major order</strong> goes column by column, as in Fortran, MATLAB and Julia. One is the other applied to the transposed matrix (rows and columns swapped).</p>
+  <figure>
+    <div class="w" id="c2order"></div>
+    <figcaption>The same matrix flattened in the two orders. The path through the matrix shows the order in which the values are written; the strip below is the resulting data block, with the position of each value counted from 0. In row-major order, element (i, j) of a matrix with 3 columns sits at position 3i + j.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="2c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Why ndarrays are faster than lists</h2>
+  <p>The slides call this "a very coarse-grained and imprecise discussion", but it explains the core. Take three lines that add up the elements of <code>l</code>:</p>
+<pre class="code">s = 0
+for x in l:
+    s += x</pre>
+  <p>If <code>l</code> is a list, Python has no way of knowing what its elements look like: integers, floats, lists, anything. Each time the third line runs, Python checks the type of <code>x</code>, then the type of <code>s</code>, then looks for the right method to call (<code>__add__</code>, <code>__radd__</code>, <code>__iadd__</code>). Adding two integers and adding two floats are different machine instructions, the type of <code>s</code> may change at every step, and Python may need to raise an error if a string turns up.</p>
+  <p>If you know in advance that every <code>x</code> is an integer, all that work disappears. Most of the gain, though, comes from the methods numpy writes in C, such as <code>a.sum()</code> for those three lines. (The slide writes <code>l.sum()</code>, but a list has no sum method; the method belongs to an ndarray.) They exploit the fixed type and work on a contiguous block of memory without following pointers. <strong>Working with ndarrays lets your code work in bulk.</strong> (Python also has optimizations for lists; the principle stands.)</p>
+  <p>The lecture's first demo, <code>0_rand_sum_demo.py</code>, measures this: it creates a million random numbers as a list and as an array, and sums both.</p>
+<pre class="code">l = [random.random() for i in range(n)]   # python list
+a = rnd.rand(n)                            # numpy array (numpy.random as rnd)
+s_list = sum(l)
+s_array = a.sum()</pre>
+  <figure>
+    <div class="w" id="c2time"></div>
+    <figcaption>The demo's four timings with n = 1,000,000, measured for this page by running the course script seven times on one machine (Python 3.13, numpy 2.5) and taking the median. Each panel has its own time axis. Your own numbers will differ (a second run, on another occasion, gave 66, 5.1, 6.2 and 1.1 ms); the ratio between the bars is what matters.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Building arrays</h2>
+  <p>The lecture then tried the most common constructors in the console. This is the slides' table. The data block of an array takes exactly the number of elements times the bytes per element; the slides add that the file <code>matrix.py</code>, with a small Matrix class, shows how this works in 2-d.</p>
+  <div class="scroll"><table><thead><tr><th>Call</th><th>What it does</th><th>Examples</th></tr></thead><tbody>
+    <tr><td><code>np.zeros(tuple)</code><br><code>np.ones(tuple)</code><br><code>np.full(tuple, x)</code></td><td>an array with the sizes in the tuple, filled with zeros, ones or <code>x</code>; the default type is float for zeros and ones, the type of <code>x</code> for full, and <code>dtype=</code> changes it</td><td><code>np.zeros((2,3))</code><br><code>np.ones((3,5,2), dtype=np.int64)</code><br><code>np.full((2,3), 99)</code></td></tr>
+    <tr><td><code>np.arange(...)</code></td><td>a 1-d range, same syntax as <code>range</code>, accepts floats</td><td><code>np.arange(4)</code> → 0, 1, 2, 3<br><code>np.arange(4,0,-1)</code> → 4, 3, 2, 1</td></tr>
+    <tr><td><code>np.linspace(start, end, n)</code></td><td>a 1-d array of length n from start to end, both included, at regular intervals</td><td><code>np.linspace(1.0, 2.0, 10)</code></td></tr>
+    <tr><td><code>a.ndim</code>, <code>a.shape</code>, <code>a.size</code></td><td>number of dimensions, shape, total number of elements</td><td>see lesson 1</td></tr>
+    <tr><td><code>a.fill(x)</code></td><td>fills <code>a</code> with <code>x</code>, converted to the type of <code>a</code></td><td><code>a = np.zeros((3,3)); a.fill(5)</code>: 5 becomes 5.0</td></tr>
+    <tr><td><code>a.max()</code>, <code>a.min()</code>, <code>a.sum()</code>, <code>a.mean()</code>, <code>a.argmax()</code>, <code>a.cumsum()</code></td><td>the usual reductions; all accept an optional <code>axis</code> argument to work along one dimension</td><td><code>a.sum(axis=0)</code></td></tr>
+  </tbody></table></div>
+  <p>The <code>axis</code> argument is the one that needs a picture.</p>
+  <figure>
+    <div class="w" id="c2axis"></div>
+    <figcaption>The slides' example <code>a = np.array([[1,2],[3,4]])</code>. In the first panel <code>a.sum()</code> adds everything, 10. In the second <code>a.sum(axis=0)</code> adds along axis 0, down each column, so axis 0 disappears: [4, 6]. In the third <code>a.sum(axis=1)</code> adds along each row: [3, 7].</figcaption>
+  </figure>
+  <p>The lecture also showed an example of overflow in the console. The plan does not record which; one you can try is an array of type <code>np.uint8</code> pushed past 255.</p>
+  <div class="quiz inq" data-quiz="2d"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>The second demo begins: estimating π</h2>
+  <p>The lecture ended by starting a second demo, completed in lesson 3. The idea: throw random points into the unit square, from 0 to 1 on both axes. The quarter of the unit circle inside it has area π/4, and the square has area 1, so a uniformly random point falls inside the quarter circle with probability π/4. Counting the points that fall inside gives an estimate of π.</p>
+  <p>The first step is drawing the quarter circle with matplotlib. The script samples equally spaced angles between 0 and π/2 and turns each into the point (cos θ, sin θ). The commented-out version does it with a list and a loop; the version kept uses arrays.</p>
+<pre class="code">num_points = 100
+theta = np.linspace(0., np.pi/2, num_points)   # equally spaced angles
+xs = np.cos(theta)                             # cos of every angle at once
+ys = np.sin(theta)
+plt.clf()
+plt.plot(xs, ys, color="red")</pre>
+  <figure>
+    <div class="w" id="c2arc"></div>
+    <figcaption>The quarter circle drawn as in the script, with 5 angles in the first panel and 100 (the script's choice) in the second. <code>plt.plot</code> joins consecutive points with straight segments: with few angles you see the polygon, with 100 it looks round. The script draws the curve in red; here it is yellow, the colour of π on this page.</figcaption>
+  </figure>
+  <p>Notice that <code>np.cos(theta)</code> computes 100 cosines in one call: the function is applied to every element. Lesson 3 turns that habit into a rule.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="2"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>an ndarray is one header plus one contiguous block of same-sized values</strong>, so the CPU can compute where every element is, while a list is an array of pointers to objects scattered in memory.</p>
+  <p>Lesson 3 completes the π demo without a single loop, and uses it to introduce broadcasting, indexing, views and copies.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>

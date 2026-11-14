@@ -1,0 +1,9 @@
+{
+  "titolo": "30509 Computer Programming",
+  "breve": "CP",
+  "descrizione": "Lectures 1 to 3: why numpy exists, fixed-width integers, how arrays and lists live in memory, Monte Carlo estimation of pi, broadcasting, indexing, views and copies.",
+  "fonte": "L. Saglietti, slides, notes, code and exercises of 30509 Computer Programming, lectures 1 to 3 (Bocconi)",
+  "ordine": 3,
+  "miniatura": 2,
+  "lingua": "en"
+}

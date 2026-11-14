@@ -1,0 +1,185 @@
+<article class="lesson" data-n="3" id="lezione-3" data-title="How do you compute on a whole array at once?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 3 · L. Saglietti, the π estimation demo and the slides on broadcasting, indexing and views</p>
+  <h1>How do you compute on a whole array at once?</h1>
+  <p class="desc">Monte Carlo estimation of π without loops, the broadcasting rules, the four ways to index an array, and the difference between a view and a copy.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 2 ended with the quarter circle drawn from 100 equally spaced angles, and with the plan: throw random points into the unit square and count how many fall inside the quarter circle. That method is called <strong>Monte Carlo</strong>: estimating a quantity by drawing many random samples. Here is the experiment.</p>
+  <figure>
+    <div class="w" id="c3mc"></div>
+    <figcaption>Points drawn uniformly in the unit square, the same random sequence at every visit (simulated in your browser). A point is blue if x² + y² ≤ 1, so it lies inside the quarter circle (yellow), and grey otherwise. Drag the slider to change the number of points n: the estimate below the drawing wanders for small n and settles near π as n grows.</figcaption>
+  </figure>
+  <p>A uniform point lands inside with probability equal to the area of the quarter circle, π/4, divided by the area of the square, 1. So the fraction of points inside estimates π/4, and four times that fraction estimates π:</p>
+  <div class="eq">\[ \piest = 4\,\frac{\Nin}{\Npts} \]</div>
+  <p>where \(\Npts\) is the number of points and \(\Nin\) the number that fall inside.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>From a loop to one line</h2>
+  <p>The script <code>01_pi_estimate.py</code> keeps the first attempt as comments: a loop that draws one point at a time and counts it if it falls inside.</p>
+<pre class="code">ninside = 0
+for i in range(n_mc):
+    px = np.random.random()
+    py = np.random.random()
+    if px**2 + py**2 &lt;= 1:
+        ninside += 1</pre>
+  <p>The version that the lecture kept does the same with no loop at all:</p>
+<pre class="code">pxs = np.random.random(n_mc)          # n_mc random x coordinates at once
+pys = np.random.random(n_mc)
+ninside = np.sum(pxs**2 + pys**2 &lt;= 1)
+print(f"estimated pi = {4 * ninside / n_mc} real pi = {np.pi}")</pre>
+  <p>Read the third line from the inside. <code>pxs**2</code> squares every element. The <code>+</code> adds the two arrays element by element. <code>&lt;= 1</code> compares every element with 1 and returns an array of booleans. <code>np.sum</code> adds the booleans, where True counts as 1 and False as 0, so it counts the points inside.</p>
+  <figure>
+    <div class="w" id="c3mask"></div>
+    <figcaption>The vectorized line on eight points, one per column. Each row is one intermediate array; the last two lines are the count and the estimate. Eight points are far too few for a good estimate: the point here is the mechanism, not the value. The eight coordinates are made up for this page.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="3a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Operations that apply element by element</h2>
+  <p>The line above works because of a mechanism that basically every numpy function uses, called <strong>broadcasting</strong>. In full generality it can be confusing until you get used to it; at the most basic level it just means that operations are applied element-wise.</p>
+  <p>Take two arrays <code>a</code> and <code>b</code> of the same shape. <code>a + b</code> gives the element-wise sum: not what happens with Python lists, where <code>+</code> concatenates. <code>a * b</code> gives the element-wise product, which is <em>not</em> the matrix product of linear algebra (unlike MATLAB). The same holds for every operator, such as <code>a**b</code>, and for numpy's versions of <code>sin</code>, <code>log</code>, <code>exp</code>: they return an array of the same shape, with the function applied to each element.</p>
+  <figure>
+    <div class="w" id="c3same"></div>
+    <figcaption>The slides' two basic examples. In the first panel two arrays of shape (2, 3) are multiplied cell by cell: each pink result is the product of the two numbers in the same position. In the second, <code>np.log2</code> is applied to each cell separately. The function <code>math.log2</code> from the standard library would refuse an array.</figcaption>
+  </figure>
+<pre class="code">In [2]: a = np.linspace(1.0, 2.0, 6)    # [1. , 1.2, 1.4, 1.6, 1.8, 2. ]
+In [4]: b = np.ones(6)
+In [6]: a + b                           # element-wise, NOT concatenation
+Out[6]: array([2. , 2.2, 2.4, 2.6, 2.8, 3. ])
+In [9]: a &gt; b
+Out[9]: array([False,  True,  True,  True,  True,  True])
+In [10]: a == b                         # even == broadcasts
+Out[10]: array([ True, False, False, False, False, False])
+In [11]: np.array_equal(a, b)           # are the arrays equal?
+Out[11]: False</pre>
+  <p>One surprise: comparisons broadcast too, even <code>==</code> and <code>!=</code>. They return an array of booleans, not a single True or False. To ask whether two whole arrays are equal, use <code>np.array_equal</code>.</p>
+  <div class="quiz inq" data-quiz="3b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>When the shapes differ</h2>
+  <p>Broadcasting really earns its name when the shapes are not the same. With an array <code>a</code> and a scalar <code>x</code>, <code>x * a</code> or <code>a ** x</code> applies the same <code>x</code> to each element: the scalar is expanded, as if it were an array of the same shape full of copies. Again unlike lists, where <code>a * 3</code> would repeat the list three times.</p>
+  <p>With a 2-d array of shape (<em>n</em>, <em>p</em>) and a 1-d array of shape (<em>p</em>,), the 1-d array is expanded into a 2-d array with identical rows. A shape (3,) is equivalent to (1, 3), or (1, 1, 3), and so on. A column of shape (2, 1) is expanded along the other direction, so (2, 1) and (1, 3) together become (2, 3).</p>
+  <figure>
+    <div class="w" id="c3bc"></div>
+    <figcaption>The slides' three cases, one per row, all with the same <code>a</code>. Solid cells are the data actually stored; dashed grey cells are the copies broadcasting pretends to make, so that both operands have shape (2, 3). In the third row both operands are expanded. The expansion is never actually performed: numpy works as if it were, without wasting time or memory.</figcaption>
+  </figure>
+<pre class="code">In [3]: a = np.array([[3,4,0],[1,2,2]])
+In [4]: b = np.array([2,4,0])
+In [5]: a * b                   # not a matrix-vector product
+Out[5]: array([[ 6, 16,  0],
+               [ 2,  8,  0]])</pre>
+  <p>A note on the source: in the slides' scalar example, <code>a</code> is <code>[1., 1.2, 1.4, 33., 1.8, 2.]</code> and <code>a**2</code> correctly gives 1089 for the fourth element, but <code>a*3</code> is printed as <code>[3., 3.6, 4.2, 4.8, 5.4, 6.]</code>. The fourth element should be 99, three times 33: 4.8 is three times 1.6, probably the value before it was changed to 33.</p>
+  <p>The slides close with the general rule, for any number of arrays and dimensions.</p>
+  <p class="stmt"><strong>Broadcasting rules.</strong> First, arrays with fewer dimensions are padded with extra dimensions of size 1 at the beginning, until all have the same number of dimensions. Second, along each axis take the largest size <em>n</em>: every array must have either size <em>n</em> or size 1 there, and a size 1 is repeated <em>n</em> times. Third, the operation is applied element-wise.</p>
+  <figure>
+    <div class="w" id="c3rules"></div>
+    <figcaption>The rules applied to two pairs of shapes, aligned on the right. In the first panel, the slides' example: (2, 4) is padded to (1, 2, 4) (orange), then each size 1 is stretched to the largest size on its axis (teal), giving (3, 2, 4). In the second panel, a pair added on this page: on the last axis the sizes are 3 and 2, neither is 1, and numpy raises an error.</figcaption>
+  </figure>
+  <p><strong>Broadcasting never copies data: it lines the shapes up from the right and stretches the sizes equal to 1.</strong> The same idea works in assignment. <code>a[:,:] = 2.0</code> sets every element, like <code>fill</code>; <code>a[0:2, 0:3] = [1,2,3]</code> writes the row <code>[1,2,3]</code> into both rows of a 2 × 3 block. You can even operate with an array and a list: the list is treated as a 1-d array.</p>
+  <div class="quiz inq" data-quiz="3c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>π in more dimensions, and how good the estimate is</h2>
+  <p>The lecture left four tasks: draw the square too, generalize the estimate to higher dimensions, study how the estimate scales with the number of points, and plot only the points that fall inside. The opening figure already does the first and, with its colours, a version of the fourth: plotting only the inside points is <code>plt.plot(pxs[mask], pys[mask], ".")</code> with <code>mask = pxs**2 + pys**2 &lt;= 1</code>, a mask index you will meet below. The course solution, <code>02_mc_pi_est_proj.py</code>, handles the second and the third.</p>
+  <p>In \(\dimd\) dimensions you draw points in the unit cube and count those inside the unit ball. The ball's volume is \(V_{\dimd} = \pi^{\dimd/2} / \Gamma(\dimd/2 + 1)\), where \(\Gamma\) is the gamma function, which extends the factorial (\(\Gamma(k+1) = k!\)). The cube from 0 to 1 holds only one of the \(2^{\dimd}\) symmetric sectors of the ball, so the fraction of points inside estimates \(V_{\dimd}/2^{\dimd}\). Solving for π:</p>
+  <div class="eq">\[ \piest = \left( 2^{\dimd}\, \Gamma\!\left(\tfrac{\dimd}{2}+1\right) \frac{\Nin}{\Npts} \right)^{2/\dimd} \]</div>
+  <p>With \(\dimd = 2\) this is the formula of the opening, since \(\Gamma(2) = 1\). The code is still one line of counting:</p>
+<pre class="code">ps = rnd.rand(dims, n)                         # rnd is numpy.random; one column per point
+ninside = ((ps**2).sum(axis=0) &lt;= 1).sum()     # squared length of each point, then count</pre>
+  <p>For the scaling analysis, the solution repeats each estimate many times with different random numbers and records the mean and the standard deviation (the typical size of the deviation from the mean).</p>
+  <figure>
+    <div class="w" id="c3scale"></div>
+    <figcaption>The solution's two experiments, re-run in your browser with seeded random numbers. In the first panel, d = 2: for each n from 100 to 100,000 (logarithmic axis), the dot is the mean of 50 estimates and the bar spans one standard deviation either side; the red curves are <span style="white-space:nowrap">π ± 1.7/√n</span>, as in the solution. In the second panel, n = 10,000 and 10 estimates for each d from 2 to 10. The dashed line is π. The solution goes up to 10 million points; here the first panel stops at 100,000 to keep the page fast.</figcaption>
+  </figure>
+  <p>The bars shrink like \(1/\sqrt{\Npts}\): ten times more precision costs a hundred times more points. In higher dimensions they grow, which the solution flags with "it gets worse!!! why? think about it". The fraction of the cube inside the ball collapses: about 79% of points in 2 dimensions, 52% in 3, but only 0.25% in 10, so 10,000 points leave about 25 inside to count.</p>
+  <div class="quiz inq" data-quiz="3d"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Picking pieces: four ways to index</h2>
+  <p>An ndarray can be indexed with the same syntax as Python lists. You can use slices, such as <code>0:5:2</code> or just <code>:</code>, and negative indices that count from the end, along each dimension: if <code>a</code> is 2-d, <code>a[0, 0:5]</code> gives row 0 and columns 0 to 4, and <code>a[1:3, :]</code> gives the sub-matrix of rows 1 and 2 with all columns.</p>
+  <p>Two more ways are not available for lists. Take <code>a = np.array([6, 2, 8, 1, 7, 3])</code>. Indexing with a <strong>list</strong> of positions, <code>a[[0, 2, 3]]</code>, gives <code>[6, 8, 1]</code>. Indexing with a <strong>boolean mask</strong>, one True or False per element, picks the elements marked True: <code>a[np.array([1,0,1,1,0,0], dtype=bool)]</code> gives the same <code>[6, 8, 1]</code>. You can mix any method along any dimension, as in <code>a[1:3, [2,4,5]]</code>.</p>
+  <p>A note on the source: the slide's mask is <code>[1,0,1,1,0,0,0]</code>, with seven entries for a six-element array. Real numpy refuses it with an IndexError: a boolean mask must have exactly as many entries as the axis it indexes. The six-entry mask above is the corrected version.</p>
+  <p>The four kinds of index do not behave the same way when you write into the result. That difference is the most important point of the lecture.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Views and copies</h2>
+  <p>When you index with slices, what you get is a <span class="k-teal">view</span>: an ndarray that shares the same data as the original. In the language of lesson 2 (a picture added here): a view is a new header that points into the same block of data, possibly reading it in strides, for example every second element; the slides note that different ndarrays can share data, or just part of it. Writing into a view writes into the original.</p>
+  <figure>
+    <div class="w" id="c3view"></div>
+    <figcaption>Three ways to take the elements 0, 2 and 4 of <code>a = np.arange(5)</code>, followed by the same write <code>b[1] = 999</code>. In the first panel <code>b</code> is a view: its cells are windows onto the data of <code>a</code> (teal lines), so <code>a[2]</code> changes. In the second and third, indexing with a list or with a mask builds a new, independent array, and <code>a</code> is untouched (<code>%</code> is the remainder, so <code>a % 2 == 0</code> marks the even numbers). The first panel is the slides' example.</figcaption>
+  </figure>
+<pre class="code">In [4]: b = a[0:5:2]           # view of a, every other element
+In [6]: b[1] = 999             # this changes both a and b!
+In [7]: a
+Out[7]: array([  0,   1, 999,   3,   4])
+In [8]: c = a[0:5:2].copy()    # how to get a new array
+In [9]: a.base is not None     # is a a view? no
+Out[9]: False
+In [10]: b.base is a           # b is a view of a
+Out[10]: True</pre>
+  <p>Every ndarray has a <code>.base</code> attribute: <code>None</code> if the array owns its data, the original array if it is a view. <code>.copy()</code> gives you independent data. Slices are not the only source of views: the methods <code>reshape()</code>, which gives the same data a new shape, and <code>ravel()</code>, which flattens it, also return views. A view of a view is still a view of the original.</p>
+  <div class="scroll"><table><thead><tr><th>You index with</th><th>You get</th><th>Example</th></tr></thead><tbody>
+    <tr><td>only scalars</td><td>one element, not a view</td><td><code>a[2]</code>, <code>m[0, 1]</code></td></tr>
+    <tr><td>scalars and at least one slice</td><td>a <span class="k-teal">view</span></td><td><code>a[0:5:2]</code>, <code>m[0, :]</code>, <code>a[::-1]</code></td></tr>
+    <tr><td>any list or mask</td><td>independent data, not a view</td><td><code>a[[0,2,4]]</code>, <code>a[a &gt; 0]</code></td></tr>
+  </tbody></table></div>
+  <p>Two warnings from the slides. If you omit indices, numpy fills in <code>:</code> for the missing dimensions: with a 2-d <code>m</code>, <code>m[3]</code> means <code>m[3, :]</code>, so it is a view. This is confusing and error-prone, so avoid it. And the three dots <code>...</code> stand for "all the remaining dimensions": <code>m[3, ..., 4]</code> is <code>m[3, :, 4]</code> in 3-d. They are seldom useful.</p>
+  <div class="quiz inq" data-quiz="3e"></div>
+  <div class="quiz inq" data-quiz="3f"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Practice with the exercise sheet</h2>
+  <p>The course's exercise sheet, <em>Numpy and pyplot exercises</em>, drills exactly these tools: creation, slicing in strides, indexing with lists and masks, assignment, broadcasting. Its rule is to use slicing and built-in array methods and avoid <code>for</code> loops. These questions come from its exercises 4, 7, 8, 12 and 15, checked against the official solutions; try each in the console after answering.</p>
+  <div class="quiz inq" data-quiz="3g"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>numpy is not math</h2>
+  <p>Mathematically, the logarithm of a number is always the same. In code, numpy's functions and those of the standard <code>math</code> module can differ. Broadcasting is one difference; behaviour outside the domain of a function is another.</p>
+  <div class="scroll"><table><thead><tr><th>Expression</th><th>Result</th></tr></thead><tbody>
+    <tr><td><code>math.log(0)</code></td><td class="bad">error</td></tr>
+    <tr><td><code>np.log(0)</code></td><td><code>-inf</code>, with a RuntimeWarning: divide by zero</td></tr>
+    <tr><td><code>(-2.0)**0.5</code></td><td>a complex number, about <code>1.414j</code></td></tr>
+    <tr><td><code>np.float64(-2.0)**0.5</code></td><td><code>nan</code> (not a number), with a RuntimeWarning: invalid value</td></tr>
+    <tr><td><code>math.sqrt(-2.0)</code></td><td class="bad">error</td></tr>
+    <tr><td><code>np.sqrt(-2.0)</code></td><td><code>nan</code>, with a RuntimeWarning: invalid value</td></tr>
+  </tbody></table></div>
+  <p>Even inside the domain there can be tiny differences, from floating point rounding and different underlying code. The slides show a curiosity: <code>math.log(0.54234)</code> and <code>np.log(0.54234)</code> are identical down to the last bit, yet in the numpy version of the slides they printed with a different number of digits, because a <code>float</code> and an <code>np.float64</code> use different printing functions. Harmless, unless you compare results as text.</p>
+  <p>Rather than memorizing every case, the slides ask you to memorize one rule, in capitals: <strong>never ignore warnings</strong>. <code>np.seterr()</code> can change numpy's behaviour, for example turning warnings into errors; don't use it to silence them unless you know what you are doing ("hint: you don't").</p>
+  <p>The style of the whole lesson has a name: <strong>vectorization</strong>, using arrays and their built-in operations instead of basic constructs such as <code>for</code> loops. It often makes code both faster and clearer, once you are used to it, and shorter anyway. Sometimes it gets faster but confusing and unnatural, and it is not always possible. Further tricks exist on top of it, such as the optional <code>out</code> argument of numpy functions, which recycles storage for intermediate results, and <code>frompyfunc</code>, which gives any function the broadcasting behaviour (rarely needed, and unlikely to be fast). In matplotlib, besides <code>plot()</code>, look at <code>hist()</code>, which computes and draws a histogram, and <code>imshow()</code>, which displays a 2-d array as an image.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>The first three lessons in one table</h2>
+  <div class="scroll"><table><thead><tr><th>Lesson</th><th>Concept</th><th>Idea</th><th>In code</th></tr></thead><tbody>
+    <tr><td>1</td><td>fixed-width integers</td><td>b bits give 2<sup>b</sup> values; past the end they wrap around</td><td><code>np.int8(127) + np.int8(1)</code> → −128</td></tr>
+    <tr><td>1</td><td>ndarray</td><td>homogeneous, fixed size, any number of dimensions</td><td><code>a.ndim</code>, <code>a.shape</code>, <code>a.size</code>, <code>a.dtype</code></td></tr>
+    <tr><td>2</td><td>header and data</td><td>length, type, shape in front of one contiguous block</td><td>row-major: (i, j) at i · ncols + j</td></tr>
+    <tr><td>2</td><td>Python list</td><td>array of pointers to objects: flexible, two jumps per read</td><td><code>l[2] = 3**100</code> costs O(1)</td></tr>
+    <tr><td>2</td><td>constructors and reductions</td><td>build in one call, reduce along an axis</td><td><code>np.linspace(0, 1, n)</code>, <code>a.sum(axis=0)</code></td></tr>
+    <tr><td>3</td><td>vectorization</td><td>whole-array operations instead of loops</td><td><code>np.sum(x**2 + y**2 &lt;= 1)</code></td></tr>
+    <tr><td>3</td><td>broadcasting</td><td>align shapes on the right, stretch sizes equal to 1</td><td>(2, 1) with (3,) → (2, 3)</td></tr>
+    <tr><td>3</td><td>views and copies</td><td>slices share data; lists and masks copy</td><td><code>b.base is a</code>, <code>.copy()</code></td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="3"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>write operations on whole arrays and let broadcasting line up the shapes, but always know whether the array you are writing into is a view</strong>.</p>
+  <p>The next lecture uses these tools for the first optimization problems: shortest paths and the travelling salesman.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>

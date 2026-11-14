@@ -1,0 +1,137 @@
+<article class="lesson" data-n="1" id="lezione-1" data-title="What does numpy add to Python?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 1 · L. Saglietti, Introduction to the course and to the Python scientific stack</p>
+  <h1>What does numpy add to Python?</h1>
+  <p class="desc">Why plain Python is slow with numbers, what numpy, scipy and matplotlib add, and how an integer with a fixed number of bits can turn a power of 3 into a negative number.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Type the same power twice in the console: once with an ordinary Python integer, once with a numpy integer. This is the lecture's first experiment.</p>
+<pre class="code">In [2]: a = 3                # python integer
+In [3]: a**100
+Out[3]: 515377520732011331036461129765621272702107522001
+In [4]: b = np.int64(3)      # numpy integer
+In [5]: b**100
+RuntimeWarning: overflow encountered in long_scalars
+Out[5]: -2984622845537545263
+In [6]: a == b               # and yet...
+Out[6]: True</pre>
+  <p>The warning is how the slides, made with an older numpy, show the session; current numpy (version 2) prints the same number without any warning, which makes the trap even quieter. A RuntimeWarning is a message numpy prints while the program keeps running.</p>
+  <p>Two numbers that compare equal give two different answers, and one of them is negative, although no power of 3 can be. The lecture's comment is short: <strong>equality is not identity</strong>. <code>a</code> and <code>b</code> hold the same value but are objects of different types, and the two types do arithmetic differently.</p>
+  <p>Repeat the experiment for every power from 3<sup>1</sup> to 3<sup>100</sup> and the pattern appears.</p>
+  <figure>
+    <div class="w" id="c1pow"></div>
+    <figcaption>Added on this page: the value of <code>np.int64(3)**k</code> for k = 1 to 100, computed exactly, as a fraction of the largest int64 value (about 9.2 · 10<sup>18</sup>). Up to k = 39 it equals the true power, which grows (blue). From k = 40 the true power is too large and the numpy result jumps around between the two limits, sometimes negative (purple). The pink dot is k = 100, the opening's result.</figcaption>
+  </figure>
+  <p>The break happens exactly where the true power passes the largest value an int64 can hold. By the end of this lesson you will know why. First, a simpler question: why does numpy exist at all?</p>
+</div></section>
+
+<section><div class="col">
+  <h2>What this course is about</h2>
+  <p>The course assumes basic but solid Python, roughly the introductory book <em>Think Python</em>, and works in Python 3 with numpy, scipy and matplotlib inside the Spyder editor (the Anaconda distribution bundles all of them). It covers families of optimization problems and the techniques for them, in four main topics: Monte Carlo and simulated annealing, non-linear optimization with gradient descent, data structures (the binary search tree), dynamic programming. <strong>The algorithms are the excuse to learn more advanced programming</strong>, with a side objective: learning to navigate documentation. The first two practice sessions lay the foundations with Python's numeric libraries, which these three lessons cover.</p>
+  <p>The exam, in a computer room, has coding exercises and a few open theoretical questions, up to about 26 points curved on the class; an individual project adds about 5. Mock and past exams are available. The lecturer's advice: practise, keep the basics rock solid, and never look at a solution before giving it your best.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Easy to write, slow to run</h2>
+  <p>Python was first released in 1991: the slides place it after the programming languages FORTRAN, C, C++, R and MATLAB and before Java, C# and JavaScript. On R the slide is inaccurate: R first appeared in 1993, after Python (its ancestor, the language S, dates from 1976). It was designed to be easier, more concise, more readable and safer than the alternatives, so that programs can be written and changed quickly, and it is now among the four most used languages, with C, C++ and Java.</p>
+  <p>The slides compare the two ways of building a list of the first <code>n</code> squares. In C:</p>
+<pre class="code">int *l, i;
+l = calloc(n, sizeof(int));
+assert(l != NULL);
+for (i = 0; i &lt; n; i++) {
+    l[i] = i*i;
+}
+/* use l here */
+free(l);   /* need to clean up */</pre>
+  <p>In Python:</p>
+<pre class="code">l = [i**2 for i in range(n)]
+# use l, no clean up needed</pre>
+  <p>In C you declare every variable in advance and manage memory yourself: you work close to the hardware, with a lot of control and a lot of work. Python manages these things for you and has many common operations built in; the slides single out text strings as a case where C is horrible and Python is great.</p>
+  <p>The price is speed. Python is a <strong>general purpose</strong> language, meant for anything from computations to web servers to small scripts that tidy your files, and it was never designed to be particularly fast. Its design relieves the programmer of work, not the program. For most tasks that is fine, since a few hundredths of a second don't matter. In data science they do: the data are large and the algorithms take time.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>A faster Python: numpy, scipy and matplotlib</h2>
+  <p>People wanted a popular language with fast code, a library of scientific algorithms, all free and open source. MATLAB, a commercial language built for numerical computing, is closed and expensive; Julia is fast and free but young. So numpy was created, scipy was built on top of it, and matplotlib, inspired by MATLAB's plots, became their plotting companion.</p>
+  <p>From now on, every file and every session starts with the standard aliases:</p>
+<pre class="code">import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+np.log(4 + np.exp(3))      # numpy functions carry the np prefix</pre>
+  <p><strong>numpy</strong> is a sort of language extension: numeric types for heavy computation (32-bit floats, 64-bit integers), a core type called the <strong>ndarray</strong> (N-dimensional array), a more efficient kind of list, mathematical functions and constants such as <code>np.pi</code>, and an alternative random module. <strong>scipy</strong> collects submodules for special functions, integration, optimization, linear algebra, statistics and signal processing: <code>from scipy import special</code>, then <code>special.erf(1.5)</code>, the error function of statistics. sympy (symbolic mathematics) and pandas (data frames) complete the picture.</p>
+  <p><strong>matplotlib</strong> draws plots. The slide's example calls <code>plt.plot</code> twice; in Spyder the plot appears at once, otherwise you call <code>plt.show()</code>.</p>
+  <figure>
+    <div class="w" id="c1plot"></div>
+    <figcaption>The two calls of the slide, redrawn. Each call takes the x values first and the y values second and joins the points with straight segments. The second call draws on top of the first; <code>plt.clf()</code> (clear figure) would wipe both.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="1a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Why a numpy integer has a limit</h2>
+  <p>Back to the opening. In Python an integer is, in principle, unlimited: it grows to as many digits as it needs. In numpy an integer has a <strong>fixed number of bits</strong>, for example 64. Each one takes a predictable amount of space, and the processor (CPU) can operate on it in a single instruction, often on 2 or 4 integers at once. That is much faster, and it is how the vast majority of languages treat integers. Python is the exception.</p>
+  <p>With \(\bits\) bits you can write \(2^{\bits}\) different patterns, so you can represent at most \(2^{\bits}\) different numbers. Take \(\bits = 4\): 16 patterns. If you want both negative and positive numbers, the convention gives the first half of the patterns, 0000 to 0111, to 0 to 7, and the second half, 1000 to 1111, to −8 to −1. If you only want non-negative numbers, the <strong>unsigned</strong> type uses all 16 patterns for 0 to 15.</p>
+  <div class="eq">\[ \text{signed: } -2^{\bits-1} \le x \le 2^{\bits-1}-1, \qquad \text{unsigned: } 0 \le x \le 2^{\bits}-1 \]</div>
+  <p>Now go one step past the largest value. There is no pattern left, so the count wraps around to the other end, like a car's odometer.</p>
+  <figure>
+    <div class="w" id="c1wheel"></div>
+    <figcaption>The slides' table of a hypothetical 4-bit type, redrawn as a wheel: each of the 16 bit patterns sits on the ring, with the signed value (int4) in the first panel and the unsigned value (uint4) in the second. The red line is where adding 1 jumps from the largest value to the smallest. In the second panel the pink dot marks where 5 · 4 = 20 lands: 20 steps from 0000 is once around plus 4.</figcaption>
+  </figure>
+  <p>This is <strong>overflow</strong>: past the maximum or below the minimum, the numbers cycle around. In the 4-bit example you get bizarre results like 7 + 1 → −8 for the signed type, and 15 + 1 → 0 and 5 · 4 → 4 for the unsigned one, where everything is computed modulo 16 (the remainder after dividing by 16).</p>
+  <p><strong>Overflow is not an error in the arithmetic: the result is right modulo \(2^{\bits}\), but read with the wrong sign or size.</strong> That is exactly what happened to <code>b**100</code>: the true result has 48 digits, numpy kept only its last 64 bits, and those bits, read as a signed number, start with a 1, so the value is negative.</p>
+  <div class="quiz inq" data-quiz="1b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>The types that really exist</h2>
+  <p>The 4-bit type does not exist; it only makes the wheel small enough to draw. The smallest real type is <code>int8</code>, from −128 to 127. Its unsigned twin <code>uint8</code>, from 0 to 255, is common in image data, where each pixel's brightness takes one byte. The others double the number of bits each time. This table applies the two formulas above.</p>
+  <div class="scroll"><table><thead><tr><th>type</th><th class="n">bits</th><th class="n">minimum</th><th class="n">maximum</th></tr></thead><tbody>
+    <tr><td><code>np.int8</code></td><td class="n">8</td><td class="n">−128</td><td class="n">127</td></tr>
+    <tr><td><code>np.uint8</code></td><td class="n">8</td><td class="n">0</td><td class="n">255</td></tr>
+    <tr><td><code>np.int16</code></td><td class="n">16</td><td class="n">−32,768</td><td class="n">32,767</td></tr>
+    <tr><td><code>np.uint16</code></td><td class="n">16</td><td class="n">0</td><td class="n">65,535</td></tr>
+    <tr><td><code>np.int32</code></td><td class="n">32</td><td class="n">−2,147,483,648</td><td class="n">2,147,483,647</td></tr>
+    <tr><td><code>np.int64</code></td><td class="n">64</td><td class="n">−9,223,372,036,854,775,808</td><td class="n">9,223,372,036,854,775,807</td></tr>
+    <tr><td><code>np.uint64</code></td><td class="n">64</td><td class="n">0</td><td class="n">18,446,744,073,709,551,615</td></tr>
+  </tbody></table></div>
+  <p>With 64 bits overflow is rare, but it still happens, and the slides add that "YouTube knows something about it". The reference, explained here because the slide leaves it implicit: in 2014 the view counter of the music video <em>Gangnam Style</em> passed 2,147,483,647, the maximum of a signed 32-bit integer, and YouTube had to move its counters to 64 bits.</p>
+  <p>The course's first exercise asks you to test the boundaries yourself: store 100 as <code>np.int16</code> and as <code>np.uint16</code>, compute their ranges from the formulas, then push past them with arithmetic, such as <code>np.int16(32767) + np.int16(1)</code>, and watch the numbers cycle. One caution: the official solution also converts out-of-range Python integers directly, as in <code>np.int16(32768)</code>. That printed a wrapped value in older numpy, but numpy 2 raises an OverflowError instead.</p>
+  <div class="quiz inq" data-quiz="1c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>The core type: the ndarray</h2>
+  <p>An <strong>ndarray</strong> is <strong>homogeneous</strong>: all its elements have the same type. The slides call this statement imprecise but close enough to the truth for now. A 1-dimensional array looks like a Python list, but all its elements share one type (all 64-bit integers, or all 32-bit floats, or all booleans) and its size is fixed. It can behave like a mathematical vector. A 2-dimensional array is a table of numbers that can behave like a matrix. You can have as many dimensions as you like: 1 or 2 suffice for simple cases, while 3 or 4 are not unusual in machine learning and computer vision.</p>
+<pre class="code">In [2]: a = np.array([4,6,8])
+In [3]: type(a)       # the type name is ndarray
+Out[3]: numpy.ndarray
+In [4]: a[0]          # indexed like standard lists
+Out[4]: 4
+In [5]: type(a[0])    # but the type is not int!
+Out[5]: numpy.int64</pre>
+  <p>The element <code>a[0]</code> prints as 4 but is a <code>numpy.int64</code>, the same kind of integer as <code>b</code> in the opening, with the same 64-bit limit. And if the list mixes types? The course's second exercise tries it, and numpy picks one type that can hold every element.</p>
+  <figure>
+    <div class="w" id="c1dtype"></div>
+    <figcaption>Three lists from the official solution of exercise 2, turned into arrays. Under each list element is its Python type; an orange outline marks an element that numpy converted. The array always ends up with a single <code>dtype</code> (the attribute that names the element type): int64, then float64, then a string type, <code>&lt;U32</code> (Unicode text of up to 32 characters), where even the numbers have become text.</figcaption>
+  </figure>
+  <p>A 2-dimensional array needs two indices per element, row first and column second, and carries three attributes that describe its form.</p>
+  <figure>
+    <div class="w" id="c1nd"></div>
+    <figcaption>The slides' 2-d array <code>a = np.array([[4,5,6],[2,3,1]])</code>. Rows run along axis 0 and columns along axis 1, both numbered from 0; <code>a[0,1]</code> picks row 0, column 1 (pink). <code>ndim</code> counts the axes (also called the rank), <code>shape</code> gives the size along each axis, <code>size</code> the total number of elements, 2 × 3 = 6.</figcaption>
+  </figure>
+  <p>Fixed type and fixed size are restrictions compared with a list. Lesson 2 shows what they buy: because every element takes the same number of bytes, the computer can find any element without searching.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="1"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>numpy trades Python's flexibility for fixed types and fixed sizes</strong>. That trade is the source of its speed and of its surprises, such as an integer that wraps around when it runs out of bits.</p>
+  <p>Lesson 2 opens the memory of the computer to see how an array, and a Python list, are actually stored.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
