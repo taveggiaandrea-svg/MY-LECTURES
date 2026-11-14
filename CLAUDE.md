@@ -9,4 +9,5 @@ Regole fisse:
 - Prima di caricare: `python3 test.py shots`, zero problemi, e guarda gli screenshot delle figure nuove.
 - Testi in italiano, senza trattini lunghi o medi.
 - Il sito resta privato: non aggiungere nulla che lo renda indicizzabile o pubblico.
-- Alla fine di ogni lavoro: commit con un messaggio chiaro e push su `main`; Cloudflare Pages pubblica da solo la cartella `site/`.
+- Alla fine di ogni lavoro: commit con un messaggio chiaro e push su `main`; Cloudflare (Workers, vedi `wrangler.jsonc`) pubblica da solo la cartella `site/`.
+- Non toccare la protezione con password in `worker/index.js` e non scrivere mai credenziali nel repository.

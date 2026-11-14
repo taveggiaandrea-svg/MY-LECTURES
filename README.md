@@ -40,4 +40,6 @@ Aggiungere `lezioni/lN.html` e `js/lN.js`, un link in `top.html`, una miniatura 
 
 ## Pubblicazione
 
-Il sito si pubblica dalla cartella `site/`, senza comando di build. Va tenuto privato: alcune fonti hanno licenze che non permettono di distribuire opere derivate. Le pagine hanno già `noindex` e `robots.txt` blocca i motori di ricerca, ma la protezione vera è l'accesso con autenticazione davanti al sito.
+Il sito è un Worker di Cloudflare (`wrangler.jsonc`): a ogni push su `main` Cloudflare esegue `npx wrangler deploy` e pubblica la cartella `site/`. Indirizzo: https://my-lectures.taveggiaandrea.workers.dev/.
+
+Va tenuto privato: alcune fonti hanno licenze che non permettono di distribuire opere derivate. Ogni richiesta passa prima da `worker/index.js`, che chiede utente e password (autenticazione HTTP Basic). Le credenziali sono i segreti `SITE_USER` e `SITE_PASSWORD`, impostati nel pannello Cloudflare (Worker my-lectures, Settings, Variables and secrets) e mai scritti nel repository. Se mancano, il sito resta chiuso a tutti. Per provarlo in locale: un file `.dev.vars` (escluso da git) con le due variabili e `npx wrangler dev`. In più le pagine hanno `noindex` e `robots.txt` blocca i motori di ricerca.
