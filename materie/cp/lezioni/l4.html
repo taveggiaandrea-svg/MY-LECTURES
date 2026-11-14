@@ -1,0 +1,104 @@
+<article class="lesson" data-n="4" id="lezione-4" data-title="What makes an optimization problem hard?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 4 · L. Saglietti, slides <em>Optimization and greedy approaches</em></p>
+  <h1>What makes an optimization problem hard?</h1>
+  <p class="desc">Optimization problems, the space of configurations and its neighbourhoods, greedy search and its local minima, and why the obvious strategy often fails.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lessons 1 to 3 built the numpy toolbox. From here on, the course uses it for its main thread: optimization, finding the best option among very many. The slides open with a small world of 13 options, each with a cost, where some options are "close" to each other.</p>
+  <figure>
+    <div class="w" id="c4walk"></div>
+    <figcaption>The slides' example, redrawn with the same costs. Each circle is a configuration with its cost (yellow); a line joins two configurations that are neighbours. A greedy search starts at 12 and tries neighbours one at a time, moving only if the cost does not increase: green arrows are accepted moves, red ones rejected, numbered in order. It stops at 6, a local minimum (purple), although the best configuration, 9 (pink), is only two steps away.</figcaption>
+  </figure>
+  <p>The search never made a bad decision: every step it took went downhill. Yet it ended at 0.5 instead of 0.2. This lesson explains why, and what can be done about it.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>What an optimization problem is</h2>
+  <p class="stmt"><strong>Optimization problem.</strong> Given a function \(c: X \to \mathbb{R}\), where \(X\) is any set, find the value \(x\) in \(X\) such that \(c(x)\) is minimum.</p>
+  <p>\(c\) is the <span class="k-yellow">cost</span> and \(X\) the set of possible <strong>configurations</strong>. If you want a maximum instead, minimize \(-c(x)\): the slides stick with the minimum from now on. In simpler cases \(X\) is \(\mathbb{R}^d\), the set of lists of \(d\) real numbers: think of a cost in money, time or energy that depends on \(d\) parameters. Even that can be very hard when \(c\) is not a "nice" function, as the second half of the course will show.</p>
+  <p>Usually there are extra restrictions, so \(X\) is only a subset of \(\mathbb{R}^d\). A parameter may have a limited range, such as a fraction of resources invested, between 0 and 1. Two parameters may interact: two such fractions cannot add up to more than 1. The restrictions can get arbitrarily complicated.</p>
+  <p>A <strong>discrete optimization problem</strong> is one where \(X\) is discrete. The slides' example: in a map of cities and roads (a weighted directed graph: points joined by one-way arrows, each with a length), find the shortest path from city A to city B. The course focuses on \(X\) discrete and finite, so \(c(x)\) takes only a finite number of values.</p>
+  <p>Things get interesting when \(X\) is very large. Its elements are usually made of pieces: a path is made of edges, and the number of paths grows exponentially with the size of the graph. Another simple case is the set of binary strings of length \(n\), a sequence of \(n\) true or false decisions, which has \(2^n\) elements.</p>
+  <figure>
+    <div class="w" id="c4grow"></div>
+    <figcaption>How long checking all \(2^n\) binary strings would take at a billion strings per second, on a logarithmic time axis: each step up is ten times longer. The speed is an assumption made on this page, but changing it only shifts every bar by the same factor.</figcaption>
+  </figure>
+  <p><strong>Checking every configuration often scales like O(2<sup>n</sup>): adding one piece doubles the work.</strong> Exhaustive search is out of the question; something smarter is needed.</p>
+  <div class="quiz inq" data-quiz="4a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Greedy: always go downhill</h2>
+  <p>Suppose you have a notion of <strong>neighbourhood</strong> in \(X\): given two configurations, you can tell whether they are "close". In the graph example, two paths from A to B are neighbours if they differ only by one intermediate node. In the binary string example, two strings are neighbours if they differ in one bit.</p>
+  <figure>
+    <div class="w" id="c4cube"></div>
+    <figcaption>The eight binary strings of length 3, with a line between any two that differ in one bit. Every string has exactly three neighbours; those of 010 are highlighted, with the flipped bit in pink. Drawn on this page to illustrate the slides' definition.</figcaption>
+  </figure>
+  <p>A greedy approach then goes like this. Pick an initial guess \(x_0\), maybe at random. At every time step, pick a neighbour \(y\) of the current \(x_t\), maybe at random. If \(c(y) \le c(x_t)\), move there: \(x_{t+1} = y\); otherwise stay: \(x_{t+1} = x_t\). Keep going until you reach an \(x\) whose neighbours are all worse.</p>
+  <p class="stmt"><strong>Local minimum.</strong> A configuration whose neighbours all have a higher cost. The configuration with the lowest cost of all is the <strong>global minimum</strong>.</p>
+  <p>The lecture's first sketch of the code is exactly this, with the pieces still to write marked TODO:</p>
+<pre class="code">def greedy(..., num_iters):        # TODO decide arguments
+    x = init_config()              # pick a configuration at random
+    for t in range(num_iters):
+        y = propose_move(x)        # propose a move
+        if cost(y) &lt;= cost(x):     # accept it if it does not worsen the cost
+            x = y
+    return x</pre>
+  <p>In the opening graph, 6 and 4 are local minima and 9 is the global minimum. From 10 the search could have gone to 9, but the neighbour it drew at random was 6, which was also downhill. Once at 6, every neighbour is worse, and greedy is stuck. <strong>A greedy approach is quick and relatively easy to implement, and it often gives very poor results.</strong></p>
+  <div class="quiz inq" data-quiz="4b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Two ways out</h2>
+  <p>The slides suggest one easy fix: <strong>multiple attempts</strong>, or restarts. Run greedy many times from different random starting points and keep the best result. In the opening graph, where greedy ends depends on the start and on the luck of the draws, and some starts can never reach 9.</p>
+  <figure>
+    <div class="w" id="c4restart"></div>
+    <figcaption>Computed exactly on the slides' graph, assuming each proposal picks a neighbour uniformly at random. In the first drawing each configuration shows the probability that greedy started there ends at the global minimum 9: the deeper the pink, the higher. In the second, the probability that at least one of k restarts, each from a random configuration, finds 9. The calculation is added on this page.</figcaption>
+  </figure>
+  <p>From 1, 4, 6 or 8 the answer is never; from 13 it is certain. Averaged over the 13 starts, one run succeeds with probability 5/13, about 38%, and \(k\) independent runs fail together with probability \((8/13)^k\). Ten restarts already give 99%. A comment added here: on real problems the number of local minima typically grows with the size, and restarts become a lottery with very long odds.</p>
+  <p>The slides' second idea is the deeper one: <strong>things might need to get worse before they get better</strong>. To go from 6 to 9 you must first accept a step uphill, to 5 or 10; from the other local minimum, 4, the way to 9 passes through 7, uphill again. Greedy never does. The course will build a method that sometimes does, simulated annealing.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>What a greedy program needs</h2>
+  <p>To code random-search greedy for a real problem you must be able to do five things. Represent a configuration \(x\) in the computer's memory: choose a <strong>representation</strong>. Compute its cost, which may be expensive but is not itself a problem. Pick an initial configuration at random. Pick a random neighbour of any configuration: <strong>propose a move</strong>. And decide whether the new configuration is better, using the <strong>delta-cost</strong>, the change in cost that the move would cause.</p>
+  <p>Why not just compute the new cost and compare it with the old? You can, but it is often much more efficient to compute only the difference. In the path example, change one intermediate node of a route from A to B.</p>
+  <figure>
+    <div class="w" id="c4delta"></div>
+    <figcaption>The slides' example of a local move: the route A → … → X → Y → Z → … → B becomes A → … → X → W → Z → … → B. Only four pieces are involved: the two removed (red) and the two added (teal). Everything else, however long, cancels out in the difference.</figcaption>
+  </figure>
+  <p>Removing an intermediate node, or adding one, works the same way. In general you want a local move to cost O(1) to evaluate: a constant amount of work, however large the configuration. The lecture implements exactly this in lesson 5.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Another greedy: build one piece at a time</h2>
+  <p>"Greedy" is a loose term, not a well-defined class. A second kind applies when configurations are made of pieces and the cost can be computed on a partial configuration. A path that starts at A and has not yet reached B still has a length; a cost on binary strings may be computable on just the beginning of a string.</p>
+  <p>Then you can build a solution one piece at a time, each time taking the option with the lowest cost so far: <strong>partial buildup</strong>. In the graph, take the shortest edge out of A, then the shortest out of the next node (without going back), and so on, hoping to reach B. With strings, choose the first bit; say 0 is better. Then choose between 00 and 01; say 01. Then between 010 and 011, and so on.</p>
+  <figure>
+    <div class="w" id="c4layer"></div>
+    <figcaption>The slides' left-to-right example, redrawn with the same edge costs (yellow): one whole path from a start node on the left to a finish node on the right is a configuration. In the first panel partial buildup takes the cheapest available edge at every step (orange), starting with the 0.3. In the second, the optimal path (blue). Both totals are computed from the edges.</figcaption>
+  </figure>
+  <p>The cheap first step leads into an expensive neighbourhood: 0.3 + 0.8 + 0.3 + 1.2 = 2.6, against 0.5 + 0.3 + 0.5 + 0.3 = 1.6 for the best path. Same verdict as before: very quick, usually easy to implement, often very poor results.</p>
+  <div class="quiz inq" data-quiz="4c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Don't be greedy</h2>
+  <p>For some selected problems there are sophisticated approaches that are not greedy. For the best path from A to B there is Dijkstra's algorithm, a classic method that finds shortest paths in a graph exactly. The course will meet dynamic programming, which solves the left-to-right route example above exactly.</p>
+  <p>For other problems no fast algorithm that guarantees the optimum is known, and likely none will ever exist. These are the <strong>NP-complete</strong> (NP-C) problems and harder ones: a family of problems such that a fast exact method for any one of them would give one for all, and decades of effort have found none. For them the course studies an approximate but general approach, a <strong>metaheuristic</strong> (a general strategy that can be adapted to many problems) called simulated annealing.</p>
+  <p>The first test case is the most famous NP-complete problem of all: the travelling salesman.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="4"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>greedy search only ever goes downhill, so it stops at the first local minimum it meets</strong>, which may be far from the global one.</p>
+  <p>Lesson 5 writes a greedy solver for the travelling salesman problem, piece by piece, as in the lectures.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>

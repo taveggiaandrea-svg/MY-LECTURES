@@ -20,6 +20,9 @@
     <a href="#lezione-1" data-go="1">1 · Numpy</a>
     <a href="#lezione-2" data-go="2">2 · Memory</a>
     <a href="#lezione-3" data-go="3">3 · Broadcasting</a>
+    <a href="#lezione-4" data-go="4">4 · Greedy</a>
+    <a href="#lezione-5" data-go="5">5 · TSP</a>
+    <a href="#lezione-6" data-go="6">6 · Interface</a>
   </nav>
   <button class="tog" id="tog" type="button"></button>
   </div>
@@ -490,9 +493,403 @@ Out[10]: True</pre>
   <nav class="navend" aria-label="Other lessons"></nav>
 </div></section>
 </article>
+<!-- ===================== LEZIONE 4 ===================== -->
+<article class="lesson" data-n="4" id="lezione-4" data-title="What makes an optimization problem hard?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 4 · L. Saglietti, slides <em>Optimization and greedy approaches</em></p>
+  <h1>What makes an optimization problem hard?</h1>
+  <p class="desc">Optimization problems, the space of configurations and its neighbourhoods, greedy search and its local minima, and why the obvious strategy often fails.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lessons 1 to 3 built the numpy toolbox. From here on, the course uses it for its main thread: optimization, finding the best option among very many. The slides open with a small world of 13 options, each with a cost, where some options are "close" to each other.</p>
+  <figure>
+    <div class="w" id="c4walk"></div>
+    <figcaption>The slides' example, redrawn with the same costs. Each circle is a configuration with its cost (yellow); a line joins two configurations that are neighbours. A greedy search starts at 12 and tries neighbours one at a time, moving only if the cost does not increase: green arrows are accepted moves, red ones rejected, numbered in order. It stops at 6, a local minimum (purple), although the best configuration, 9 (pink), is only two steps away.</figcaption>
+  </figure>
+  <p>The search never made a bad decision: every step it took went downhill. Yet it ended at 0.5 instead of 0.2. This lesson explains why, and what can be done about it.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>What an optimization problem is</h2>
+  <p class="stmt"><strong>Optimization problem.</strong> Given a function \(c: X \to \mathbb{R}\), where \(X\) is any set, find the value \(x\) in \(X\) such that \(c(x)\) is minimum.</p>
+  <p>\(c\) is the <span class="k-yellow">cost</span> and \(X\) the set of possible <strong>configurations</strong>. If you want a maximum instead, minimize \(-c(x)\): the slides stick with the minimum from now on. In simpler cases \(X\) is \(\mathbb{R}^d\), the set of lists of \(d\) real numbers: think of a cost in money, time or energy that depends on \(d\) parameters. Even that can be very hard when \(c\) is not a "nice" function, as the second half of the course will show.</p>
+  <p>Usually there are extra restrictions, so \(X\) is only a subset of \(\mathbb{R}^d\). A parameter may have a limited range, such as a fraction of resources invested, between 0 and 1. Two parameters may interact: two such fractions cannot add up to more than 1. The restrictions can get arbitrarily complicated.</p>
+  <p>A <strong>discrete optimization problem</strong> is one where \(X\) is discrete. The slides' example: in a map of cities and roads (a weighted directed graph: points joined by one-way arrows, each with a length), find the shortest path from city A to city B. The course focuses on \(X\) discrete and finite, so \(c(x)\) takes only a finite number of values.</p>
+  <p>Things get interesting when \(X\) is very large. Its elements are usually made of pieces: a path is made of edges, and the number of paths grows exponentially with the size of the graph. Another simple case is the set of binary strings of length \(n\), a sequence of \(n\) true or false decisions, which has \(2^n\) elements.</p>
+  <figure>
+    <div class="w" id="c4grow"></div>
+    <figcaption>How long checking all \(2^n\) binary strings would take at a billion strings per second, on a logarithmic time axis: each step up is ten times longer. The speed is an assumption made on this page, but changing it only shifts every bar by the same factor.</figcaption>
+  </figure>
+  <p><strong>Checking every configuration often scales like O(2<sup>n</sup>): adding one piece doubles the work.</strong> Exhaustive search is out of the question; something smarter is needed.</p>
+  <div class="quiz inq" data-quiz="4a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Greedy: always go downhill</h2>
+  <p>Suppose you have a notion of <strong>neighbourhood</strong> in \(X\): given two configurations, you can tell whether they are "close". In the graph example, two paths from A to B are neighbours if they differ only by one intermediate node. In the binary string example, two strings are neighbours if they differ in one bit.</p>
+  <figure>
+    <div class="w" id="c4cube"></div>
+    <figcaption>The eight binary strings of length 3, with a line between any two that differ in one bit. Every string has exactly three neighbours; those of 010 are highlighted, with the flipped bit in pink. Drawn on this page to illustrate the slides' definition.</figcaption>
+  </figure>
+  <p>A greedy approach then goes like this. Pick an initial guess \(x_0\), maybe at random. At every time step, pick a neighbour \(y\) of the current \(x_t\), maybe at random. If \(c(y) \le c(x_t)\), move there: \(x_{t+1} = y\); otherwise stay: \(x_{t+1} = x_t\). Keep going until you reach an \(x\) whose neighbours are all worse.</p>
+  <p class="stmt"><strong>Local minimum.</strong> A configuration whose neighbours all have a higher cost. The configuration with the lowest cost of all is the <strong>global minimum</strong>.</p>
+  <p>The lecture's first sketch of the code is exactly this, with the pieces still to write marked TODO:</p>
+<pre class="code">def greedy(..., num_iters):        # TODO decide arguments
+    x = init_config()              # pick a configuration at random
+    for t in range(num_iters):
+        y = propose_move(x)        # propose a move
+        if cost(y) &lt;= cost(x):     # accept it if it does not worsen the cost
+            x = y
+    return x</pre>
+  <p>In the opening graph, 6 and 4 are local minima and 9 is the global minimum. From 10 the search could have gone to 9, but the neighbour it drew at random was 6, which was also downhill. Once at 6, every neighbour is worse, and greedy is stuck. <strong>A greedy approach is quick and relatively easy to implement, and it often gives very poor results.</strong></p>
+  <div class="quiz inq" data-quiz="4b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Two ways out</h2>
+  <p>The slides suggest one easy fix: <strong>multiple attempts</strong>, or restarts. Run greedy many times from different random starting points and keep the best result. In the opening graph, where greedy ends depends on the start and on the luck of the draws, and some starts can never reach 9.</p>
+  <figure>
+    <div class="w" id="c4restart"></div>
+    <figcaption>Computed exactly on the slides' graph, assuming each proposal picks a neighbour uniformly at random. In the first drawing each configuration shows the probability that greedy started there ends at the global minimum 9: the deeper the pink, the higher. In the second, the probability that at least one of k restarts, each from a random configuration, finds 9. The calculation is added on this page.</figcaption>
+  </figure>
+  <p>From 1, 4, 6 or 8 the answer is never; from 13 it is certain. Averaged over the 13 starts, one run succeeds with probability 5/13, about 38%, and \(k\) independent runs fail together with probability \((8/13)^k\). Ten restarts already give 99%. A comment added here: on real problems the number of local minima typically grows with the size, and restarts become a lottery with very long odds.</p>
+  <p>The slides' second idea is the deeper one: <strong>things might need to get worse before they get better</strong>. To go from 6 to 9 you must first accept a step uphill, to 5 or 10; from the other local minimum, 4, the way to 9 passes through 7, uphill again. Greedy never does. The course will build a method that sometimes does, simulated annealing.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>What a greedy program needs</h2>
+  <p>To code random-search greedy for a real problem you must be able to do five things. Represent a configuration \(x\) in the computer's memory: choose a <strong>representation</strong>. Compute its cost, which may be expensive but is not itself a problem. Pick an initial configuration at random. Pick a random neighbour of any configuration: <strong>propose a move</strong>. And decide whether the new configuration is better, using the <strong>delta-cost</strong>, the change in cost that the move would cause.</p>
+  <p>Why not just compute the new cost and compare it with the old? You can, but it is often much more efficient to compute only the difference. In the path example, change one intermediate node of a route from A to B.</p>
+  <figure>
+    <div class="w" id="c4delta"></div>
+    <figcaption>The slides' example of a local move: the route A → … → X → Y → Z → … → B becomes A → … → X → W → Z → … → B. Only four pieces are involved: the two removed (red) and the two added (teal). Everything else, however long, cancels out in the difference.</figcaption>
+  </figure>
+  <p>Removing an intermediate node, or adding one, works the same way. In general you want a local move to cost O(1) to evaluate: a constant amount of work, however large the configuration. The lecture implements exactly this in lesson 5.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Another greedy: build one piece at a time</h2>
+  <p>"Greedy" is a loose term, not a well-defined class. A second kind applies when configurations are made of pieces and the cost can be computed on a partial configuration. A path that starts at A and has not yet reached B still has a length; a cost on binary strings may be computable on just the beginning of a string.</p>
+  <p>Then you can build a solution one piece at a time, each time taking the option with the lowest cost so far: <strong>partial buildup</strong>. In the graph, take the shortest edge out of A, then the shortest out of the next node (without going back), and so on, hoping to reach B. With strings, choose the first bit; say 0 is better. Then choose between 00 and 01; say 01. Then between 010 and 011, and so on.</p>
+  <figure>
+    <div class="w" id="c4layer"></div>
+    <figcaption>The slides' left-to-right example, redrawn with the same edge costs (yellow): one whole path from a start node on the left to a finish node on the right is a configuration. In the first panel partial buildup takes the cheapest available edge at every step (orange), starting with the 0.3. In the second, the optimal path (blue). Both totals are computed from the edges.</figcaption>
+  </figure>
+  <p>The cheap first step leads into an expensive neighbourhood: 0.3 + 0.8 + 0.3 + 1.2 = 2.6, against 0.5 + 0.3 + 0.5 + 0.3 = 1.6 for the best path. Same verdict as before: very quick, usually easy to implement, often very poor results.</p>
+  <div class="quiz inq" data-quiz="4c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Don't be greedy</h2>
+  <p>For some selected problems there are sophisticated approaches that are not greedy. For the best path from A to B there is Dijkstra's algorithm, a classic method that finds shortest paths in a graph exactly. The course will meet dynamic programming, which solves the left-to-right route example above exactly.</p>
+  <p>For other problems no fast algorithm that guarantees the optimum is known, and likely none will ever exist. These are the <strong>NP-complete</strong> (NP-C) problems and harder ones: a family of problems such that a fast exact method for any one of them would give one for all, and decades of effort have found none. For them the course studies an approximate but general approach, a <strong>metaheuristic</strong> (a general strategy that can be adapted to many problems) called simulated annealing.</p>
+  <p>The first test case is the most famous NP-complete problem of all: the travelling salesman.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="4"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>greedy search only ever goes downhill, so it stops at the first local minimum it meets</strong>, which may be far from the global one.</p>
+  <p>Lesson 5 writes a greedy solver for the travelling salesman problem, piece by piece, as in the lectures.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
+<!-- ===================== LEZIONE 5 ===================== -->
+<article class="lesson" data-n="5" id="lezione-5" data-title="How do you search for a short TSP route?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 5 · L. Saglietti, slides <em>Optimization and greedy approaches</em> and the lecture code <code>1_greedy_TSP</code></p>
+  <h1>How do you search for a short TSP route?</h1>
+  <p class="desc">The travelling salesman problem, a route stored as a permutation, the swap-paths move, a delta-cost in O(1), a distance matrix built with broadcasting, and random restarts.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 4 described random-search greedy in the abstract and listed what it needs: a representation, a cost, a random start, a move and a delta-cost. The lectures then wrote all of it for one concrete problem. This is the result at work.</p>
+  <figure>
+    <div class="w" id="c5anim"></div>
+    <figcaption>Greedy on 40 random cities in the unit square, simulated in your browser with the lecture's moves and acceptance rule. The pink line is the current route, which always returns to its start; the curve below is its length (the cost) over the iterations, with the dot at the current one. Press play: the tangled random route straightens out quickly, then the improvements become rare. The time axis speeds up as the run goes on.</figcaption>
+  </figure>
+  <p>Every change you saw was the same small move, accepted only when it made the route no longer. This lesson builds that program piece by piece, following the lectures' versions of the code.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>The travelling salesman problem</h2>
+  <p>The <strong>travelling salesman problem</strong> (TSP) is a celebrated NP-complete problem: there is no known efficient way to reach the optimum in the worst case.</p>
+  <p class="stmt"><strong>TSP.</strong> Given \(n\) cities and the distance \(d_{ij}\) between any two cities \(i\) and \(j\) (symmetric: \(d_{ij} = d_{ji}\)), find the shortest route that goes through every city exactly once and goes back to the starting point.</p>
+  <p>The slides call such a route a "shortest Hamiltonian path on a graph"; since it closes on itself, the usual name is a Hamiltonian cycle. In the language of lesson 4, \(X\) is the set of all such routes and \(c(x)\) is the total distance along the route. How large is \(X\)? There are \(n!\) ways to order the cities, but the same loop can start from any of its \(n\) cities and run in either of 2 directions:</p>
+  <div class="eq">\[ |X| = \frac{n!}{2n} \]</div>
+  <div class="scroll"><table><thead><tr><th class="n">cities n</th><th class="n">different routes n!/(2n), computed here</th></tr></thead><tbody>
+    <tr><td class="n">5</td><td class="n">12</td></tr>
+    <tr><td class="n">10</td><td class="n">181,440</td></tr>
+    <tr><td class="n">20</td><td class="n">60,822,550,204,416,000</td></tr>
+    <tr><td class="n">50</td><td class="n">about 3 · 10<sup>62</sup></td></tr>
+    <tr><td class="n">200 (the lecture's run)</td><td class="n">about 2 · 10<sup>372</sup></td></tr>
+  </tbody></table></div>
+  <p>The slides also show a map of a large TSP instance over the United States, a picture not reproduced here. The table makes the same point: checking every route is hopeless already for a few dozen cities.</p>
+  <div class="quiz inq" data-quiz="5a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Two greedy ideas</h2>
+  <p>The first is partial buildup: start from a random city, go each time to the closest city not yet visited, and when all are visited go back to the first. It is called the <strong>nearest neighbour</strong> heuristic. The slides' verdict: "this works awfully".</p>
+  <p>The second is random-search greedy, the one the lectures implement. It needs two decisions. How do you represent a route? A permutation of the cities' indices works fine. When are two routes neighbours? There are several possibilities; the course uses the <strong>swap-paths</strong> rule: from any route, pick two edges i → j and l → k and swap them to i → l and j → k.</p>
+  <figure>
+    <div class="w" id="c5nn"></div>
+    <figcaption>The 40 cities of the opening, solved twice. In the first panel the nearest neighbour heuristic, starting from city 0 (ringed): it is fine at the beginning, but the last cities are left scattered and must be fetched with long edges. In the second the final route of the random-search greedy run of the opening. Both computed in your browser; the comparison is added on this page.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>A route is a permutation</h2>
+  <p>The lecture starts by representing the problem: a class <code>Cities</code> (later renamed <code>TSP</code>) that stores <code>n</code> and random coordinates in the unit square, with an optional <code>seed</code> so that the same cities come out every time, which helps a lot with debugging.</p>
+<pre class="code">class Cities:
+    def __init__(self, n, seed=None):
+        if seed is not None:
+            np.random.seed(seed)
+        self.n = n
+        self.x = np.random.rand(n)         # coordinates uniform in [0,1) x [0,1)
+        self.y = np.random.rand(n)
+
+def init_config(cities):
+    return np.random.permutation(cities.n)  # a random route</pre>
+  <p>A route is an array that lists the cities in the order they are visited. The <em>e</em>-th edge joins <code>route[e]</code> and <code>route[e+1]</code>, and the last one, edge \(n-1\), joins the last city back to the first. A single formula covers both cases with the modulus: edge <em>e</em> joins <code>route[e]</code> and <code>route[(e+1) % n]</code>, because \((n-1+1) \bmod n = 0\).</p>
+  <figure>
+    <div class="w" id="c5perm"></div>
+    <figcaption>A route through 6 cities, <code>route = [3, 0, 4, 1, 5, 2]</code>. The top row is the array with its positions; on the map each edge is labelled with its index <em>e</em>. Edge 5, from <code>route[5]</code> = 2 back to <code>route[0]</code> = 3, is the comeback edge (dashed), the one that needs the modulus. Example added on this page.</figcaption>
+  </figure>
+  <p>The <code>display</code> function needs the coordinates in route order: <code>x[route[0]], x[route[1]], …</code>, which is exactly <code>x[route]</code>, indexing with an array as in lesson 3. The comeback edge is drawn separately at first; the task left in the code, solved in <code>09_TSP.py</code>, uses the modulus to draw everything in one call: <code>plt.plot(x[route[np.arange(n+1) % n]], y[route[np.arange(n+1) % n]])</code>. The index array is 0, 1, …, n−1, 0.</p>
+  <div class="quiz inq" data-quiz="5b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>The swap-paths move</h2>
+  <p>Picking edges i → j and l → k and reconnecting them as i → l and j → k has a side effect, noted on the slide: the piece of route from j to l gets reversed. In the array, that piece is a contiguous block, so the move is a reversed slice.</p>
+  <figure>
+    <div class="w" id="c5swap"></div>
+    <figcaption>The slides' swap-paths move, redrawn on a small route with a crossing. The move is the pair of edge indices (e1, e2) = (1, 5). The two old edges (red) are replaced by the two new ones (teal); the cities between them (orange in the array) are visited in reverse order. Only these 4 edges enter the delta-cost. Example added on this page.</figcaption>
+  </figure>
+<pre class="code">new_route = route.copy()
+new_route[e1+1:e2+1] = new_route[e2:e1:-1]   # reverse the block between the two edges</pre>
+  <p>The right-hand side reads from <code>e2</code> down to <code>e1+1</code> with step −1 (the stop <code>e1</code> is excluded), and it is written into positions <code>e1+1</code> to <code>e2</code>. With <code>e1 = 1</code> and <code>e2 = 5</code>, positions 2 to 5 are reversed, as in the figure.</p>
+  <p>Not every pair of edges gives a real move. The code draws <code>e1</code> and <code>e2</code> at random, sorts them, and redraws until three bad cases are excluded: the same edge twice (<code>e1 == e2</code>), two adjacent edges (<code>e1 + 1 == e2</code>), and the special adjacent pair at the end of the route, edge \(n-1\) and edge 0, caught by <code>(e2+1) % n == e1</code>. In each of these cases the "new" route would be the same loop as the old one. (The commented final copy of the code writes the last test as <code>not (e1 == 0 and e2 == n-1)</code>, which is equivalent once e1 &lt; e2.)</p>
+<pre class="code">while True:
+    e1 = np.random.randint(n)
+    e2 = np.random.randint(n)
+    if e1 &gt; e2:
+        e1, e2 = e2, e1
+    if e1 != e2 and e1+1 != e2 and (e2+1) % n != e1:
+        break</pre>
+  <div class="quiz inq" data-quiz="5c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>The cost, and only what changes</h2>
+  <p>The cost walks along the route and adds the length of every edge, the comeback included thanks to the modulus. It does \(n\) additions: O(n).</p>
+<pre class="code">def cost(cities, route):
+    n = cities.n
+    c = 0.
+    for i in range(n):
+        c += cities.dist(route[i], route[(i+1) % n])
+    return c</pre>
+  <p>The first delta-cost is the naive one: cost of the new route minus cost of the old, O(n) per proposal. But lesson 4 promised O(1) for a local move, and the slide says why it is possible: <strong>only 4 edges are involved in the delta-cost computation</strong>. The two removed edges join <code>route[e1]</code> to <code>route[e1+1]</code> and <code>route[e2]</code> to <code>route[e2+1]</code>; the two added edges join <code>route[e1]</code> to <code>route[e2]</code> and <code>route[e1+1]</code> to <code>route[e2+1]</code>. The reversed block keeps the same length, since distances are symmetric.</p>
+  <div class="eq">\[ \Delta c = d(c_{11}, c_{21}) + d(c_{12}, c_{22}) - d(c_{11}, c_{12}) - d(c_{21}, c_{22}) \]</div>
+  <p>Here \(c_{11}, c_{12}\) are the two cities of the first edge and \(c_{21}, c_{22}\) those of the second, the names used in the code. The greedy loop accepts the move when \(\Delta c \le 0\) and updates the running cost with <code>c = c + delta_c</code>, without recomputing it.</p>
+  <div class="quiz inq" data-quiz="5d"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>All the distances at once</h2>
+  <p>The delta-cost asks for distances again and again, and computing each one from the coordinates means a square root every time. Since the cities never move, the final version computes all the distances once, in the constructor, and stores them in an \(n \times n\) matrix: <code>dist[i, j]</code> is the distance between cities <code>i</code> and <code>j</code>. The matrix is symmetric, with zeros on the diagonal.</p>
+  <p>The first version uses a double loop over the upper triangle and copies each value to its mirror. The second uses broadcasting, as in lesson 3: subtracting a column of shape (n, 1) from a row of shape (n,) gives the (n, n) matrix of all pairwise differences.</p>
+<pre class="code">xT = x.reshape((n, 1))                       # column copies of the coordinates
+yT = y.reshape((n, 1))
+self.dist = np.sqrt((xT - x)**2 + (yT - y)**2)   # (n,1) with (n,) broadcasts to (n,n)</pre>
+  <p>(The commented final copy writes <code>x - xT</code>: the sign of each difference flips, the squares do not.)</p>
+  <figure>
+    <div class="w" id="c5dist"></div>
+    <figcaption>Eight random cities (first panel) and their distance matrix (second panel), built exactly like <code>self.dist</code>: row i, column j holds the distance between city i and city j. Brighter means farther. The matrix mirrors itself across the diagonal of zeros, since d<sub>ij</sub> = d<sub>ji</sub>. Cities generated on this page.</figcaption>
+  </figure>
+  <p>With the matrix, <code>self.dist(city1, city2)</code> becomes the lookup <code>self.dist[city1, city2]</code>: the lecture calls this "using the memory to speed up even further".</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Random restarts</h2>
+  <p>Lesson 4's easy fix for local minima is multiple attempts. The lecture adds a <code>restarts</code> argument to <code>greedy</code> (called <code>repeats</code> in the commented final copy): each restart picks a new random route, runs the loop, and if its final cost beats the best so far, stores it away. The course scripts run 200 cities with 5 restarts of 200,000 iterations, and 100 cities with 30 restarts of 50,000 iterations.</p>
+<pre class="code">best_c = np.inf                      # placeholder: any real cost is smaller
+for i in range(restarts):
+    x = init_config(cities)
+    c = cost(cities, x)
+    for t in range(num_iters):
+        y = propose_move(x)
+        delta_c = compute_delta_cost(cities, y, x)
+        if delta_c &lt;= 0:
+            c = c + delta_c
+            x = y
+    if c &lt; best_c:
+        best_c, best_x = c, x</pre>
+  <figure>
+    <div class="w" id="c5restart"></div>
+    <figcaption>The second course script re-run in your browser on its own random cities: 100 cities, 30 restarts of 50,000 iterations each. The first panel is the best final route; the second shows the final cost of every restart, sorted, with the best one in pink. No two restarts end at the same route: each stops at its own local minimum (one of the 30, re-checked, still had an improving move left after 50,000 iterations).</figcaption>
+  </figure>
+  <p>One detail in the lecture's version 2: the function ends with <code>return x</code>, the last restart's route, rather than the best one, <code>best_x</code>. The later versions return the best object, as they should.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="5"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>choose a representation and a move so that a move changes only a few pieces</strong>; then the delta-cost costs O(1), and greedy can afford hundreds of thousands of proposals.</p>
+  <p>Lesson 6 refactors this code into a generic optimizer that works with any problem, and meets the subtle difference between a shallow and a deep copy.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
+<!-- ===================== LEZIONE 6 ===================== -->
+<article class="lesson" data-n="6" id="lezione-6" data-title="How do you write an optimizer that works for any problem?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 6 · L. Saglietti, the lecture code <code>1_greedy_TSP</code> (versions 3 to 6) and the <em>Greedy solver exercises</em></p>
+  <h1>How do you write an optimizer that works for any problem?</h1>
+  <p class="desc">Separating the problem from the optimizer, an interface of seven methods, moves as tuples, changing data in place, shallow and deep copies, and the same solver applied to Latin squares.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 5 ended with a working greedy for the TSP, but written as loose functions: <code>greedy(cities, ...)</code> calls <code>init_config(cities)</code>, <code>cost(cities, route)</code>, <code>propose_move(route)</code>. Look at what the main loop needs to know. Nothing in it is about cities: it proposes, measures, accepts. The lectures' next step is to make that explicit, so that the same <code>greedy</code> can solve any problem.</p>
+  <h2>Disentangling the problem from the optimizer</h2>
+  <p>The refactored code (version 3) puts everything that is specific to the TSP inside a class, <code>TSP</code>, as <strong>methods</strong>: functions that belong to an object and receive it as their first argument, <code>self</code>. The optimizer receives an object <code>probl</code> and only calls its methods. Any class that provides the same methods can be optimized by the same code. The list of methods is the <strong>interface</strong> between the two.</p>
+  <p>The final version of the interface, as written at the top of <code>Greedy.py</code>, has seven methods.</p>
+  <div class="scroll"><table><thead><tr><th>Method</th><th>What it does</th><th>Cost for the TSP (estimated here)</th></tr></thead><tbody>
+    <tr><td><code>init_config()</code></td><td>sets a random initial configuration inside the object</td><td>O(n)</td></tr>
+    <tr><td><code>cost()</code></td><td>returns the cost of the current configuration, from scratch</td><td>O(n)</td></tr>
+    <tr><td><code>propose_move()</code></td><td>returns a random move, encoded (for the TSP, the tuple <code>(e1, e2)</code>)</td><td>O(1)</td></tr>
+    <tr><td><code>compute_delta_cost(move)</code></td><td>returns the change in cost the move would cause, without applying it</td><td>O(1)</td></tr>
+    <tr><td><code>accept_move(move)</code></td><td>applies the move to the current configuration</td><td>O(n)</td></tr>
+    <tr><td><code>copy()</code></td><td>returns an independent duplicate of the whole object</td><td>O(n²), since it also copies the n × n distance matrix</td></tr>
+    <tr><td><code>display()</code></td><td>draws the current configuration (optional)</td><td>O(n)</td></tr>
+  </tbody></table></div>
+<pre class="code">def greedy(probl, repeats=1, num_iters=10, seed=None, debug_delta_cost=False):
+    best_probl = None
+    best_c = np.inf
+    for step in range(repeats):
+        probl.init_config()
+        c = probl.cost()
+        for t in range(num_iters):
+            move = probl.propose_move()
+            delta_c = probl.compute_delta_cost(move)
+            if delta_c &lt;= 0:
+                probl.accept_move(move)
+                c += delta_c
+        if c &lt; best_c:
+            best_c = c
+            best_probl = probl.copy()
+    return best_probl</pre>
+  <p>The scripts keep the two halves in separate files, <code>TSP.py</code> and <code>Greedy.py</code>, which become <strong>modules</strong>: a file name without <code>.py</code> is the name you import. The run script does <code>from TSP import TSP</code> and <code>from Greedy import greedy</code>, then <code>tsp = TSP(200, seed=45871231)</code> and <code>greedy(tsp, restarts=5, num_iters=200000, seed=1282323)</code>. The constructor also guards its input with <code>raise Exception(...)</code> when n is not a large enough integer, and the commented final <code>greedy</code> records <code>last_accepted_t</code>, the last iteration with an accepted move, a quick check of whether <code>num_iters</code> was enough.</p>
+  <p>Three design choices of this version deserve a closer look: the move is a small encoding rather than a new configuration, the configuration lives inside the object and is changed in place, and the best result is saved with <code>copy()</code>. Each of them comes from a problem with the previous version.</p>
+  <div class="quiz inq" data-quiz="6a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Proposing is not accepting</h2>
+  <p>In lesson 5, <code>propose_move(route)</code> returned a whole new route: an O(n) copy for every proposal, even though most proposals are rejected. Version 4 splits the job in two. <code>propose_move()</code> only <strong>encodes</strong> the move, packing the two edge indices into a tuple, <code>move = (e1, e2)</code>: O(1). <code>compute_delta_cost(move)</code> unpacks it and evaluates it, and only if the move is accepted does <code>accept_move(move)</code> actually reverse the block of the route.</p>
+  <p>The first delta-cost of the refactored code was still the naive, safe one: copy the whole problem, accept the move on the copy, compute the new cost, subtract. Version 5 replaced it with the 4-edge formula of lesson 5, marked in the code as "O(n) bottleneck → O(1)". The naive version did not disappear: it became a debugging tool.</p>
+<pre class="code">if debug_delta_cost:
+    probl_copy = probl.copy()
+    probl_copy.accept_move(move)
+    assert abs(c + delta_c - probl_copy.cost()) &lt; 1e-10   # floating-point tolerance</pre>
+  <p>The check relies on <code>copy</code> and <code>accept_move</code>, which are much easier to write correctly than an efficient <code>compute_delta_cost</code>. It is very slow, so it is switched on only while developing a new problem class. <strong>Write the slow, obviously correct version first, and use it to test the fast one.</strong></p>
+</div></section>
+
+<section><div class="col">
+  <h2>The configuration lives inside the object</h2>
+  <p>From version 4, the route is an attribute, <code>self.route</code>, created once in the constructor with <code>np.zeros(n, dtype=int)</code>. Methods change its contents in place instead of building new arrays: <code>init_config</code> writes <code>self.route[:] = np.random.permutation(n)</code>, and the greedy loop comments the call as "O(n) not allocating new memory".</p>
+  <p>Inside the methods the code often writes <code>route = self.route</code> to keep lines short. The commented version of the course warns about what that line means: <code>route</code> and <code>self.route</code> share the same data, but they are not the same variable.</p>
+  <figure>
+    <div class="w" id="c6alias"></div>
+    <figcaption>Drawn on this page: what a method sees after <code>route = self.route</code>: two names, one array (pink arrows). In the second panel, writing into the array through <code>route</code>, with a slice, changes what <code>self.route</code> sees too: this is what <code>accept_move</code> relies on. In the third, assigning a new array to the name <code>route</code> only moves that name; <code>self.route</code> keeps the old data.</figcaption>
+  </figure>
+  <p>The same applies to the local copies of the coordinates, <code>x</code> next to <code>self.x</code>: as the comments of the constructor put it, writing <code>x = something</code> would not affect <code>self.x</code>. <strong>Writing into a shared array (<code>a[...] = ...</code>) changes it for everyone; assigning to a name (<code>a = ...</code>) changes only that name.</strong></p>
+  <div class="quiz inq" data-quiz="6b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Saving the best: shallow and deep copies</h2>
+  <p>With restarts, the solver must remember the best configuration found so far while it keeps changing the current one in place. The obvious line, <code>best_probl = probl</code>, does not work: it makes a second name for the same object, which the next restart overwrites. So the lectures add a <code>copy()</code> method. But copying an object can mean two different things.</p>
+  <p>A <strong>shallow copy</strong>, <code>copy.copy(probl)</code>, makes a new object whose attributes are the same values as the old one's: for an attribute that is an array, the new object points to the same array. A <strong>deep copy</strong>, <code>copy.deepcopy(probl)</code> from the module <code>copy</code>, duplicates everything recursively, arrays included.</p>
+  <figure>
+    <div class="w" id="c6copy"></div>
+    <figcaption>Drawn on this page: three ways to save the best object, followed by the next restart, which calls <code>init_config()</code> and overwrites the current route in place. In the first panel there is only one object, so the saved route changes. In the second, the shallow copy is a new object, but its <code>route</code> attribute points to the same array, so the saved route changes too. Only the deep copy, in the third panel, keeps its own route (green).</figcaption>
+  </figure>
+  <p>That is why the course writes <code>return deepcopy(self)</code> in <code>copy</code>, with the comment that it "could be optimized (specialized for the problem)": a problem class could copy only the parts that change, here the route. The shallow copy fails precisely because the code changes arrays in place, the efficient choice of the previous section. The two decisions go together.</p>
+  <div class="quiz inq" data-quiz="6c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Drawing a fair move</h2>
+  <p>The move proposal of lesson 5 draws <code>e1</code> and <code>e2</code> and redraws until the pair is valid. A task left in version 6 asks to do it without rejections, using the modulus; <code>09_TSP.py</code> solves it (the commented copy in <code>11_more_comments.zip</code> keeps the loop):</p>
+<pre class="code">e1 = np.random.randint(n)
+e2 = (e1 + 2 + np.random.randint(n-3)) % n   # skips e1-1, e1 and e1+1, cyclically
+if e1 &gt; e2: e1, e2 = e2, e1</pre>
+  <p>Going around the ring of \(n\) edges, <code>e2</code> lands anywhere from 2 to \(n-2\) steps after <code>e1</code>: never on <code>e1</code> itself or on either of its two neighbours, the invalid cases, and on each valid edge with the same probability.</p>
+  <figure>
+    <div class="w" id="c6ring"></div>
+    <figcaption>The n = 10 edges of a route as a ring, with e1 = 8. The three red edges are the invalid partners: e1 itself and the two adjacent edges 7 and 9. Each of the seven teal edges is reached by exactly one value r of <code>np.random.randint(n-3)</code>, written next to its arrow: e2 = (8 + 2 + r) % 10. The modulus wraps 10 to 0. Drawn on this page.</figcaption>
+  </figure>
+  <p>Exercise 2 of the course, "The wrong move", warns that a shortcut can look right and still be wrong. To draw two different indices with <code>e1 &lt; e2</code>, its first method, like the lecture's code, redraws until the indices are acceptable and sorts them. (As printed on the sheet, that loop has lost its exit condition: without an <code>if ...: break</code> it would never stop. The official solution has <code>if i != j: break</code>.) A tempting alternative avoids the loop: <code>e1 = np.random.randint(n-1)</code>, then <code>e2 = np.random.randint(e1+1, n)</code>. Every pair it produces is valid, but not every pair is equally likely.</p>
+  <figure>
+    <div class="w" id="c6wrong"></div>
+    <figcaption>The exact probability of each pair (e1, e2) with n = 10, for the two methods of exercise 2: row e1, column e2, only e1 &lt; e2 possible. In the first panel, draw and reject: all 45 pairs have probability 1/45 ≈ 2.2%. In the second, the shortcut: e1 is uniform over 9 values, then e2 is uniform over what is left, so the pairs with a large e1 come out far more often. The exercise asks you to see this with a histogram; the exact values are computed here.</figcaption>
+  </figure>
+  <p>For greedy the bias only makes some moves come up more often than others. For simulated annealing, the exercise adds, the second code is "definitely wrong": the method assumes the moves are proposed with the right probabilities (the detailed balance condition, which the course meets with Markov chains). The exercise's rule of thumb: <strong>keep extracting moves randomly with a flat measure, and reject the invalid ones, until you get a good one</strong>.</p>
+  <p>Exercise 3 tries a different move for the TSP, swapping two cities along the route instead of crossing two edges (the sheet's "Call the indices 1 and j" means i and j). Its delta-cost is harder: more edges are involved, and the cases depend on whether the two cities are adjacent.</p>
+  <div class="quiz inq" data-quiz="6d"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Same solver, different problem: Latin squares</h2>
+  <p>The payoff of the interface is that a new problem needs only a new class. The exercise sheet's longest sequence uses <strong>Latin squares</strong>: an \(n \times n\) table in which every row and every column contains each number from 0 to \(n-1\) exactly once, like a Sudoku without the sub-squares. The configuration is the table; the cost counts the rows and columns that violate the rule, so the goal is cost 0.</p>
+  <figure>
+    <div class="w" id="c6latin"></div>
+    <figcaption>In the first panel, the exercise's example with n = 3: row 1 and columns 0 and 2 contain a repeated number (red), so the cost is 3. In the second, two rows of length 5 from exercise 6 under two cost functions: counting a row as simply wrong (1) or right (0), as in exercises 4 and 5, versus counting how many values are missing, n minus the number of distinct values, as in exercise 6.</figcaption>
+  </figure>
+  <p>Exercise 4 makes the obvious choices: a random table, and a move that changes one entry to a different value; the delta-cost only needs the affected row and column, checked with <code>np.unique</code>. It works for very small n, but at n = 15 it is very unlikely to succeed in any reasonable time.</p>
+  <p>Exercise 5 shrinks the search space instead. Start from a table in which every column already contains 0 to n−1 in order (cost n: every row is wrong), and move only by swapping two entries of the same column, so the columns stay valid and only two rows change. Exercise 6 changes a single line, the cost of a row: from "wrong or right" to "how many values are missing". Now the solver can tell an almost-correct row from a hopeless one, and performance improves dramatically, especially at larger n.</p>
+  <p>The sheet's conclusion holds for every problem in the course: what makes greedy work is the choice of <strong>representation, moves and cost function</strong>, not the loop, which never changed.</p>
+  <div class="quiz inq" data-quiz="6e"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Lessons 4 to 6 in one table</h2>
+  <div class="scroll"><table><thead><tr><th>Lesson</th><th>Concept</th><th>Idea</th><th>In code</th></tr></thead><tbody>
+    <tr><td>4</td><td>optimization problem</td><td>find x in X minimizing c(x); discrete X is often huge</td><td>binary strings: 2<sup>n</sup> configurations</td></tr>
+    <tr><td>4</td><td>random-search greedy</td><td>propose a neighbour, accept if not worse; stops at a local minimum</td><td><code>if delta_c &lt;= 0: accept</code></td></tr>
+    <tr><td>4</td><td>partial buildup</td><td>build piece by piece, cheapest choice each time</td><td>nearest neighbour for the TSP (described, not coded)</td></tr>
+    <tr><td>5</td><td>TSP route</td><td>a permutation; edge e joins route[e] and route[(e+1) % n]</td><td><code>np.random.permutation(n)</code></td></tr>
+    <tr><td>5</td><td>swap-paths move</td><td>swap two edges, reverse the block between them</td><td><code>route[e1+1:e2+1] = route[e2:e1:-1]</code></td></tr>
+    <tr><td>5</td><td>delta-cost</td><td>only 4 edges change: O(1)</td><td>new edges minus old edges</td></tr>
+    <tr><td>5</td><td>distance matrix</td><td>compute every distance once</td><td><code>np.sqrt((xT - x)**2 + (yT - y)**2)</code></td></tr>
+    <tr><td>6</td><td>interface</td><td>the optimizer only calls the problem's methods</td><td><code>greedy(probl, ...)</code></td></tr>
+    <tr><td>6</td><td>in place and copies</td><td>change arrays in place, save the best with a deep copy</td><td><code>self.route[:] = ...</code>, <code>deepcopy(self)</code></td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="6"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>the optimizer knows nothing about the problem, it only calls an interface</strong>, so all the cleverness lives in the problem class: its representation, its moves, its delta-cost.</p>
+  <p>This is the end of the slides on greedy approaches. The course continues with Monte Carlo methods and Markov chains, the road to simulated annealing, the method that can accept a move uphill.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
 </main>
 <footer><div class="col">
   <p>Study rework of the course material of <em>30509 Computer Programming</em>, Bocconi University, academic year 2025/2026 (course director L. Saglietti, teaching assistant D. Straziota). Lesson 1 follows the lecture of 8 September 2025: <em>Introduction to the course</em> and <em>Introduction to the Python scientific stack: numpy, scipy &amp; matplotlib</em>, parts 1 to 3. Lesson 2 follows the lecture of 11 September 2025: the handwritten notes <em>Storing arrays in memory</em>, the slides on ndarray internals and constructors, and the script <code>0_rand_sum_demo.py</code>. Lesson 3 follows the lecture of 15 September 2025: the script <code>01_pi_estimate.py</code> and its tasks, the solution <code>02_mc_pi_est_proj.py</code>, and the slides on indexing, views and broadcasting.</p>
+  <p>Lessons 4 to 6 follow the lectures of 18, 22 and 25 September 2025 (the part before Monte Carlo methods): the slides <em>Optimization and greedy approaches</em> and the lecture code <code>1_greedy_TSP</code> (from <code>0_greedy_sketch.py</code> through the versions v0 to v6, then <code>08_Greedy.py</code>, <code>09_TSP.py</code> and <code>10_tsp_greedy_run.py</code>, plus the commented versions in <code>11_more_comments.zip</code>). Lesson 6 also uses the exercise sheet <em>Greedy solver exercises</em> and its official solutions.</p>
   <p>Quizzes also draw on the course exercise sheet <em>Numpy and pyplot exercises</em> (with its official solutions) and on the course list of theory questions. Further material named in the lecture plan: the numpy quickstart and user guide, the scipy tutorial and the matplotlib pyplot tutorial.</p>
   <p>Definitions, examples and numbers are those of the slides, notes and scripts; text and figures are rewritten. Timings measured on another machine, simulated Monte Carlo points and examples marked as added on this page are not in the sources. Personal study use only: do not share.</p>
 </div></footer>

@@ -248,6 +248,22 @@ const arrowM=(id,c)=>'<defs>'+arrowDef(id,c)+'</defs>';
   let sd=11;const r=()=>{sd=(sd*16807)%2147483647;return (sd-1)/2147483646};for(let k=0;k<70;k++){const x=r(),y=r();t+='<circle cx="'+(30+x*56).toFixed(1)+'" cy="'+(64-y*56).toFixed(1)+'" r="1.6" fill="'+(x*x+y*y<=1?BLUE:'#666')+'"/>'}
   t+='<path d="M86 64A56 56 0 0 0 30 8" fill="none" stroke="'+YEL+'" stroke-width="2"/>';
   THUMB[3]=sv(t);
+  /* lesson 4: a small configuration graph with a local minimum */
+  t='';const g4=[[20,52],[40,22],[60,46],[82,20],[92,54]],e4=[[0,1],[1,2],[2,3],[3,4],[0,2],[2,4]];
+  e4.forEach(([a,b])=>{t+='<line x1="'+g4[a][0]+'" y1="'+g4[a][1]+'" x2="'+g4[b][0]+'" y2="'+g4[b][1]+'" stroke="#555" stroke-width="2"/>'});
+  g4.forEach((p,k)=>{t+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="6" fill="#111" stroke="'+(k===2?PUR:k===4?PINK:'#999')+'" stroke-width="2.5"/>'});
+  t+='<path d="M24 46Q34 30 54 44" fill="none" stroke="'+GRN+'" stroke-width="2"/>';
+  THUMB[4]=sv(t);
+  /* lesson 5: a TSP route through random cities */
+  t='';sd=77;const pts5=[];for(let k=0;k<12;k++){const a=2*Math.PI*k/12;pts5.push([54+30*Math.cos(a)+(r()-.5)*10,36+24*Math.sin(a)+(r()-.5)*8])}
+  t+='<path d="M'+pts5.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')+'Z" fill="none" stroke="'+PINK+'" stroke-width="2"/>';
+  pts5.forEach(p=>{t+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.4" fill="#fff"/>'});
+  THUMB[5]=sv(t);
+  /* lesson 6: two objects, one shared array */
+  t='<rect x="10" y="10" width="34" height="18" fill="none" stroke="#999"/><rect x="10" y="44" width="34" height="18" fill="none" stroke="#999"/>';
+  for(let k=0;k<4;k++)t+='<rect x="'+(62+k*10)+'" y="28" width="9" height="16" fill="'+BLUE+'" fill-opacity=".75"/>';
+  t+='<path d="M44 19C56 19 54 32 62 34" fill="none" stroke="'+PINK+'" stroke-width="2"/><path d="M44 53C56 53 54 40 62 38" fill="none" stroke="'+PINK+'" stroke-width="2"/>';
+  THUMB[6]=sv(t);
 })();
 
 /* Lesson 1: why numpy, fixed-width integers, the ndarray */
@@ -795,6 +811,452 @@ QZ['3']=()=>[
    o:['Raises an error, like math.sqrt','Returns nan and prints a RuntimeWarning','Returns the complex number 1.414j','Returns −1.414'],a:1,
    e:'numpy returns nan (not a number) with a warning instead of stopping. That is why the slides insist: never ignore warnings.',
    h:'numpy prefers not to stop the program when a value falls outside a function\'s domain. What special value could it return instead?'}
+];
+
+/* Lesson 4: optimization problems and greedy approaches */
+/* the slides' configuration graph: costs, neighbours, positions (slide pixels) */
+const G4={cost:{1:.7,2:1.2,3:1.1,4:.3,5:.8,6:.5,7:.5,8:1.0,9:.2,10:.6,11:2.5,12:2.5,13:.3},
+  E:[[1,2],[1,6],[2,5],[3,5],[3,4],[5,6],[5,7],[5,9],[5,10],[4,7],[7,9],[7,11],[6,8],[6,10],[8,12],[10,12],[9,10],[9,13],[11,13]],
+  P:{1:[253,340],2:[430,282],3:[750,240],4:[966,338],5:[575,386],6:[381,478],7:[806,463],8:[220,572],9:[714,566],10:[490,620],11:[968,672],12:[345,743],13:[661,803]},
+  L:{1:[-6,-22],2:[0,-24],3:[30,-14],4:[0,-24],5:[0,-24],6:[2,-24],7:[-26,-20],8:[-14,-24],9:[36,6],10:[0,34],11:[24,-22],12:[-40,6],13:[-30,-18]}};
+G4.nb=(()=>{const nb={};Object.keys(G4.cost).forEach(v=>nb[v]=[]);G4.E.forEach(([a,b])=>{nb[a].push(b);nb[b].push(a)});return nb})();
+/* probability of ending at 9 when each proposal is a uniformly random neighbour (rejections only repeat) */
+G4.p9=(()=>{const m={};const f=v=>{if(m[v]!==undefined)return m[v];const b=G4.nb[v].filter(w=>G4.cost[w]<=G4.cost[v]);
+  m[v]=b.length?b.reduce((a,w)=>a+f(w),0)/b.length:(+v===9?1:0);return m[v]};Object.keys(G4.cost).forEach(f);return m})();
+INIT[4]=function(){
+  codeHL($('#lezione-4'));
+  const isLoc=v=>G4.nb[v].every(w=>G4.cost[w]>G4.cost[v]);
+  /* draw the graph: o.sc scale, o.fill(v) node fill, o.extra(X,Y) extra layers, o.lab(v) label under node */
+  const graph=o=>{const sc=o.sc||0.78,X=v=>(G4.P[v][0]-190)*sc+18,Y=v=>(G4.P[v][1]-215)*sc+30,r=o.r||15;let s='';
+    G4.E.forEach(([a,b])=>{s+=line(X(a).toFixed(1),Y(a).toFixed(1),X(b).toFixed(1),Y(b).toFixed(1),'#666',2)});
+    if(o.under)s+=o.under(X,Y);
+    Object.keys(G4.cost).forEach(v=>{const lc=isLoc(v),gl=+v===9;
+      s+='<circle cx="'+X(v).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="'+r+'" fill="'+(o.fill?o.fill(v):'#111')+'" stroke="'+(gl?PINK:lc?PUR:'#bbb')+'" stroke-width="'+(gl||lc?3.5:1.5)+'"/>'+
+        tx(X(v).toFixed(1),(Y(v)+5).toFixed(1),v,{s:o.fs||14,f:'#fff',w:600});
+      const [dx,dy]=G4.L[v];s+=lbl((X(v)+dx*sc*1.15).toFixed(1),(Y(v)+dy*sc*1.15+5).toFixed(1),o.lab?o.lab(v):G4.cost[v].toFixed(1),o.lab?PINK:YEL,{s:o.ls||14,w:600})});
+    if(o.over)s+=o.over(X,Y);return s};
+  /* opening: the greedy walk from 12 */
+  (function(){
+    const root=$('#c4walk');root.append(legend([[YEL,'cost','box'],[GRN,'move accepted'],[RED,'move rejected'],[PUR,'local minimum','dot'],[PINK,'global minimum','dot']]));
+    const W=680,H=520;
+    const arc=(X,Y,a,b,c,k,id,dash)=>{const x1=X(a),y1=Y(a),x2=X(b),y2=Y(b),dx=x2-x1,dy=y2-y1,L_=Math.hypot(dx,dy),ux=dx/L_,uy=dy/L_,nx=-uy*k,ny=ux*k;
+      const sx=x1+ux*20+nx*.35,sy=y1+uy*20+ny*.35,ex=x2-ux*22+nx*.35,ey=y2-uy*22+ny*.35,cx=(x1+x2)/2+nx,cy=(y1+y2)/2+ny;
+      return {d:'<path d="M'+sx.toFixed(1)+' '+sy.toFixed(1)+'Q'+cx.toFixed(1)+' '+cy.toFixed(1)+' '+ex.toFixed(1)+' '+ey.toFixed(1)+'" fill="none" stroke="'+c+'" stroke-width="2.6"'+(dash?' stroke-dasharray="5 4"':'')+' marker-end="url(#'+id+')"/>',mx:(sx+2*cx+ex)/4,my:(sy+2*cy+ey)/4}};
+    const badge=(x,y,t,c)=>'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="10" fill="#000" stroke="'+c+'" stroke-width="2"/>'+tx(x.toFixed(1),(y+4.5).toFixed(1),t,{s:12.5,f:c,w:600});
+    const s=arrowM('c4ok',GRN)+arrowM('c4no',RED)+graph({over:(X,Y)=>{let o='';
+      const steps=[[12,10,GRN,'c4ok','1',-28],[10,5,RED,'c4no','2',-30],[10,6,GRN,'c4ok','3',-30]];
+      steps.forEach(([a,b,c,id,t,k])=>{const r=arc(X,Y,a,b,c,k,id,c===RED);o+=r.d+badge(r.mx,r.my,t,c)});
+      [1,5,8,10].forEach(b=>{const r=arc(X,Y,6,b,RED,b===10?-30:22,'c4no',true);o+=r.d+lbl(r.mx.toFixed(1),(r.my+5).toFixed(1),'✕',RED,{s:14,w:600})});
+      o+=lbl(X(12),Y(12)+36,'start',ORG,{s:14,w:600})+lbl(X(6)-2,Y(6)+38,'end',ORG,{s:14,w:600})+lbl(X(9)+8,Y(9)+40,'global minimum',PINK,{s:13.5,w:600})+lbl(X(4),Y(4)+38,'local minimum',PUR,{s:13.5,w:600});
+      return o}});
+    svgBox(root,W,H,s,'Graph of 13 configurations with costs and the greedy walk from 12 to 6','42rem');
+  })();
+  /* time to check all 2^n strings */
+  (function(){
+    const rows=[10,20,30,40,50,60],W=620,lx=92,rx=W-110,lo=-7,hi=10,Xl=v=>lx+(v-lo)/(hi-lo)*(rx-lx);let s='';
+    const fmtT=t=>t<1e-3?fe(t*1e6,1)+' µs':t<1?fe(t*1e3,1)+' ms':t<60?fe(t,1)+' s':t<3600?Math.round(t/60)+' minutes':t<86400?fe(t/3600,1)+' hours':t<86400*365.25?Math.round(t/86400)+' days':fe(t/86400/365.25,1)+' years';
+    [[-6,'1 µs'],[-3,'1 ms'],[0,'1 s'],[Math.log10(86400),'1 day'],[Math.log10(86400*365.25),'1 year']].forEach(([v,t])=>{s+=line(Xl(v),14,Xl(v),246,'#222',1)+tx(Xl(v),266,t,{s:12.5,f:GRAY})});
+    rows.forEach((n,k)=>{const t=Math.pow(2,n)/1e9,y=22+k*38;s+=tx(lx-12,y+19,'n = '+n,{s:14,f:'#fff',a:'end'})+rect(lx,y,Xl(Math.log10(t))-lx,26,k>3?RED:BLUE)+tx(Xl(Math.log10(t))+8,y+18,fmtT(t),{s:14,f:'#fff',a:'start'})});
+    s+=line(lx,14,lx,246,'#888',1.5)+tx((lx+rx)/2,288,'time to check all 2ⁿ strings (logarithmic scale)',{s:13,f:GRAY});
+    svgBox($('#c4grow'),W,298,s,'Time to check all binary strings of length n at a billion per second','40rem');
+  })();
+  /* the 3-bit cube */
+  (function(){
+    const W=420,H=300,pos={'000':[90,230],'100':[250,230],'010':[90,90],'110':[250,90],'001':[170,270],'101':[330,270],'011':[170,130],'111':[330,130]};
+    const ks=Object.keys(pos),diff=(a,b)=>[0,1,2].filter(i=>a[i]!==b[i]);let s='';const c='010';
+    ks.forEach(a=>ks.forEach(b=>{if(a<b&&diff(a,b).length===1){const hi=a===c||b===c;s+=line(pos[a][0],pos[a][1],pos[b][0],pos[b][1],hi?PINK:'#555',hi?3:1.8)}}));
+    ks.forEach(a=>{const hi=a===c,nb=diff(a,c).length===1,[x,y]=pos[a];
+      s+=rect(x-30,y-17,60,34,hi?'#3a1d36':'#111',hi?PINK:nb?PINK:'#777',hi||nb?' stroke-width="2"':'');
+      const ch=a.split('').map((b,i)=>'<tspan'+(nb&&b!==c[i]?' style="fill:'+PINK+';font-weight:700"':'')+'>'+b+'</tspan>').join('');
+      s+=mono(x,y+6,ch,{s:17,a:'middle',f:'#fff'})});
+    svgBox($('#c4cube'),W,H,s,'The eight 3-bit strings joined when they differ in one bit','28rem');
+  })();
+  /* restarts: probability of reaching 9 from each start, and with k restarts */
+  (function(){
+    const root=$('#c4restart');root.append(legend([[PINK,'probability of ending at 9','box']]));
+    const s=graph({fill:v=>'rgba(220,117,205,'+(0.08+0.8*G4.p9[v]).toFixed(2)+')',lab:v=>Math.round(100*G4.p9[v])+'%'});
+    svgBox(root,680,526,s,'Probability of reaching the global minimum from each start','40rem');
+    const pbar=Object.values(G4.p9).reduce((a,b)=>a+b,0)/13,W=620,H=220,L0=56,B0=176,T0=14,bw=40;let t='';
+    [0,0.25,0.5,0.75,1].forEach(v=>{const y=B0-v*(B0-T0);t+=line(L0,y,W-10,y,'#1e1e1e',1)+tx(L0-8,y+4.5,Math.round(v*100)+'%',{s:12.5,f:GRAY,a:'end'})});
+    for(let k=1;k<=10;k++){const p=1-Math.pow(1-pbar,k),x=L0+16+(k-1)*55,y=B0-p*(B0-T0);t+=rect(x,y,bw,B0-y,PINK)+tx(x+bw/2,y-6,Math.round(p*100)+'%',{s:12.5,f:'#fff'})+tx(x+bw/2,B0+18,k,{s:13,f:GRAY})}
+    t+=line(L0,B0,W-10,B0,'#888',1.5)+tx((L0+W)/2,H-6,'number of restarts k',{s:13,f:GRAY});
+    svgBox(root,W,H,t,'Probability that at least one of k restarts reaches the global minimum','40rem');
+  })();
+  /* a local move on a route: four pieces change */
+  (function(){
+    const W=640,H=224,P={A:[30,120],d1:[110,120],X:[200,120],Y:[300,44],W:[300,176],Z:[400,120],d2:[490,120],B:[600,120]};let s='';
+    s+=line(P.A[0],120,P.X[0],120,'#777',2,' stroke-dasharray="2 6"')+line(P.Z[0],120,P.B[0],120,'#777',2,' stroke-dasharray="2 6"');
+    s+=line(P.X[0],P.X[1],P.Y[0],P.Y[1],RED,3)+line(P.Y[0],P.Y[1],P.Z[0],P.Z[1],RED,3);
+    s+=line(P.X[0],P.X[1],P.W[0],P.W[1],TEAL,3)+line(P.W[0],P.W[1],P.Z[0],P.Z[1],TEAL,3);
+    ['A','X','Y','W','Z','B'].forEach(k=>{const [x,y]=P[k];s+='<circle cx="'+x+'" cy="'+y+'" r="17" fill="#111" stroke="'+(k==='Y'?RED:k==='W'?TEAL:'#bbb')+'" stroke-width="2"/>'+tx(x,y+5.5,k,{s:15,f:'#fff',w:600})});
+    s+=lbl(300,20,'old: X → Y → Z',RED,{s:14})+lbl(300,222,'new: X → W → Z',TEAL,{s:14})+tx(115,104,'…',{s:20,f:GRAY})+tx(495,104,'…',{s:20,f:GRAY});
+    svgBox($('#c4delta'),W,H+10,s,'Replacing one intermediate node changes four pieces of the route','40rem');
+  })();
+  /* partial buildup on the layered graph */
+  (function(){
+    const root=$('#c4layer'),duo=el('div','duo');root.append(legend([[YEL,'edge cost','box'],[ORG,'partial buildup'],[BLUE,'optimal path']]),duo);
+    const N={S1:[107,407],S2:[107,541],A:[355,314],B:[355,473],C:[355,632],D:[603,314],E:[603,420],F:[603,526],G:[603,632],H:[851,314],I:[851,473],J:[851,632],F1:[1098,407],F2:[1098,541]};
+    const Ed=[['S1','A',1.0],['S1','C',0.5],['S2','B',0.3],['S2','C',1.2],['A','E',0.9],['B','D',0.8],['B','G',1.1],['C','E',1.0],['C','F',0.3],['D','H',1.2],['D','I',0.3],['E','J',0.6],['F','H',0.5],['G','I',0.8],['H','F1',0.3],['H','F2',1.0],['I','F1',1.2],['J','F1',0.5]];
+    const out=v=>Ed.filter(e=>e[0]===v);
+    /* partial buildup: cheapest first edge among both starts, then cheapest outgoing edge */
+    const gp=[];let cur=Ed.filter(e=>e[0][0]==='S'&&e[0].length===2).reduce((a,e)=>e[2]<a[2]?e:a);gp.push(cur);
+    while(out(cur[1]).length){cur=out(cur[1]).reduce((a,e)=>e[2]<a[2]?e:a);gp.push(cur)}
+    /* optimal: best total over all complete paths (exhaustive, the graph is tiny) */
+    const paths=[];const walk=(v,acc)=>{const o=out(v);if(!o.length){if(v[0]==='F')paths.push(acc);return}o.forEach(e=>walk(e[1],acc.concat([e])))};
+    walk('S1',[]);walk('S2',[]);const tot=p=>p.reduce((a,e)=>a+e[2],0),op=paths.reduce((a,p)=>tot(p)<tot(a)?p:a);
+    const W=340,H=272,X=v=>(N[v][0]-107)/991*286+26,Y=v=>(N[v][1]-314)/318*190+44;
+    const panel=(path,c,id)=>{let s=arrowM(id,c);const on=e=>path.includes(e);
+      Ed.forEach(e=>{if(!on(e))s+=line(X(e[0]),Y(e[0]),X(e[1]),Y(e[1]),'#555',1.6)});
+      path.forEach(e=>{const x1=X(e[0]),y1=Y(e[0]),x2=X(e[1]),y2=Y(e[1]),L_=Math.hypot(x2-x1,y2-y1);
+        s+=line(x1,y1,(x2-(x2-x1)/L_*11).toFixed(1),(y2-(y2-y1)/L_*11).toFixed(1),c,3,' marker-end="url(#'+id+')"')});
+      Ed.forEach(e=>{const x1=X(e[0]),y1=Y(e[0]),x2=X(e[1]),y2=Y(e[1]),L_=Math.hypot(x2-x1,y2-y1),nx=(y2-y1)/L_,ny=-(x2-x1)/L_;s+=lbl((x1+(x2-x1)*0.3+nx*9).toFixed(1),(y1+(y2-y1)*0.3+ny*9+4).toFixed(1),e[2].toFixed(1),on(e)?c:YEL,{s:12.5,w:600})});
+      Object.keys(N).forEach(v=>{const inP=path.some(e=>e[0]===v||e[1]===v);s+='<circle cx="'+X(v).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="8.5" fill="#000" stroke="'+(inP?c:'#bbb')+'" stroke-width="2.2"/>'});
+      s+=tx(18,24,'start',{s:13,f:GRAY,a:'start'})+tx(W-8,24,'finish',{s:13,f:GRAY,a:'end'});
+      return s};
+    cell(duo,'Partial buildup',panel(gp,ORG,'c4l1'),W,H,'Greedy partial buildup path','Cheapest edge each time: total <b>'+fe(tot(gp),1)+'</b>.');
+    cell(duo,'Optimal path',panel(op,BLUE,'c4l2'),W,H,'Optimal path','Best of all '+paths.length+' complete paths: total <b>'+fe(tot(op),1)+'</b>.');
+  })();
+};
+QZ['4a']=()=>[
+  {q:'A configuration is a sequence of 20 yes or no decisions. How many configurations are there?',
+   o:['400','40','1,048,576','20!'],a:2,
+   e:'Each of the 20 positions has 2 choices, independently: 2<sup>20</sup> = 1,048,576.',
+   h:'Count the choices for the first decision, then for the first two, then for the first three.'}
+];
+QZ['4b']=()=>[
+  {q:'In the opening graph, greedy starts at configuration 3 (cost 1.1). At which configurations can it end, depending on the random proposals?',
+   o:['Only 9','4, 6 or 9','Only 4','3, 4 or 5'],a:1,
+   e:'From 3 it can go to 4 (stuck) or 5. From 5 every lower neighbour is possible: 6 (stuck), 7, 9, 10. From 7 it reaches 4 or 9, from 10 it reaches 6 or 9. So the possible ends are the three minima 4, 6 and 9.',
+   h:'Follow every downhill path from 3 until you reach a node whose neighbours are all more expensive.'}
+];
+QZ['4c']=()=>[
+  {q:'In the left-to-right example, suppose partial buildup is forced to start from the upper start node. What total cost does it reach?',
+   o:['2.6','2.0','3.0','1.6'],a:3,
+   e:'From the upper node the cheapest edge is 0.5, then 0.3, then the only edge 0.5, then 0.3 rather than 1.0: total 1.6, which happens to be the optimum. Greedy is not always wrong; it just has no guarantee.',
+   h:'Repeat the rule "take the cheapest edge out of the current node" from the upper start, reading the costs on the figure.'}
+];
+QZ['4']=()=>[
+  {q:'You want to <em>maximize</em> a profit p(x). How do you state it as the problem of the slides?',
+   o:['Minimize 1/p(x)','Minimize −p(x)','Minimize p(x) and take the last value','It cannot be stated that way'],a:1,
+   e:'The x that makes p(x) largest is the one that makes −p(x) smallest. (1/p would fail for negative or zero profits.)',
+   h:'Which transformation turns the largest value into the smallest, for any sign?'},
+  {q:'In the opening graph greedy starts at 10, and each proposal is a neighbour picked uniformly at random. What is the probability that it ends at the global minimum 9?',
+   o:['0.25','1','0.5','0.6'],a:2,
+   e:'The lower neighbours of 10 (cost 0.6) are 6 (0.5) and 9 (0.2); 5 and 12 are rejected and just cause another draw. So the first accepted move goes to 6 or 9 with equal probability, and 6 is a dead end: 0.5.',
+   h:'Think about what a rejected proposal does, and which accepted moves lead to a dead end.'},
+  {q:'Which of these configurations of the opening graph is <em>not</em> a local minimum?',
+   o:['6 (0.5)','4 (0.3)','9 (0.2)','13 (0.3)'],a:3,
+   e:'13 has the neighbour 9, which costs less (0.2), so greedy can still move from 13. The other three have only more expensive neighbours.',
+   h:'For each candidate, compare its cost with those of its neighbours.'},
+  {q:'A route from A to B has 1,000 intermediate nodes, and a move replaces one of them. How many pieces of the route enter the delta-cost?',
+   o:['4','1,001','2','It depends on the length'],a:0,
+   e:'Two pieces are removed (X to Y and Y to Z) and two are added (X to W and W to Z); all the others cancel in the difference, so the work is O(1).',
+   h:'Draw X → Y → Z and X → W → Z: which pieces differ?'},
+  {q:'At a billion configurations per second, roughly how long does checking all binary strings of length 40 take?',
+   o:['About a second','About 18 minutes','About 13 days','About 37 years'],a:1,
+   e:'2<sup>40</sup> ≈ 1.1 · 10<sup>12</sup> strings, divided by 10<sup>9</sup> per second, is about 1,100 seconds: 18 minutes. Ten more bits multiply this by 1,024.',
+   h:'2<sup>10</sup> is about a thousand, so 2<sup>40</sup> is about 10<sup>12</sup>.'},
+  {q:'What does the slides\' "things might need to get worse before they get better" mean for the opening graph?',
+   o:['That greedy should start from the most expensive configuration','That costs change over time','That to go from the local minimum 6 to 9 the search must first accept an uphill step, which greedy never does','That restarts make the cost worse'],a:2,
+   e:'Every path from 6 to 9 passes through 5 or 10, both more expensive than 6. A method that sometimes accepts uphill moves can escape; this is the idea behind simulated annealing.',
+   h:'Look at the neighbours of 6 and ask how greedy could ever leave it.'}
+];
+
+/* Lesson 5: greedy for the travelling salesman problem */
+/* a small TSP simulator that follows the course code: random permutation, swap-paths move with rejection, 4-edge delta, reversal */
+function tspMake(n,seed){const r=lcg(seed),x=[],y=[];for(let i=0;i<n;i++){x.push(r());y.push(r())}
+  const d=[];for(let i=0;i<n;i++){d.push(new Float64Array(n));for(let j=0;j<n;j++)d[i][j]=Math.hypot(x[i]-x[j],y[i]-y[j])}return {n,x,y,d}}
+const tspCost=(P,route)=>{let c=0;for(let i=0;i<P.n;i++)c+=P.d[route[i]][route[(i+1)%P.n]];return c};
+function tspPerm(n,r){const a=Array.from({length:n},(_,i)=>i);for(let i=n-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function tspGreedy(P,iters,r,onAccept){const n=P.n,route=tspPerm(n,r);let c=tspCost(P,route);if(onAccept)onAccept(0,route,c);
+  for(let t=1;t<=iters;t++){let e1,e2;
+    while(true){e1=Math.floor(r()*n);e2=Math.floor(r()*n);if(e1>e2){const q=e1;e1=e2;e2=q}if(e1!==e2&&e1+1!==e2&&(e2+1)%n!==e1)break}
+    const a=route[e1],b=route[(e1+1)%n],p=route[e2],q=route[(e2+1)%n],dc=P.d[a][p]+P.d[b][q]-P.d[a][b]-P.d[p][q];
+    if(dc<=0){let i=e1+1,j=e2;while(i<j){const w=route[i];route[i]=route[j];route[j]=w;i++;j--}c+=dc;if(onAccept)onAccept(t,route,c)}}
+  return {route,c}}
+function tspNN(P,start){const n=P.n,seen=new Array(n).fill(false),route=[start];seen[start]=true;
+  for(let k=1;k<n;k++){const u=route[k-1];let best=-1;for(let v=0;v<n;v++)if(!seen[v]&&(best<0||P.d[u][v]<P.d[u][best]))best=v;route.push(best);seen[best]=true}return route}
+/* draw a route on a square map: returns svg pieces */
+const tspMap=(P,route,o)=>{o=o||{};const m=o.m||14,S=o.S||300,X=v=>m+P.x[v]*S,Y=v=>m+S-P.y[v]*S;let s=rect(m,m,S,S,'none','#333');
+  if(route)s+='<path d="'+route.concat([route[0]]).map((v,i)=>(i?'L':'M')+X(v).toFixed(1)+' '+Y(v).toFixed(1)).join('')+'" fill="none" stroke="'+(o.c||PINK)+'" stroke-width="'+(o.w||2)+'" stroke-linejoin="round"/>';
+  for(let i=0;i<P.n;i++)s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(i).toFixed(1)+'" r="'+(o.r||3.2)+'" fill="#fff"/>';
+  if(o.ring!==undefined)s+='<circle cx="'+X(o.ring).toFixed(1)+'" cy="'+Y(o.ring).toFixed(1)+'" r="8" fill="none" stroke="'+ORG+'" stroke-width="2.5"/>';
+  return s};
+INIT[5]=function(){
+  codeHL($('#lezione-5'));
+  const P40=tspMake(40,4242),hist=[],T=8000;
+  const run40=tspGreedy(P40,T,lcg(777),(t,route,c)=>hist.push({t,route:route.slice(),c}));
+  /* opening animation */
+  (function(){
+    const root=$('#c5anim');root.append(legend([[PINK,'current route'],[YEL,'cost (route length)']]));
+    const box=el('div');box.style.cssText='width:100%;max-width:30rem';root.append(box);const o=out();
+    const W=420,mapS=320,cy0=364,ch=110,cx0=46,cw=W-cx0-30,cmax=Math.ceil(hist[0].c),cmin=Math.floor(hist[hist.length-1].c*0.9);
+    const CX=t=>cx0+t/T*cw,CY=c=>cy0+ch-(c-cmin)/(cmax-cmin)*ch;
+    let curve='';hist.forEach((h,i)=>{const nx=i+1<hist.length?hist[i+1].t:T;curve+=(i?'L':'M')+CX(h.t).toFixed(1)+' '+CY(h.c).toFixed(1)+'H'+CX(nx).toFixed(1)});
+    let axes=line(cx0,cy0,cx0,cy0+ch,'#888',1.3)+line(cx0,cy0+ch,cx0+cw,cy0+ch,'#888',1.3)+tx(cx0-6,CY(cmax)+4,cmax,{s:12.5,f:GRAY,a:'end'})+tx(cx0-6,CY(cmin)+4,cmin,{s:12.5,f:GRAY,a:'end'})+
+      [0,2000,4000,6000,8000].map(t=>tx(CX(t),cy0+ch+17,fk(t),{s:12.5,f:GRAY})).join('')+tx(cx0+cw/2,cy0+ch+36,'iteration t',{s:13,f:GRAY})+'<path d="'+curve+'" fill="none" stroke="'+YEL+'" stroke-width="2"/>';
+    const frame=t=>{let k=0;while(k+1<hist.length&&hist[k+1].t<=t)k++;const h=hist[k];
+      box.innerHTML='<svg viewBox="0 0 '+W+' '+(cy0+ch+44)+'" role="img" aria-label="Greedy improving a route through 40 cities">'+'<g transform="translate('+((W-mapS)/2-14)+',0)">'+tspMap(P40,h.route,{S:mapS,w:2.2})+'</g>'+axes+
+        '<circle cx="'+CX(t).toFixed(1)+'" cy="'+CY(h.c).toFixed(1)+'" r="5" fill="'+YEL+'" stroke="#000" stroke-width="1.5"/></svg>';
+      o.innerHTML='Iteration <span class="num">'+fk(t)+'</span> of '+fk(T)+': '+k+' moves accepted so far, route length <span class="num">'+h.c.toFixed(3)+'</span>.'};
+    root.append(o);player(root,20,p=>frame(Math.round(T*Math.pow(p/20,2))));
+  })();
+  /* nearest neighbour versus random-search greedy */
+  (function(){
+    const root=$('#c5nn'),duo=el('div','duo');root.append(legend([[ORG,'nearest neighbour'],[PINK,'random-search greedy']]),duo);
+    const nn=tspNN(P40,0),cn=tspCost(P40,nn);
+    cell(duo,'Nearest neighbour from city 0',tspMap(P40,nn,{c:ORG,ring:0}),328,328,'Nearest neighbour route','Length <b>'+cn.toFixed(2)+'</b>.');
+    cell(duo,'Random-search greedy',tspMap(P40,run40.route),328,328,'Greedy route','Length <b>'+run40.c.toFixed(2)+'</b>.');
+  })();
+  /* a route as a permutation */
+  (function(){
+    const route=[3,0,4,1,5,2],n=6,W=560,H=400,ax=150,cw=44,pts=[];route.forEach((v,k)=>{const a=(210-60*k)*Math.PI/180;pts[v]=[0.5+0.42*Math.cos(a),0.5+0.42*Math.sin(a)]});let s=arrowM('c5p',PINK);
+    s+=tx(ax-14,30,'position',{s:12.5,f:GRAY,a:'end'})+mono(ax-14,58,'route',{s:14,a:'end',f:'#fff'});
+    route.forEach((v,i)=>{s+=tx(ax+i*cw+cw/2,30,i,{s:12.5,f:GRAY})+rect(ax+i*cw,38,cw,30,'rgba(220,117,205,.16)','#555')+tx(ax+i*cw+cw/2,58,v,{s:16,f:PINK,w:600})});
+    const X=v=>W/2+(pts[v][0]-0.5)*330,Y=v=>244+(0.5-pts[v][1])*290;
+    for(let e=0;e<n;e++){const a=route[e],b=route[(e+1)%n],x1=X(a),y1=Y(a),x2=X(b),y2=Y(b),L_=Math.hypot(x2-x1,y2-y1);
+      s+=line(x1,y1,(x2-(x2-x1)/L_*16).toFixed(1),(y2-(y2-y1)/L_*16).toFixed(1),PINK,2.4,' marker-end="url(#c5p)"'+(e===n-1?' stroke-dasharray="6 5"':''));
+      const mx=(x1+x2)/2,my=(y1+y2)/2,ox=mx-W/2,oy=my-244,ol=Math.hypot(ox,oy);s+=lbl((mx+ox/ol*24).toFixed(1),(my+oy/ol*24+5).toFixed(1),'e = '+e,'#bbb',{s:13})}
+    pts.forEach((p,v)=>{s+='<circle cx="'+X(v).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="13" fill="#111" stroke="#fff" stroke-width="1.8"/>'+tx(X(v).toFixed(1),(Y(v)+5).toFixed(1),v,{s:14,f:'#fff',w:600})});
+    svgBox($('#c5perm'),W,H,s,'A route as a permutation of six cities, with edges numbered','36rem');
+  })();
+  /* the swap-paths move on a small route with a crossing */
+  (function(){
+    const root=$('#c5swap'),duo=el('div','duo');root.append(legend([[RED,'removed edges'],[TEAL,'new edges'],[ORG,'reversed block','box']]),duo);
+    const n=10,pts=[];for(let k=0;k<n;k++){const a=Math.PI/2-2*Math.PI*k/n,rr=k%2?0.42:0.38;pts.push([0.5+rr*Math.cos(a),0.5+rr*Math.sin(a)])}
+    const before=[0,1,5,4,3,2,6,7,8,9],e1=1,e2=5,after=before.slice();after.splice(e1+1,e2-e1,...before.slice(e1+1,e2+1).reverse());
+    const W=320,H=410,S=250,m=35,X=v=>m+pts[v][0]*S,Y=v=>m+(1-pts[v][1])*S;
+    const panel=(route,old)=>{let s='';const oldE=[[before[e1],before[e1+1]],[before[e2],before[(e2+1)%n]]],newE=[[before[e1],before[e2]],[before[e1+1],before[(e2+1)%n]]];
+      const isE=(a,b,L)=>L.some(([p,q])=>(p===a&&q===b)||(p===b&&q===a));
+      for(let e=0;e<n;e++){const a=route[e],b=route[(e+1)%n],c=old&&isE(a,b,oldE)?RED:!old&&isE(a,b,newE)?TEAL:'#777';s+=line(X(a).toFixed(1),Y(a).toFixed(1),X(b).toFixed(1),Y(b).toFixed(1),c,c==='#777'?1.8:3.2)}
+      const nm={};nm[before[e1]]='i';nm[before[e1+1]]='j';nm[before[e2]]='l';nm[before[(e2+1)%n]]='k';
+      pts.forEach((p,v)=>{s+='<circle cx="'+X(v).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="11" fill="#111" stroke="#ddd" stroke-width="1.5"/>'+tx(X(v).toFixed(1),(Y(v)+4.5).toFixed(1),v,{s:12.5,f:'#fff'});
+        if(nm[v]){const dx=(p[0]-0.5)*44,dy=-(p[1]-0.5)*44;s+=lbl((X(v)+dx).toFixed(1),(Y(v)+dy+5).toFixed(1),nm[v],'#fff',{s:15,w:600})}});
+      const ay=338,cw=28,ax=(W-n*cw)/2;
+      route.forEach((v,i)=>{const rev=i>e1&&i<=e2;s+=rect(ax+i*cw,ay,cw,28,rev?'rgba(255,134,47,.25)':'#0d0d0d',rev?ORG:'#555')+tx(ax+i*cw+cw/2,ay+19,v,{s:13.5,f:rev?ORG:'#eee'})+tx(ax+i*cw+cw/2,ay-6,i,{s:12.5,f:GRAY})});
+      s+=tx(W/2,ay+50,old?'edges e1 = 1 and e2 = 5 marked':'positions 2 to 5 reversed',{s:13,f:GRAY});return s};
+    cell(duo,'Before: route has a crossing',panel(before,true),W,H,'Route before the move','Old edges i → j and l → k (red).');
+    cell(duo,'After: route[2:6] = route[5:1:-1]',panel(after,false),W,H,'Route after the move','New edges i → l and j → k (teal): the crossing is gone.');
+  })();
+  /* the distance matrix */
+  (function(){
+    const root=$('#c5dist'),duo=el('div','duo');root.append(duo);
+    const P=tspMake(8,909),W=330,S=270,m=28;let s=rect(m,m,S,S,'none','#333');
+    for(let i=0;i<8;i++){const x=m+P.x[i]*S,y=m+S-P.y[i]*S;s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="11" fill="#111" stroke="#fff" stroke-width="1.6"/>'+tx(x.toFixed(1),(y+4.5).toFixed(1),i,{s:12.5,f:'#fff'})}
+    cell(duo,'Eight cities',s,W,W,'Eight random cities','Coordinates uniform in the unit square.');
+    const cw=38,gx=32,gy=28,mx=Math.max(...P.d.map(r=>Math.max(...r)));let t='';
+    for(let i=0;i<8;i++){t+=tx(gx-8,gy+i*cw+cw/2+4.5,i,{s:12.5,f:GRAY,a:'end'})+tx(gx+i*cw+cw/2,gy-8,i,{s:12.5,f:GRAY});
+      for(let j=0;j<8;j++){const v=P.d[i][j],a=(v/mx);t+=rect(gx+j*cw,gy+i*cw,cw,cw,'rgba(88,196,221,'+(0.08+0.8*a).toFixed(2)+')','#222')+tx(gx+j*cw+cw/2,gy+i*cw+cw/2+4.5,v.toFixed(2).replace(/^0/,''),{s:12.5,f:a>0.55?'#000':'#fff'})}}
+    cell(duo,'dist[i, j]',t,346,346,'Symmetric distance matrix with zero diagonal','Symmetric, zero diagonal. Values shown without the leading 0.');
+  })();
+  /* random restarts: 100 cities, 30 runs of 50,000 iterations */
+  (function(){
+    const root=$('#c5restart'),duo=el('div','duo');root.append(legend([[PINK,'best restart','box'],[BLUE,'other restarts','box']]),duo);
+    const P=tspMake(100,456329),r=lcg(1282323),res=[];for(let k=0;k<30;k++)res.push(tspGreedy(P,50000,r));
+    const best=res.reduce((a,b)=>b.c<a.c?b:a),cs=res.map(x=>x.c).sort((a,b)=>a-b);
+    cell(duo,'Best of 30 restarts',tspMap(P,best.route,{r:2.6}),328,328,'Best route of 30 restarts on 100 cities','Length <b>'+best.c.toFixed(2)+'</b>.');
+    const W=330,H=328,L0=48,B0=280,T0=16,lo=Math.floor(cs[0]*10)/10-0.1,hi=Math.ceil(cs[29]*10)/10+0.05,Y=v=>B0-(v-lo)/(hi-lo)*(B0-T0);let s='';
+    const step=(hi-lo)>1?0.2:0.1;for(let v=Math.ceil(lo/step)*step;v<=hi+1e-9;v+=step)s+=line(L0,Y(v),W-8,Y(v),'#1e1e1e',1)+tx(L0-6,Y(v)+4.5,v.toFixed(1),{s:12.5,f:GRAY,a:'end'});
+    cs.forEach((c,k)=>{const x=L0+8+k*9.2;s+='<circle cx="'+x.toFixed(1)+'" cy="'+Y(c).toFixed(1)+'" r="3.6" fill="'+(k===0?PINK:BLUE)+'"/>'});
+    s+=line(L0,B0,W-8,B0,'#888',1.3)+tx((L0+W)/2,B0+22,'30 restarts, sorted by final cost',{s:13,f:GRAY})+tx(14,(T0+B0)/2,'final cost',{s:13,f:GRAY,x:' transform="rotate(-90 14 '+(T0+B0)/2+')"'});
+    cell(duo,'Final cost of each restart',s,W,H,'Final costs of 30 restarts, sorted','From <b>'+cs[0].toFixed(2)+'</b> to <b>'+cs[29].toFixed(2)+'</b>.');
+  })();
+};
+QZ['5a']=()=>[
+  {q:'How many different routes does a TSP with 6 cities have, counting a loop once whatever its starting city and direction?',
+   o:['720','60','120','36'],a:1,
+   e:'6! = 720 orderings, divided by 6 possible starting cities and 2 directions: 720 / 12 = 60.',
+   h:'Count the orderings, then divide out the choices that describe the same loop.'}
+];
+QZ['5b']=()=>[
+  {q:'<code>route = np.array([3, 0, 4, 1, 5, 2])</code>, so <code>n = 6</code>. Which two cities does edge <code>e = 5</code> join?',
+   o:['2 and 3','5 and 2','2 and nothing: it is the last city','1 and 5'],a:0,
+   e:'Edge e joins <code>route[e]</code> and <code>route[(e+1) % n]</code>: <code>route[5]</code> = 2 and <code>route[6 % 6]</code> = <code>route[0]</code> = 3. It is the comeback edge.',
+   h:'Apply the formula with the modulus: what is (5 + 1) % 6?'}
+];
+QZ['5c']=()=>[
+  {q:'<code>route = [0, 1, 2, 3, 4, 5, 6, 7]</code> and the move is (e1, e2) = (2, 6). What is <code>route</code> after <code>route[e1+1:e2+1] = route[e2:e1:-1]</code>?',
+   o:['[0, 1, 6, 5, 4, 3, 2, 7]','[0, 1, 2, 6, 5, 4, 3, 7]','[0, 1, 2, 3, 6, 5, 4, 7]','[7, 6, 5, 4, 3, 2, 1, 0]'],a:1,
+   e:'Positions 3 to 6 receive <code>route[6:2:-1]</code> = [6, 5, 4, 3]. Positions 0 to 2 and 7 are untouched: [0, 1, 2, 6, 5, 4, 3, 7].',
+   h:'The slice on the left covers positions e1+1 to e2. The one on the right reads from e2 down to e1+1.'}
+];
+QZ['5d']=()=>[
+  {q:'For a proposed move, the four distances are d(c11, c12) = 0.40, d(c21, c22) = 0.35 (the old edges), d(c11, c21) = 0.30 and d(c12, c22) = 0.50 (the new edges). What does greedy do?',
+   o:['Accepts: Δc = −0.05','Rejects: Δc = +0.05','Accepts: Δc = +0.05','Rejects: Δc = −0.05'],a:1,
+   e:'Δc = (0.30 + 0.50) − (0.40 + 0.35) = 0.80 − 0.75 = +0.05 &gt; 0: the route would get longer, so the move is rejected.',
+   h:'New edges minus old edges; greedy accepts only when the result is ≤ 0.'}
+];
+QZ['5']=()=>[
+  {q:'With n = 10 cities, the code draws e1 = 0 and e2 = 9. Why is the pair rejected?',
+   o:['Because e1 must be positive','Because e2 is out of range','Because edges 9 and 0 are adjacent: they share the first city of the route','Because e2 − e1 is odd'],a:2,
+   e:'Edge 9 joins <code>route[9]</code> to <code>route[0]</code>, and edge 0 starts at <code>route[0]</code>. The test <code>(e2+1) % n != e1</code> catches it: (9 + 1) % 10 = 0.',
+   h:'Which city does edge n − 1 end at?'},
+  {q:'Why does the efficient delta-cost not need to look at the reversed block of the route?',
+   o:['Because the block is always short','Because distances are symmetric, so walking the block backwards gives the same length','Because the block is recomputed later in accept_move','Because the cost of the block is stored in the header'],a:1,
+   e:'The block keeps the same edges, only traversed in the opposite direction, and d<sub>ij</sub> = d<sub>ji</sub>. Only the 4 edges at its two ends change.',
+   h:'Compare the edges inside the block before and after the move.'},
+  {q:'<code>x.shape</code> is <code>(n,)</code> and <code>xT = x.reshape((n,1))</code>. What is the shape of <code>xT - x</code>, and what is its element [i, j]?',
+   o:['(n,), the element x<sub>i</sub> − x<sub>i</sub> = 0','(n, n), the element x<sub>j</sub> − x<sub>i</sub>','(n, 1), the element x<sub>i</sub> − x<sub>0</sub>','(n, n), the element x<sub>i</sub> − x<sub>j</sub>'],a:3,
+   e:'(n, 1) with (n,) broadcasts to (n, n). Row i comes from xT (value x<sub>i</sub> repeated along the row), column j from x (value x<sub>j</sub>): element x<sub>i</sub> − x<sub>j</sub>.',
+   h:'Recall lesson 3: which operand varies along the rows and which along the columns?'},
+  {q:'Which statement about the nearest neighbour heuristic for the TSP is true, according to the slides?',
+   o:['It is a partial buildup greedy: from the last chosen city it always goes to the closest unvisited one, and it works awfully','It always finds the optimal route','It is the random-search greedy with the swap-paths move','It needs the delta-cost to be O(1)'],a:0,
+   e:'It builds the route one city at a time choosing the cheapest next step, with no way to undo early choices; the slides judge it very poor.',
+   h:'Which of the two greedy families builds a configuration piece by piece?'},
+  {q:'In the greedy loop, why does <code>c = c + delta_c</code> replace a call to <code>cost</code> after each accepted move?',
+   o:['Because cost is wrong for long routes','Because delta_c is exact and O(1), while recomputing the cost from scratch is O(n)','Because the cost never changes','Because cost can only be called once'],a:1,
+   e:'The delta-cost already gives the exact change, so the running cost stays correct without an O(n) recomputation.',
+   h:'Compare the work done by the two expressions.'},
+  {q:'The variable <code>best_c</code> starts at <code>np.inf</code>. Why?',
+   o:['So that the first restart\'s cost is always stored as the best so far','Because costs are infinite at the start','To make the loop run forever','Because np.inf is the cost of a random route'],a:0,
+   e:'Any real cost is smaller than infinity, so the test <code>c &lt; best_c</code> succeeds on the first restart and the best is initialized correctly.',
+   h:'What happens to the comparison <code>c &lt; best_c</code> the first time it runs?'}
+];
+
+/* Lesson 6: a generic optimizer, in-place changes, shallow and deep copies, fair moves, Latin squares */
+INIT[6]=function(){
+  codeHL($('#lezione-6'));
+  const BBG='rgba(88,196,221,.14)',PBG='rgba(220,117,205,.2)',GBG='rgba(131,193,103,.22)',RBG='rgba(252,98,85,.22)';
+  const arr=(x,y,vals,o)=>{o=o||{};const cw=o.cw||30;let s='';vals.forEach((v,i)=>{s+=rect(x+i*cw,y,cw,28,o.bg||BBG,o.st||'#555')+tx(x+i*cw+cw/2,y+19,v,{s:14,f:o.f||'#eee'})});return s};
+  const name=(x,y,t,c)=>rect(x,y,96,28,'#141414',c||'#888')+mono(x+48,y+19,t,{s:13.5,a:'middle',f:'#fff'});
+  const curve=(x1,y1,x2,y2,c,id,dash)=>'<path d="M'+x1+' '+y1+'C'+(x1+40)+' '+y1+' '+(x2-40)+' '+y2+' '+(x2-6)+' '+y2+'" fill="none" stroke="'+c+'" stroke-width="2"'+(dash?' stroke-dasharray="4 4"':'')+' marker-end="url(#'+id+')"/>';
+  /* two names, one array */
+  (function(){
+    const root=$('#c6alias'),trio=el('div','trio');root.append(legend([[PINK,'name refers to'],[BLUE,'array data','box'],[ORG,'value written','box']]),trio);
+    const W=290,H=190;
+    const panel=(k,id)=>{let s=arrowM(id,PINK)+arrowM(id+'g','#666');
+      s+=name(6,30,'self.route',PINK)+name(6,110,'route',PINK);
+      const A=k===1?[7,7,7,7]:[3,0,2,1];s+=arr(170,66,A,{bg:k===1?'rgba(255,134,47,.22)':BBG,st:k===1?ORG:'#555',f:k===1?ORG:'#eee',cw:28});
+      s+=curve(102,44,170,80,PINK,id);
+      if(k===2){s+=arr(170,146,[9,9,9,9],{cw:28})+curve(102,124,170,160,PINK,id)+curve(102,124,170,86,'#666',id+'g',true)}
+      else s+=curve(102,124,170,84,PINK,id);
+      return s};
+    cell(trio,'route = self.route',panel(0,'c6a1'),W,H,'Two names refer to the same array','One array, two names.');
+    cell(trio,'route[:] = 7',panel(1,'c6a2'),W,H,'Writing through route changes the shared array','The shared data change: <code>self.route</code> sees 7s.');
+    cell(trio,'route = np.full(4, 9)',panel(2,'c6a3'),W,H,'Rebinding route leaves self.route unchanged','Only the name moves: <code>self.route</code> is unchanged.');
+  })();
+  /* three ways to save the best object */
+  (function(){
+    const root=$('#c6copy'),trio=el('div','trio');root.append(legend([[PINK,'refers to'],[RED,'saved route overwritten','box'],[GRN,'saved route intact','box']]),trio);
+    const W=290,H=260;
+    const obj=(x,y,t,c)=>rect(x,y,104,58,'#141414',c)+mono(x+52,y+18,t,{s:13,a:'middle',f:c})+mono(x+12,y+44,'.route',{s:13,f:'#bbb'})+'<circle cx="'+(x+88)+'" cy="'+(y+40)+'" r="4" fill="'+PINK+'"/>';
+    const panel=(k,id)=>{let s=arrowM(id,PINK);
+      s+=name(4,18,'probl','#888')+name(4,206,'best_probl','#888');
+      const newR=[5,2,0,4,1,3],oldR=[1,3,5,0,2,4];
+      if(k===0){s+=obj(132,96,'TSP object','#bbb')+curve(100,32,132,112,PINK,id)+curve(100,220,132,126,PINK,id)+arr(132,186,newR,{cw:26,bg:RBG,st:RED,f:RED})+curve(220,136,200,186,PINK,id)}
+      else{s+=obj(132,14,'TSP object','#bbb')+obj(132,126,k===1?'shallow copy':'deep copy','#bbb')+curve(100,32,132,30,PINK,id)+curve(100,220,132,146,PINK,id);
+        s+=arr(132,82,newR,{cw:26,bg:k===1?RBG:BBG,st:k===1?RED:'#555',f:k===1?RED:'#eee'});
+        s+=curve(220,54,214,82,PINK,id);
+        if(k===1)s+='<path d="M220 166C262 166 262 116 238 112" fill="none" stroke="'+PINK+'" stroke-width="2" marker-end="url(#'+id+')"/>';
+        else{s+=arr(132,200,oldR,{cw:26,bg:GBG,st:GRN,f:GRN})+curve(220,166,214,200,PINK,id)}}
+      return s};
+    cell(trio,'best_probl = probl',panel(0,'c6c1'),W,H,'No copy: one object with two names','<span class="bad">Lost:</span> one object, overwritten by the next restart.');
+    cell(trio,'copy.copy(probl)',panel(1,'c6c2'),W,H,'Shallow copy shares the route array','<span class="bad">Lost:</span> two objects, one shared route.');
+    cell(trio,'copy.deepcopy(probl)',panel(2,'c6c3'),W,H,'Deep copy owns its route','<span class="ok">Safe:</span> the copy has its own route.');
+  })();
+  /* moves without rejection: the ring of edges */
+  (function(){
+    const root=$('#c6ring');root.append(legend([[RED,'invalid partner for e1','box'],[TEAL,'valid e2, one per value of r','box']]));
+    const n=10,e1=8,W=420,H=410,cx=210,cy=180,R=140,ang=k=>(-90+k*36)*Math.PI/180;let s=arrowM('c6r','#888');
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="#333" stroke-width="2"/>';
+    for(let k=0;k<n;k++){const bad=k===e1||k===(e1+1)%n||k===(e1+n-1)%n,x=cx+R*Math.cos(ang(k)),y=cy+R*Math.sin(ang(k));
+      s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="17" fill="'+(bad?RBG:'rgba(92,208,179,.2)')+'" stroke="'+(bad?RED:TEAL)+'" stroke-width="2.2"/>'+tx(x.toFixed(1),(y+5).toFixed(1),k,{s:15,f:'#fff',w:600});
+      if(!bad){const r=(k-e1-2+2*n)%n,ix=cx+(R-84)*Math.cos(ang(k)),iy=cy+(R-84)*Math.sin(ang(k)),sx=cx+(R-62)*Math.cos(ang(k)),sy=cy+(R-62)*Math.sin(ang(k));
+        s+=line(sx.toFixed(1),sy.toFixed(1),(cx+(R-22)*Math.cos(ang(k))).toFixed(1),(cy+(R-22)*Math.sin(ang(k))).toFixed(1),'#666',1.5,' marker-end="url(#c6r)"')+lbl(ix.toFixed(1),(iy+5).toFixed(1),'r = '+r,TEAL,{s:13})}}
+    s+=tx(cx,cy+6,'e1 = 8',{s:16,f:'#fff',w:600})+mono(cx,cy+R+46,'e2 = (e1 + 2 + r) % 10',{s:14,a:'middle',f:'#bbb'});
+    svgBox(root,W,H,s,'Ring of ten edges: the seven valid partners of edge 8, one for each random value','28rem');
+  })();
+  /* exercise 2: exact pair probabilities */
+  (function(){
+    const root=$('#c6wrong'),duo=el('div','duo');root.append(legend([[PINK,'probability of the pair (brighter = more likely)','box']]),duo);
+    const n=10,p1=(i,j)=>i<j?2/(n*n-n):0,p2=(i,j)=>i<j&&i<n-1?1/(n-1)/(n-1-i):0,mx=p2(n-2,n-1),cw=30,gx=30,gy=26,W=gx+n*cw+8;
+    const panel=f=>{let s='';for(let i=0;i<n;i++){s+=tx(gx-7,gy+i*cw+cw/2+4.5,i,{s:12.5,f:GRAY,a:'end'});
+      for(let j=0;j<n;j++){const p=f(i,j);s+=rect(gx+j*cw,gy+i*cw,cw,cw,p?'rgba(220,117,205,'+(0.06+0.9*p/mx).toFixed(3)+')':'#0b0b0b','#1e1e1e');
+        if(p&&(j===n-1||(i===0&&j===1)))s+=tx(gx+j*cw+cw/2,gy+i*cw+cw/2+4.5,Math.round(p*1000)/10,{s:12,f:p/mx>0.55?'#000':'#fff'})}}
+      for(let j=0;j<n;j++)s+=tx(gx+j*cw+cw/2,gy-8,j,{s:12.5,f:GRAY});
+      s+=tx(gx+n*cw/2,gy+n*cw+22,'e2 (columns), e1 (rows); numbers in %',{s:12.5,f:GRAY});return s};
+    cell(duo,'Draw, reject, sort (correct)',panel(p1),W,gy+n*cw+30,'Uniform probability over all valid pairs','Every pair: <b>2.2%</b>. Uniform.');
+    cell(duo,'randint(n-1), then randint(e1+1, n)',panel(p2),W,gy+n*cw+30,'Biased probabilities: large e1 pairs are favoured','From <b>1.2%</b> (row 0) to <b>11.1%</b> (pair 8, 9).');
+  })();
+  /* Latin squares: the exercise's example and two cost functions for a row */
+  (function(){
+    const root=$('#c6latin'),duo=el('div','duo');root.append(legend([[GRN,'row or column valid','box'],[RED,'violates the rule','box']]),duo);
+    const T=[[0,1,2],[1,2,2],[1,0,2]],n=3,cw=46,gx=86,gy=30,ok=a=>new Set(a).size===a.length;
+    let s='';const rows=T.map(ok),cols=[0,1,2].map(j=>ok(T.map(r=>r[j])));
+    T.forEach((r,i)=>r.forEach((v,j)=>{s+=rect(gx+j*cw,gy+i*cw,cw,cw,!rows[i]||!cols[j]?'rgba(252,98,85,.28)':'#0d0d0d','#555')+tx(gx+j*cw+cw/2,gy+i*cw+cw/2+6,v,{s:18,f:'#fff'})}));
+    rows.forEach((o,i)=>{s+=tx(gx+n*cw+18,gy+i*cw+cw/2+6,o?'✓':'✕',{s:18,f:o?GRN:RED,w:600})});
+    cols.forEach((o,j)=>{s+=tx(gx+j*cw+cw/2,gy+n*cw+24,o?'✓':'✕',{s:18,f:o?GRN:RED,w:600})});
+    [0,1,2].forEach(i=>{s+=tx(gx-12,gy+i*cw+cw/2+5,'row '+i,{s:12.5,f:GRAY,a:'end'})});
+    const cost=rows.filter(o=>!o).length+cols.filter(o=>!o).length;
+    s+=tx(gx+n*cw/2,gy+n*cw+56,'cost = '+cost,{s:16,f:YEL,w:600});
+    cell(duo,'Cost: rows and columns that violate',s,300,250,'A 3 by 3 table with cost 3','Row 1 and columns 0 and 2: cost <b>'+cost+'</b>.');
+    const R=[[0,0,0,0,0],[0,4,2,1,1]],c1=a=>a.length!==new Set(a).size?1:0,c3=a=>a.length-new Set(a).size;
+    let t=tx(150,24,'exercises 4, 5',{s:12.5,f:GRAY})+tx(230,24,'exercise 6',{s:12.5,f:GRAY});
+    R.forEach((r,k)=>{const y=42+k*86;r.forEach((v,j)=>{t+=rect(10+j*24,y,24,30,'#0d0d0d','#555')+tx(22+j*24,y+20,v,{s:14,f:'#fff'})});
+      t+=tx(150,y+21,c1(r),{s:18,f:YEL,w:600})+tx(230,y+21,c3(r),{s:18,f:YEL,w:600})+tx(70,y+50,k?'almost correct':'completely wrong',{s:12.5,f:GRAY})});
+    t+=tx(150,224,'1 if wrong',{s:12.5,f:GRAY})+tx(230,224,'n − distinct',{s:12.5,f:GRAY});
+    cell(duo,'Two costs for one row (n = 5)',t,280,236,'Two rows of length 5 under two cost functions','The refined cost tells them apart: <b>4</b> versus <b>1</b>.');
+  })();
+};
+QZ['6a']=()=>[
+  {q:'You write a new class for a different problem and want to use the course\'s <code>greedy</code> unchanged. What must the class provide?',
+   o:['A subclass of TSP','A route attribute and a dist matrix','The methods init_config, cost, propose_move, compute_delta_cost, accept_move and copy (display is optional)','A function called greedy'],a:2,
+   e:'The optimizer only calls these methods, so any object that implements them, with the same meaning, can be optimized. Nothing about routes or distances is required.',
+   h:'Read which calls appear inside the greedy loop.'}
+];
+QZ['6b']=()=>[
+  {q:'Inside a method: <code>route = self.route</code>, then <code>route = np.random.permutation(self.n)</code>. What happens to <code>self.route</code>?',
+   o:['It is unchanged: the second line only gives the name route a new array','It becomes the new permutation','It is deleted','It becomes a view of the new permutation'],a:0,
+   e:'Assigning to a name rebinds the name. To change the shared data you must write into it, as <code>init_config</code> does with <code>self.route[:] = ...</code>.',
+   h:'Is the second line writing into an array, or giving a name a new value?'}
+];
+QZ['6c']=()=>[
+  {q:'Why would <code>best_probl = copy.copy(probl)</code> (a shallow copy) still lose the best route?',
+   o:['Because copy.copy only copies numbers','Because the copy and the original share the same route array, which the next restart overwrites in place','Because shallow copies are read-only','Because copy.copy returns the same object'],a:1,
+   e:'A shallow copy is a new object whose attributes refer to the same values; its <code>route</code> is the very array that <code>init_config</code> and <code>accept_move</code> modify in place.',
+   h:'Which attributes are duplicated by a shallow copy, and which are only shared?'}
+];
+QZ['6d']=()=>[
+  {q:'With n = 10, the line <code>e2 = (e1 + 2 + np.random.randint(n-3)) % n</code> is run with <code>e1 = 8</code>. Which values can e2 take?',
+   o:['0 to 9 except 8','10 to 16','2 to 8','0 to 6'],a:3,
+   e:'<code>np.random.randint(7)</code> gives 0 to 6, so e1 + 2 + that is 10 to 16, and modulo 10 that is 0 to 6. The excluded values are 7, 8 and 9: e1 itself and its two neighbours on the ring.',
+   h:'Find the smallest and largest value before the modulus is applied.'}
+];
+QZ['6e']=()=>[
+  {q:'Exercise 5 starts from a table whose columns are all 0, 1, …, n−1 in order. What is its cost (rows plus columns that violate the rule), for n &gt; 1?',
+   o:['0','2n','n','1'],a:2,
+   e:'Every column is valid. Each row repeats one value n times, so every row is wrong: cost n, one per row.',
+   h:'Write the table for n = 3 and check rows and columns separately.'}
+];
+QZ['6']=()=>[
+  {q:'Exercise 3: the move swaps two cities that are <em>not</em> adjacent along the route, say the route goes … a, i, b … c, j, d …. How many edges change length in the delta-cost?',
+   o:['2','4','6','All n'],a:1,
+   e:'The edges (a, i), (i, b), (c, j) and (j, d) are replaced by (a, j), (j, b), (c, i) and (i, d): four edges out, four in. If i and j are adjacent the edge between them survives, which is one of the special cases the exercise warns about.',
+   h:'Write the route around each of the two cities before and after the swap, and compare the edges.'},
+  {q:'Why does version 4 make <code>propose_move</code> return a tuple <code>(e1, e2)</code> instead of a new route?',
+   o:['Because tuples are faster to print','Because most proposals are rejected, and encoding a move is O(1) while building a new route is O(n)','Because routes cannot be returned from methods','Because the tuple is the new route'],a:1,
+   e:'The move is evaluated by compute_delta_cost before anything is changed; the O(n) work of accept_move is paid only for accepted moves.',
+   h:'Compare the work spent on a rejected proposal in the two designs.'},
+  {q:'What does the <code>debug_delta_cost</code> option check?',
+   o:['That the cost is positive','That the move is valid','That the current cost plus delta_c equals the cost of a copy on which the move was really accepted','That copy() returns a deep copy'],a:2,
+   e:'It applies the move to a copy and compares the cost from scratch with c + delta_c, within 1e-10. It tests the fast formula against the slow, obvious one.',
+   h:'Read the assert line in the code.'},
+  {q:'<code>a = np.zeros(3)</code>; <code>b = a</code>; <code>b[0] = 5</code>; <code>b = np.ones(3)</code>. What is <code>a</code>?',
+   o:['[0, 0, 0]','[5, 0, 0]','[1, 1, 1]','[5, 1, 1]'],a:1,
+   e:'<code>b[0] = 5</code> writes into the array that both names share, so a[0] becomes 5. Then <code>b = np.ones(3)</code> only moves the name b; a is left as [5, 0, 0].',
+   h:'Separate the line that writes into an array from the line that rebinds a name.'},
+  {q:'In exercise 2\'s shortcut, <code>e1 = np.random.randint(n-1)</code> and <code>e2 = np.random.randint(e1+1, n)</code>, with n = 10. What is the probability of the pair (8, 9)?',
+   o:['1/9, about 11%','1/45, about 2.2%','1/90','1/10'],a:0,
+   e:'e1 = 8 has probability 1/9; then e2 must be drawn from {9} only, probability 1. So 1/9 ≈ 11.1%, five times the fair 1/45.',
+   h:'Multiply the probability of e1 = 8 by the probability of e2 = 9 given e1 = 8.'},
+  {q:'Exercise 6 changes the cost of a row from "1 if wrong" to "n minus the number of distinct values". What is the cost of the row [0, 4, 2, 1, 1] (n = 5) under the new rule?',
+   o:['0','4','1','2'],a:2,
+   e:'Its distinct values are 0, 1, 2, 4: four of them, so the cost is 5 − 4 = 1. The row [0, 0, 0, 0, 0] costs 5 − 1 = 4.',
+   h:'Count the distinct values and subtract from n.'},
+  {q:'According to the exercise sheet, what made the Latin square solver dramatically better in exercises 5 and 6?',
+   o:['More iterations and more restarts','A faster computer','Changing the greedy loop','A smaller search space with moves that keep columns valid, and a cost that measures how wrong a row is'],a:3,
+   e:'The loop never changed. Exercise 5 changed the representation and the moves, exercise 6 the cost function: the sheet calls this the importance of choosing a suitable representation, moves and cost.',
+   h:'Which parts of the code were modified between exercises 4, 5 and 6?'}
 ];
 
 /* ---------- Riquadri: ogni figura in un fotogramma nero ---------- */

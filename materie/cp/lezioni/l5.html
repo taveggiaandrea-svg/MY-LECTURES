@@ -1,0 +1,149 @@
+<article class="lesson" data-n="5" id="lezione-5" data-title="How do you search for a short TSP route?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 5 · L. Saglietti, slides <em>Optimization and greedy approaches</em> and the lecture code <code>1_greedy_TSP</code></p>
+  <h1>How do you search for a short TSP route?</h1>
+  <p class="desc">The travelling salesman problem, a route stored as a permutation, the swap-paths move, a delta-cost in O(1), a distance matrix built with broadcasting, and random restarts.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 4 described random-search greedy in the abstract and listed what it needs: a representation, a cost, a random start, a move and a delta-cost. The lectures then wrote all of it for one concrete problem. This is the result at work.</p>
+  <figure>
+    <div class="w" id="c5anim"></div>
+    <figcaption>Greedy on 40 random cities in the unit square, simulated in your browser with the lecture's moves and acceptance rule. The pink line is the current route, which always returns to its start; the curve below is its length (the cost) over the iterations, with the dot at the current one. Press play: the tangled random route straightens out quickly, then the improvements become rare. The time axis speeds up as the run goes on.</figcaption>
+  </figure>
+  <p>Every change you saw was the same small move, accepted only when it made the route no longer. This lesson builds that program piece by piece, following the lectures' versions of the code.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>The travelling salesman problem</h2>
+  <p>The <strong>travelling salesman problem</strong> (TSP) is a celebrated NP-complete problem: there is no known efficient way to reach the optimum in the worst case.</p>
+  <p class="stmt"><strong>TSP.</strong> Given \(n\) cities and the distance \(d_{ij}\) between any two cities \(i\) and \(j\) (symmetric: \(d_{ij} = d_{ji}\)), find the shortest route that goes through every city exactly once and goes back to the starting point.</p>
+  <p>The slides call such a route a "shortest Hamiltonian path on a graph"; since it closes on itself, the usual name is a Hamiltonian cycle. In the language of lesson 4, \(X\) is the set of all such routes and \(c(x)\) is the total distance along the route. How large is \(X\)? There are \(n!\) ways to order the cities, but the same loop can start from any of its \(n\) cities and run in either of 2 directions:</p>
+  <div class="eq">\[ |X| = \frac{n!}{2n} \]</div>
+  <div class="scroll"><table><thead><tr><th class="n">cities n</th><th class="n">different routes n!/(2n), computed here</th></tr></thead><tbody>
+    <tr><td class="n">5</td><td class="n">12</td></tr>
+    <tr><td class="n">10</td><td class="n">181,440</td></tr>
+    <tr><td class="n">20</td><td class="n">60,822,550,204,416,000</td></tr>
+    <tr><td class="n">50</td><td class="n">about 3 · 10<sup>62</sup></td></tr>
+    <tr><td class="n">200 (the lecture's run)</td><td class="n">about 2 · 10<sup>372</sup></td></tr>
+  </tbody></table></div>
+  <p>The slides also show a map of a large TSP instance over the United States, a picture not reproduced here. The table makes the same point: checking every route is hopeless already for a few dozen cities.</p>
+  <div class="quiz inq" data-quiz="5a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Two greedy ideas</h2>
+  <p>The first is partial buildup: start from a random city, go each time to the closest city not yet visited, and when all are visited go back to the first. It is called the <strong>nearest neighbour</strong> heuristic. The slides' verdict: "this works awfully".</p>
+  <p>The second is random-search greedy, the one the lectures implement. It needs two decisions. How do you represent a route? A permutation of the cities' indices works fine. When are two routes neighbours? There are several possibilities; the course uses the <strong>swap-paths</strong> rule: from any route, pick two edges i → j and l → k and swap them to i → l and j → k.</p>
+  <figure>
+    <div class="w" id="c5nn"></div>
+    <figcaption>The 40 cities of the opening, solved twice. In the first panel the nearest neighbour heuristic, starting from city 0 (ringed): it is fine at the beginning, but the last cities are left scattered and must be fetched with long edges. In the second the final route of the random-search greedy run of the opening. Both computed in your browser; the comparison is added on this page.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>A route is a permutation</h2>
+  <p>The lecture starts by representing the problem: a class <code>Cities</code> (later renamed <code>TSP</code>) that stores <code>n</code> and random coordinates in the unit square, with an optional <code>seed</code> so that the same cities come out every time, which helps a lot with debugging.</p>
+<pre class="code">class Cities:
+    def __init__(self, n, seed=None):
+        if seed is not None:
+            np.random.seed(seed)
+        self.n = n
+        self.x = np.random.rand(n)         # coordinates uniform in [0,1) x [0,1)
+        self.y = np.random.rand(n)
+
+def init_config(cities):
+    return np.random.permutation(cities.n)  # a random route</pre>
+  <p>A route is an array that lists the cities in the order they are visited. The <em>e</em>-th edge joins <code>route[e]</code> and <code>route[e+1]</code>, and the last one, edge \(n-1\), joins the last city back to the first. A single formula covers both cases with the modulus: edge <em>e</em> joins <code>route[e]</code> and <code>route[(e+1) % n]</code>, because \((n-1+1) \bmod n = 0\).</p>
+  <figure>
+    <div class="w" id="c5perm"></div>
+    <figcaption>A route through 6 cities, <code>route = [3, 0, 4, 1, 5, 2]</code>. The top row is the array with its positions; on the map each edge is labelled with its index <em>e</em>. Edge 5, from <code>route[5]</code> = 2 back to <code>route[0]</code> = 3, is the comeback edge (dashed), the one that needs the modulus. Example added on this page.</figcaption>
+  </figure>
+  <p>The <code>display</code> function needs the coordinates in route order: <code>x[route[0]], x[route[1]], …</code>, which is exactly <code>x[route]</code>, indexing with an array as in lesson 3. The comeback edge is drawn separately at first; the task left in the code, solved in <code>09_TSP.py</code>, uses the modulus to draw everything in one call: <code>plt.plot(x[route[np.arange(n+1) % n]], y[route[np.arange(n+1) % n]])</code>. The index array is 0, 1, …, n−1, 0.</p>
+  <div class="quiz inq" data-quiz="5b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>The swap-paths move</h2>
+  <p>Picking edges i → j and l → k and reconnecting them as i → l and j → k has a side effect, noted on the slide: the piece of route from j to l gets reversed. In the array, that piece is a contiguous block, so the move is a reversed slice.</p>
+  <figure>
+    <div class="w" id="c5swap"></div>
+    <figcaption>The slides' swap-paths move, redrawn on a small route with a crossing. The move is the pair of edge indices (e1, e2) = (1, 5). The two old edges (red) are replaced by the two new ones (teal); the cities between them (orange in the array) are visited in reverse order. Only these 4 edges enter the delta-cost. Example added on this page.</figcaption>
+  </figure>
+<pre class="code">new_route = route.copy()
+new_route[e1+1:e2+1] = new_route[e2:e1:-1]   # reverse the block between the two edges</pre>
+  <p>The right-hand side reads from <code>e2</code> down to <code>e1+1</code> with step −1 (the stop <code>e1</code> is excluded), and it is written into positions <code>e1+1</code> to <code>e2</code>. With <code>e1 = 1</code> and <code>e2 = 5</code>, positions 2 to 5 are reversed, as in the figure.</p>
+  <p>Not every pair of edges gives a real move. The code draws <code>e1</code> and <code>e2</code> at random, sorts them, and redraws until three bad cases are excluded: the same edge twice (<code>e1 == e2</code>), two adjacent edges (<code>e1 + 1 == e2</code>), and the special adjacent pair at the end of the route, edge \(n-1\) and edge 0, caught by <code>(e2+1) % n == e1</code>. In each of these cases the "new" route would be the same loop as the old one. (The commented final copy of the code writes the last test as <code>not (e1 == 0 and e2 == n-1)</code>, which is equivalent once e1 &lt; e2.)</p>
+<pre class="code">while True:
+    e1 = np.random.randint(n)
+    e2 = np.random.randint(n)
+    if e1 &gt; e2:
+        e1, e2 = e2, e1
+    if e1 != e2 and e1+1 != e2 and (e2+1) % n != e1:
+        break</pre>
+  <div class="quiz inq" data-quiz="5c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>The cost, and only what changes</h2>
+  <p>The cost walks along the route and adds the length of every edge, the comeback included thanks to the modulus. It does \(n\) additions: O(n).</p>
+<pre class="code">def cost(cities, route):
+    n = cities.n
+    c = 0.
+    for i in range(n):
+        c += cities.dist(route[i], route[(i+1) % n])
+    return c</pre>
+  <p>The first delta-cost is the naive one: cost of the new route minus cost of the old, O(n) per proposal. But lesson 4 promised O(1) for a local move, and the slide says why it is possible: <strong>only 4 edges are involved in the delta-cost computation</strong>. The two removed edges join <code>route[e1]</code> to <code>route[e1+1]</code> and <code>route[e2]</code> to <code>route[e2+1]</code>; the two added edges join <code>route[e1]</code> to <code>route[e2]</code> and <code>route[e1+1]</code> to <code>route[e2+1]</code>. The reversed block keeps the same length, since distances are symmetric.</p>
+  <div class="eq">\[ \Delta c = d(c_{11}, c_{21}) + d(c_{12}, c_{22}) - d(c_{11}, c_{12}) - d(c_{21}, c_{22}) \]</div>
+  <p>Here \(c_{11}, c_{12}\) are the two cities of the first edge and \(c_{21}, c_{22}\) those of the second, the names used in the code. The greedy loop accepts the move when \(\Delta c \le 0\) and updates the running cost with <code>c = c + delta_c</code>, without recomputing it.</p>
+  <div class="quiz inq" data-quiz="5d"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>All the distances at once</h2>
+  <p>The delta-cost asks for distances again and again, and computing each one from the coordinates means a square root every time. Since the cities never move, the final version computes all the distances once, in the constructor, and stores them in an \(n \times n\) matrix: <code>dist[i, j]</code> is the distance between cities <code>i</code> and <code>j</code>. The matrix is symmetric, with zeros on the diagonal.</p>
+  <p>The first version uses a double loop over the upper triangle and copies each value to its mirror. The second uses broadcasting, as in lesson 3: subtracting a column of shape (n, 1) from a row of shape (n,) gives the (n, n) matrix of all pairwise differences.</p>
+<pre class="code">xT = x.reshape((n, 1))                       # column copies of the coordinates
+yT = y.reshape((n, 1))
+self.dist = np.sqrt((xT - x)**2 + (yT - y)**2)   # (n,1) with (n,) broadcasts to (n,n)</pre>
+  <p>(The commented final copy writes <code>x - xT</code>: the sign of each difference flips, the squares do not.)</p>
+  <figure>
+    <div class="w" id="c5dist"></div>
+    <figcaption>Eight random cities (first panel) and their distance matrix (second panel), built exactly like <code>self.dist</code>: row i, column j holds the distance between city i and city j. Brighter means farther. The matrix mirrors itself across the diagonal of zeros, since d<sub>ij</sub> = d<sub>ji</sub>. Cities generated on this page.</figcaption>
+  </figure>
+  <p>With the matrix, <code>self.dist(city1, city2)</code> becomes the lookup <code>self.dist[city1, city2]</code>: the lecture calls this "using the memory to speed up even further".</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Random restarts</h2>
+  <p>Lesson 4's easy fix for local minima is multiple attempts. The lecture adds a <code>restarts</code> argument to <code>greedy</code> (called <code>repeats</code> in the commented final copy): each restart picks a new random route, runs the loop, and if its final cost beats the best so far, stores it away. The course scripts run 200 cities with 5 restarts of 200,000 iterations, and 100 cities with 30 restarts of 50,000 iterations.</p>
+<pre class="code">best_c = np.inf                      # placeholder: any real cost is smaller
+for i in range(restarts):
+    x = init_config(cities)
+    c = cost(cities, x)
+    for t in range(num_iters):
+        y = propose_move(x)
+        delta_c = compute_delta_cost(cities, y, x)
+        if delta_c &lt;= 0:
+            c = c + delta_c
+            x = y
+    if c &lt; best_c:
+        best_c, best_x = c, x</pre>
+  <figure>
+    <div class="w" id="c5restart"></div>
+    <figcaption>The second course script re-run in your browser on its own random cities: 100 cities, 30 restarts of 50,000 iterations each. The first panel is the best final route; the second shows the final cost of every restart, sorted, with the best one in pink. No two restarts end at the same route: each stops at its own local minimum (one of the 30, re-checked, still had an improving move left after 50,000 iterations).</figcaption>
+  </figure>
+  <p>One detail in the lecture's version 2: the function ends with <code>return x</code>, the last restart's route, rather than the best one, <code>best_x</code>. The later versions return the best object, as they should.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="5"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>choose a representation and a move so that a move changes only a few pieces</strong>; then the delta-cost costs O(1), and greedy can afford hundreds of thousands of proposals.</p>
+  <p>Lesson 6 refactors this code into a generic optimizer that works with any problem, and meets the subtle difference between a shallow and a deep copy.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>

@@ -1,0 +1,137 @@
+<article class="lesson" data-n="6" id="lezione-6" data-title="How do you write an optimizer that works for any problem?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 6 · L. Saglietti, the lecture code <code>1_greedy_TSP</code> (versions 3 to 6) and the <em>Greedy solver exercises</em></p>
+  <h1>How do you write an optimizer that works for any problem?</h1>
+  <p class="desc">Separating the problem from the optimizer, an interface of seven methods, moves as tuples, changing data in place, shallow and deep copies, and the same solver applied to Latin squares.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lesson 5 ended with a working greedy for the TSP, but written as loose functions: <code>greedy(cities, ...)</code> calls <code>init_config(cities)</code>, <code>cost(cities, route)</code>, <code>propose_move(route)</code>. Look at what the main loop needs to know. Nothing in it is about cities: it proposes, measures, accepts. The lectures' next step is to make that explicit, so that the same <code>greedy</code> can solve any problem.</p>
+  <h2>Disentangling the problem from the optimizer</h2>
+  <p>The refactored code (version 3) puts everything that is specific to the TSP inside a class, <code>TSP</code>, as <strong>methods</strong>: functions that belong to an object and receive it as their first argument, <code>self</code>. The optimizer receives an object <code>probl</code> and only calls its methods. Any class that provides the same methods can be optimized by the same code. The list of methods is the <strong>interface</strong> between the two.</p>
+  <p>The final version of the interface, as written at the top of <code>Greedy.py</code>, has seven methods.</p>
+  <div class="scroll"><table><thead><tr><th>Method</th><th>What it does</th><th>Cost for the TSP (estimated here)</th></tr></thead><tbody>
+    <tr><td><code>init_config()</code></td><td>sets a random initial configuration inside the object</td><td>O(n)</td></tr>
+    <tr><td><code>cost()</code></td><td>returns the cost of the current configuration, from scratch</td><td>O(n)</td></tr>
+    <tr><td><code>propose_move()</code></td><td>returns a random move, encoded (for the TSP, the tuple <code>(e1, e2)</code>)</td><td>O(1)</td></tr>
+    <tr><td><code>compute_delta_cost(move)</code></td><td>returns the change in cost the move would cause, without applying it</td><td>O(1)</td></tr>
+    <tr><td><code>accept_move(move)</code></td><td>applies the move to the current configuration</td><td>O(n)</td></tr>
+    <tr><td><code>copy()</code></td><td>returns an independent duplicate of the whole object</td><td>O(n²), since it also copies the n × n distance matrix</td></tr>
+    <tr><td><code>display()</code></td><td>draws the current configuration (optional)</td><td>O(n)</td></tr>
+  </tbody></table></div>
+<pre class="code">def greedy(probl, repeats=1, num_iters=10, seed=None, debug_delta_cost=False):
+    best_probl = None
+    best_c = np.inf
+    for step in range(repeats):
+        probl.init_config()
+        c = probl.cost()
+        for t in range(num_iters):
+            move = probl.propose_move()
+            delta_c = probl.compute_delta_cost(move)
+            if delta_c &lt;= 0:
+                probl.accept_move(move)
+                c += delta_c
+        if c &lt; best_c:
+            best_c = c
+            best_probl = probl.copy()
+    return best_probl</pre>
+  <p>The scripts keep the two halves in separate files, <code>TSP.py</code> and <code>Greedy.py</code>, which become <strong>modules</strong>: a file name without <code>.py</code> is the name you import. The run script does <code>from TSP import TSP</code> and <code>from Greedy import greedy</code>, then <code>tsp = TSP(200, seed=45871231)</code> and <code>greedy(tsp, restarts=5, num_iters=200000, seed=1282323)</code>. The constructor also guards its input with <code>raise Exception(...)</code> when n is not a large enough integer, and the commented final <code>greedy</code> records <code>last_accepted_t</code>, the last iteration with an accepted move, a quick check of whether <code>num_iters</code> was enough.</p>
+  <p>Three design choices of this version deserve a closer look: the move is a small encoding rather than a new configuration, the configuration lives inside the object and is changed in place, and the best result is saved with <code>copy()</code>. Each of them comes from a problem with the previous version.</p>
+  <div class="quiz inq" data-quiz="6a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Proposing is not accepting</h2>
+  <p>In lesson 5, <code>propose_move(route)</code> returned a whole new route: an O(n) copy for every proposal, even though most proposals are rejected. Version 4 splits the job in two. <code>propose_move()</code> only <strong>encodes</strong> the move, packing the two edge indices into a tuple, <code>move = (e1, e2)</code>: O(1). <code>compute_delta_cost(move)</code> unpacks it and evaluates it, and only if the move is accepted does <code>accept_move(move)</code> actually reverse the block of the route.</p>
+  <p>The first delta-cost of the refactored code was still the naive, safe one: copy the whole problem, accept the move on the copy, compute the new cost, subtract. Version 5 replaced it with the 4-edge formula of lesson 5, marked in the code as "O(n) bottleneck → O(1)". The naive version did not disappear: it became a debugging tool.</p>
+<pre class="code">if debug_delta_cost:
+    probl_copy = probl.copy()
+    probl_copy.accept_move(move)
+    assert abs(c + delta_c - probl_copy.cost()) &lt; 1e-10   # floating-point tolerance</pre>
+  <p>The check relies on <code>copy</code> and <code>accept_move</code>, which are much easier to write correctly than an efficient <code>compute_delta_cost</code>. It is very slow, so it is switched on only while developing a new problem class. <strong>Write the slow, obviously correct version first, and use it to test the fast one.</strong></p>
+</div></section>
+
+<section><div class="col">
+  <h2>The configuration lives inside the object</h2>
+  <p>From version 4, the route is an attribute, <code>self.route</code>, created once in the constructor with <code>np.zeros(n, dtype=int)</code>. Methods change its contents in place instead of building new arrays: <code>init_config</code> writes <code>self.route[:] = np.random.permutation(n)</code>, and the greedy loop comments the call as "O(n) not allocating new memory".</p>
+  <p>Inside the methods the code often writes <code>route = self.route</code> to keep lines short. The commented version of the course warns about what that line means: <code>route</code> and <code>self.route</code> share the same data, but they are not the same variable.</p>
+  <figure>
+    <div class="w" id="c6alias"></div>
+    <figcaption>Drawn on this page: what a method sees after <code>route = self.route</code>: two names, one array (pink arrows). In the second panel, writing into the array through <code>route</code>, with a slice, changes what <code>self.route</code> sees too: this is what <code>accept_move</code> relies on. In the third, assigning a new array to the name <code>route</code> only moves that name; <code>self.route</code> keeps the old data.</figcaption>
+  </figure>
+  <p>The same applies to the local copies of the coordinates, <code>x</code> next to <code>self.x</code>: as the comments of the constructor put it, writing <code>x = something</code> would not affect <code>self.x</code>. <strong>Writing into a shared array (<code>a[...] = ...</code>) changes it for everyone; assigning to a name (<code>a = ...</code>) changes only that name.</strong></p>
+  <div class="quiz inq" data-quiz="6b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Saving the best: shallow and deep copies</h2>
+  <p>With restarts, the solver must remember the best configuration found so far while it keeps changing the current one in place. The obvious line, <code>best_probl = probl</code>, does not work: it makes a second name for the same object, which the next restart overwrites. So the lectures add a <code>copy()</code> method. But copying an object can mean two different things.</p>
+  <p>A <strong>shallow copy</strong>, <code>copy.copy(probl)</code>, makes a new object whose attributes are the same values as the old one's: for an attribute that is an array, the new object points to the same array. A <strong>deep copy</strong>, <code>copy.deepcopy(probl)</code> from the module <code>copy</code>, duplicates everything recursively, arrays included.</p>
+  <figure>
+    <div class="w" id="c6copy"></div>
+    <figcaption>Drawn on this page: three ways to save the best object, followed by the next restart, which calls <code>init_config()</code> and overwrites the current route in place. In the first panel there is only one object, so the saved route changes. In the second, the shallow copy is a new object, but its <code>route</code> attribute points to the same array, so the saved route changes too. Only the deep copy, in the third panel, keeps its own route (green).</figcaption>
+  </figure>
+  <p>That is why the course writes <code>return deepcopy(self)</code> in <code>copy</code>, with the comment that it "could be optimized (specialized for the problem)": a problem class could copy only the parts that change, here the route. The shallow copy fails precisely because the code changes arrays in place, the efficient choice of the previous section. The two decisions go together.</p>
+  <div class="quiz inq" data-quiz="6c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Drawing a fair move</h2>
+  <p>The move proposal of lesson 5 draws <code>e1</code> and <code>e2</code> and redraws until the pair is valid. A task left in version 6 asks to do it without rejections, using the modulus; <code>09_TSP.py</code> solves it (the commented copy in <code>11_more_comments.zip</code> keeps the loop):</p>
+<pre class="code">e1 = np.random.randint(n)
+e2 = (e1 + 2 + np.random.randint(n-3)) % n   # skips e1-1, e1 and e1+1, cyclically
+if e1 &gt; e2: e1, e2 = e2, e1</pre>
+  <p>Going around the ring of \(n\) edges, <code>e2</code> lands anywhere from 2 to \(n-2\) steps after <code>e1</code>: never on <code>e1</code> itself or on either of its two neighbours, the invalid cases, and on each valid edge with the same probability.</p>
+  <figure>
+    <div class="w" id="c6ring"></div>
+    <figcaption>The n = 10 edges of a route as a ring, with e1 = 8. The three red edges are the invalid partners: e1 itself and the two adjacent edges 7 and 9. Each of the seven teal edges is reached by exactly one value r of <code>np.random.randint(n-3)</code>, written next to its arrow: e2 = (8 + 2 + r) % 10. The modulus wraps 10 to 0. Drawn on this page.</figcaption>
+  </figure>
+  <p>Exercise 2 of the course, "The wrong move", warns that a shortcut can look right and still be wrong. To draw two different indices with <code>e1 &lt; e2</code>, its first method, like the lecture's code, redraws until the indices are acceptable and sorts them. (As printed on the sheet, that loop has lost its exit condition: without an <code>if ...: break</code> it would never stop. The official solution has <code>if i != j: break</code>.) A tempting alternative avoids the loop: <code>e1 = np.random.randint(n-1)</code>, then <code>e2 = np.random.randint(e1+1, n)</code>. Every pair it produces is valid, but not every pair is equally likely.</p>
+  <figure>
+    <div class="w" id="c6wrong"></div>
+    <figcaption>The exact probability of each pair (e1, e2) with n = 10, for the two methods of exercise 2: row e1, column e2, only e1 &lt; e2 possible. In the first panel, draw and reject: all 45 pairs have probability 1/45 ≈ 2.2%. In the second, the shortcut: e1 is uniform over 9 values, then e2 is uniform over what is left, so the pairs with a large e1 come out far more often. The exercise asks you to see this with a histogram; the exact values are computed here.</figcaption>
+  </figure>
+  <p>For greedy the bias only makes some moves come up more often than others. For simulated annealing, the exercise adds, the second code is "definitely wrong": the method assumes the moves are proposed with the right probabilities (the detailed balance condition, which the course meets with Markov chains). The exercise's rule of thumb: <strong>keep extracting moves randomly with a flat measure, and reject the invalid ones, until you get a good one</strong>.</p>
+  <p>Exercise 3 tries a different move for the TSP, swapping two cities along the route instead of crossing two edges (the sheet's "Call the indices 1 and j" means i and j). Its delta-cost is harder: more edges are involved, and the cases depend on whether the two cities are adjacent.</p>
+  <div class="quiz inq" data-quiz="6d"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Same solver, different problem: Latin squares</h2>
+  <p>The payoff of the interface is that a new problem needs only a new class. The exercise sheet's longest sequence uses <strong>Latin squares</strong>: an \(n \times n\) table in which every row and every column contains each number from 0 to \(n-1\) exactly once, like a Sudoku without the sub-squares. The configuration is the table; the cost counts the rows and columns that violate the rule, so the goal is cost 0.</p>
+  <figure>
+    <div class="w" id="c6latin"></div>
+    <figcaption>In the first panel, the exercise's example with n = 3: row 1 and columns 0 and 2 contain a repeated number (red), so the cost is 3. In the second, two rows of length 5 from exercise 6 under two cost functions: counting a row as simply wrong (1) or right (0), as in exercises 4 and 5, versus counting how many values are missing, n minus the number of distinct values, as in exercise 6.</figcaption>
+  </figure>
+  <p>Exercise 4 makes the obvious choices: a random table, and a move that changes one entry to a different value; the delta-cost only needs the affected row and column, checked with <code>np.unique</code>. It works for very small n, but at n = 15 it is very unlikely to succeed in any reasonable time.</p>
+  <p>Exercise 5 shrinks the search space instead. Start from a table in which every column already contains 0 to n−1 in order (cost n: every row is wrong), and move only by swapping two entries of the same column, so the columns stay valid and only two rows change. Exercise 6 changes a single line, the cost of a row: from "wrong or right" to "how many values are missing". Now the solver can tell an almost-correct row from a hopeless one, and performance improves dramatically, especially at larger n.</p>
+  <p>The sheet's conclusion holds for every problem in the course: what makes greedy work is the choice of <strong>representation, moves and cost function</strong>, not the loop, which never changed.</p>
+  <div class="quiz inq" data-quiz="6e"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Lessons 4 to 6 in one table</h2>
+  <div class="scroll"><table><thead><tr><th>Lesson</th><th>Concept</th><th>Idea</th><th>In code</th></tr></thead><tbody>
+    <tr><td>4</td><td>optimization problem</td><td>find x in X minimizing c(x); discrete X is often huge</td><td>binary strings: 2<sup>n</sup> configurations</td></tr>
+    <tr><td>4</td><td>random-search greedy</td><td>propose a neighbour, accept if not worse; stops at a local minimum</td><td><code>if delta_c &lt;= 0: accept</code></td></tr>
+    <tr><td>4</td><td>partial buildup</td><td>build piece by piece, cheapest choice each time</td><td>nearest neighbour for the TSP (described, not coded)</td></tr>
+    <tr><td>5</td><td>TSP route</td><td>a permutation; edge e joins route[e] and route[(e+1) % n]</td><td><code>np.random.permutation(n)</code></td></tr>
+    <tr><td>5</td><td>swap-paths move</td><td>swap two edges, reverse the block between them</td><td><code>route[e1+1:e2+1] = route[e2:e1:-1]</code></td></tr>
+    <tr><td>5</td><td>delta-cost</td><td>only 4 edges change: O(1)</td><td>new edges minus old edges</td></tr>
+    <tr><td>5</td><td>distance matrix</td><td>compute every distance once</td><td><code>np.sqrt((xT - x)**2 + (yT - y)**2)</code></td></tr>
+    <tr><td>6</td><td>interface</td><td>the optimizer only calls the problem's methods</td><td><code>greedy(probl, ...)</code></td></tr>
+    <tr><td>6</td><td>in place and copies</td><td>change arrays in place, save the best with a deep copy</td><td><code>self.route[:] = ...</code>, <code>deepcopy(self)</code></td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="6"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>the optimizer knows nothing about the problem, it only calls an interface</strong>, so all the cleverness lives in the problem class: its representation, its moves, its delta-cost.</p>
+  <p>This is the end of the slides on greedy approaches. The course continues with Monte Carlo methods and Markov chains, the road to simulated annealing, the method that can accept a move uphill.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>
