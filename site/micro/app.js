@@ -2245,14 +2245,15 @@ renderMath(document.querySelector('footer'));
   go.onclick=async()=>{const q=ta.value.trim(),k=q&&key();if(!k)return;
     const art=lessons.find(l=>!l.hidden),ctx=(art?art.innerText:'').slice(0,30000);
     o.textContent='…';go.disabled=true;
-    try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',{method:'POST',
-        headers:{'Content-Type':'application/json','x-goog-api-key':k},
-        body:JSON.stringify({systemInstruction:{parts:[{text:UI.askSys}]},contents:[{role:'user',parts:[{text:'LESSON:\n'+ctx+'\n\nQUESTION: '+q}]}]})});
-      const j=await r.json();
+    try{let j;const body=JSON.stringify({systemInstruction:{parts:[{text:UI.askSys}]},contents:[{role:'user',parts:[{text:'LESSON:\n'+ctx+'\n\nQUESTION: '+q}]}]});
+      /* modelli in ordine di preferenza: se uno non esiste o non è disponibile si passa al successivo */
+      for(const m of ['gemini-4-hydrogen','gemini-3.5-flash','gemini-2.5-flash']){
+        const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body});
+        j=await r.json();if(r.ok||(r.status!==404&&r.status!==400))break}
       o.textContent=j.candidates&&j.candidates[0].content?j.candidates[0].content.parts.map(x=>x.text||'').join(''):((j.error&&j.error.message)||'Error')}
     catch(e){o.textContent=String(e)}
     go.disabled=false};
-  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))go.click()});
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();go.click()}});
 })();
 
 })();
