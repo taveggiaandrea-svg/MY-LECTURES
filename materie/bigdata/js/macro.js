@@ -1,6 +1,7 @@
 /* Big Data and Databases: interface in English and small drawing helpers shared by the four lessons */
 Object.assign(UI,{check:'Check',pickFirst:'Pick an answer first.',right:'Correct.',wrong:'Not quite.',play:'Play',pause:'Pause',seek:'Position in the animation',
-  prev:'Previous lesson',next:'Next lesson',toLight:'Switch to light theme',toDark:'Switch to dark theme'});
+  prev:'Previous lesson',next:'Next lesson',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
+  askSys:'You are a tutor. Answer in English, briefly and clearly, based on the lesson provided. If the question goes beyond the lesson, say so.'});
 /* colour roles of this subject: primary key YEL, foreign key PINK, conditions ORG, NULL PUR, measures BLUE, windows TEAL, accepted GRN, rejected RED */
 const PKC=YEL,FKC=PINK,PRC=ORG,NLC=PUR,MSC=BLUE,WNC=TEAL;
 Object.assign(MAC,{'\\kk':col(BLUE,'k'),'\\qv':col(ORG,'q'),'\\vb':col(BLUE,'v')});

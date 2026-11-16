@@ -239,3 +239,12 @@ code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:.86em
 pre.code{margin:0;background:var(--track);padding:1rem 1.2rem;overflow-x:auto;line-height:1.6;font:400 .9rem/1.6 ui-monospace,'SF Mono',Menlo,Consolas,monospace;position:relative}
 pre.code .kw{color:var(--theme)}
 .stage code{color:#fff}
+
+/* Riquadro Ask AI */
+.askbtn{position:fixed;right:14px;bottom:14px;z-index:30;font:500 .85rem/1 var(--sans);background:var(--theme);color:var(--on-theme);border:0;border-radius:999px;padding:.6rem .9rem;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.askp{position:fixed;right:14px;bottom:58px;z-index:30;width:min(22rem,calc(100vw - 28px));max-height:70vh;display:flex;flex-direction:column;gap:.6rem;background:var(--band);color:var(--fg);border:1px solid var(--frame);padding:.8rem;font:400 .9rem/1.5 var(--sans);box-shadow:0 6px 24px rgba(0,0,0,.45)}
+.askh{display:flex;justify-content:space-between;align-items:center}
+.askx{background:none;border:0;color:var(--fg);font-size:1.3rem;cursor:pointer;line-height:1}
+.asko{overflow-y:auto;white-space:pre-wrap;max-height:45vh}
+.asko:empty{display:none}
+.askp textarea{width:100%;resize:vertical;font:inherit;background:var(--bg);color:var(--fg);border:1px solid var(--rule);padding:.5rem}

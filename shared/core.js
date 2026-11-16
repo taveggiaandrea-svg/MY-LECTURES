@@ -46,7 +46,9 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro'};
+  prev:'Lezione precedente',next:'Lezione successiva',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
+  askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulla lezione fornita. Se la domanda esce dalla lezione, dillo.'};
 const $=s=>document.querySelector(s);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e};
 const btn=(label,html)=>{const b=el('button','btn');b.type='button';if(html)b.innerHTML=label;else b.textContent=label;return b};

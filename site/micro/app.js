@@ -47,7 +47,9 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro'};
+  prev:'Lezione precedente',next:'Lezione successiva',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
+  askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulla lezione fornita. Se la domanda esce dalla lezione, dillo.'};
 const $=s=>document.querySelector(s);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e};
 const btn=(label,html)=>{const b=el('button','btn');b.type='button';if(html)b.innerHTML=label;else b.textContent=label;return b};
@@ -2227,5 +2229,30 @@ document.addEventListener('click',e=>{
 });
 (function(){const m=location.hash.match(/lezione-(\d+)/);show(m?clamp(+m[1],1,LAST):1,false)})();
 renderMath(document.querySelector('footer'));
+
+/* ---------- Ask AI: domande a Gemini sulla lezione aperta; la chiave resta solo in questo browser ---------- */
+(function(){
+  const b=el('button','askbtn',UI.ask),p=el('div','askp');b.type='button';p.hidden=true;
+  p.innerHTML='<div class="askh"><b>'+UI.ask+'</b><button type="button" class="askx" aria-label="×">×</button></div><div class="asko" aria-live="polite"></div>'+
+    '<textarea rows="3" aria-label="'+UI.ask+'"></textarea><div class="ctl"><button type="button" class="btn solid">'+UI.askSend+'</button><button type="button" class="btn askk">'+UI.askKey+'</button></div>';
+  document.body.append(b,p);
+  const o=p.querySelector('.asko'),ta=p.querySelector('textarea'),go=p.querySelector('.solid');
+  const key=ask=>{let k='';try{k=localStorage.getItem('gemini-key')||''}catch(e){}
+    if(!k||ask){k=(prompt(UI.askPrompt)||'').trim();if(k)try{localStorage.setItem('gemini-key',k)}catch(e){}}return k};
+  b.onclick=()=>{p.hidden=!p.hidden;if(!p.hidden)ta.focus()};
+  p.querySelector('.askx').onclick=()=>{p.hidden=true};
+  p.querySelector('.askk').onclick=()=>key(true);
+  go.onclick=async()=>{const q=ta.value.trim(),k=q&&key();if(!k)return;
+    const art=lessons.find(l=>!l.hidden),ctx=(art?art.innerText:'').slice(0,30000);
+    o.textContent='…';go.disabled=true;
+    try{const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',{method:'POST',
+        headers:{'Content-Type':'application/json','x-goog-api-key':k},
+        body:JSON.stringify({systemInstruction:{parts:[{text:UI.askSys}]},contents:[{role:'user',parts:[{text:'LESSON:\n'+ctx+'\n\nQUESTION: '+q}]}]})});
+      const j=await r.json();
+      o.textContent=j.candidates&&j.candidates[0].content?j.candidates[0].content.parts.map(x=>x.text||'').join(''):((j.error&&j.error.message)||'Error')}
+    catch(e){o.textContent=String(e)}
+    go.disabled=false};
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))go.click()});
+})();
 
 })();
