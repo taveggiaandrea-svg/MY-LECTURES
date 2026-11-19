@@ -335,8 +335,8 @@ h3{font-size:1.25rem;font-weight:500;margin-top:1.2rem}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(0,0,0,.78);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);color:#fff;
   display:flex;align-items:center;gap:1.2rem;padding:1.05rem 1.6rem;font-family:var(--sans);font-size:1.02rem;line-height:1.3;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.07)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.top{background:#000}}
-.top .tg{position:absolute;left:0;top:0;width:620px;height:100%;pointer-events:none;z-index:0;
-  -webkit-mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.75) 35%,transparent 96%);mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.75) 35%,transparent 96%)}
+.top .tg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;
+  -webkit-mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.75) 45%,rgba(0,0,0,.55) 100%);mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.75) 45%,rgba(0,0,0,.55) 100%)}
 .top>*{position:relative;z-index:1}
 .top .name{font-family:var(--serif);font-weight:400;font-size:1.45rem;letter-spacing:.005em;margin-right:auto;white-space:nowrap;color:#fff;text-decoration:none}
 .top .right{display:flex;align-items:center;justify-content:flex-end;gap:.4rem;min-width:0;flex:0 1 auto}
