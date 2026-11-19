@@ -965,7 +965,7 @@ QZ['4a']=()=>[
   h:'Calcola prima l\'utilità attesa, poi cerca la somma certa che ha proprio quell\'utilità.'}
 ];
 QZ['4b']=()=>[
- {q:'Quanto vale il coefficiente di Arrow–Pratt di '+K('\\vv(z)=\\ln z')+' in '+K('z=2')+'?',
+ {q:'Quanto vale il coefficiente di Arrow-Pratt di '+K('\\vv(z)=\\ln z')+' in '+K('z=2')+'?',
   o:['2','0,5','−0,25','0'],a:1,
   e:K('\\vv\'(z)=1/z')+' e '+K('\\vv\'\'(z)=-1/z^2')+', quindi '+K('r_A(z)=1/z')+', che in 2 vale 0,5. L\'avversione assoluta scende al crescere della ricchezza.',
   h:'Calcola le prime due derivate di '+K('\\ln z')+' e fai il rapporto, cambiato di segno.'}
@@ -1973,7 +1973,7 @@ QZ['10c']=()=>[
 ];
 QZ['10']=()=>[
  {q:'In un\'economia con due beni e prezzi positivi tutti spendono esattamente il valore della propria dotazione, e il mercato delle mele torna. Che cosa si può dire di quello delle banane?',
-  o:['Torna anch\'esso','Non si può dire nulla','Ha per forza una domanda in eccesso','Torna solo se le preferenze sono Cobb–Douglas'],a:0,
+  o:['Torna anch\'esso','Non si può dire nulla','Ha per forza una domanda in eccesso','Torna solo se le preferenze sono Cobb-Douglas'],a:0,
   e:'Sommando i vincoli di bilancio, '+K('\\pu\\cdot(\\text{eccesso di mele}) = -\\pd\\cdot(\\text{eccesso di banane})')+'. Con prezzi positivi, se il primo è zero lo è anche il secondo.',
   h:'Somma i vincoli di bilancio di tutti gli individui.'},
  {q:'Il gioco delle mele non soddisfa le ipotesi della proposizione di esistenza, eppure ha un equilibrio. Perché non c\'è contraddizione?',
@@ -2141,7 +2141,7 @@ const BOS=[[[2,1],[0,0]],[[0,0],[1,2]]];
     for(let d=1;d<=3;d++){const y=y0+(d-1)*rh,hit=d===k,after=d>k;
       s+='<rect x="'+(x+6)+'" y="'+y+'" width="'+(cw-12)+'" height="'+(rh-10)+'" rx="5" fill="'+(hit?'rgba(88,196,221,.18)':'none')+'" stroke="'+(hit?BLUE:'#333')+'"/>';
       for(let j=0;j<k;j++){const cx=x+cw/2-(k-1)*16+j*32;s+='<circle cx="'+cx+'" cy="'+(y+18)+'" r="10" fill="'+(after?'#333':BLUE)+'" stroke="'+(hit?'#fff':'none')+'" stroke-width="2"/>'}
-      s+=tx(x+cw/2,y+42,after?'—':hit?(k===1?'compie il rito':'compiono il rito'):'nessun rito',{s:12,f:hit?BLUE:GRAY});
+      s+=tx(x+cw/2,y+42,after?'-':hit?(k===1?'compie il rito':'compiono il rito'):'nessun rito',{s:12,f:hit?BLUE:GRAY});
     }});
   s+=tx(W/2,y0+3*rh+8,'riga 1: primo giorno dopo l\'annuncio · riga 2: secondo giorno · riga 3: terzo giorno',{s:12,f:GRAY});
   root.append(legend([[BLUE,'persona con gli occhi azzurri','dot'],[BLUE,'giorno del rito','box']]));

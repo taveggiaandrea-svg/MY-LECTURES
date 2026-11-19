@@ -59,7 +59,7 @@ QZ['10c']=()=>[
 ];
 QZ['10']=()=>[
  {q:'In un\'economia con due beni e prezzi positivi tutti spendono esattamente il valore della propria dotazione, e il mercato delle mele torna. Che cosa si può dire di quello delle banane?',
-  o:['Torna anch\'esso','Non si può dire nulla','Ha per forza una domanda in eccesso','Torna solo se le preferenze sono Cobb–Douglas'],a:0,
+  o:['Torna anch\'esso','Non si può dire nulla','Ha per forza una domanda in eccesso','Torna solo se le preferenze sono Cobb-Douglas'],a:0,
   e:'Sommando i vincoli di bilancio, '+K('\\pu\\cdot(\\text{eccesso di mele}) = -\\pd\\cdot(\\text{eccesso di banane})')+'. Con prezzi positivi, se il primo è zero lo è anche il secondo.',
   h:'Somma i vincoli di bilancio di tutti gli individui.'},
  {q:'Il gioco delle mele non soddisfa le ipotesi della proposizione di esistenza, eppure ha un equilibrio. Perché non c\'è contraddizione?',

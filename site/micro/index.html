@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Microeconomia computazionale</title>
+<title>30418 Computational Microeconomics 1</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%231b2a3a'/%3E%3Cstop offset='1' stop-color='%230b0f14'/%3E%3C/linearGradient%3E%3ClinearGradient id='l' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%233fa9c9'/%3E%3Cstop offset='1' stop-color='%237fd6ea'/%3E%3C/linearGradient%3E%3ClinearGradient id='r' x1='1' y1='0' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%23b8559f'/%3E%3Cstop offset='1' stop-color='%23ea95dc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23bg)'/%3E%3Crect x='.75' y='.75' width='62.5' height='62.5' rx='14.3' fill='none' stroke='%23fff' stroke-opacity='.12' stroke-width='1.5'/%3E%3Cpath d='M31 25Q22 19 11 22V49Q22 46 31 51Z' fill='url(%23l)'/%3E%3Cpath d='M33 25Q42 19 53 22V49Q42 46 33 51Z' fill='url(%23r)'/%3E%3Cpath d='M15 29Q22 27.5 27 30M15 35Q22 33.5 27 36M15 41Q22 39.5 27 42M37 30Q42 27.5 49 29M37 36Q42 33.5 49 35M37 42Q42 39.5 49 41' stroke='%230b0f14' stroke-opacity='.35' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='13' r='7' fill='%23FFFF00' opacity='.18'/%3E%3Ccircle cx='32' cy='13' r='4.2' fill='%23FFFF00'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -236,7 +236,7 @@
   </figure>
   <p class="stmt">Se \(f\) è crescente, cioè \(f(s) &gt; f(t)\) ogni volta che \(s &gt; t\), e \(\uu\) rappresenta \(\pf\), allora anche \(\ww(x) = f(\uu(x))\) rappresenta \(\pf\).</p>
   <p>La ragione sta in una riga: \(\ww(x) \ge \ww(y)\) se e solo se \(f(\uu(x)) \ge f(\uu(y))\), se e solo se \(\uu(x) \ge \uu(y)\), se e solo se \(x \pf y\).</p>
-  <p>Un esempio che tornerà spesso è l'utilità <em>Cobb–Douglas</em> sulle coppie di numeri non negativi, \(\uu(x,y) = x^{\alf} y^{1-\alf}\) con \(\alf\) fra 0 e 1. La stessa preferenza è rappresentata dal suo logaritmo, \(\alf \ln x + (1-\alf)\ln y\); dalla sua radice quadrata, \(x^{\alf/2}y^{(1-\alf)/2}\); dal suo cubo, \(x^{3\alf}y^{3-3\alf}\). Tre formule diverse, un solo ordinamento.</p>
+  <p>Un esempio che tornerà spesso è l'utilità <em>Cobb-Douglas</em> sulle coppie di numeri non negativi, \(\uu(x,y) = x^{\alf} y^{1-\alf}\) con \(\alf\) fra 0 e 1. La stessa preferenza è rappresentata dal suo logaritmo, \(\alf \ln x + (1-\alf)\ln y\); dalla sua radice quadrata, \(x^{\alf/2}y^{(1-\alf)/2}\); dal suo cubo, \(x^{3\alf}y^{3-3\alf}\). Tre formule diverse, un solo ordinamento.</p>
   <p><strong>Un'utilità è un'etichetta d'ordine, non una misura.</strong> Dire che \(\uu(a)\) è «il doppio» di \(\uu(b)\) non significa niente, in linea con la decisione iniziale di ignorare l'intensità.</p>
   <h3>Una scala che dice solo l'ordine</h3>
   <p>I geologi usano da due secoli una scala fatta così: la scala di Mohs della durezza dei minerali. Un minerale ha un numero più alto di un altro se lo graffia. Nient'altro.</p>
@@ -605,7 +605,7 @@
 <section class="hero"><div class="col">
   <p class="chap">Capitolo 3 · Topic 3-2</p>
   <h1>Quanto vale la certezza?</h1>
-  <p class="desc">Rischio: avversione al rischio, equivalente certo, il coefficiente di Arrow–Pratt e la dominanza stocastica fra lotterie.</p>
+  <p class="desc">Rischio: avversione al rischio, equivalente certo, il coefficiente di Arrow-Pratt e la dominanza stocastica fra lotterie.</p>
 </div></section>
 
 <section><div class="col">
@@ -658,7 +658,7 @@
   <h2>Misurare l'avversione</h2>
   <p>Sapere <em>se</em> una persona è avversa al rischio non basta: vogliamo sapere <em>quanto</em>. L'avversione viene dalla curvatura di \(\vv\), quindi il candidato più ovvio è la derivata seconda \(\vv''(z)\).</p>
   <p>Ma ha un difetto. Nella lezione 3 abbiamo visto che \(k\vv + h\), con \(k \gt 0\), rappresenta le stesse preferenze di \(\vv\): e la sua derivata seconda è \(k\vv''\), un numero diverso per la stessa persona. Dividendo per \(\vv'\) il fattore \(k\) si cancella. Cambiando segno, il numero è positivo per una \(\vv\) crescente e concava.</p>
-  <p class="stmt">Il <strong>coefficiente di avversione assoluta al rischio di Arrow–Pratt</strong> in \(z\), per una \(\vv\) derivabile due volte, è \(r_A(z) = -\vv''(z)/\vv'(z)\).</p>
+  <p class="stmt">Il <strong>coefficiente di avversione assoluta al rischio di Arrow-Pratt</strong> in \(z\), per una \(\vv\) derivabile due volte, è \(r_A(z) = -\vv''(z)/\vv'(z)\).</p>
   <p>Per esempio, con \(\vv(z) = \ln z\) si ha \(\vv' = 1/z\) e \(\vv'' = -1/z^2\), quindi \(r_A(z) = 1/z\). Con \(\vv(z) = \sqrt z\) viene \(r_A(z) = 1/(2z)\): la metà, a ogni livello di ricchezza. Con \(\vv(z) = z\) viene zero.</p>
   <p>Ora si possono confrontare due persone. Quando \(\vv_2\) è, senza ambiguità, più avversa al rischio di \(\vv_1\)? Tre definizioni plausibili: \(r_A(z,\vv_2) \ge r_A(z,\vv_1)\) per ogni \(z\); \(\vv_2\) è «più concava» di \(\vv_1\), cioè \(\vv_2(z) = \varphi(\vv_1(z))\) per una \(\varphi\) crescente e concava; \(\ceq(\Lp,\vv_2) \le \ceq(\Lp,\vv_1)\) per ogni lotteria.</p>
   <p class="stmt"><strong>Proposizione.</strong> Le tre definizioni di «più avversa al rischio» sono equivalenti.</p>
@@ -1076,7 +1076,7 @@
   <p>Primo risultato: il 95,7% delle famiglie supera il test di razionalità. Sembra un trionfo, e altri studi trovano lo stesso per allevatori di New York, consumatori danesi, bambini e scimmie cappuccine. Ma gli autori fanno un passo in più: simulano al computer famiglie finte, con gli stessi insiemi di bilancio, che comprano a caso.</p>
   <figure>
     <div class="w" id="bc7"></div>
-    <figcaption>Sopra: quota di famiglie che supera il test, vere e simulate (Beatty e Crawford, 2011; 3 134 famiglie, Spagna 1985–1997). Le slide dicono che la quota delle famiglie simulate è «solo il 4,5% più bassa»: la barra la mostra come 4,5 punti in meno. Sotto: perché succede.</figcaption>
+    <figcaption>Sopra: quota di famiglie che supera il test, vere e simulate (Beatty e Crawford, 2011; 3 134 famiglie, Spagna, dal 1985 al 1997). Le slide dicono che la quota delle famiglie simulate è «solo il 4,5% più bassa»: la barra la mostra come 4,5 punti in meno. Sotto: perché succede.</figcaption>
   </figure>
   <p>Anche chi sceglie a caso supera quasi sempre il test. Il motivo è nei dati: i prezzi cambiano poco e i redditi molto, quindi gli insiemi di bilancio sono quasi sempre uno dentro l'altro. E <strong>quando un insieme di bilancio contiene l'altro, qualunque coppia di scelte sulle rispettive rette rispetta l'assioma</strong>: il test non ha modo di fallire.</p>
   <p>Che cosa se ne ricava? Che leggere i dati con questa teoria funziona, ma dice poco sulla «vera» razionalità delle persone. Allora perché non usare un modello di scelta casuale? Perché l'approccio economico permette di attribuire preferenze alle persone, e con quelle di valutare quanto bene il mercato le soddisfa: è ciò che serve per ragionare di politiche pubbliche. Resta il dubbio che le preferenze attribuite siano davvero quelle rivelate dalle scelte. Ma è difficile dire con che cos'altro lavorare.</p>
@@ -1140,7 +1140,7 @@
     <p><em>Omogeneità.</em> \(\sB_{\lam\pp,\lam\wl} = \{x : \lam\pp\cdot x \le \lam\wl\} = \{x : \pp \cdot x \le \wl\} = \sB_{\pp,\wl}\). Stesso insieme, stesso problema, stesse soluzioni. Non serve nessuna ipotesi su \(\uu\).</p>
     <p><em>Legge di Walras, per assurdo.</em> Supponi \(\pp \cdot x \lt \wl\) per un \(x\) ottimo. Allora esiste un \(\epsi \gt 0\) abbastanza piccolo perché \(y = (x_1 + \epsi, x_2 + \epsi)\) costi ancora meno di \(\wl\). Per la monotonia \(y \spf x\): \(x\) non era ottimo.</p>
   </div></details>
-  <h3>L'esempio da sapere a memoria: Cobb–Douglas</h3>
+  <h3>L'esempio da sapere a memoria: Cobb-Douglas</h3>
   <p>Con \(\uu(x_1,x_2) = x_1^{\alf} x_2^{1-\alf}\), per un \(\alf\) fra 0 e 1, la soluzione è</p>
   <div class="eq">\[ \dx_1(\pp,\wl) = \frac{\alf\,\wl}{\pu}, \qquad \dx_2(\pp,\wl) = \frac{(1-\alf)\,\wl}{\pd}. \]</div>
   <p>La spesa per ciascun bene è una quota fissa della ricchezza, \(\alf\) e \(1-\alf\), qualunque siano i prezzi. Con \(\alf = 1/2\) è la regola «metà per bene» della lezione 7, e il caso \(\uu = x_1x_2\) dell'apertura dà lo stesso paniere: è una trasformazione crescente di \(x_1^{1/2}x_2^{1/2}\).</p>
@@ -1168,7 +1168,7 @@
     <p><em>Soluzione interna.</em> Se \(0 \lt t^* \lt \wl/\pu\), la derivata nel massimo è zero: \(\uu_1(x^*) = (\pu/\pd)\,\uu_2(x^*)\). Dividendo per \(\uu_2(x^*) \gt 0\) si ottiene \(\mrs(x^*) = \pu/\pd\).</p>
     <p><em>Angoli.</em> Se \(x_1^* = 0\) il massimo è nell'estremo sinistro: spostandosi di poco a destra \(g\) non può salire, quindi la derivata da destra è \(\le 0\), cioè \(\mrs(x^*) \le \pu/\pd\). Se \(x_2^* = 0\) il massimo è nell'estremo destro: la derivata da sinistra è \(\ge 0\), cioè \(\mrs(x^*) \ge \pu/\pd\).</p>
   </div></details>
-  <p>Con la Cobb–Douglas \(\mrs = \alf x_2/((1-\alf)x_1)\). Uguagliandolo a \(\pu/\pd\) si ottiene \((1-\alf)\,\pu x_1 = \alf\,\pd x_2\): le due spese stanno fra loro come \(\alf\) e \(1-\alf\). Insieme alla retta di bilancio ridà le formule di prima, senza derivare niente.</p>
+  <p>Con la Cobb-Douglas \(\mrs = \alf x_2/((1-\alf)x_1)\). Uguagliandolo a \(\pu/\pd\) si ottiene \((1-\alf)\,\pu x_1 = \alf\,\pd x_2\): le due spese stanno fra loro come \(\alf\) e \(1-\alf\). Insieme alla retta di bilancio ridà le formule di prima, senza derivare niente.</p>
   <div class="quiz inq" data-quiz="8c"></div>
   <h3>Quando si finisce in un angolo</h3>
   <p>Le due disuguaglianze servono quando la soluzione sta su un asse. Se \(x^*_1 = 0\), il consumatore vorrebbe forse cedere altro bene 1, ma non ne ha: per questo lì l'uguaglianza può fallire. Un esempio è \(\uu = x_1 + \sqrt{x_2}\), per cui \(\mrs(x_1,x_2) = 2\sqrt{x_2}\).</p>
@@ -1200,10 +1200,10 @@
   <h2>Quanto si sta bene, dati prezzi e ricchezza</h2>
   <p>Il secondo oggetto che esce dall'UMP è il valore del massimo.</p>
   <p class="stmt">La <strong>funzione di utilità indiretta</strong> \(\vv(\pp,\wl)\) è l'utilità raggiunta nell'ottimo: \(\vv(\pp,\wl) = \uu(x^*)\) per qualunque \(x^* \in \dx(\pp,\wl)\).</p>
-  <p>Si chiama «indiretta» perché dipende dai panieri solo attraverso prezzi e ricchezza. Per la Cobb–Douglas basta sostituire la domanda nell'utilità:</p>
+  <p>Si chiama «indiretta» perché dipende dai panieri solo attraverso prezzi e ricchezza. Per la Cobb-Douglas basta sostituire la domanda nell'utilità:</p>
   <div class="eq">\[ \vv(\pp,\wl) = \left(\frac{\alf\wl}{\pu}\right)^{\!\alf} \left(\frac{(1-\alf)\wl}{\pd}\right)^{\!1-\alf} = \frac{\alf^{\alf}(1-\alf)^{1-\alf}}{\pu^{\alf}\,\pd^{1-\alf}}\;\wl . \]</div>
   <p class="stmt"><strong>Proposizione.</strong> Se \(\uu\) è continua e rappresenta una preferenza monotona, \(\vv\) è omogenea di grado zero in \((\pp,\wl)\), strettamente crescente in \(\wl\) e non crescente in \(\pu\) e in \(\pd\).</p>
-  <p>L'idea è quella che ti aspetti. Moltiplicare prezzi e ricchezza per lo stesso \(\lam \gt 0\) non cambia l'insieme di bilancio, quindi nemmeno il massimo. Più ricchezza, o un prezzo più basso, allargano l'insieme: il massimo non può scendere. Con più ricchezza sale strettamente, perché diventa acquistabile un paniere con un po' di più di entrambi i beni, che per la monotonia è strettamente migliore. Nella formula Cobb–Douglas si vede a occhio: \(\wl\) sta sopra, i prezzi sotto.</p>
+  <p>L'idea è quella che ti aspetti. Moltiplicare prezzi e ricchezza per lo stesso \(\lam \gt 0\) non cambia l'insieme di bilancio, quindi nemmeno il massimo. Più ricchezza, o un prezzo più basso, allargano l'insieme: il massimo non può scendere. Con più ricchezza sale strettamente, perché diventa acquistabile un paniere con un po' di più di entrambi i beni, che per la monotonia è strettamente migliore. Nella formula Cobb-Douglas si vede a occhio: \(\wl\) sta sopra, i prezzi sotto.</p>
   <p>Una differenza da ricordare. La domanda \(\dx(\pp,\wl)\) non dipende da quale utilità si usa per rappresentare la preferenza. <strong>L'utilità indiretta sì</strong>: se al posto di \(\uu\) si usa \(f(\uu)\), con \(f\) crescente, al posto di \(\vv\) si ottiene \(f(\vv)\).</p>
 </div></section>
 
@@ -1238,7 +1238,7 @@
     <p><em>\(\ee\) crescente in \(\ub\).</em> Se non lo fosse, ci sarebbero \(u' \lt u''\) con \(\ee(\pp,u') \ge \ee(\pp,u'')\), cioè \(\pp\cdot x' \ge \pp\cdot x''\) per i rispettivi ottimi. Rimpicciolendo di poco \(x''\) si ottiene un paniere che dà ancora più di \(u'\) e costa meno di \(x'\): \(x'\) non era ottimo.</p>
     <p><em>\(\ee\) non decrescente nei prezzi.</em> Se \(\pp''\) ha il primo prezzo più alto di \(\pp'\) e il secondo uguale, e \(x''\) è ottimo a \(\pp''\), allora \(\ee(\pp'',\ub) = \pp''\cdot x'' \ge \pp'\cdot x'' \ge \ee(\pp',\ub)\).</p>
   </div></details>
-  <p>Per la Cobb–Douglas \(x_1^{\alf}x_2^{1-\alf}\):</p>
+  <p>Per la Cobb-Douglas \(x_1^{\alf}x_2^{1-\alf}\):</p>
   <div class="eq">\[ \hh_1(\pp,\ub) = \left[\frac{\alf\,\pd}{(1-\alf)\,\pu}\right]^{1-\alf}\!\ub, \qquad \hh_2(\pp,\ub) = \left[\frac{(1-\alf)\,\pu}{\alf\,\pd}\right]^{\alf}\!\ub, \qquad \ee(\pp,\ub) = \alf^{-\alf}(1-\alf)^{\alf-1}\,\pu^{\alf}\pd^{1-\alf}\,\ub . \]</div>
   <details class="reveal"><summary>Da dove vengono queste formule</summary><div class="in">
     <p>Nell'ottimo non c'è utilità in eccesso, quindi \(x_1^{\alf}x_2^{1-\alf} = \ub\), cioè \(x_2 = \ub^{1/(1-\alf)}\,x_1^{-\alf/(1-\alf)}\). Resta da minimizzare \(\pu x_1 + \pd\,\ub^{1/(1-\alf)}\,x_1^{-\alf/(1-\alf)}\) in una variabile.</p>
@@ -1451,7 +1451,7 @@
       <tr><td class="c">3</td><td>Lotteria</td><td>Probabilità sui premi</td><td>\(\Lp = (\Lp_1, \dots, \Lp_K)\)</td></tr>
       <tr><td class="c">3</td><td>Utilità attesa</td><td>Equivale a continuità più indipendenza</td><td>\(\UU(\Lp) = \sum_z \Lp(z)\vv(z)\)</td></tr>
       <tr><td class="c">4</td><td>Avversione al rischio</td><td>Il valore atteso certo vale almeno quanto la lotteria</td><td>\(\vv\) concava; \(\ceq(\Lp,\vv) \le E[\Lp]\)</td></tr>
-      <tr><td class="c">4</td><td>Arrow–Pratt</td><td>Quanto è curva \(\vv\), in un numero</td><td>\(r_A(z) = -\vv''(z)/\vv'(z)\)</td></tr>
+      <tr><td class="c">4</td><td>Arrow-Pratt</td><td>Quanto è curva \(\vv\), in un numero</td><td>\(r_A(z) = -\vv''(z)/\vv'(z)\)</td></tr>
       <tr><td class="c">4</td><td>Dominanza stocastica</td><td>Meglio per chiunque preferisca di più a di meno</td><td>\(\FF(z) \le \GG(z)\) per ogni \(z\)</td></tr>
       <tr><td class="c">5</td><td>Utilità attesa soggettiva</td><td>Le probabilità le mette chi decide</td><td>\(\sum_{\omega} \ppi(\omega)\,\vv(\af(\omega))\)</td></tr>
       <tr><td class="c">6</td><td>Monotonia</td><td>Di più è meglio</td><td>\(x_i \gt y_i\) per \(i=1,2 \Rightarrow x \spf y\)</td></tr>
@@ -1484,9 +1484,9 @@
 <section><div class="col">
   <p>Nella lezione 9 le case andavano al più forte, o si spostavano solo con il consenso di tutti. Ora le persone possiedono qualcosa e lo scambiano sul mercato, a prezzi uguali per tutti.</p>
   <h2>Mele e banane su un'isola</h2>
-  <p>Su un'isola vivono Ann e Bob. Ann ha 6 mele, Bob ha 6 banane; i beni sono divisibili. Le loro preferenze sono Cobb–Douglas, già viste nella lezione 8: Ann ha \(\uu_1 = x_1^{2/3}x_2^{1/3}\), Bob ha \(\uu_2 = x_1^{1/3}x_2^{2/3}\), dove \(x_1\) sono mele e \(x_2\) banane.</p>
+  <p>Su un'isola vivono Ann e Bob. Ann ha 6 mele, Bob ha 6 banane; i beni sono divisibili. Le loro preferenze sono Cobb-Douglas, già viste nella lezione 8: Ann ha \(\uu_1 = x_1^{2/3}x_2^{1/3}\), Bob ha \(\uu_2 = x_1^{1/3}x_2^{2/3}\), dove \(x_1\) sono mele e \(x_2\) banane.</p>
   <p>Un moderatore annuncia un tasso \(r\): una mela vale \(r\) banane, cioè i prezzi sono \((r, 1)\). Ognuno sceglie il paniere migliore che può permettersi a quel tasso. Se le due richieste insieme si possono soddisfare con le 6 mele e le 6 banane che ci sono, lo scambio si fa; altrimenti si annuncia un altro tasso.</p>
-  <p>Con la Cobb–Douglas si spende una quota fissa della ricchezza su ogni bene. La ricchezza di Ann è il valore delle sue mele, \(6r\); quella di Bob è 6. Quindi Ann chiede \((4,\ 2r)\) e Bob chiede \((2/r,\ 4)\).</p>
+  <p>Con la Cobb-Douglas si spende una quota fissa della ricchezza su ogni bene. La ricchezza di Ann è il valore delle sue mele, \(6r\); quella di Bob è 6. Quindi Ann chiede \((4,\ 2r)\) e Bob chiede \((2/r,\ 4)\).</p>
   <figure>
     <div class="w" id="edge10"></div>
     <figcaption>La scatola di Edgeworth: il lato orizzontale sono le 6 mele, quello verticale le 6 banane. Le quantità di Ann si leggono dall'angolo in basso a sinistra, quelle di Bob dall'angolo in alto a destra, quindi ogni punto della scatola è un modo di dividere tutto fra i due. Il punto bianco è la dotazione; la retta passa per lì con pendenza \(-r\). Nel primo riquadro, con \(r = 2\), i due chiedono punti diversi; nel secondo, con \(r = 1\), lo stesso punto.</figcaption>
@@ -1558,7 +1558,7 @@
 </div></section>
 
 <section><div class="col">
-  <div class="examend"><b>Fine del programma del primo parziale</b>Qui finisce la materia del primo parziale: le lezioni 1–10, cioè le slide dal Topic 1 al Topic 5-2 compreso. Le lezioni 11 e 12 (teoria dei giochi, Topic 6) sono oltre.</div>
+  <div class="examend"><b>Fine del programma del primo parziale</b>Qui finisce la materia del primo parziale: le lezioni da 1 a 10, cioè le slide dal Topic 1 al Topic 5-2 compreso. Le lezioni 11 e 12 (teoria dei giochi, Topic 6) sono oltre.</div>
   <p>Se di questa lezione dovesse restarti una sola cosa: <strong>in un equilibrio concorrenziale ognuno sceglie il meglio ai prezzi comuni e i mercati tornano; e senza esternalità il risultato è Pareto stabile.</strong></p>
   <p>Fin qui ognuno sceglieva prendendo il mondo come dato. Con la teoria dei giochi le scelte degli altri diventano parte del problema.</p>
   <nav class="navend" aria-label="Altre lezioni"></nav>
@@ -1567,7 +1567,7 @@
 <!-- ===================== LEZIONE 11 ===================== -->
 <article class="lesson" data-n="11" id="lezione-11" data-title="Come si scrive un gioco?" hidden>
 <section class="hero"><div class="col">
-  <p class="chap">Watson, capitoli 1–3 · Topic 6-1</p>
+  <p class="chap">Watson, capitoli da 1 a 3 · Topic 6-1</p>
   <p class="examtag">Oltre il programma del primo parziale</p>
   <h1>Come si scrive un gioco?</h1>
   <p class="desc">Introduzione alla teoria dei giochi: forma estesa, insiemi di informazione, strategie come piani completi, forma normale.</p>
@@ -1660,7 +1660,7 @@
 <!-- ===================== LEZIONE 12 ===================== -->
 <article class="lesson" data-n="12" id="lezione-12" data-title="Che cosa crede un giocatore?" hidden>
 <section class="hero"><div class="col">
-  <p class="chap">Watson, capitoli 4–5 · Topic 6-2 e 6-3</p>
+  <p class="chap">Watson, capitoli 4 e 5 · Topic 6-2 e 6-3</p>
   <p class="examtag">Oltre il programma del primo parziale</p>
   <h1>Che cosa crede un giocatore?</h1>
   <p class="desc">Convinzioni, strategie miste e payoff atteso; poi le ipotesi generali della teoria: razionalità, conoscenza comune, realismo.</p>
@@ -1767,9 +1767,9 @@
 </article>
 </main>
 <footer><div class="col">
-  <p>Rielaborazione a scopo di studio personale di due fonti. Il libro: M. J. Osborne e A. Rubinstein, <em>Models in Microeconomic Theory</em> (Expanded Second Edition), Open Book Publishers, 2023, <a href="https://doi.org/10.11647/OBP.0361">doi.org/10.11647/OBP.0361</a>, licenza CC BY-NC-ND 4.0, capitoli 1–5, 8 e 10. J. Watson, <em>Strategy: An Introduction to Game Theory</em>, terza edizione, W. W. Norton, capitoli 1–5. Le slide del corso <em>Computational Microeconomics 1</em> (Università Bocconi, prof. Tangren Feng), Topic 1 – Topic 6-3.</p>
-  <p>Lezione 1: capitolo 1 e Topic 1. Lezione 2: capitolo 2 e Topic 2. Lezione 3: capitolo 3 e Topic 3-1. Lezione 4: capitolo 3 e Topic 3-2. Lezione 5: Topic 3-3. Lezione 6: capitolo 4 e Topic 4-1. Lezione 7: capitolo 5 e Topic 4-2. Lezione 8: capitolo 5 e Topic 4-3. Lezione 9: capitolo 8 (sezioni 8.1–8.4) e Topic 5-1. Lezione 10: capitolo 10 e Topic 5-2. Lezione 11: Watson, capitoli 1–3, e Topic 6-1. Lezione 12: Watson, capitoli 4–5, e Topic 6-2 e 6-3.</p>
-  <p>Le slide rimandano a loro volta a A. Mas-Colell, M. D. Whinston e J. R. Green, <em>Microeconomic Theory</em>, Oxford University Press, 1995, e a T. K. M. Beatty e I. A. Crawford, «How Demanding Is the Revealed Preference Approach to Demand?», <em>American Economic Review</em> 101(6), 2011, pp. 2782–95.</p>
+  <p>Rielaborazione a scopo di studio personale di tre fonti. Il libro: M. J. Osborne e A. Rubinstein, <em>Models in Microeconomic Theory</em> (Expanded Second Edition), Open Book Publishers, 2023, <a href="https://doi.org/10.11647/OBP.0361">doi.org/10.11647/OBP.0361</a>, licenza CC BY-NC-ND 4.0, capitoli da 1 a 5, 8 e 10. J. Watson, <em>Strategy: An Introduction to Game Theory</em>, terza edizione, W. W. Norton, capitoli da 1 a 5. Le slide del corso <em>30418 Computational Microeconomics 1</em> (Università Bocconi, prof. Tangren Feng), dal Topic 1 al Topic 6-3.</p>
+  <p>Lezione 1: capitolo 1 e Topic 1. Lezione 2: capitolo 2 e Topic 2. Lezione 3: capitolo 3 e Topic 3-1. Lezione 4: capitolo 3 e Topic 3-2. Lezione 5: Topic 3-3. Lezione 6: capitolo 4 e Topic 4-1. Lezione 7: capitolo 5 e Topic 4-2. Lezione 8: capitolo 5 e Topic 4-3. Lezione 9: capitolo 8 (sezioni da 8.1 a 8.4) e Topic 5-1. Lezione 10: capitolo 10 e Topic 5-2. Lezione 11: Watson, capitoli da 1 a 3, e Topic 6-1. Lezione 12: Watson, capitoli 4 e 5, e Topic 6-2 e 6-3.</p>
+  <p>Le slide rimandano a loro volta a A. Mas-Colell, M. D. Whinston e J. R. Green, <em>Microeconomic Theory</em>, Oxford University Press, 1995, e a T. K. M. Beatty e I. A. Crawford, «How Demanding Is the Revealed Preference Approach to Demand?», <em>American Economic Review</em> 101(6), 2011, pp. 2782-2795.</p>
   <p>Definizioni, enunciati, esempi e dati degli esperimenti sono quelli delle fonti; testo e figure sono riscritti. La licenza del libro di Osborne e Rubinstein non permette di distribuire opere derivate: questa pagina è per uso personale e non va condivisa.</p>
 </div></footer>
 <script src="../assets/katex/katex.min.js"></script>

@@ -106,7 +106,7 @@ QZ['4a']=()=>[
   h:'Calcola prima l\'utilità attesa, poi cerca la somma certa che ha proprio quell\'utilità.'}
 ];
 QZ['4b']=()=>[
- {q:'Quanto vale il coefficiente di Arrow–Pratt di '+K('\\vv(z)=\\ln z')+' in '+K('z=2')+'?',
+ {q:'Quanto vale il coefficiente di Arrow-Pratt di '+K('\\vv(z)=\\ln z')+' in '+K('z=2')+'?',
   o:['2','0,5','−0,25','0'],a:1,
   e:K('\\vv\'(z)=1/z')+' e '+K('\\vv\'\'(z)=-1/z^2')+', quindi '+K('r_A(z)=1/z')+', che in 2 vale 0,5. L\'avversione assoluta scende al crescere della ricchezza.',
   h:'Calcola le prime due derivate di '+K('\\ln z')+' e fai il rapporto, cambiato di segno.'}
