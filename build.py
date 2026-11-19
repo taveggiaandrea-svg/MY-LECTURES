@@ -15,6 +15,10 @@ def write(path, text):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     open(path, 'w', encoding='utf-8').write(text)
 
+LOGO = ('<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,'
+        "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111'/%3E"
+        "%3Cpath d='M12 18q10-4 20 2v30q-10-6-20-2z' fill='%2358C4DD'/%3E%3Cpath d='M52 18q-10-4-20 2v30q10-6 20-2z' fill='%23DC75CD'/%3E"
+        "%3Ccircle cx='32' cy='12' r='5' fill='%23FFFF00'/%3E%3C/svg%3E" '">\n')
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
          '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300..700'
@@ -25,7 +29,7 @@ def head(title, up, lang='it'):
     return ('<!DOCTYPE html>\n<html lang="' + lang + '">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
             '<meta name="robots" content="noindex, nofollow">\n'
-            '<title>' + html.escape(title) + '</title>\n' + FONTS +
+            '<title>' + html.escape(title) + '</title>\n' + LOGO + FONTS +
             '<link rel="stylesheet" href="' + up + 'assets/katex/katex.min.css">\n'
             '<link rel="stylesheet" href="' + up + 'assets/style.css">\n' + THEME + '</head>\n<body>\n')
 
