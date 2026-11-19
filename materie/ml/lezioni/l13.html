@@ -1,0 +1,100 @@
+<article class="lesson" data-n="13" id="lezione-13" data-title="Come sceglie una rete fra molte classi?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 13</p>
+  <h1>Come sceglie una rete fra molte classi?</h1>
+  <p class="desc">Lo strato softmax e la cross-entropy: trasformare \(K\) punteggi in probabilità, misurare l'errore, e ricavare la regola con cui l'ultimo strato si corregge.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Una rete che riconosce le cifre scritte a mano deve scegliere fra dieci classi. Il suo ultimo strato produce dieci numeri, uno per classe: li chiamiamo <em>punteggi</em>, e possono essere qualsiasi numero reale. La lezione 12 suggeriva «uno contro tutti»: passare ogni punteggio in una sigmoide e leggerlo come la probabilità di quella classe. Vediamo perché non basta.</p>
+  <p>Prendiamo tre classi con punteggi 2,5, 2,0 e −1. Le tre sigmoidi danno 0,92, 0,88 e 0,27. Le classi non si parlano: due si dichiarano entrambe «quasi certe», e la somma fa 2,07. Ma le classi si escludono a vicenda, una cifra è un 3 oppure un 8: le probabilità devono sommare a 1.</p>
+  <p>Serve una regola che guardi tutti i punteggi insieme e restituisca numeri positivi con somma 1. La costruiamo in due mosse.</p>
+  <figure data-fig="build" data-opts='{"id":"l13_softmax"}'>
+    <figcaption>I tre punteggi dell'esempio, una barra per classe (blu, verde, arancione). Prima diventano esponenziali, tutti positivi; poi ciascuno viene diviso per la loro somma, e le barre diventano probabilità. Nell'ultimo passo sale solo il terzo punteggio, scritto in giallo: guarda come le altre due barre si abbassano anche se i loro punteggi restano fermi.</figcaption>
+  </figure>
+  <p>Questa regola è la <b>softmax</b>, già incontrata nella lezione 7. Nella formula \(a_k\) è il punteggio della classe \(k\) e \(p_k\) la probabilità che la rete le assegna. Ogni probabilità sta fra 0 e 1 e la somma fa sempre 1: alzare il punteggio di una classe abbassa la probabilità di tutte le altre.</p>
+  <figure data-fig="ovr">
+    <figcaption>Ora prova tu: muovi i tre punteggi. Nel primo riquadro ogni classe decide per conto suo, con una sigmoide; nel secondo c'è la softmax. Sotto ciascuno, la somma delle tre uscite: verde se fa 1, rossa altrimenti.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Da dove vengono i punteggi</h2>
+  <p>L'ultimo strato è un normale strato lineare. Se \(z_1,\dots,z_m\) sono gli output dell'ultimo strato nascosto, il punteggio della classe \(k\) è una somma pesata più un bias:</p>
+  <div class="math-block">\[a_k=\sum_{j=1}^{m}\Ws_{kj}\,z_j+\Bi_k\]</div>
+  <p>C'è un peso \(\Ws_{kj}\) per ogni coppia (classe \(k\), unità nascosta \(j\)). Sono questi i parametri di cui vogliamo la regola di aggiornamento.</p>
+  <h3>Il bersaglio e la loss</h3>
+  <p>La classe corretta si scrive come un vettore <em>one-hot</em> \(\Yv=(\Yy_1,\dots,\Yy_K)\): vale 1 nella posizione della classe vera e 0 altrove. Con quattro classi, se quella vera è la terza, \(\Yv=(0,0,1,0)\).</p>
+  <p>Come nella lezione 7 usiamo la massima verosimiglianza: vogliamo che la rete dia probabilità alta alla classe che si è osservata. Da questa richiesta si ricava un costo, la <b>cross-entropy</b>.</p>
+  <figure data-fig="build" data-opts='{"id":"l13_ce"}'>
+    <figcaption>Nella prima parte le quattro probabilità previste (barre gialle): quella della classe vera è piena, le altre sbiadite. Nella seconda la curva rosa del costo al variare della probabilità data alla classe vera; il punto bianco segna dove siamo. Nell'ultimo passo compare, in verde, il bersaglio one-hot.</figcaption>
+  </figure>
+  <p>Le due righe dicono la stessa cosa. Con il one-hot la probabilità della classe osservata si scrive come prodotto \(\prod_k p_k^{\Yy_k}\): i fattori con esponente 0 valgono 1, e resta solo \(p_t\). Il logaritmo trasforma il prodotto nella somma della seconda riga, e il segno meno ne fa un costo da minimizzare.</p>
+  <figure data-fig="celoss">
+    <figcaption>Ora prova tu. In giallo le probabilità che la rete assegna alle classi per un certo input (non cambiano); in verde il bersaglio one-hot. Scegli quale classe è quella vera: la loss dipende da una sola barra gialla, quella della classe vera.</figcaption>
+  </figure>
+  <p>La loss è piccola quando la rete dà molta probabilità alla classe giusta, e cresce senza limite quando gliene dà poca. Con due classi è la log loss della lezione 7.</p>
+  <div class="quiz" data-quiz="13a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>La derivata che conta</h2>
+  <p>Per aggiornare i pesi serve sapere come cambia la loss se si sposta di poco ciascun punteggio. Proviamo con i numeri: tre classi con punteggi 0,3, 1,6 e −0,4, e la classe vera è la prima. La rete per ora preferisce la seconda.</p>
+  <figure data-fig="build" data-opts='{"id":"l13_pmy"}'>
+    <figcaption>Le barre sono le probabilità delle tre classi; sotto ciascuna il suo punteggio. A turno un punteggio (in giallo) sale di 0,1: le linee tratteggiate ricordano dov'erano le barre prima, e in rosa si legge di quanto è cambiata la loss. Alla fine, sotto ogni classe, probabilità meno bersaglio; le frecce gialle indicano il verso in cui la discesa sposterà quel punteggio.</figcaption>
+  </figure>
+  <p>Il risultato è sorprendentemente semplice: probabilità prevista meno bersaglio. È lo stesso segnale di errore \(\delta\) della lezione 12, e ha la stessa forma già vista per i minimi quadrati e per la regressione logistica. Con le spinte l'abbiamo visto su un esempio; il conto esatto è qui sotto.</p>
+  <details class="rev"><summary>Come si ricava</summary>
+    <p>Serve prima la derivata della softmax: \(\partial p_i/\partial a_k=p_i(1-p_k)\) se \(i=k\), e \(-p_ip_k\) se \(i\ne k\). Poi la regola della catena: \(\frac{\partial\cL}{\partial a_k}=\sum_i\frac{\partial\cL}{\partial p_i}\frac{\partial p_i}{\partial a_k}\), con \(\partial\cL/\partial p_i=-\Yy_i/p_i\). Il fattore \(p_i\) si semplifica e resta \(-\Yy_k(1-p_k)+\sum_{i\ne k}\Yy_ip_k=-\Yy_k+p_k\sum_i\Yy_i\). Poiché \(\Yv\) è one-hot, \(\sum_i\Yy_i=1\), e il risultato è \(p_k-\Yy_k\).</p>
+  </details>
+  <p>Per la classe vera \(p_t-1\) è negativo: scendere lungo il gradiente fa <em>salire</em> il suo punteggio. Per ogni altra classe \(p_k-0\) è positivo: il suo punteggio scende, tanto più quanto più probabilità le era stata data per errore.</p>
+  <figure data-fig="delta">
+    <figcaption>Gli stessi tre punteggi di prima, con il gradient descent applicato direttamente a loro. Le barre sono le probabilità, le linee bianche il bersaglio, le frecce rosa il verso in cui si muove ogni punteggio. All'inizio la rete preferisce la seconda classe.</figcaption>
+  </figure>
+  <h3>Dai punteggi ai pesi</h3>
+  <p>Un peso \(\Ws_{kj}\) entra nella loss solo attraverso il punteggio della sua classe. In quel punteggio il peso moltiplica \(z_j\): una piccola spinta al peso arriva al punteggio moltiplicata per \(z_j\). Quindi, come per ogni strato nella lezione 12, la derivata è «errore dell'unità di arrivo per output dell'unità di partenza»:</p>
+  <div class="math-block">\[\frac{\partial\cL}{\partial \Ws_{kj}}=(p_k-\Yy_k)\,z_j,\qquad \frac{\partial\cL}{\partial \Bi_k}=p_k-\Yy_k\]</div>
+  <p>Per il bias non c'è niente da moltiplicare: resta il solo errore. Un passo di gradient descent con step size \(\Et\) sposta ogni parametro dalla parte opposta alla sua derivata:</p>
+  <div class="math-block">\[\Ws_{kj}\leftarrow \Ws_{kj}-\Et\,(p_k-\Yy_k)\,z_j,\qquad \Bi_k\leftarrow \Bi_k-\Et\,(p_k-\Yy_k)\]</div>
+  <figure data-fig="outer">
+    <figcaption>Un esempio con tre classi e quattro unità nascoste. Ogni casella è la variazione di un peso: l'errore della sua riga per l'output della sua colonna, cambiato di segno. Verde: il peso cresce. Rosso: cala.</figcaption>
+  </figure>
+  <p>Un'unità nascosta che per questo input non era attiva (\(z_j=0\)) non ha contribuito alla previsione, e i pesi che partono da lei non vengono toccati.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Dentro la backpropagation</h2>
+  <p>Questo è solo l'ultimo strato; il resto è la backpropagation della lezione 12. In avanti si calcolano gli strati nascosti, poi i punteggi, la softmax e la loss. All'indietro si parte da \(\delta_k=p_k-\Yy_k\) e si propaga l'errore agli strati precedenti con la solita formula: ogni unità nascosta raccoglie i \(\delta\) dello strato successivo attraverso i pesi, e li moltiplica per la derivata della propria attivazione.</p>
+  <figure data-fig="smtrain">
+    <figcaption>Una rete con dieci unità nascoste e uscita softmax, allenata su tre classi disposte a spirale.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Le lezioni da 10 a 13 in una tabella</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Lezione</th><th>Concetto</th><th>Idea</th><th>Formula</th></tr></thead>
+    <tbody>
+      <tr><td>10</td><td>Entropia</td><td>La sorpresa media: alta se le classi sono mescolate, zero se il nodo è puro</td><td>\(H(Y)=\sum_k P_k\log_2\frac{1}{P_k}\)</td></tr>
+      <tr><td>10</td><td>Information gain</td><td>Di quanto una domanda riduce l'entropia</td><td>\(H(Y)-H(Y\mid X)\)</td></tr>
+      <tr><td>10</td><td>Random forest</td><td>Molti alberi diversi votano: la varianza si riduce</td><td>\(\sigma^2/n\)</td></tr>
+      <tr><td>11</td><td>k-NN</td><td>Votano i \(\Kk\) punti di training più vicini</td><td>nessuna</td></tr>
+      <tr><td>11</td><td>Perceptron</td><td>Corregge i pesi solo quando sbaglia; al più \(R^2/\Gk^2\) errori</td><td>\(\Wv\leftarrow\Wv+\Et\,\Yy\,\Xv\)</td></tr>
+      <tr><td>12</td><td>MLP</td><td>Strati non lineari in sequenza: la rete impara le sue features</td><td>\(\phi(W\Xv+\mathbf b)\)</td></tr>
+      <tr><td>12</td><td>Backpropagation</td><td>Errore dell'unità di arrivo per output di quella di partenza</td><td>\(\delta_j^{(l)}z_i^{(l-1)}\)</td></tr>
+      <tr><td>13</td><td>Softmax e cross-entropy</td><td>Punteggi → probabilità; la loss guarda la classe vera</td><td>\(\partial\cL/\partial a_k=p_k-\Yy_k\)</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="13"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>con uscita softmax e cross-entropy, l'errore di ogni classe è probabilità prevista meno bersaglio, \(p_k-\Yy_k\); da lì parte tutta la backpropagation.</b></p>
+  <p>Qui finisce il supervised learning. Nelle prossime lezioni le etichette spariscono: restano solo i dati, e la domanda diventa come descriverli in modo più compatto. Si comincia con la PCA.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

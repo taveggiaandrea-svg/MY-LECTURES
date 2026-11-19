@@ -1,0 +1,157 @@
+<article class="lesson" data-n="9" id="lezione-9" data-title="Come si separa ciò che una retta non separa?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 9</p>
+  <h1>Come si separa ciò che una retta non separa?</h1>
+  <p class="desc">La forma duale e i kernel: ottenere confini curvi lavorando in spazi con moltissime dimensioni, senza mai calcolarne le coordinate.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Una classe sta al centro, l'altra tutt'intorno. Nessuna retta le separa, e nessun margine morbido può rimediare. Ma guarda che cosa succede aggiungendo una terza feature, calcolata dalle prime due: \(\Xs_1^2+\Xs_2^2\), il quadrato della distanza dal centro.</p>
+  <figure data-fig="ring">
+    <figcaption>Ogni punto sale a un'altezza pari a \(\Xs_1^2+\Xs_2^2\). I punti centrali restano in basso, quelli esterni salgono: nello spazio a tre dimensioni un piano li separa.</figcaption>
+  </figure>
+  <p>È l'idea delle basis functions della lezione 4: una <b>feature map</b> \(\Ph\) trasforma ogni input \(\Xv\) in un vettore \(\Ph(\Xv)\) con più coordinate, e il modello resta lineare in quel nuovo spazio. Un confine piatto lassù corrisponde a un confine curvo nello spazio di partenza.</p>
+  <h3>Il conto diventa presto insostenibile</h3>
+  <p>Di solito non si sa in anticipo quale feature serve, quindi le si aggiunge tutte: i quadrati, i prodotti a coppie, i cubi e così via.</p>
+  <figure data-fig="kdim">
+    <figcaption>Quante features servono per avere tutti i prodotti fino a un certo grado, partendo da \(d\) features. L'asse verticale è logaritmico.</figcaption>
+  </figure>
+  <p>Calcolare e memorizzare milioni di coordinate per ogni dato è troppo costoso. In questa lezione vediamo come ottenere lo stesso risultato senza mai costruire \(\Ph(\Xv)\). Il primo passo è guardare la SVM da un'altra angolazione.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La SVM vista dai dati</h2>
+  <p>Il problema della lezione 8 cerca un vettore di pesi, con una coordinata per feature. Con una feature map enorme, le incognite diventano milioni. Esiste però una formulazione equivalente, detta <b>duale</b>, che cerca un numero \(\Al_i\) per ogni dato: tante incognite quanti sono i dati, non quante sono le features.</p>
+  <p>Non la deriviamo. La riportiamo, nella scala usata negli appunti del corso, solo per vedere com'è fatta:</p>
+  <div class="math-block">\[\max_{\boldsymbol{\Al}}\ \sum_{i=1}^{N}\Al_i-\frac{1}{2\Rl N^2}\sum_{i=1}^{N}\sum_{j=1}^{N}\Al_i\Al_j\,\Yy_i\Yy_j\,(\Xv_i^\top\Xv_j)\qquad\text{con}\quad 0\le\Al_i\le\frac{1}{\Rl N},\quad \sum_{i=1}^{N}\Al_i\Yy_i=0\]</div>
+  <p>Non serve leggerla tutta. Guarda due cose: ogni coefficiente sta fra zero e un tetto massimo, e i dati entrano solo nell'ultimo fattore, il prodotto scalare fra due punti. Su questo torniamo fra poco.</p>
+  <p>Una volta trovati i coefficienti, come si torna al confine? I pesi si ricostruiscono sommando i dati, ciascuno moltiplicato per il suo coefficiente e per la sua etichetta:</p>
+  <div class="math-block">\[\Wv^*=\frac{1}{\Rl N}\sum_{i=1}^{N}\Al_i^*\,\Yy_i\,\Xv_i\]</div>
+  <p>Quindi il coefficiente dice quanto il suo dato pesa nella soluzione. E nella soluzione molti coefficienti sono esattamente zero: i dati con coefficiente positivo sono proprio i vettori di supporto della lezione 8.</p>
+  <figure data-fig="svtypes">
+    <figcaption>La SVM a margine morbido della lezione 8, con ogni punto segnato secondo il suo coefficiente. Senza anello: coefficiente zero, il punto non conta. Anello giallo: sul bordo della strada, coefficiente fra zero e il tetto. Anello rosa: dentro la strada o dalla parte sbagliata, coefficiente al tetto.</figcaption>
+  </figure>
+  <p>I punti senza anello si potrebbero togliere senza cambiare nulla. Quelli sul bordo fissano posizione e direzione del confine. Quelli con il coefficiente al tetto sono i punti che violano il margine: il tetto serve proprio a impedire che un singolo punto anomalo pesi quanto vuole.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Lo stesso succede con ridge</h2>
+  <p>La forma duale non è una particolarità delle SVM. Prendiamo la ridge regression della lezione 6, errore quadratico medio più multa sui pesi, scritta come \(\tfrac1N\lVert\Yv-\Xm\Wv\rVert^2+\Rl\lVert\Wv\rVert^2\). La sua soluzione si può scrivere in due modi equivalenti, dove \(I_d\) e \(I_N\) sono matrici identità grandi quanto il numero di features e il numero di dati:</p>
+  <div class="math-block">\[\Wv^*=(\Xm^\top\Xm+\Rl N I_d)^{-1}\Xm^\top\Yv\;=\;\Xm^\top\underbrace{(\Xm\Xm^\top+\Rl N I_N)^{-1}\Yv}_{\boldsymbol{\Al}^*}\]</div>
+  <p>Il primo modo è quello della lezione 6. Nel secondo, i pesi sono la matrice dei dati (trasposta) per un vettore con un numero per dato. Scritto per esteso:</p>
+  <div class="math-block">\[\Wv^*=\Xm^\top\boldsymbol{\Al}^*=\sum_{i=1}^{N}\Al_i^*\,\Xv_i\]</div>
+  <p>Di nuovo una somma dei dati, ciascuno con un suo coefficiente: come nella SVM.</p>
+  <details class="rev"><summary>Perché le due formule coincidono</summary>
+    <p>Per due matrici qualsiasi \(P\) e \(Q\) di dimensioni compatibili vale \(P(QP+I)=PQP+P=(PQ+I)P\). Se le due matrici fra parentesi sono invertibili, moltiplicando a sinistra per \((PQ+I)^{-1}\) e a destra per \((QP+I)^{-1}\) si ottiene \((PQ+I)^{-1}P=P(QP+I)^{-1}\). Scegliendo \(P=\Xm^\top\) e \(Q=\tfrac{1}{\Rl N}\Xm\) si arriva a \((\Xm^\top\Xm+\Rl N I_d)^{-1}\Xm^\top=\Xm^\top(\Xm\Xm^\top+\Rl N I_N)^{-1}\).</p>
+  </details>
+  <h3>Perché i pesi sono una combinazione dei dati</h3>
+  <p>Facciamo il caso più semplice: un solo dato con due features. La previsione, pesi per features, dipende solo dalla parte dei pesi che punta nella direzione del dato. Qualunque componente perpendicolare non cambia la previsione, ma allunga il vettore dei pesi e fa pagare più multa. Quindi non conviene mai.</p>
+  <figure data-fig="span">
+    <figcaption>Il piano dei pesi. Tutti i pesi sulla retta rosa danno la previsione esatta per il dato \(\Xv\) (freccia blu). Il punto vuoto è uno di questi; il più corto sta lungo \(\Xv\). La soluzione di ridge (punto giallo) è sempre un multiplo di \(\Xv\).</figcaption>
+  </figure>
+  <p>Con molti dati vale lo stesso: la soluzione sta nello spazio generato dai dati, cioè fra i vettori che si ottengono sommando i dati con dei coefficienti. Il <b>teorema del rappresentante</b> dice che questo vale per qualunque problema della forma «loss media più multa sul quadrato della lunghezza dei pesi», qualunque sia la loss: esiste sempre una soluzione ottima che è combinazione dei dati.</p>
+  <h3>Quando conviene</h3>
+  <p>Le due formule costano diversamente. La prima inverte una matrice grande quanto il numero di features \(d\), la seconda una grande quanto il numero di dati \(N\).</p>
+  <figure data-fig="dualcost">
+    <figcaption>Numero di operazioni, in ordine di grandezza, delle due formule: \(d^3+Nd^2\) per quella nei pesi, \(N^3+dN^2\) per quella nei dati.</figcaption>
+  </figure>
+  <p>Con poche features e molti dati conviene la forma nei pesi. Con moltissime features e pochi dati conviene quella nei dati: il suo costo quasi non dipende dal numero di features. Ed è proprio la situazione in cui ci mette una feature map.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il trucco del kernel</h2>
+  <p>La forma duale costa poco anche con tantissime features. Resta un ostacolo: per usarla sembra comunque necessario costruire le features di ogni dato. Per vedere che non è così, seguiamo che cosa serve davvero per fare una previsione su un punto nuovo, con tre dati e i loro coefficienti.</p>
+  <figure data-fig="build" data-opts='{"id":"l9_dots"}'>
+    <figcaption>La previsione riscritta in tre mosse. In blu i tre dati e il punto nuovo, in giallo i coefficienti e i pesi, in bianco i prodotti scalari di ciascun dato con il punto nuovo, in arancione gli stessi numeri passati per un kernel.</figcaption>
+  </figure>
+  <p>Lo stesso vale per trovare i coefficienti: nelle formule duali di ridge e della SVM i dati entrano solo attraverso i prodotti scalari fra coppie di punti. Con una feature map \(\Ph\), quindi, tutto ciò che serve è un numero per ogni coppia: il prodotto scalare fra le loro features.</p>
+  <p>Una <b>funzione kernel</b> è una funzione di due punti che restituisce direttamente quel numero, senza passare per le features:</p>
+  <div class="math-block">\[\Ka(\Xv,\Xv')=\Ph(\Xv)^\top\Ph(\Xv')\]</div>
+  <p>Che una scorciatoia del genere esista non è ovvio. Un esempio: con tre features, prendi il quadrato del prodotto scalare. Sviluppando il quadrato si scopre che è il prodotto scalare di due vettori a sei coordinate, i quadrati e i prodotti a coppie delle features di partenza:</p>
+  <div class="math-block">\[\Ka(\Xv,\Xv')=(\Xv^\top\Xv')^2\qquad\Longleftrightarrow\qquad\Ph(\Xv)=\big[\Xs_1^2,\ \Xs_2^2,\ \Xs_3^2,\ \sqrt2\,\Xs_1\Xs_2,\ \sqrt2\,\Xs_1\Xs_3,\ \sqrt2\,\Xs_2\Xs_3\big]\]</div>
+  <figure data-fig="ktrick">
+    <figcaption>Due strade per lo stesso numero. Nel primo riquadro si costruiscono le sei features di ciascun vettore e se ne fa il prodotto scalare. Nel secondo un prodotto scalare a tre termini e un quadrato. Premi il pulsante per cambiare vettori: i due numeri gialli coincidono sempre.</figcaption>
+  </figure>
+  <p>Qui il risparmio è piccolo, sei coordinate contro tre. Ma alzando il grado e il numero di features la strada lunga cresce come nella figura dell'inizio, mentre la scorciatoia resta un prodotto scalare e una potenza. <b>Si lavora in uno spazio enorme pagando il prezzo di quello piccolo.</b></p>
+  <div class="quiz" data-quiz="9a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Tre kernel da conoscere</h2>
+  <p>Il <b>kernel lineare</b> è il prodotto scalare di sempre: nessuna trasformazione. Il <b>kernel polinomiale</b> lo eleva a una potenza \(p\), e corrisponde a tutti i prodotti di grado \(p\) fra le features:</p>
+  <div class="math-block">\[\text{lineare:}\ \ \Ka(\Xv,\Xv')=\Xv^\top\Xv'\qquad\qquad\text{polinomiale:}\ \ \Ka(\Xv,\Xv')=(\Xv^\top\Xv')^p\]</div>
+  <p>Il terzo è il più usato, il <b>kernel RBF</b> o gaussiano. Non nasce da un elenco di features ma da un'idea diversa: misurare direttamente quanto due punti si somigliano.</p>
+  <figure data-fig="build" data-opts='{"id":"l9_rbf"}'>
+    <figcaption>Il kernel RBF costruito in tre mosse, in funzione della distanza fra i due punti: prima la distanza al quadrato (blu), poi cambiata di segno e moltiplicata per \(\Gk\) (rosa), infine l'esponenziale (giallo). I pallini bianchi sono le tre distanze dell'esempio: 0, 1 e 3. Alla fine, tratteggiate, le campane per altri due valori di \(\Gk\).</figcaption>
+  </figure>
+  <p>Il kernel si legge quindi come una misura di somiglianza. Calcolandolo per ogni coppia di dati e scrivendo i risultati in una tabella, con una riga e una colonna per ogni dato, si ottiene la <b>matrice kernel</b> \(K\). È l'unica cosa che l'algoritmo vede dei dati.</p>
+  <figure data-fig="gram">
+    <figcaption>Nel primo riquadro dodici punti in due gruppi, nel secondo la loro matrice kernel RBF: più chiara è una casella, più i due punti corrispondenti sono considerati simili. Con \(\Gk\) grande ogni punto somiglia solo a se stesso; con \(\Gk\) piccolo tutti somigliano a tutti.</figcaption>
+  </figure>
+  <p>Sostituire il prodotto scalare con un kernel dentro la SVM duale dà la <em>SVM con kernel</em>. Per classificare un punto nuovo non servono più i pesi: bastano i vettori di supporto.</p>
+  <figure data-fig="build" data-opts='{"id":"l9_score"}'>
+    <figcaption>Il punteggio di un punto nuovo (bianco) con tre vettori di supporto: uno arancione di classe +1 e due blu di classe −1. Le linee tratteggiate sono le distanze. Le barre sono i voti: verso destra per la classe +1, verso sinistra per la classe −1. La barra bianca in fondo è il punteggio finale.</figcaption>
+  </figure>
+  <figure data-fig="ktrio">
+    <figcaption>Gli stessi dati, lo stesso algoritmo, tre kernel. Il colore dello sfondo è la classe prevista. Con il kernel lineare il confine è una retta e non può funzionare; con gli altri due diventa una curva chiusa.</figcaption>
+  </figure>
+  <h3>Che cosa fa γ</h3>
+  <p>Con il kernel RBF ogni vettore di supporto «vota» per la sua classe nei dintorni, e \(\Gk\) decide quanto è ampio il dintorno.</p>
+  <figure data-fig="rbfsvm">
+    <figcaption>Due classi a mezzaluna. Con \(\Gk\) grande ogni punto influenza solo i suoi immediati vicini e il confine si frastaglia attorno ai singoli dati: overfitting. Con \(\Gk\) piccolo il confine diventa quasi una retta: underfitting.</figcaption>
+  </figure>
+  <p>\(\Gk\) e \(\Rl\) sono due iperparametri, e si scelgono insieme con la cross-validation (lezione 5).</p>
+  <h3>Anche la regressione</h3>
+  <p>Lo stesso scambio funziona per ridge. Nella formula duale la matrice dei prodotti scalari fra i dati lascia il posto alla matrice kernel, e nella previsione ogni prodotto scalare con il punto nuovo lascia il posto a un kernel:</p>
+  <div class="math-block">\[\boldsymbol{\Al}^*=(K+\Rl N I_N)^{-1}\Yv\qquad\qquad \Yh(\Xs)=\sum_{i=1}^{N}\Al_i^*\,\Ka(\Xs_i,\Xs)\]</div>
+  <p>Con il kernel RBF la previsione è una somma di «campane» centrate sui dati, ognuna alta quanto il suo coefficiente.</p>
+  <figure data-fig="kridge">
+    <figcaption>Ridge con kernel RBF su nove punti. Ogni curva blu è il contributo di un dato, una campana moltiplicata per il suo coefficiente; la curva gialla è la loro somma, cioè la previsione.</figcaption>
+  </figure>
+  <details class="rev"><summary>Facoltativo: lo spazio del kernel RBF ha infinite dimensioni</summary>
+    <p>Con una sola feature, \(\Ka(\Xs,\Xs')=e^{-\Gk(\Xs-\Xs')^2}=e^{-\Gk \Xs^2}\,e^{-\Gk \Xs'^2}\,e^{2\Gk \Xs\Xs'}\). Sviluppando l'ultimo fattore con la serie \(e^{u}=\sum_{k\ge0}u^k/k!\) si ottiene \(\sum_{k\ge0}\frac{(2\Gk)^k}{k!}\Xs^k\Xs'^k\). Quindi \(\Ka(\Xs,\Xs')=\Ph(\Xs)^\top\Ph(\Xs')\) con \(\Ph(\Xs)=e^{-\Gk \Xs^2}\big[1,\ \sqrt{2\Gk/1!}\,\Xs,\ \sqrt{(2\Gk)^2/2!}\,\Xs^2,\ \dots\big]\): un vettore con infinite coordinate. Eppure il kernel si calcola con una sola esponenziale.</p>
+  </details>
+</div></section>
+
+<section><div class="col">
+  <h2>Non ogni funzione è un kernel</h2>
+  <p>Nuovi kernel si costruiscono da quelli noti: la somma di due kernel con coefficienti non negativi è un kernel, e così il loro prodotto. Ma una funzione qualsiasi di due punti non va bene: deve esistere una feature map di cui è il prodotto scalare.</p>
+  <p>Le <b>condizioni di Mercer</b> permettono di verificarlo senza trovare la feature map. La prima: la funzione deve essere simmetrica, cioè scambiando i due punti il valore non cambia. La seconda: per qualunque insieme di punti, e qualunque scelta di un numero \(c_i\) per ciascun punto, deve valere</p>
+  <div class="math-block">\[\sum_{i=1}^{N}\sum_{j=1}^{N}c_i\,c_j\,\Ka(\Xv_i,\Xv_j)\ \ge\ 0\]</div>
+  <p>Una matrice kernel con questa proprietà si dice <em>semidefinita positiva</em>. Il motivo è geometrico. Se il kernel è davvero un prodotto scalare, quella somma è il quadrato della lunghezza di un vettore: quello che si ottiene sommando le features dei punti, ciascuna moltiplicata per il suo \(c_i\). E una lunghezza al quadrato non può essere negativa.</p>
+  <figure data-fig="mercer">
+    <figcaption>Per tre funzioni candidate, il valore della somma qui sopra per trecento scelte casuali dei numeri \(c_i\), su sette punti presi a caso. Basta un valore negativo per escludere la candidata.</figcaption>
+  </figure>
+  <p>C'è anche una conseguenza pratica: se la matrice kernel è semidefinita positiva, la matrice \(K+\Rl N I_N\) della formula di ridge si può sempre invertire, e il problema duale ha soluzione.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Le lezioni da 5 a 9 in una tabella</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Lezione</th><th>Concetto</th><th>Idea</th><th>Formula</th></tr></thead>
+    <tbody>
+      <tr><td>5</td><td>Hold-out e Hoeffding</td><td>L'errore su dati messi da parte stima l'errore vero, con un'incertezza che scende come \(1/\sqrt{N_{te}}\)</td><td>\(\sqrt{\log(2/\delta)/(2N_{te})}\)</td></tr>
+      <tr><td>5</td><td>Cross-validation</td><td>Ogni dato fa da test una volta; si fa la media su \(\Kk\) giri</td><td>\(\tfrac1{\Kk}\sum_{j}\text{err}_j\)</td></tr>
+      <tr><td>6</td><td>Ridge</td><td>Multa sui quadrati: tutti i pesi si rimpiccioliscono, soluzione unica</td><td>\(\cL(\Wv)+\Rl\lVert\Wv\rVert_2^2\)</td></tr>
+      <tr><td>6</td><td>Lasso</td><td>Multa sui valori assoluti: molti pesi diventano zero</td><td>\(\cL(\Wv)+\Rl\lVert\Wv\rVert_1\)</td></tr>
+      <tr><td>7</td><td>Regressione logistica</td><td>Punteggio lineare, sigmoide, log loss; il confine è una retta</td><td>\(P(\Yy=1\mid\Xv)=\sigma(\Wv^\top\Xv)\)</td></tr>
+      <tr><td>7</td><td>Valutazione</td><td>Due tipi di errore: recall, precision, curva ROC, F1</td><td>\(\frac{TP}{TP+FN},\ \frac{TP}{TP+FP}\)</td></tr>
+      <tr><td>8</td><td>SVM</td><td>Il confine con la strada più larga; slack per chi la viola</td><td>\(\tfrac{\Rl}{2}\lVert\Wv\rVert^2+\tfrac1N\sum_i\Sl_i\)</td></tr>
+      <tr><td>8</td><td>Hinge loss</td><td>Zero oltre il margine, lineare prima</td><td>\(\max\{0,1-\Yy\,\Wv^\top\Xv\}\)</td></tr>
+      <tr><td>9</td><td>Forma duale</td><td>I pesi sono una combinazione dei dati; servono solo prodotti scalari</td><td>\(\Wv^*=\sum_i\Al_i\Xv_i\)</td></tr>
+      <tr><td>9</td><td>Kernel</td><td>Prodotto scalare in uno spazio grande, calcolato in quello piccolo</td><td>\(\Ka(\Xv,\Xv')=\Ph(\Xv)^\top\Ph(\Xv')\)</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="9"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>molti modelli lineari si possono riscrivere usando solo prodotti scalari fra i dati; sostituendo il prodotto scalare con un kernel si ottengono confini curvi senza mai costruire le nuove features.</b></p>
+  <p>Con questa lezione si chiude il blocco sui modelli lineari e sulle loro estensioni. Il corso prosegue con una famiglia del tutto diversa: gli alberi di decisione, che dividono i dati con una serie di domande, e l'entropia, che serve a scegliere quali domande fare.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

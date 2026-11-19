@@ -1,0 +1,97 @@
+<article class="lesson" data-n="8" id="lezione-8" data-title="Fra tutte le rette che separano, quale scegliere?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 8</p>
+  <h1>Fra tutte le rette che separano, quale scegliere?</h1>
+  <p class="desc">Le Support Vector Machines: cercare il confine che passa il più lontano possibile dai dati, e che cosa fare quando un confine perfetto non esiste.</p>
+</div></section>
+
+<section><div class="col">
+  <p>La lezione 7 si è chiusa con un problema: se due classi sono separabili, le rette che le separano senza errori sono infinite. Sui dati di training sono tutte ugualmente perfette. Lo sono anche sui dati nuovi?</p>
+  <figure data-fig="manylines">
+    <figcaption>Ruota e sposta il confine. La fascia gialla è la «strada» più larga che si può tracciare attorno al confine senza toccare nessun punto.</figcaption>
+  </figure>
+  <p>Un confine che sfiora i punti di una classe lascia poco spazio agli imprevisti: basta un dato nuovo appena diverso per finire dalla parte sbagliata. Un confine che passa in mezzo, lontano da entrambe le classi, è più prudente. <b>Le Support Vector Machines (SVM) scelgono il confine con la strada più larga.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Misurare la distanza dal confine</h2>
+  <p>Per rendere precisa l'idea di strada serve un numero che dica, per ogni punto, quanto è lontano dal confine e se sta dalla parte giusta. Prima due convenzioni. Le classi ora si chiamano +1 e −1 invece che 1 e 0: fra poco si vede perché conviene. E l'intercetta si scrive \(\Bi\), tenuta separata dai pesi \(\Wv\).</p>
+  <p>Si parte dal punteggio della lezione 7: pesi per features, più l'intercetta. Sul confine vale zero, da un lato è positivo e dall'altro negativo. Da solo però non basta, e il numero che cerchiamo si costruisce in tre mosse.</p>
+  <figure data-fig="build" data-opts='{"id":"l8_margin"}'>
+    <figcaption>Il margine costruito su due punti: A (arancione, classe +1) e B (blu, classe −1). La retta bianca è il confine, la freccia gialla è la direzione dei pesi, i segmenti rosa sono le distanze dal confine. Alla fine la fascia gialla è la strada, larga due volte il margine più piccolo.</figcaption>
+  </figure>
+  <p>Ecco a che cosa servono le etichette +1 e −1: una sola formula per entrambe le classi. Il <b>margine</b> di un punto è la sua distanza dal confine, positiva se sta dalla parte giusta. Il <b>margine del classificatore</b> è il più piccolo dei margini dei punti, cioè la distanza del punto più vicino: metà della larghezza della strada.</p>
+  <figure data-fig="distance">
+    <figcaption>Ora prova tu. Trascina il punto bianco: il segmento rosa è la sua distanza dal confine, positiva dal lato verso cui punta la freccia gialla dei pesi, negativa dall'altro. Poi muovi il cursore: moltiplicare pesi e intercetta per lo stesso numero cambia il punteggio, ma non il confine né la distanza.</figcaption>
+  </figure>
+  <h3>Perché un margine largo protegge</h3>
+  <p>Supponi che ogni dato sia misurato con un piccolo errore: il punto vero può stare ovunque entro una distanza \(r\) da quello osservato.</p>
+  <figure data-fig="noise">
+    <figcaption>Gli stessi dati con due confini diversi: nel primo riquadro un confine che passa vicino ai punti, nel secondo quello con il margine più largo. Ogni cerchio è la zona in cui potrebbe trovarsi il punto vero. In rosso i cerchi che attraversano il confine.</figcaption>
+  </figure>
+  <p>Finché \(r\) è più piccolo del margine, nessun cerchio tocca il confine e la classificazione resta giusta. <b>Il margine è la quantità di rumore che il classificatore sopporta senza sbagliare.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il problema da risolvere</h2>
+  <p>Vogliamo i pesi che rendono massimo il margine. Scritto così il problema è scomodo: pesi e intercetta si possono moltiplicare per un numero qualsiasi senza spostare il confine, quindi le soluzioni equivalenti sono infinite. Conviene usare questa libertà per fissare una scala, e poi vedere che cosa diventa il margine in quella scala.</p>
+  <figure data-fig="build" data-opts='{"id":"l8_hard"}'>
+    <figcaption>Il problema della SVM costruito su dieci punti, con un confine verticale già orientato nel modo migliore. La fascia gialla è la strada; i suoi bordi tratteggiati sono i punti con punteggio +1 e −1. Accorciando i pesi la strada si allarga, finché tocca i punti più vicini (anello giallo).</figcaption>
+  </figure>
+  <p>È la <b>SVM a margine rigido</b>. Riletta a parole: fra tutti i confini che lasciano ogni punto dalla parte giusta e fuori dalla strada, prendi quello con i pesi più corti, cioè con la strada più larga. In questa scala il margine vale 1 diviso la lunghezza dei pesi \(\lVert\Wv\rVert\), e la strada è larga il doppio. Il problema è convesso, quindi ha un solo minimo (lezione 2).</p>
+  <figure data-fig="rescale">
+    <figcaption>Ora prova tu, sui dati dell'inizio. La direzione del confine è già quella migliore. Riduci la lunghezza dei pesi: la strada si allarga, finché qualche punto ci finisce dentro e viola il suo vincolo (bordo bianco).</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="8a"></div>
+  <h3>Contano solo i punti sul bordo</h3>
+  <p>Nella soluzione, alcuni punti stanno esattamente sul bordo della strada: sono loro a impedirle di allargarsi ancora. Si chiamano <b>vettori di supporto</b>.</p>
+  <figure data-fig="sv">
+    <figcaption>Trascina i punti. I vettori di supporto hanno l'anello giallo. Sposta un punto lontano dalla strada: il confine non si muove. Sposta un vettore di supporto: cambia subito.</figcaption>
+  </figure>
+  <p><b>La soluzione dipende soltanto dai vettori di supporto.</b> Tutti gli altri punti si potrebbero cancellare dal dataset senza cambiare nulla. È una differenza netta rispetto alla regressione logistica, dove ogni punto contribuisce al gradiente.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando un punto rovina tutto</h2>
+  <p>Il margine rigido ha due difetti seri. Funziona solo se i dati sono separabili, e basta un punto anomalo per stravolgere il confine.</p>
+  <figure data-fig="outlier">
+    <figcaption>Sposta il punto arancione segnato con l'anello verso la nuvola blu. Prima la strada si stringe e ruota per fargli posto; poi nessuna retta separa più le classi e il problema non ha soluzione.</figcaption>
+  </figure>
+  <p>Un confine che cambia così tanto per un solo dato è un confine che non generalizza. Conviene accettare qualche violazione in cambio di una strada più larga.</p>
+  <h3>Il margine morbido</h3>
+  <p>Per permettere le violazioni bisogna prima misurarle. Diamo a ogni punto una variabile \(\Sl_i\), detta <em>slack</em>, mai negativa: dice di quanto quel punto manca il suo vincolo. Al punto non si chiede più di arrivare a 1, ma a 1 meno il suo slack.</p>
+  <p>Le violazioni però non devono essere gratis, altrimenti basterebbe dare a tutti uno slack enorme. Si pagano: alla funzione da minimizzare si aggiunge la media degli slack. È la <b>SVM a margine morbido</b>:</p>
+  <div class="math-block">\[\min_{\Wv,\Bi,\boldsymbol{\Sl}}\ \frac{\Rl}{2}\lVert\Wv\rVert^2+\frac1N\sum_{i=1}^{N}\Sl_i\qquad\text{con}\quad \Yy_i\,(\Wv^\top\Xv_i+\Bi)\ge 1-\Sl_i,\quad \Sl_i\ge 0\]</div>
+  <p>Il primo addendo vuole pesi corti, cioè una strada larga; il secondo vuole poche violazioni. L'iperparametro \(\Rl\) decide il compromesso. Con \(\Rl\) grande conta di più la strada larga, anche a costo di molte violazioni. Con \(\Rl\) piccolo contano di più le violazioni e ci si avvicina al margine rigido.</p>
+  <figure data-fig="soft">
+    <figcaption>Due classi che si sovrappongono. I segmenti rosa sono gli slack: quanto manca a ogni punto per raggiungere il bordo della strada dalla sua parte.</figcaption>
+  </figure>
+  <p>Molti testi e molte librerie usano al posto di \(\Rl\) il parametro \(C=1/(\Rl N)\), che moltiplica la somma degli slack: \(C\) grande significa poche violazioni tollerate.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La SVM è una loss più una multa</h2>
+  <p>Gli slack sono incognite in più, ma si possono eliminare. Dato che si pagano, nella soluzione ognuno vale il minimo indispensabile: zero se il punto rispetta il vincolo, altrimenti esattamente quanto gli manca. Quindi lo slack si calcola direttamente dal punto, e i vincoli spariscono.</p>
+  <p>Per fare il conto serve un solo numero per punto: l'etichetta per il punteggio, che chiamiamo \(m\). È positivo dalla parte giusta e vale 1 sul bordo della strada.</p>
+  <figure data-fig="build" data-opts='{"id":"l8_hinge"}'>
+    <figcaption>Quattro punti disposti secondo il loro \(m\), uno per riga. La linea bianca è il confine (\(m=0\)), quella gialla tratteggiata il bordo della strada (\(m=1\)), la fascia gialla la strada più il lato sbagliato. I segmenti rosa sono ciò che manca per arrivare al bordo; quelli grigi tratteggiati, di chi è già oltre, spariscono.</figcaption>
+  </figure>
+  <p>È la struttura della lezione 6: una loss media più una multa ridge sui pesi. La loss si chiama <b>hinge loss</b>: zero per chi è oltre il bordo, e per gli altri quanto manca per arrivarci.</p>
+  <figure data-fig="hingecmp">
+    <figcaption>Tre loss in funzione di \(m\). La 0-1 conta solo gli errori. La hinge è zero oltre il bordo della strada e cresce in linea retta prima. La log loss della regressione logistica, riscritta con etichette +1 e −1, ha una forma simile ma non arriva mai a zero.</figcaption>
+  </figure>
+  <p>La hinge è una versione convessa della loss 0-1, quindi minimizzabile. Ha uno spigolo in \(m=1\), dove non è derivabile: si usa il subgradiente della lezione 2. E il tratto piatto oltre il bordo spiega i vettori di supporto: i punti ben oltre il margine hanno loss zero e gradiente zero, quindi non influenzano la soluzione.</p>
+  <p>Le SVM funzionano bene anche con molte features, e il confine dipende da pochi punti. In cambio non restituiscono una probabilità ma solo un punteggio, e richiedono di scegliere \(\Rl\) con la cross-validation della lezione 5.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="8"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>una SVM cerca il confine con il margine più largo; quando i dati non sono separabili, lascia che alcuni punti violino il margine pagando una hinge loss.</b></p>
+  <p>Il confine, però, è ancora una retta. Se una classe sta dentro e l'altra tutt'intorno, nessuna retta va bene, per quanto morbido sia il margine. La prossima lezione mostra come ottenere confini curvi senza cambiare algoritmo.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

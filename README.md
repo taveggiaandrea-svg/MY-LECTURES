@@ -16,11 +16,13 @@ shared/home.js       tema della pagina iniziale
 materie/<id>/
   materia.json       titolo, breve, descrizione, fonte, ordine nella pagina iniziale, numero della miniatura, lingua (facoltativa, "it" se manca)
   top.html           barra superiore della materia (il nome porta alla pagina iniziale) e apertura di <main>
-  lezioni/lN.html    una lezione per file: <article class="lesson" data-n="N" id="lezione-N" data-title="...">
+  lezioni/lN.html    una lezione per file (si può partire da l0, per esempio una mappa del corso): <article class="lesson" data-n="N" id="lezione-N" data-title="...">
   foot.html          chiusura di <main> e piè di pagina con le fonti
   js/macro.js        (facoltativo) macro KaTeX della materia: Object.assign(MAC,{...}); per una materia in un'altra lingua anche Object.assign(UI,{...}) con i testi fissi dell'interfaccia
   js/thumbs.js       miniature: THUMB[n] = SVG 108x72
   js/lN.js           INIT[N]=function(){...} per le figure; QZ['Na']=()=>[...] per i quiz
+  js/shared.js       (facoltativo) componenti della materia usati da più lezioni, caricati dopo thumbs.js
+  style.css          (facoltativo) stile proprio della materia, caricato dopo shared/style.css: solo ciò che manca, mai una copia
 build.py             costruisce site/ (pagina iniziale + una pagina per materia)
 test.py              test in browser di tutto il sito
 site/                il sito pubblicato: si genera con build.py, non si modifica a mano

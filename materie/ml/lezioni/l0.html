@@ -1,0 +1,63 @@
+<article class="lesson" data-n="0" id="lezione-0" data-title="Come è fatto questo corso?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Prima di cominciare</p>
+  <h1>Come è fatto questo corso?</h1>
+  <p class="desc">Tre modi di imparare dai dati, un solo filo che li tiene insieme, e le istruzioni per usare questa pagina.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Un corso, tre modi di imparare</h2>
+  <p>Il programma del corso è diviso in tre parti, e la differenza fra una parte e l'altra sta in <em>che cosa viene dato alla macchina per imparare</em>.</p>
+  <p>Nella prima parte, il <b>supervised learning</b>, la macchina riceve esempi già risolti: ogni dato arriva insieme alla risposta giusta, e l'obiettivo è prevedere la risposta su dati mai visti. È la parte più lunga, e comprende anche la domanda «come faccio a sapere se il modello è buono?».</p>
+  <p>Nella seconda, l'<b>unsupervised learning</b>, le risposte non ci sono: ci sono solo i dati, e si cerca un modo più efficiente di rappresentarli, per esempio comprimendoli o raggruppandoli.</p>
+  <p>Nella terza, il <b>reinforcement learning</b>, la macchina agisce, osserva una ricompensa e deve imparare quale azione conviene in ogni situazione.</p>
+  <div class="cards" data-cards></div>
+  <div data-upwrap><p>Queste sono le lezioni di questa pagina. Gli argomenti del corso non ancora coperti sono:</p>
+  <div class="tw"><table data-upcoming></table></div></div>
+  <p><b>Quasi tutto il corso sta nella prima parte: prima si impara a prevedere e a misurare l'errore, poi si riusano gli stessi strumenti dove le risposte mancano.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Ogni lezione rifà lo stesso percorso</h2>
+  <p>Secondo le slide introduttive, un sistema di machine learning ha tre componenti: <b>i dati</b>, <b>il modello matematico</b> e <b>l'algoritmo di apprendimento</b>, che regola automaticamente i parametri del modello usando i dati.</p>
+  <p>Il trucco che tiene insieme tutto è sempre lo stesso: si trasforma la domanda in un <em>problema di ottimizzazione</em>. Si definisce una funzione obiettivo che misura quanto si sta sbagliando, e la risposta è il punto in cui quella funzione è minima.</p>
+  <p>Qui sotto il percorso è in funzione su un problema minuscolo. I punti pieni sono i dati di <em>training</em>, quelli usati per regolare il modello. I punti vuoti sono i dati di <em>test</em>, tenuti da parte per controllare come se la cava su dati che non ha mai visto. Il modello è una retta, e parte sbagliata. Premi play, oppure trascina la barra per andare avanti e indietro un giro alla volta.</p>
+  <figure data-fig="loop">
+    <figcaption>A ogni giro il modello fa le sue previsioni, il costo misura di quanto sbagliano (i segmenti rosa), e l'ottimizzazione corregge i due parametri della retta. A destra, il costo sui dati di training e su quelli di test, giro dopo giro.</figcaption>
+  </figure>
+  <p>In quel ciclo ci sono cinque ingredienti: i dati, il modello, il costo, l'ottimizzazione e il controllo sui dati nuovi, cioè la generalizzazione. Le prime quattro lezioni li costruiscono uno alla volta. Poi arrivano gli strumenti per scegliere e tenere a freno un modello (lezioni 5 e 6) e cambiano i modelli (regressione logistica, SVM, alberi, reti neurali), ma <b>i passi restano questi: scegli un modello, scegli un costo, minimizzalo, controlla che funzioni su dati nuovi.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Che cosa aspettarsi</h2>
+  <p>Il corso dichiara un obiettivo preciso: il machine learning non va visto come una collezione di scatole nere. Nessun metodo funziona bene in tutte le applicazioni, e per scegliere quello giusto bisogna capire gli ingranaggi dentro la scatola.</p>
+  <p>Per questo ogni argomento viene accompagnato dalla sua struttura matematica, e si parte dai metodi più semplici: servono per capire quelli più sofisticati.</p>
+  <p>Le lezioni sono di due tipi. Quelle <b>standard</b> trattano teoria, metodo e aspetti computazionali, alla lavagna o con slide. Le <b>hands-on sessions</b> sono sessioni di programmazione su scikit-learn e PyTorch, due librerie Python: la prima per i metodi classici, la seconda per le reti neurali.</p>
+  <details class="rev"><summary>I libri di riferimento indicati nelle slide</summary><div class="in">
+    <p>Non c'è un libro di testo obbligatorio. Le slide indicano questi riferimenti, con rimandi precisi su Blackboard lezione per lezione:</p>
+    <p>Lindholm et al., <em>Machine Learning: A First Course for Engineers and Scientists</em> (Cambridge University Press, 2022); James et al., <em>An Introduction to Statistical Learning: With Applications in Python</em> (2023); Bishop, <em>Pattern Recognition and Machine Learning</em> (Springer, 2006); MacKay, <em>Information Theory, Inference, and Learning Algorithms</em> (Cambridge University Press); Hastie, Tibshirani e Friedman, <em>The Elements of Statistical Learning</em> (Springer); Goodfellow, Bengio e Courville, <em>Deep Learning</em>; Deisenroth, Faisal e Ong, <em>Mathematics for Machine Learning</em> (Cambridge University Press, 2019).</p>
+    <p>La cartella «Review material» contiene materiale per ripassare algebra lineare e probabilità.</p>
+  </div></details>
+</div></section>
+
+<section><div class="col">
+  <h2>Come si legge questa pagina</h2>
+  <p>Ogni lezione ha un titolo in forma di domanda e si apre con qualcosa da toccare. Le figure nei riquadri neri si manipolano: si trascinano punti, si muovono cursori, si premono pulsanti. Sotto ogni figura una riga dice a parole che cosa sta succedendo.</p>
+  <p>Nelle formule e nelle figure <b>ogni tipo di quantità ha sempre lo stesso colore</b>, così si riconosce a colpo d'occhio che cosa è un dato e che cosa è un parametro.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Colore</th><th>Che cosa indica</th><th>Simboli</th></tr></thead>
+    <tbody>
+      <tr><td><span class="sw" style="background:var(--yellow)"></span>giallo</td><td>parametri che la macchina regola</td><td>\(\Ws,\ \Wv,\ \Mm,\ \Bi\)</td></tr>
+      <tr><td><span class="sw" style="background:var(--blue)"></span>blu</td><td>dati in ingresso</td><td>\(\Xs,\ \Xv,\ \Xm,\ \Ph\)</td></tr>
+      <tr><td><span class="sw" style="background:var(--green)"></span>verde</td><td>risposte: quelle vere e quelle previste</td><td>\(\Yy,\ \Yh,\ \Ff,\ \Fh\)</td></tr>
+      <tr><td><span class="sw" style="background:var(--pink)"></span>rosa</td><td>costo ed errore</td><td>\(\cL,\ \cl\)</td></tr>
+      <tr><td><span class="sw" style="background:var(--orange)"></span>arancione</td><td>scelte che fai tu (iperparametri)</td><td>\(\Et,\ \Kk,\ \Bw\)</td></tr>
+      <tr><td><span class="sw" style="background:var(--purple)"></span>viola</td><td>rumore</td><td>\(\Eps,\ \Sg^2\)</td></tr>
+      <tr><td><span class="sw" style="background:var(--teal)"></span>verde acqua</td><td>gradiente (la pendenza del costo: lezione 2)</td><td>\(\Gr\cL\)</td></tr>
+    </tbody>
+  </table></div>
+  <p>Nei grafici, inoltre, l'errore sui dati di training è sempre grigio e quello sui dati di test è sempre rosso.</p>
+  <p>I pulsanti «Rivela» nascondono le dimostrazioni più lunghe. Lungo il testo e in fondo a ogni lezione ci sono domande a scelta multipla per mettersi alla prova. Il pulsante in alto a destra cambia tema.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

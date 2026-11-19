@@ -1,0 +1,243 @@
+<article class="lesson" data-n="1" id="lezione-1" data-title="Che cosa vuol dire che una macchina impara?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 1</p>
+  <h1>Che cosa vuol dire che una macchina impara?</h1>
+  <p class="desc">Dati, modelli ed errori: il vocabolario minimo del corso, e un primo algoritmo che decide guardando i vicini.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Qui sotto ci sono duecento punti, ciascuno con un'etichetta: arancione oppure blu. Il punto bianco è nuovo e l'etichetta non ce l'ha.</p>
+  <p>Trascinalo in giro. In ogni posizione, di che colore lo diresti?</p>
+  <figure data-fig="knn" data-opts='{"k":1}'>
+    <figcaption>Il punto bianco prende il colore del punto etichettato più vicino. Nessuno ha scritto la regola che separa le due zone: è stata ricavata dagli esempi.</figcaption>
+  </figure>
+  <p>Probabilmente hai risposto guardando chi c'era intorno, e la figura fa lo stesso. Tieni a mente due cose che riprenderemo alla fine: nelle zone in cui i colori si mescolano la risposta cambia a ogni piccolo spostamento, e in mezzo ai blu ogni tanto c'è un arancione isolato che si porta dietro la sua piccola isola.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Imparare vuol dire migliorare con l'esperienza</h2>
+  <p>La definizione più citata è di Arthur Samuel, che nel 1959 lavorava a un programma capace di migliorare da solo a dama: il machine learning è il campo di studio che dà a un computer la capacità di imparare <em>senza essere programmato esplicitamente</em>.</p>
+  <p>«Imparare» però è ancora vago: come si controlla se è successo? Nel 1997 Tom Mitchell, autore di un manuale molto diffuso della materia, lo rende verificabile. Servono tre cose: un <b>compito</b> da svolgere, un'<b>esperienza</b> da cui attingere e una <b>misura di prestazione</b>, cioè un numero che dica quanto bene il compito viene svolto.</p>
+  <p>Un programma <b>impara</b> se, accumulando esperienza, quel numero migliora. Senza la misura non ci sarebbe modo di dirlo: è lei che trasforma «sembra più bravo» in un'affermazione che si può controllare.</p>
+  <p>Nella figura di apertura il compito è dare un colore al punto, l'esperienza sono i duecento punti già colorati, la misura è la frazione di colori indovinati.</p>
+  <figure data-fig="tradml">
+    <figcaption>Il programma qui è una regola con una soglia. Nella programmazione tradizionale la soglia la scrivi tu: trascinala. Nel machine learning entrano i dati con le loro etichette ed esce la soglia: trascina un esempio e la regola si riscrive da sola.</figcaption>
+  </figure>
+  <p><b>Il prodotto del machine learning è una funzione, cioè un modello, ricavata dai dati invece che scritta a mano.</b></p>
+  <p>Quanta parte del programma lasciare ai dati è a sua volta una scelta, ed è cambiata nel tempo. Le slide confrontano due modi di costruire un sistema che riconosce che cosa c'è in un'immagine.</p>
+  <figure data-fig="pipes">
+    <figcaption>Nel primo schema una persona decide quali caratteristiche dell'immagine contano e solo l'ultimo blocco viene appreso. Nel secondo tutti i blocchi hanno parametri regolati dai dati. In giallo ciò che viene imparato.</figcaption>
+  </figure>
+  <p>Che cosa significhi «convesso», e perché faccia tanta differenza, è l'argomento della lezione 2.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Tre ingredienti: dati, modello, algoritmo</h2>
+  <p>Il processo è automatico, ma ha sempre tre componenti: i <b>dati</b>, il <b>modello matematico</b> (una famiglia di funzioni con dei parametri da regolare) e l'<b>algoritmo di apprendimento</b>, che regola i parametri usando i dati. Questa fase si chiama <em>training</em>, cioè allenamento, e i dati che usa sono i <em>dati di training</em>.</p>
+  <p>Per «regolare» bisogna sapere verso che cosa. Si definisce allora una funzione obiettivo che codifica ciò che ci interessa, e la domanda diventa un problema di ottimizzazione: la risposta sta nel suo minimo (o massimo). Come si trova quel minimo è l'argomento della lezione 2.</p>
+  <h3>I dati sono vettori</h3>
+  <p>Si assume che i dati siano leggibili da un computer e rappresentabili in forma numerica: una tabella in cui ogni riga è un esempio e ogni colonna una caratteristica. Spesso c'è da tradurre. Le slide mostrano questa tabella:</p>
+  <figure>
+    <div class="scroll"><table>
+      <thead><tr><th>Name</th><th>Gender</th><th>Degree</th><th>Postcode</th><th>Age</th><th>Annual salary</th></tr></thead>
+      <tbody>
+        <tr><td>Aditya</td><td>M</td><td>MSc</td><td>W21BG</td><td>36</td><td>89563</td></tr>
+        <tr><td>Bob</td><td>M</td><td>PhD</td><td>EC1A1BA</td><td>47</td><td>123543</td></tr>
+        <tr><td>Chloé</td><td>F</td><td>BEcon</td><td>SW1A1BH</td><td>26</td><td>23989</td></tr>
+      </tbody>
+    </table></div>
+    <div class="scroll"><table>
+      <thead><tr><th>Gender ID</th><th>Degree</th><th>Latitude</th><th>Longitude</th><th>Age</th><th>Salary (migliaia)</th></tr></thead>
+      <tbody>
+        <tr><td>−1</td><td>2</td><td>51,5073</td><td>0,1290</td><td>36</td><td>89,563</td></tr>
+        <tr><td>−1</td><td>3</td><td>51,5074</td><td>0,1275</td><td>47</td><td>123,543</td></tr>
+        <tr><td>+1</td><td>1</td><td>51,5071</td><td>0,1278</td><td>26</td><td>23,989</td></tr>
+      </tbody>
+    </table></div>
+    <figcaption>Le prime tre righe dell'esempio delle slide. Il nome sparisce, il genere diventa ±1, il titolo di studio un numero, il codice postale due coordinate. Ogni persona è ora un vettore di sei numeri.</figcaption>
+  </figure>
+  <p><b>Quali caratteristiche tenere e come tradurle dipende dalla conoscenza del dominio</b>: è una scelta di chi costruisce il modello, non dell'algoritmo.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Con le risposte, senza risposte, con le ricompense</h2>
+  <p>Prendi un tracciato elettrocardiografico. Per insegnare a un programma a riconoscere le anomalie, l'approccio del machine learning è chiedere a dei cardiologi di <em>etichettare</em> molti tracciati, e lasciare che l'algoritmo regoli il modello finché le sue previsioni concordano con le etichette.</p>
+  <figure data-fig="ecg">
+    <figcaption>Tracciati schematici, disegnati per questa pagina: non sono elettrocardiogrammi reali. Le tre etichette sono quelle dell'esempio delle slide.</figcaption>
+  </figure>
+  <p>Ogni dato di training è quindi una coppia (input, output): il tracciato e la condizione cardiaca che vi si legge. Questo è il <b>supervised learning</b>: l'algoritmo è «supervisionato» dall'esperto e prova a imitarlo. Lo scopo vero però è un altro: fare previsioni accurate su tracciati non etichettati, cioè <em>generalizzare</em> oltre i dati di training.</p>
+  <p>Detto con i simboli che useremo in tutto il corso: chiamiamo \(\Xs\) l'input e \(\Yy\) l'output desiderato. Il <em>training set</em> è un elenco di coppie di questo tipo, e dietro c'è una funzione sconosciuta \(\Ff\) che da ogni input produce il suo output. Il compito è trovarne una buona approssimazione, che funzioni anche sui <em>dati di test</em>: quelli non usati per il training.<sup><a href="#n1-2">2</a></sup></p>
+  <p>I nomi cambiano da un libro all'altro. Gli input si chiamano anche <em>features</em>, <em>predictors</em>, <em>attributes</em>; gli output anche <em>targets</em>, <em>responses</em>, <em>labels</em>.</p>
+  <p>Il nome del problema dipende invece dal tipo di output. Se è discreto, cioè una categoria, si parla di <b>classificazione</b>. Se è continuo, di <b>regressione</b>. Se è la probabilità di un evento, di <b>stima di probabilità</b>.</p>
+
+  <figure data-fig="outtypes">
+    <figcaption>Lo stesso tipo di input, tre tipi di output. In giallo il modello: un gradino fra due categorie, una curva, una probabilità che sale da 0 a 1.</figcaption>
+  </figure>
+  <p>L'esempio classico di classificazione è il dataset Iris: 150 fiori di iris, 50 per ciascuna di tre specie (versicolor, virginica, setosa). Le features sono quattro misure in centimetri (lunghezza e larghezza del sepalo e del petalo), il target è la specie.</p>
+  <figure data-fig="iris">
+    <figcaption>Un fiore stilizzato disegnato a partire dalle quattro misure, per le quattro righe mostrate nelle slide. Le slide usano fotografie dei fiori; qui il disegno è ricostruito dai numeri.</figcaption>
+  </figure>
+  <figure>
+    <div class="scroll"><table>
+      <thead><tr><th style="color:var(--blue)">Sepal.Length</th><th style="color:var(--blue)">Sepal.Width</th><th style="color:var(--blue)">Petal.Length</th><th style="color:var(--blue)">Petal.Width</th><th style="color:var(--green)">Species</th></tr></thead>
+      <tbody>
+        <tr><td>4,3</td><td>3,0</td><td>1,1</td><td>0,1</td><td>setosa</td></tr>
+        <tr><td>5,0</td><td>3,3</td><td>1,4</td><td>0,2</td><td>setosa</td></tr>
+        <tr><td>7,7</td><td>3,8</td><td>6,7</td><td>2,2</td><td>virginica</td></tr>
+        <tr><td>5,5</td><td>2,5</td><td>4,0</td><td>1,3</td><td>versicolor</td></tr>
+      </tbody>
+    </table></div>
+    <figcaption>Quattro righe del dataset, come nelle slide: quattro colonne di features (in blu, gli input) e una di target (in verde, l'output). L'ipotesi di fondo è che il target si possa spiegare con una combinazione delle features.</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="1a"></div>
+  <h3>Gli altri due modi</h3>
+  <p>Nell'<b>unsupervised learning</b> gli output non ci sono. L'obiettivo è imparare una rappresentazione più efficiente degli input: comprimerli, oppure raggrupparli (<em>clustering</em>).</p>
+  <p>Le slide danno un esempio minuscolo di compressione: una tabella con quattro colonne X, Y, W, Z in cui W vale sempre 1, e quindi è inutile, e i punti rimasti stanno in realtà su un piano a due dimensioni. Due delle tecniche che le slide citano le incontreremo nella seconda parte del corso: k-means, per raggruppare, e la Principal Component Analysis, per comprimere.</p>
+  <figure data-fig="plane3d">
+    <figcaption>Le dieci righe dell'esempio delle slide, senza la colonna W. In tutte vale Z = 15 − X − Y: è l'equazione del piano su cui stanno i punti.</figcaption>
+  </figure>
+  <p>Nel <b>reinforcement learning</b> nessuno dice quale fosse la mossa giusta: si prova, e si riceve un premio oppure no. Ogni dato registra quattro cose: la situazione in cui ci si trovava, l'azione scelta, la situazione in cui si è arrivati e la ricompensa ricevuta.</p>
+  <p>L'obiettivo è una <em>policy</em> ottima: una regola che in ogni situazione sceglie l'azione che alla lunga rende di più.<sup><a href="#n1-3">3</a></sup></p>
+  <figure data-fig="rlgrid">
+    <figcaption>Un esempio minimo: una griglia con un traguardo che vale +1. A ogni passo l'agente registra da dove è partito, che cosa ha fatto, dove è arrivato e che cosa ha ricevuto.</figcaption>
+  </figure>
+  <p><b>La differenza fra le tre famiglie è che cosa accompagna ogni dato: la risposta giusta, niente, oppure una ricompensa.</b> Le prossime lezioni restano tutte nella prima.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>E se un dato non è un numero?</h2>
+  <p>Features e target possono essere di quattro tipi: <b>numerici</b> (un numero reale qualsiasi, come un'altezza), <b>interi</b> (un conteggio), <b>categorici</b> (una voce scelta da un elenco finito, come la specie di un fiore) e <b>binari</b> (0 oppure 1).</p>
+  <p>La maggior parte degli algoritmi sa trattare solo features numeriche. Ci sono eccezioni (gli alberi di decisione usano interi e categorie senza problemi), ma di solito bisogna scegliere una <em>codifica</em>, cioè un modo di trasformare le categorie in numeri.</p>
+  <h3>Perché non basta numerarle</h3>
+  <p>La prima idea che viene in mente è la più semplice: se le categorie sono «a», «b» e «c», scriviamo 1, 2 e 3. Proviamola su un caso inventato, in cui la risposta media è 5 per «a», 1 per «b» e 4 per «c», e usiamo un modello lineare: uno che moltiplica il numero in ingresso per un peso e aggiunge una costante.</p>
+  <figure data-fig="enc2">
+    <figcaption>Gli stessi dati con due codifiche. Nel primo riquadro, con i numeri 1, 2, 3, il modello può solo tracciare una retta e sbaglia tutte e tre le categorie. Nel secondo, con una posizione per categoria, ogni categoria ha il suo livello.</figcaption>
+  </figure>
+  <p>Con i numeri interi abbiamo detto al modello due cose che non sono vere: che le categorie hanno un ordine («c» vale più di «b», che vale più di «a») e che sono equidistanti. Un modello lineare prende quei numeri sul serio, e non può assegnare a «b» un valore più basso di entrambe le altre.</p>
+  <p><b>Una categoria non è una quantità: numerarla inventa un ordine che nei dati non c'è.</b></p>
+  <h3>Una posizione per categoria</h3>
+  <p>Il rimedio è espandere la feature: una posizione per ogni categoria. Con tre categorie mutuamente esclusive la feature diventa un vettore di tre numeri, tutti zero tranne un 1 nella posizione della categoria giusta: «b» diventa (0, 1, 0).</p>
+  <p>Ogni posizione risponde a una domanda («è a?», «è b?», «è c?») e viene trattata come una feature a sé, con un suo peso. È la codifica <b>one-hot</b>.</p>
+  <figure data-fig="encode">
+    <figcaption>La stessa categoria nelle due codifiche delle slide. Nella one-hot esattamente un elemento vale 1; nella dummy c'è una posizione in meno e una categoria, quella di riferimento, diventa il vettore di soli zeri.</figcaption>
+  </figure>
+  <h3>Perché allora ne esiste una seconda</h3>
+  <p>La one-hot ha un difetto nascosto. Le sue posizioni sommano sempre a 1, e quasi tutti i modelli lineari hanno già un termine costante, l'intercetta. Le due cose dicono la stessa informazione due volte.</p>
+  <p>Torniamo all'esempio. Il modello prevede intercetta più peso della categoria. Con intercetta 0 e pesi 5, 1, 4 le previsioni sono giuste. Ma lo sono anche con intercetta 4 e pesi 1, −3, 0. E con qualunque altra intercetta, purché si tolga lo stesso numero dai tre pesi.</p>
+  <figure data-fig="redund">
+    <figcaption>Muovi l'intercetta: i pesi si adattano e le previsioni non cambiano. Esistono infinite soluzioni ugualmente buone.</figcaption>
+  </figure>
+  <p>Quando le soluzioni sono infinite l'algoritmo non ha modo di sceglierne una, e i metodi che risolvono un sistema, come la regressione lineare, si bloccano: è il caso della «matrice singolare» che ritroveremo nella lezione 3.</p>
+  <p>La codifica <b>dummy</b> toglie una posizione: con tre categorie ne restano due, e la categoria esclusa fa da riferimento. Ora la soluzione è una sola, e si legge bene: l'intercetta è il valore della categoria di riferimento, e ogni peso è la differenza rispetto a quella.</p>
+  <p><b>La one-hot è la codifica naturale; la dummy è la stessa cosa senza il doppione che manda in crisi i modelli lineari.</b></p>
+  <p>Da qui in poi, se non è detto altrimenti, le features sono numeriche.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>C'è un errore che nessun modello può togliere</h2>
+  <p>Prima di chiederci come si costruisce un buon modello conviene sapere quanto può diventare buono. La risposta è: non perfetto, e per un motivo che non dipende dal modello.</p>
+  <p>Per vederlo servono due oggetti. Il primo è una descrizione di come nascono i dati: una regola vera, più qualcosa che le features non vedono. Il secondo è la nostra stima di quella regola. Costruiamoli uno alla volta, e poi misuriamo di quanto sbaglia la stima.</p>
+  <figure data-fig="build" data-opts='{"id":"l01_irr"}'>
+    <figcaption>La curva bianca è la regola vera, i punti verdi i dati, i segmenti viola il rumore su ciascun dato. La retta gialla è la stima. Sull'input 7 il segmento rosa è la distanza fra stima e regola vera; i puntini viola sono le risposte che potrebbero capitare per quell'input.</figcaption>
+  </figure>
+  <p>Le ipotesi sul rumore sono due: ha media zero ed è indipendente dalle features. L'«errore quadratico atteso» è la media del quadrato dell'errore su tutti i dati che potrebbero capitare, non solo su quelli che abbiamo.</p>
+  <p>Il primo pezzo è <em>riducibile</em>: dipende da quanto la stima è vicina alla regola vera, e con un modello migliore si abbassa. <b>Il secondo è irriducibile: anche conoscendo la regola vera esattamente, resta la varianza del rumore.</b></p>
+  <figure data-fig="errsplit">
+    <figcaption>Ora prova tu. I segmenti viola sono il rumore: la distanza fra ogni dato e la curva vera. Il segmento rosa è la distanza fra la curva vera e la stima, nel punto scelto.</figcaption>
+  </figure>
+  <h3>Come si costruisce una stima</h3>
+  <p>Cercare la stima fra tutte le funzioni possibili è senza speranza: sono troppe. Si restringe allora la ricerca a una famiglia semplice. La più semplice è il <b>modello lineare</b>: ogni feature viene moltiplicata per un suo peso, e i risultati si sommano a una costante.</p>
+  <div class="math-block">\[\Yy \;\approx\; \Be_0+\sum_{i=1}^{p}\Be_i\,\Xs_i\]</div>
+  <p>Qui \(p\) è il numero di features, \(\Be_0\) la costante e gli altri \(\Be_i\) i pesi. Con due features, per esempio, restano da scegliere solo tre numeri: è questo il guadagno. Li si stima adattando il modello ai dati di training.</p>
+  <p>Le slide lo applicano a dati simulati in cui il reddito dipende da anni di istruzione e anzianità. Il modello lineare è un piano: reddito previsto uguale a una costante, più un peso per gli anni di istruzione, più un peso per l'anzianità. Sugli stessi dati un modello più flessibile produce una superficie ondulata che passa più vicino ai punti.</p>
+  <figure data-fig="surf2">
+    <figcaption>Dati simulati, come nelle slide. I segmenti rosa sono gli errori sui dati di training: con il modello flessibile sono più corti. Che sia migliore anche sui dati nuovi è un'altra questione.</figcaption>
+  </figure>
+  <p>Quale dei due è meglio? Esistono molti algoritmi di regressione, e scegliere comporta dei compromessi:</p>
+  <p>Il primo è <b>accuratezza contro interpretabilità</b>: i modelli lineari si leggono facilmente, quelli più complessi spesso no. Il secondo è <b>buon adattamento contro adattamento eccessivo o insufficiente</b> (in inglese <em>over-fit</em> e <em>under-fit</em>: li definiamo fra due sezioni): come si capisce quando è quello giusto? Il terzo è <b>parsimonia contro scatola nera</b>: spesso si preferisce un modello semplice, con poche variabili, a uno che le usa tutte.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Come si misura se un modello è buono?</h2>
+  <p>Bisogna misurare quanto le previsioni concordano con i dati osservati, e serve un numero solo. La prima cosa da fare è scegliere una <b>loss function</b> (o funzione di errore): la regola che trasforma gli errori in quel numero.</p>
+  <p>Per la regressione l'esempio standard è l'<b>errore quadratico medio</b>, in sigla MSE. Su ogni dato si prende la differenza fra la risposta giusta e la previsione, la si eleva al quadrato perché sbagliare in più o in meno pesi uguale, e si fa la media su tutti gli \(n\) dati:</p>
+  <div class="math-block">\[\cL_{\text{MSE}} \;=\; \frac1n\sum_{i=1}^{n}\big(\Yy_i-\Fh(\Xs_i)\big)^2\]</div>
+  <p>Se un modello sbaglia di 1 su tre dati e di 3 sul quarto, l'MSE è (1 + 1 + 1 + 9) / 4 = 3. La lezione 2 ricostruisce questa formula un pezzo alla volta.</p>
+  <p>Ma la media su quali dati? Lo scopo è un modello che generalizzi a esempi mai visti. Serve quindi un insieme di osservazioni di <em>test</em>, <b>non</b> usate per il training: si calcola la stessa media su quelle, e si sceglie il modello per cui è più bassa.</p>
+  <p>Nella figura qui sotto la curva bianca è la regola vera, i punti sono dati di training rumorosi e la curva gialla è il modello. Aumenta la flessibilità e guarda che cosa succede ai due errori.</p>
+  <figure data-fig="flex">
+    <figcaption>Nel primo riquadro il modello sui dati di training. Nel secondo l'MSE di training (grigio) e di test (rosso) per ogni livello di flessibilità: il primo scende sempre, il secondo scende e poi risale. La linea tratteggiata è la varianza del rumore, l'errore irriducibile.</figcaption>
+  </figure>
+  <p><b>L'errore di training non dice quanto il modello è buono: scende sempre, anche quando il modello sta imparando il rumore.</b> L'errore di test invece ha un minimo, e non scende mai stabilmente sotto l'errore irriducibile.<sup><a href="#n1-4">4</a></sup></p>
+  <p>Per la classificazione la differenza fra risposta e previsione non ha senso: «setosa meno virginica» non è un numero. Si conta allora quante volte la previsione è sbagliata. La loss tipica è l'<em>error rate</em>, la frazione di classificazioni sbagliate:</p>
+  <div class="math-block">\[\frac1n\sum_{i=1}^{n}\mathbb 1\big[\Yy_i\neq\Yh_i\big]\]</div>
+  <p>Il simbolo \(\mathbb 1[\cdot]\) vale 1 quando ciò che sta fra parentesi è vero e 0 altrimenti: qui vale 1 su ogni dato in cui la categoria prevista è diversa da quella giusta. Con 3 sbagli su 20 dati l'error rate è 0,15. Anche qui conta la prestazione su osservazioni di test non usate nel training.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Tre insiemi, tre errori</h2>
+  <p>In pratica si procede così. Si parte da dati etichettati e se ne mette da parte un sottoinsieme, il <b>validation set</b>: indicativamente il 20%. Il restante 80% è il <b>training set</b>.</p>
+  <figure>
+    <div class="split" role="img" aria-label="Divisione dei dati etichettati: 80% training, 20% validation, più un test set di dati nuovi">
+      <div style="flex:8;background:#c9c9c9">Training · 80%</div>
+      <div style="flex:2;background:#FF862F">Validation · 20%</div>
+      <div style="flex:2.4;background:#FC6255;margin-left:.6rem">Test · dati nuovi</div>
+    </div>
+    <figcaption>I dati etichettati si dividono in training e validation. Il test set è fatto di dati nuovi, su cui avviene la valutazione finale.</figcaption>
+  </figure>
+  <p>Con il training set si imparano i pesi del modello; il validation set <b>non</b> si usa per il training. Di solito non si allena un modello solo: si provano più algoritmi, oppure lo stesso algoritmo con diversi <em>iperparametri</em> (le manopole che l'algoritmo non regola da solo), oppure entrambe le cose.</p>
+  <p>Poi si valutano tutti i modelli allenati sul validation set e si sceglie quello con l'errore di validazione più basso. Solo alla fine si prova il modello scelto su un test set di dati <b>nuovi</b>: è la valutazione finale, e tipicamente di quei dati non si hanno le etichette.</p>
+  <p>Ne escono tre errori diversi. Il <b>training error</b> è la frazione di training set classificata male. Il <b>validation error</b> è la frazione di validation set classificata male, e serve a scegliere modello e iperparametri. Il <b>test error</b> è quella sul test set, ed è quello con cui si viene giudicati.</p>
+  <p>Quando l'errore di validazione o di test peggiora, le cause possibili hanno un nome. Per capirle serve prima un terzo termine: gli <b>outlier</b> sono punti con etichette atipiche, per esempio un debitore ricco che è comunque andato in default.</p>
+  <p>Si ha <b>overfitting</b> quando il modello diventa troppo sensibile agli outlier o ad altri pattern spuri: impara anche ciò che nei dati c'è per caso. Più outlier ci sono, più il rischio cresce. Si ha <b>underfitting</b> nel caso opposto: il modello non è abbastanza flessibile da cogliere i pattern che ci sono davvero.</p>
+  <figure data-fig="tript">
+    <figcaption>Tre classificatori allenati sugli stessi duecento punti dell'apertura. Il primo non sbaglia mai sul training, ma sul test sbaglia più del secondo; il terzo sbaglia molto su entrambi.</figcaption>
+  </figure>
+  <p><b>Overfitting e underfitting sono entrambi nemici della generalizzazione</b>: la lezione 4 è dedicata a capire da dove vengono.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Torniamo ai vicini</h2>
+  <p>L'algoritmo della figura di apertura ha un nome: <b>nearest neighbour</b>, il vicino più vicino. L'idea di base: se un punto nuovo è vicino a un punto di training, la sua risposta dovrebbe somigliare a quella di quel punto.</p>
+  <p>La versione più semplice, 1-NN, cerca il punto di training più vicino e ne copia l'etichetta. Il suo difetto lo hai già visto nell'apertura: un solo punto con un'etichetta atipica si porta dietro un'isola. Il rimedio è far votare più vicini; il loro numero si indica con \(\Kk\). Costruiamo le due regole su diciotto punti.</p>
+  <figure data-fig="build" data-opts='{"id":"l01_knn"}'>
+    <figcaption>Il punto bianco è quello da classificare, gli altri sono i punti di training con il loro colore. I segmenti sono le distanze; il cerchio tratteggiato dell'ultimo passo racchiude i tre punti più vicini.</figcaption>
+  </figure>
+  <p>La ricetta generale, <b>k-NN</b>, è quindi questa: si calcolano le distanze da tutti i punti di training, si tengono i \(\Kk\) più vicini e li si fa decidere. In classificazione con il voto di maggioranza; in regressione, dove la risposta è un numero, con la media delle loro risposte.</p>
+  <figure data-fig="knn" data-opts='{"k":1,"regions":true,"errors":true}'>
+    <figcaption>Ora prova tu. La stessa figura dell'apertura, con le regioni di decisione colorate e l'errore su training e test per ogni \(\Kk\). Con \(\Kk=1\) il training error è zero e il confine è frastagliato; con \(\Kk\) molto grande il confine diventa troppo rigido.</figcaption>
+  </figure>
+  <p>Muovi \(\Kk\) e guarda il grafico degli errori. Con un solo vicino ogni punto di training è il più vicino a se stesso: l'accuratezza sul training è perfetta, ma la generalizzazione è scarsa. È overfitting. Con moltissimi vicini votano anche punti lontanissimi e il confine ignora la forma dei dati. È underfitting. <b>Il \(\Kk\) migliore sta in mezzo, e lo si trova con il validation set, non con il training set.</b></p>
+  <h3>Come si sceglie k, in pratica</h3>
+  <p>Non guardando il training set: lì vince sempre \(\Kk=1\), che non sbaglia mai. Serve la ricetta della sezione precedente.</p>
+  <p>Dei 200 punti etichettati se ne mettono da parte 40: sono il validation set. Con gli altri 160 si costruisce il classificatore, una volta per ogni valore di \(\Kk\). Poi a ciascuno si fanno classificare i 40 punti messi da parte, di cui conosciamo il colore vero, e si conta quanti ne sbaglia.</p>
+  <figure data-fig="valbars">
+    <figcaption>Ogni barra arancione è un valore di \(\Kk\): l'altezza dice quanti dei 40 punti di validazione ha sbagliato. Si sceglie la barra più bassa. La barra rossa è quello stesso classificatore, messo alla prova sui punti di test.</figcaption>
+  </figure>
+  <p>La barra rossa è spesso un po' più alta di quella scelta. Il motivo è che fra tanti valori di \(\Kk\) abbiamo preso quello a cui i 40 punti sono andati meglio, in parte per bravura e in parte per fortuna. Sui punti di test la fortuna non si ripete.</p>
+  <p><b>Per questo il giudizio finale si dà su dati che non hanno partecipato a nessuna scelta.</b> Premi «Rimescola»: con soli 40 punti di validazione, il \(\Kk\) vincente cambia da una suddivisione all'altra.</p>
+  <p>Le slide aggiungono tre osservazioni. k-NN è un metodo <em>non parametrico</em>: non riassume i dati in un numero fisso di parametri, li tiene tutti e li consulta a ogni previsione. Guardare i confini di decisione, come hai appena fatto, aiuta a capire come si comporta un classificatore.</p>
+  <p>La terza è la più pratica: la <b>normalizzazione delle features</b> è importante. La distanza somma features diverse, e una feature misurata su una scala molto più grande delle altre finirebbe per decidere da sola chi è vicino.</p>
+
+  <figure data-fig="scale">
+    <figcaption>Sedici persone descritte da età e stipendio. Trascina il punto bianco: con le unità originali decide tutto lo stipendio.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="1"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>un modello si giudica sui dati che non ha visto. L'errore di training scende sempre con la flessibilità; quello di test scende e poi risale.</b></p>
+  <p>Resta aperta una domanda pratica. Abbiamo detto che imparare significa minimizzare una funzione obiettivo: ma come si trova, concretamente, il minimo di una funzione con migliaia di parametri?</p>
+  <div class="notes">
+    <p id="n1-1"><sup>1</sup> Nelle slide i due schemi si chiamano «Good Old Fashion AI» e «Deep Learning».</p>
+    <p id="n1-2"><sup>2</sup> Le slide indicano i target con \(t_i\); qui si usa \(\Yy_i\) per uniformità con le lezioni successive.</p>
+    <p id="n1-3"><sup>3</sup> Nelle slide ogni dato è la quadrupla \(\langle x, a, x', r\rangle\) (situazione, azione, nuova situazione, ricompensa) e la policy ottima è scritta \(\pi^*(x)=\arg\max_a Q^*(x,a)\), dove \(Q^*\) è una funzione da stimare. I problemi citati sono Markov Decision Process, Partially Observable MDP e Stochastic Games; le tecniche, Q-learning e metodi policy-gradient.</p>
+    <p id="n1-4"><sup>4</sup> Su un singolo test set finito l'errore può capitare leggermente sotto \(\mathrm{Var}(\Eps)\) per caso; in media no.</p>
+  </div>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

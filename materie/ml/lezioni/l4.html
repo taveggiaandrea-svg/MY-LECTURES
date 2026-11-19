@@ -1,0 +1,211 @@
+<article class="lesson" data-n="4" id="lezione-4" data-title="Perché un modello più potente può sbagliare di più?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 4</p>
+  <h1>Perché un modello più potente può sbagliare di più?</h1>
+  <p class="desc">Le basis functions danno alla regressione lineare il modo di piegarsi. Il prezzo è il compromesso fra bias e varianza.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 3 abbiamo trovato la retta migliore. Qui partiamo da dati che una retta non può spiegare: dieci punti generati da una parabola, più un po' di rumore.</p>
+  <p>La curva gialla è un polinomio adattato ai punti con i minimi quadrati. Cambia il grado. Quale sceglieresti? E il tuo criterio è l'errore sui punti che vedi, o qualcos'altro?</p>
+  <figure data-fig="poly" data-opts='{"deg":5}'>
+    <figcaption>Punti pieni: training. Punti vuoti: test, generati dalla stessa parabola ma mai usati per adattare la curva. Con il grado 5 la curva passa vicinissima ai punti di training e sbaglia quelli di test.</figcaption>
+  </figure>
+  <p>Aumentando il grado, l'errore di training non fa che scendere. Quello di test no: a un certo punto risale. Il modello più potente è quello che sbaglia di più sui dati nuovi. Lo avevamo già visto nella lezione 1; ora possiamo dire esattamente perché.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Lineare nei parametri, non negli input</h2>
+  <p>Prima però: come fa una «regressione lineare» a disegnare una curva? La regressione della lezione 3 ha due limiti. Molte relazioni reali non sono lineari; e non tutti i dati sono naturalmente vettori di numeri (pensa a una molecola o a una rete sociale).</p>
+  <p>Il primo limite si supera con un'idea semplice: trasformare l'input <em>prima</em> di darlo al modello. Se ai dati serve una parabola, si calcola una feature in più, il quadrato dell'input, e si lascia che il modello pesi anche quella. Ogni feature costruita così si chiama <b>basis function</b> (o feature derivata).</p>
+  <figure data-fig="build" data-opts='{"id":"l04_feat"}'>
+    <figcaption>Il modello costruito un pezzo alla volta, sulla parabola che ha generato i dati dell'apertura. Le curve azzurre sono le tre basis functions, prima da sole e poi moltiplicate ciascuna per il suo peso; la curva gialla è la loro somma. I pallini segnano i valori nell'input 0,5.</figcaption>
+  </figure>
+  <p>Guarda bene: il modello è non lineare in \(\Xs\), perché le basis functions possono essere qualunque cosa, ma è ancora lineare nei pesi. E i minimi quadrati richiedono solo questo.</p>
+  <figure data-fig="lift">
+    <figcaption>Lo stesso trucco visto dalla parte dei dati (pallini verdi), generati da una parabola. Nel primo riquadro sono disegnati contro \(\Xs\) e chiedono una curva; nel secondo sono disegnati contro la nuova feature \(\Xs^2\) e si allineano. La linea gialla è lo stesso modello in entrambi, con gli stessi due pesi.</figcaption>
+  </figure>
+  <p>Conviene una scrittura più compatta. Le \(k\) basis functions si raccolgono in un vettore \(\Ph(\Xs)\), detto <b>feature map</b>: prende un input e restituisce le sue \(k\) nuove features. Mettendo anche i pesi in un vettore, la somma di prima diventa un prodotto scalare:</p>
+  <div class="math-block">\[\Yh\;=\;\Wv^\top\Ph(\Xs)\]</div>
+  <p>È la stessa scrittura della retta nella lezione 3, con le features trasformate al posto dell'input.</p>
+  <p>Per questo tutta la macchina della lezione 3 funziona identica. Al posto della design matrix si usa una tabella \(\Phi\) con una riga per ogni dato e una colonna per ogni basis function: ogni riga contiene le features trasformate di un dato. Se i dati sono almeno quanti i pesi e le colonne della tabella sono linearmente indipendenti (cioè la tabella ha rango pieno), i pesi migliori sono</p>
+  <div class="math-block">\[\Wv^*\;=\;(\Phi^\top\Phi)^{-1}\Phi^\top\Yv\]</div>
+  <p>È la formula chiusa della lezione 3, con la nuova tabella al posto della vecchia. <b>Restare lineari nei parametri conserva la formula chiusa; diventare non lineari negli input dà la potenza espressiva.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Tre famiglie di basi</h2>
+  <p>Quali basis functions usare è una decisione di modello: dipende da ciò che si sa del problema, dai vincoli di calcolo e da quanti dati ci sono. Le dispense ne presentano tre.</p>
+  <h3>Polinomiali</h3>
+  <p>Quando l'input è un solo numero, la scelta più immediata sono le sue potenze: l'input, il suo quadrato, il suo cubo, fino a un grado massimo \(p\).</p>
+  <div class="math-block">\[\Ph(\Xs)=[1,\ \Xs,\ \Xs^2,\ \dots,\ \Xs^p]^\top\]</div>
+  <p>Il modello è allora un polinomio di grado \(p\), con un peso per ogni potenza. Con \(p=2\) si ottiene un modello quadratico, capace di relazioni a U o a U rovesciata.</p>
+  <figure data-fig="monos">
+    <figcaption>Le prime sei basis functions polinomiali, dalla costante alla quinta potenza. Sono globali: ognuna è diversa da zero quasi ovunque, quindi cambiare un peso sposta la curva dappertutto.</figcaption>
+  </figure>
+  <p>I polinomi piacciono per tre motivi. Sono <em>approssimatori universali</em>: per il teorema di approssimazione di Weierstrass, qualunque funzione continua su un intervallo chiuso e limitato si può approssimare bene quanto si vuole con un polinomio di grado abbastanza alto. Sono facili da calcolare e derivare. E formano una gerarchia naturale di modelli di complessità crescente.</p>
+  <p>I difetti: i polinomi di grado alto possono oscillare molto fra un dato e l'altro, e le potenze alte creano problemi numerici quando l'input è grande in valore assoluto o le features non sono riscalate.</p>
+  <p>Con più variabili, poi, bisogna includere tutti i monomi fino al grado \(p\), prodotti misti compresi. Con due variabili e grado 2 servono già sei features:</p>
+  <div class="math-block">\[\Ph(\Xs_1,\Xs_2)=[1,\ \Xs_1,\ \Xs_2,\ \Xs_1^2,\ \Xs_1\Xs_2,\ \Xs_2^2]^\top\]</div>
+  <p>E al crescere di variabili e grado il numero di termini cresce in modo combinatorio.</p>
+  <figure data-fig="terms">
+    <figcaption>Il numero di monomi di grado al più \(p\) in \(d\) variabili è \(\binom{d+p}{p}\). Con \(d=2\) e \(p=2\) sono i 6 dell'esempio. La barra è in scala logaritmica.</figcaption>
+  </figure>
+  <h3>Lineari a tratti</h3>
+  <p>Invece di un polinomio liscio e globale, si può dividere lo spazio degli input in regioni e adattare una retta diversa in ciascuna. Prendiamo un solo punto di rottura \(c\). Serve un interruttore che accenda una feature solo da un lato: è la <em>funzione indicatrice</em> \(\mathbb 1(\cdot)\), che vale 1 quando la condizione fra parentesi è vera e 0 altrimenti. Con lei bastano quattro basis functions:</p>
+  <div class="math-block">\[\Ph_1=1,\quad \Ph_2=\Xs\cdot\mathbb 1(\Xs\le c),\quad \Ph_3=\Xs\cdot\mathbb 1(\Xs\gt c),\quad \Ph_4=\mathbb 1(\Xs\gt c)\]</div>
+  <p>Prima del punto di rottura sono accese solo le prime due: il modello è una retta, con il primo peso come intercetta e il secondo come pendenza. Dopo, la pendenza diventa il terzo peso e all'intercetta si aggiunge il quarto. Pendenza e intercetta possono quindi cambiare nel punto di rottura.</p>
+  <figure data-fig="pwbasis">
+    <figcaption>Le quattro basis functions dell'esempio, una per riquadro, con \(c=0{,}5\) (linea tratteggiata). Ognuna è diversa da zero solo da un lato del punto di rottura, tranne la costante.</figcaption>
+  </figure>
+  <p>I vantaggi sono il controllo locale (correggere l'adattamento in una regione non tocca le altre), la capacità di cogliere cambiamenti bruschi e l'interpretabilità. La difficoltà è scegliere quanti punti di rottura mettere e dove. Su questa idea si fondano metodi più sofisticati, come le <em>regression splines</em> e gli alberi di regressione.</p>
+  <h3>Radiali (RBF)</h3>
+  <p>Una <em>radial basis function</em> dipende solo dalla distanza da un punto fissato, il suo centro: conta molto vicino al centro e quasi niente lontano. La più comune è la gaussiana. Costruiamola.</p>
+  <figure data-fig="build" data-opts='{"id":"l04_rbf"}'>
+    <figcaption>La gaussiana costruita un pezzo alla volta, con il centro in 0,5 (linea arancione tratteggiata). La curva azzurra è la quantità calcolata fino a quel passo, per ogni input; il pallino bianco ne segue il valore nell'input 0,7.</figcaption>
+  </figure>
+  <p>Raccogliendo tutto in una sola frazione si ottiene la forma che trovi nelle dispense:</p>
+  <div class="math-block">\[\Ph_j(\Xs)=\exp\!\Big(-\frac{\lVert\Xs-\mu_j\rVert^2}{2\Bw^2}\Big)\]</div>
+  <p>Il centro \(\mu_j\) dice dove la funzione si accende; la <em>bandwidth</em> \(\Bw\), un numero positivo, ne fissa la scala. Con una bandwidth piccola la funzione è un picco stretto attorno al centro; con una grande è larga e influenza una regione ampia.</p>
+  <figure data-fig="rbf1">
+    <figcaption>Ora prova tu: cinque gaussiane con i centri a distanza uniforme (le tacche bianche). La bandwidth decide quanto ciascuna si sovrappone alle vicine.</figcaption>
+  </figure>
+  <p>Le RBF uniscono i pregi delle due famiglie precedenti: sono locali come le funzioni a tratti, ma con transizioni lisce (la gaussiana è derivabile infinite volte), e con abbastanza centri approssimano qualunque funzione continua.</p>
+  <p>Gli iperparametri sono tre: il numero \(\Kk\) di funzioni, la posizione dei centri (per conoscenza del dominio, a distanza uniforme, o in un sottoinsieme dei punti di training) e la bandwidth. Quest'ultima si sceglie spesso provando più valori su dati tenuti da parte (la <em>cross-validation</em> della lezione 5) o in base alla distanza tipica fra i centri.</p>
+  <p>Ora che le conosci una per una, mettile alla prova sugli stessi dati.</p>
+  <figure data-fig="basis">
+    <figcaption>Gli stessi dati (pallini bianchi) adattati con le tre famiglie. Le curve azzurre sottili sono le singole basis functions moltiplicate per il loro peso; la curva gialla è la loro somma.</figcaption>
+  </figure>
+  <p><b>Tutte e tre le famiglie hanno una manopola che ne regola la complessità: il grado, il numero di tratti, il numero e la larghezza delle gaussiane.</b> Come si regola?</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Troppo semplice, troppo complesso</h2>
+  <p>Un modello troppo semplice non coglie pattern importanti dei dati; uno troppo complesso si adatta al rumore e a pattern spuri che non generalizzano. I due fallimenti hanno un nome e si riconoscono dagli errori.</p>
+  <p>Il primo è l'<b>underfitting</b>. Lo spazio delle ipotesi, cioè l'insieme delle funzioni fra cui il modello può scegliere, è troppo ristretto per catturare la vera struttura della funzione, anche se quella struttura è presente nei dati di training. Si riconosce da un errore alto <em>sia</em> sul training <em>sia</em> sul test.</p>
+  <p>Il secondo è l'<b>overfitting</b>. Lo spazio delle ipotesi è abbastanza grande da permettere all'algoritmo di adattarsi al rumore dei dati di training, cioè a pattern che non riflettono nessuna struttura generalizzabile. Si riconosce da un errore di training basso e un errore di test alto.</p>
+  <figure data-fig="fit3">
+    <figcaption>Gli stessi dieci punti dell'apertura con tre gradi, uno per riquadro: 1, 2 e 7. Punti pieni: training; punti vuoti: test. La curva gialla è il polinomio adattato, quella bianca tratteggiata la parabola vera. Sotto ogni riquadro i due errori.</figcaption>
+  </figure>
+  <p>L'underfitting compare quando la classe di modelli è troppo semplice (una retta su dati non lineari), mancano features importanti, o la regolarizzazione (i vincoli imposti al modello per limitarne la libertà, lezione 6) è troppo forte.</p>
+  <p>L'overfitting compare in quattro situazioni. La prima è un modello troppo complesso rispetto alla quantità di dati: un dataset piccolo contiene più facilmente correlazioni accidentali, e un modello molto espressivo ammette tante ipotesi che spiegano bene il training ma fanno previsioni diversissime altrove. Senza abbastanza dati non c'è modo di distinguerle.</p>
+  <p>La seconda sono dati rumorosi, con un rapporto segnale/rumore basso. La terza è uno spazio degli input con molte dimensioni: ogni feature in più ha qualche probabilità di risultare correlata alle etichette per puro caso. La quarta riguarda i metodi iterativi: se l'allenamento dura troppo, il modello finisce per memorizzare gli esempi.</p>
+
+  <p><b>La diagnosi si fa confrontando i due errori: entrambi alti è underfitting, training basso e test alto è overfitting.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Un esperimento: una parabola, una retta, un grado 5</h2>
+  <p>Torniamo alla figura di apertura, con qualche comando in più. Stavolta diciamo anche come nascono i dati: ogni output è la somma di due pezzi.</p>
+  <div class="math-block">\[\Yy\;=\;\Ff(\Xs)+\Eps\]</div>
+  <p>Il primo, \(\Ff\), è la funzione vera, qui una parabola. Il secondo, \(\Eps\), è il rumore: un numero casuale con media zero, diverso per ogni dato.</p>
+  <p>Il rumore è estratto da una gaussiana di varianza \(\Sg^2\): più \(\Sg\) è grande, più i punti si allontanano dalla parabola. È imprevedibile per definizione, quindi l'obiettivo è ricostruire la funzione vera il meglio possibile.</p>
+  <figure data-fig="poly" data-opts='{"deg":1,"extra":true}'>
+    <figcaption>La stessa figura con due cursori in più: il numero di punti di training e l'ampiezza del rumore. La curva bianca tratteggiata è la vera \(\Ff\), quella gialla il polinomio adattato.</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="4a"></div>
+  <div class="quiz" data-quiz="4b"></div>
+  <p>La retta sbaglia perché la parabola sta <em>fuori</em> dalla sua classe di ipotesi: si dice che ha <b>bias alto</b>, cioè commette errori sistematici. Il grado 5 la parabola la contiene (basta mettere a zero i pesi delle potenze dalla terza in su), ma con pochi dati si adatta alle fluttuazioni casuali di quel particolare campione.</p>
+  <p>Le due prove mostrano una differenza cruciale. <b>L'underfitting è un difetto del modello e i dati non lo curano; l'overfitting è una conseguenza di avere pochi dati rispetto alla complessità del modello.</b> Con abbastanza dati, un modello più complesso fa in genere almeno altrettanto bene di uno più semplice. Ma in pratica i dati non sono mai illimitati.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Stesso algoritmo, dataset diversi</h2>
+  <p>Nella seconda prova hai visto la curva cambiare a ogni nuovo dataset. Rendiamolo sistematico: estraiamo molti dataset dalla stessa distribuzione, adattiamo lo stesso tipo di modello a ciascuno e sovrapponiamo i risultati.</p>
+  <figure data-fig="spread">
+    <figcaption>Ogni curva sottile è il modello adattato a un dataset diverso di 10 punti. La curva gialla spessa è la loro media; quella bianca tratteggiata è la verità. Il bias è la distanza fra gialla spessa e bianca; la varianza è lo sparpagliamento delle sottili attorno alla gialla spessa.</figcaption>
+  </figure>
+  <p>Con il grado 1 le rette sono quasi tutte uguali, ma la loro media è lontana dalla parabola: <b>bias alto, varianza bassa</b>. Il modello è stabile e sistematicamente sbagliato.</p>
+  <p>Con il grado 5 la media ricalca la parabola quasi perfettamente, ma le singole curve vanno ognuna per conto proprio: <b>bias basso, varianza alta</b>. Piccoli cambiamenti nei dati producono grandi cambiamenti nel modello. E noi, in pratica, abbiamo una sola di quelle curve.</p>
+  <p><b>Aumentando la complessità il bias scende, perché il modello è più flessibile, e la varianza sale, perché è più sensibile al particolare training set.</b> È il <em>bias-variance tradeoff</em>.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>L'errore si spezza in tre</h2>
+  <p>L'esperimento si può trasformare in un conto esatto. Per farlo servono tre nomi, uno per ciascuna delle cose che hai appena visto nella figura.</p>
+  <p>Il primo è per il training set: lo chiamiamo \(S\). Sono punti estratti in modo indipendente dalla stessa sorgente, una distribuzione che non conosciamo. Il secondo è per il modello allenato su quei punti: \(\Fh_S\). Il pedice ricorda che la funzione imparata dipende dal dataset capitato: ogni curva sottile della figura è una \(\Fh_S\) diversa.</p>
+  <p>In pratica si allena una volta sola, su un dataset fissato. Ma per capire il comportamento <em>tipico</em> dell'algoritmo conviene immaginare di ripetere l'allenamento su tanti dataset diversi. Il terzo nome è per la media dei modelli così ottenuti: il <b>modello medio</b> \(\Fb\), cioè il predittore che si otterrebbe facendo la media dei modelli allenati su infiniti dataset. È la curva gialla spessa di prima. Guardalo nascere.</p>
+  <figure data-fig="avg">
+    <figcaption>Come nasce il modello medio: a ogni fotogramma si estrae un nuovo dataset di 10 punti, si adatta un polinomio di grado 5 (curva sottile) e si aggiorna la media (curva gialla spessa). La curva bianca tratteggiata è la verità.</figcaption>
+  </figure>
+  <p>Ora fissiamo un input e chiediamoci di quanto sbaglia lì, in media, la previsione su un dato nuovo. Serve un ultimo simbolo: \(\mathbb E\) con un pedice significa «la media al variare di» ciò che sta nel pedice. Per fare i conti a mente usiamo numeri tondi: in quel punto la verità vale 2 e cinque dataset danno cinque previsioni diverse.</p>
+  <figure data-fig="build" data-opts='{"id":"l04_bv"}'>
+    <figcaption>La scomposizione costruita in un solo punto, con numeri di esempio. Sull'asse stanno i valori dell'output: i pallini viola sono dati nuovi, quelli gialli le previsioni di cinque modelli allenati su dataset diversi, la tacca bianca è la verità e quella gialla il modello medio. La barra in basso si riempie con i tre pezzi: viola il rumore, azzurro il bias al quadrato, verde acqua la varianza.</figcaption>
+  </figure>
+  <details class="rev"><summary>La derivazione, passo per passo</summary><div class="in">
+    <p>Si sostituisce \(\Yy=\Ff(\Xs)+\Eps\):</p>
+    <div class="math-block">\[\mathbb E_{S,\Yy}\big[(\Ff(\Xs)-\Fh_S(\Xs)+\Eps)^2\big]=\mathbb E[\Eps^2]+\mathbb E_S\big[(\Ff(\Xs)-\Fh_S(\Xs))^2\big]\]</div>
+    <p>Il doppio prodotto sparisce perché \(\Eps\) ha media zero ed è indipendente dal training set. Il primo termine è \(\Sg^2\). Nel secondo si aggiunge e si toglie \(\Fb(\Xs)\):</p>
+    <div class="math-block">\[\mathbb E_S\big[(\Ff(\Xs)-\Fb(\Xs)+\Fb(\Xs)-\Fh_S(\Xs))^2\big]=\big(\Ff(\Xs)-\Fb(\Xs)\big)^2+\mathbb E_S\big[(\Fh_S(\Xs)-\Fb(\Xs))^2\big]\]</div>
+    <p>Anche qui il doppio prodotto si annulla: \(\Ff(\Xs)-\Fb(\Xs)\) non dipende da \(S\), e \(\mathbb E_S[\Fb(\Xs)-\Fh_S(\Xs)]=0\) per la definizione stessa di \(\Fb\).</p>
+  </div></details>
+  <figure data-fig="pointwise">
+    <figcaption>Ora prova tu, sull'esperimento della parabola: la scomposizione in un solo punto, che puoi trascinare. I pallini sono le previsioni di 80 modelli, ciascuno allenato su un dataset diverso: la distanza fra la loro media (tacca gialla) e la verità (tacca bianca) è il bias, segnato in rosa; il loro sparpagliamento è la varianza.</figcaption>
+  </figure>
+  <p>Il conto vale in ogni punto. Facendo la media anche su tutti gli input si ottiene il <b>rischio atteso</b> \(\bar{\cL}\): l'errore di test medio che si otterrebbe allenando il modello tante volte su dataset diversi e provandolo ogni volta su dati nuovi. Si spezza allo stesso modo:</p>
+  <div class="math-block">\[\bar{\cL}\;=\;\underbrace{\mathbb E_{\Xs}\big[\text{bias}^2(\Xs)\big]}_{\text{bias}^2\text{ medio}}+\underbrace{\mathbb E_{\Xs}\big[\text{varianza}(\Xs)\big]}_{\text{varianza media}}+\underbrace{\Sg^2}_{\text{rumore}}\]</div>
+  <p>È il teorema della <b>decomposizione bias-varianza</b>. Vale per la loss quadratica, quando i dati nascono come funzione vera più rumore gaussiano: proprio il nostro esperimento. I tre pezzi hanno significati diversi.</p>
+  <p>L'<b>errore irriducibile</b> \(\Sg^2\) è la varianza del rumore nel processo che genera i dati. Nessun algoritmo può eliminarlo. Il massimo a cui si può aspirare è ricostruire la funzione vera, cioè il valore medio dell'output per quell'input; le singole previsioni resteranno comunque sbagliate di quanto vale il rumore. È la stessa varianza del rumore incontrata nella lezione 1.</p>
+  <p>Il <b>bias</b> misura quanto il modello medio \(\Fb\) è lontano dalla verità \(\Ff\). Attenzione al nome: non è l'intercetta \(\Bi\) della lezione 3, che in inglese si chiama allo stesso modo. È l'errore sistematico dovuto a una classe di ipotesi ristretta: informalmente, l'errore di test che resterebbe allenando su infiniti dati, quando la varianza diventa trascurabile.</p>
+  <p>La <b>varianza</b> misura quanto \(\Fh_S\) oscilla attorno alla sua media al cambiare del training set: la sensibilità dell'algoritmo al campione che gli è capitato. Cresce quando la classe di modelli diventa più espressiva, perché un modello flessibile ha più gradi di libertà per adattarsi alle particolarità di ogni dataset.</p>
+  <figure data-fig="stack3">
+    <figcaption>I tre pezzi nell'esperimento della parabola, con 10 punti di training, stimati per simulazione: azzurro il bias al quadrato, verde acqua la varianza, viola l'errore irriducibile. Il pezzo viola è uguale per tutti i gradi; cambia come si divide il resto.</figcaption>
+  </figure>
+  <p><b>L'errore di test atteso è la somma di ciò che il modello non può rappresentare, di quanto dipende dal campione, e di ciò che nessuno può prevedere.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>La curva a U</h2>
+  <p>Ora possiamo calcolare i tre pezzi per ogni grado del polinomio, nel nostro esperimento, e sommarli.</p>
+  <figure data-fig="ucurve">
+    <figcaption>Bias² (azzurro), varianza (verde acqua) ed errore irriducibile (viola tratteggiato) al variare del grado, stimati simulando molti dataset. La loro somma, l'errore di test atteso (rosso), ha la forma di una U. Aumenta i punti di training e guarda che cosa succede al braccio destro.</figcaption>
+  </figure>
+  <p>All'inizio aumentare la complessità riduce il bias più in fretta di quanto aumenti la varianza, e l'errore di test scende. A un certo livello di complessità i due effetti si bilanciano: lì l'errore è minimo. Oltre, il bias non ha quasi più niente da guadagnare mentre la varianza cresce molto, e l'errore risale.</p>
+  <p><b>Bias e varianza si muovono in direzioni opposte: il modello migliore è quello che ne minimizza la somma, non quello che ne azzera uno.</b></p>
+  <p>Il cursore dei dati mostra da che cosa dipende il compromesso. Con più dati la varianza scende a ogni grado e il braccio destro della U si appiattisce: i modelli complessi costano sempre meno. In questo esperimento il minimo resta al grado 2, perché la verità è proprio una parabola; in generale vale però la regola pratica che <b>la complessità ottimale cresce con la dimensione del training set.</b></p>
+  <p>Con pochi dati conviene un modello semplice, perché quelli complessi vanno in overfitting; con molti dati i modelli complessi possono cogliere più struttura senza andarci. È il motivo per cui il deep learning, che usa modelli estremamente complessi, è diventato praticabile solo quando sono diventati disponibili dataset enormi.</p>
+  <figure data-fig="learn">
+    <figcaption>Errore di test atteso, stimato per simulazione, per un modello semplice e uno complesso al crescere dei dati. L'asse orizzontale è in scala logaritmica.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Dove la storia si complica</h2>
+  <p>La curva a U descrive il regime <em>classico</em>, o sotto-parametrizzato, in cui i parametri sono meno dei dati di training.</p>
+  <p>Negli ultimi anni si è scoperto che i modelli molto grandi, come le reti neurali profonde, possono mostrare un fenomeno detto <b>double descent</b>: dopo la U, continuando ad aumentare la complessità fino al regime sovra-parametrizzato, in cui i parametri sono molti più dei dati, l'errore di test può tornare a scendere. Se ne riparlerà con il deep learning.</p>
+  <figure data-fig="dd">
+    <figcaption>Schema qualitativo, non calcolato sui dati di questa pagina: prima la U classica, poi la seconda discesa oltre il punto in cui i parametri sono tanti quanti i dati.</figcaption>
+  </figure>
+  <p>Seconda cautela: la decomposizione vista qui vale per la loss quadratica. Per altre loss, come la 0-1 della classificazione (che conta solo se la risposta è giusta o sbagliata), prende una forma diversa, anche se l'intuizione di un compromesso fra bias e varianza spesso rimane.</p>
+  <p><b>La curva a U è la regola del regime classico, non una legge universale.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Le prime quattro lezioni in una tabella</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Lezione</th><th>Concetto</th><th>Idea</th><th>Formula</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Generalizzazione</td><td>Un modello si giudica su dati che non ha visto; una parte dell'errore è irriducibile</td><td>\(\Yy=\Ff(\Xs)+\Eps\)</td></tr>
+      <tr><td>1</td><td>k-NN</td><td>Prevedi come i \(\Kk\) punti di training più vicini</td><td>\(\Yh_*=\) voto di \(N_{\Kk}(\Xs_*)\)</td></tr>
+      <tr><td>2</td><td>Funzione di costo</td><td>Imparare è minimizzare l'errore medio sui dati</td><td>\(\cL(\Wv)=\frac1N\sum_i\cl(e_i)\)</td></tr>
+      <tr><td>2</td><td>Gradient descent</td><td>Un passo alla volta nella direzione opposta al gradiente</td><td>\(\Wv_{t+1}=\Wv_t-\Et\,\Gr\cL(\Wv_t)\)</td></tr>
+      <tr><td>2</td><td>SGD</td><td>Stimare il gradiente su pochi esempi a caso</td><td>\(\mathbb E_i[\Gr\cl_i]=\Gr\cL\)</td></tr>
+      <tr><td>3</td><td>Minimi quadrati</td><td>La retta migliore ha una formula chiusa ed è una proiezione ortogonale</td><td>\(\Wv^*=(\Xm^\top\Xm)^{-1}\Xm^\top\Yv\)</td></tr>
+      <tr><td>3</td><td>Massima verosimiglianza</td><td>Con rumore gaussiano, massimizzare la verosimiglianza è minimizzare i quadrati</td><td>\(\Eps_i\sim\mathcal N(0,\Sg^2)\)</td></tr>
+      <tr><td>4</td><td>Basis functions</td><td>Trasformare gli input restando lineari nei pesi</td><td>\(\Yh=\Wv^\top\Ph(\Xs)\)</td></tr>
+      <tr><td>4</td><td>Bias-varianza</td><td>L'errore atteso è la somma di tre pezzi; due si muovono in direzioni opposte</td><td>\(\bar{\cL}=\text{bias}^2+\text{var}+\Sg^2\)</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="4"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>un modello sbaglia per due ragioni opposte, perché è troppo rigido per la verità o perché è troppo sensibile al campione, e aumentare la complessità cura la prima peggiorando la seconda.</b></p>
+  <p>Resta la domanda pratica: nella realtà non conosciamo \(\Ff\) e non possiamo estrarre cento dataset. Come si sceglie allora il grado giusto con un solo campione? È l'argomento della lezione 5, model selection.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

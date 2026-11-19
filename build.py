@@ -25,13 +25,13 @@ FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
          '&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&display=swap">\n')
 THEME = "<script>try{if(localStorage.getItem('tema')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>\n"
 
-def head(title, up, lang='it'):
+def head(title, up, lang='it', extra=''):
     return ('<!DOCTYPE html>\n<html lang="' + lang + '">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
             '<meta name="robots" content="noindex, nofollow">\n'
             '<title>' + html.escape(title) + '</title>\n' + LOGO + FONTS +
             '<link rel="stylesheet" href="' + up + 'assets/katex/katex.min.css">\n'
-            '<link rel="stylesheet" href="' + up + 'assets/style.css">\n' + THEME + '</head>\n<body>\n')
+            '<link rel="stylesheet" href="' + up + 'assets/style.css">\n' + extra + THEME + '</head>\n<body>\n')
 
 def katex_assets():
     src = sys.argv[1] if len(sys.argv) > 1 else None
@@ -58,13 +58,17 @@ def build_subject(mid):
     for n in nums:
         body += '<!-- ===================== LEZIONE %d ===================== -->\n' % n + rd('materie', mid, 'lezioni', 'l%d.html' % n)
     body += rd('materie', mid, 'foot.html')
-    page = (head(meta['titolo'], '../', meta.get('lingua', 'it')) + body +
+    css = os.path.join(HERE, 'materie', mid, 'style.css')
+    extra = '<link rel="stylesheet" href="style.css">\n' if os.path.exists(css) else ''
+    if extra:
+        write(os.path.join(SITE, mid, 'style.css'), open(css, encoding='utf-8').read())
+    page = (head(meta['titolo'], '../', meta.get('lingua', 'it'), extra) + body +
             '<script src="../assets/katex/katex.min.js"></script>\n'
             '<script src="../assets/katex/contrib/auto-render.min.js"></script>\n'
             '<script src="app.js"></script>\n</body>\n</html>\n')
     js = [rd('shared', 'core.js')]
-    for extra in ('macro.js', 'thumbs.js'):
-        p = os.path.join(HERE, 'materie', mid, 'js', extra)
+    for f in ('macro.js', 'thumbs.js', 'shared.js'):
+        p = os.path.join(HERE, 'materie', mid, 'js', f)
         if os.path.exists(p):
             js.append(open(p, encoding='utf-8').read())
     js += [rd('materie', mid, 'js', 'l%d.js' % n) for n in nums if os.path.exists(os.path.join(HERE, 'materie', mid, 'js', 'l%d.js' % n))]

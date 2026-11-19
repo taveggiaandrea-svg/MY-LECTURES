@@ -1,0 +1,108 @@
+<article class="lesson" data-n="14" id="lezione-14" data-title="Come si riassumono mille numeri in due?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 14</p>
+  <h1>Come si riassumono mille numeri in due?</h1>
+  <p class="desc">La PCA: trovare le poche direzioni lungo cui i dati variano davvero, e descrivere ogni dato con le sue coordinate lungo quelle.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Da qui in poi le etichette non ci sono più: è l'<em>unsupervised learning</em>. Ci sono solo i dati, e la domanda è come descriverli in modo più compatto. Un'immagine di 28 × 28 pixel è un punto in uno spazio a 784 dimensioni: difficile da analizzare, da visualizzare, perfino da archiviare. Ma i dati reali sono ridondanti: molte coordinate si possono ricavare, più o meno, dalle altre. Il caso più semplice ha due sole coordinate.</p>
+  <figure data-fig="drop">
+    <figcaption>Una nuvola di punti quasi piatta. Si prova a descrivere ogni punto con una sola coordinata invece di due: prima tenendo \(\Xs_1\), poi tenendo \(\Xs_2\).</figcaption>
+  </figure>
+  <p>Buttare \(\Xs_2\) non costa quasi nulla, perché lungo \(\Xs_2\) i punti sono quasi tutti uguali. Buttare \(\Xs_1\) distrugge quasi tutta l'informazione. <b>La coordinata da tenere è quella lungo cui i dati sono più sparsi</b>, cioè con più varianza. La <b>riduzione di dimensionalità</b> è una forma di compressione, come il formato jpeg per le foto.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando la direzione giusta non è un asse</h2>
+  <p>Di solito la nuvola è inclinata, e nessuna delle coordinate originali è quella buona. Si cerca allora una <em>direzione</em> qualsiasi: una retta per l'origine su cui proiettare i punti. Fra tutte le rette, quale conviene?</p>
+  <figure data-fig="proj1">
+    <figcaption>Sessanta punti blu con media zero. Ruota la retta bianca: i punti arancioni sono le proiezioni, i segmenti rosa quello che si perde. Nel grafico sotto, per ogni direzione possibile, la varianza delle proiezioni in arancione e l'errore di ricostruzione in rosa: dove una è massima l'altro è minimo.</figcaption>
+  </figure>
+  <p>Ci sono due modi di dire «la retta migliore», e la figura mostra che coincidono. Si può volere che le proiezioni siano il più sparse possibile (massima varianza), oppure che i punti si spostino il meno possibile (minimo errore di ricostruzione).</p>
+  <p>Coincidono per il teorema di Pitagora. Per ogni punto, proiezione e scarto sono i cateti di un triangolo rettangolo che ha per ipotenusa la distanza del punto dall'origine, e quella non dipende dalla retta. Se un cateto si allunga, l'altro si accorcia: massimizzare l'una è minimizzare l'altro. La <b>Principal Component Analysis</b> (PCA) trova questa direzione, e poi le successive.</p>
+  <div class="quiz" data-quiz="14a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Codice e ricostruzione</h2>
+  <p>Scelta una retta, come si passa in pratica da un dato al suo riassunto, e dal riassunto di nuovo a un punto? Servono due operazioni. Conviene costruirle su un dato solo, il punto (5; 5), che vogliamo descrivere con un unico numero.</p>
+  <figure data-fig="build" data-opts='{"id":"l14_code"}'>
+    <figcaption>Le due operazioni della PCA costruite su un solo dato. In blu il dato, in bianco la retta e il vettore \(\mathbf b\) che ne indica la direzione, in arancione il codice e la ricostruzione, in rosa lo scarto. I numeri accanto seguono il conto passo per passo.</figcaption>
+  </figure>
+  <p>Il numero che si conserva è il <b>codice</b> del dato; il punto che se ne ricava è la sua <b>ricostruzione</b>. L'ultima riga è il teorema di Pitagora della figura precedente, scritto per un dato solo.</p>
+  <p>Con più direzioni si ripete lo stesso conto per ciascuna. Diciamo che ogni dato ha \(D\) coordinate e che vogliamo tenerne solo \(M\). Si scelgono altrettante direzioni, lunghe 1 e perpendicolari fra loro, così nessuna ripete quello che dice un'altra.</p>
+  <p>Le direzioni si affiancano come colonne di una matrice \(B\). Il codice di un dato diventa allora una lista di numeri, uno per direzione:</p>
+  <div class="math-block">\[\mathbf z_n=B^\top\Xv_n\]</div>
+  <p>Per tornare indietro si avanza lungo ogni direzione di quanto dice il suo numero, e si sommano gli spostamenti. Si ottiene di nuovo un punto con \(D\) coordinate:</p>
+  <div class="math-block">\[\tilde{\Xv}_n=B\,\mathbf z_n=BB^\top\Xv_n\]</div>
+  <p>La matrice \(B^\top\) comprime, e fa da <em>encoder</em>; \(B\) decomprime, e fa da <em>decoder</em>. L'obiettivo è che ogni ricostruzione sia il più vicino possibile al dato da cui viene. D'ora in poi ai dati si intende già sottratta la media: così la nuvola è centrata nell'origine, dove passano le rette.</p>
+  <figure data-fig="encdec">
+    <figcaption>Ora prova tu, con due coordinate e una sola direzione. Nel primo riquadro trascina il punto bianco: il punto arancione è la sua ricostruzione, il segmento rosa lo scarto. Nel secondo riquadro gli stessi numeri: il dato, compresso in un solo numero, e la ricostruzione che se ne ricava.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>La direzione migliore è un autovettore</h2>
+  <p>Resta la domanda di partenza: fra tutte le direzioni, quale rende le proiezioni più sparse? Per rispondere senza provarle tutte serve prima un numero che misuri quanto sono sparse lungo una direzione data. Lo costruiamo su quattro dati: (3; 1), (1; 3) e i loro opposti, che hanno media zero.</p>
+  <figure data-fig="build" data-opts='{"id":"l14_var"}'>
+    <figcaption>La varianza lungo una direzione, costruita su quattro dati. In blu i dati, in arancione le loro proiezioni sulla retta bianca, in rosa gli scarti. Accanto, prima i codici e i loro quadrati, poi la tabella \(S\) che riassume i dati, infine la varianza al ruotare della retta.</figcaption>
+  </figure>
+  <p>La matrice di covarianza \(S\) ha tante righe e tante colonne quante sono le coordinate dei dati. Con essa la ricerca diventa un problema preciso: rendere massimo \(\mathbf b^\top S\,\mathbf b\) fra i vettori di lunghezza 1. Il vincolo serve: senza, basterebbe allungare il vettore per far crescere il risultato a piacere.</p>
+  <p>Per risolverlo serve un'idea di algebra lineare. Invece di guardare il numero che esce da \(S\), guardiamo che cosa \(S\) fa a un vettore.</p>
+  <figure data-fig="build" data-opts='{"id":"l14_eig"}'>
+    <figcaption>La tabella \(S\) dei quattro dati applicata a un vettore di lunghezza 1. In bianco il vettore \(\mathbf b\), in giallo il vettore \(S\mathbf b\); il cerchio tratteggiato raccoglie tutti i vettori lunghi 1. Il tratto verde acqua, quando compare, misura quanto \(S\mathbf b\) pende di lato rispetto a \(\mathbf b\).</figcaption>
+  </figure>
+  <figure data-fig="eig">
+    <figcaption>Ora prova tu, con la matrice \(S\) dei sessanta punti di prima. Ruota il vettore bianco \(\mathbf b\) fino a trovare le direzioni in cui il vettore giallo \(S\mathbf b\) gli è allineato: sono le due rette grigie tratteggiate. Sotto si legge la varianza lungo \(\mathbf b\).</figcaption>
+  </figure>
+  <p>Le direzioni speciali sono due, perpendicolari fra loro. Lungo quella con l'autovalore più grande la varianza è massima, lungo l'altra è minima. Vale in generale:</p>
+  <p><b>La direzione di massima varianza è l'autovettore di \(S\) con l'autovalore più grande, e la varianza lungo di essa è quell'autovalore.</b> Si chiama prima <em>componente principale</em>.</p>
+  <details class="rev"><summary>La dimostrazione</summary>
+    <p>Si usa il metodo dei moltiplicatori di Lagrange (per massimizzare una funzione sotto un vincolo si aggiunge il vincolo moltiplicato per un numero incognito \(\Rl\), e si annullano le derivate) per il problema «massimizza \(\mathbf b^\top S\mathbf b\) con \(\mathbf b^\top\mathbf b=1\)». La funzione da derivare è \(\mathbf b^\top S\mathbf b+\Rl(1-\mathbf b^\top\mathbf b)\). Annullando la derivata rispetto a \(\mathbf b\) si ottiene \(2S\mathbf b-2\Rl\mathbf b=0\), cioè \(S\mathbf b=\Rl\mathbf b\): la soluzione è un autovettore. Sostituendo, \(V=\mathbf b^\top S\mathbf b=\Rl\,\mathbf b^\top\mathbf b=\Rl\). Per avere \(V\) massimo si sceglie l'autovettore con \(\Rl\) più grande.</p>
+  </details>
+  <h3>Le direzioni successive</h3>
+  <p>Una direzione di solito non basta. La seconda si cerca fra quelle perpendicolari alla prima, per non catturare due volte la stessa informazione, e di nuovo con la massima varianza: risulta essere l'autovettore con il secondo autovalore più grande. E così via.</p>
+  <p>Poiché \(S\) è simmetrica, i suoi autovettori si possono sempre scegliere perpendicolari fra loro. Le prime \(M\) componenti principali sono gli \(M\) autovettori con gli autovalori più grandi.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La ricetta</h2>
+  <p>In pratica la PCA si fa in quattro passi: si sottrae la media; si standardizza; si calcolano autovalori e autovettori della matrice di covarianza; si proiettano i dati sugli \(M\) autovettori con gli autovalori più grandi.</p>
+  <figure data-fig="steps">
+    <figcaption>Settanta punti blu in due dimensioni attraverso i quattro passi: centrare, standardizzare, trovare gli autovettori, proiettare. La retta gialla è la prima componente principale, quella grigia la seconda; i punti arancioni sono le proiezioni e i segmenti rosa gli scarti.</figcaption>
+  </figure>
+  <p>Standardizzare significa dividere ogni coordinata per la sua deviazione standard, così che tutte abbiano varianza 1. Serve perché la PCA guarda le varianze: senza, una coordinata misurata in millimetri peserebbe mille volte più della stessa misurata in metri.</p>
+  <p>Un dato nuovo va trattato con la stessa media e la stessa deviazione standard calcolate sui dati di partenza. Per riportare una ricostruzione nello spazio originale si rifanno i primi due passi al contrario.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Con le immagini</h2>
+  <p>Vediamo il metodo su dati con molte dimensioni. Le slide usano le cifre scritte a mano di MNIST e fotografie di volti; qui usiamo 180 piccole immagini generate al computer, che imitano uno 0, un 1 e un 7 disegnati con posizione, spessore e inclinazione variabili. Ogni immagine è un vettore di 144 numeri.</p>
+  <figure data-fig="eigimg">
+    <figcaption>Ogni componente principale è un vettore di 144 numeri, quindi si può guardare come un'immagine. Dice quali pixel aumentare (in arancione) e quali diminuire (in blu), insieme, per spostarsi lungo quella direzione.</figcaption>
+  </figure>
+  <p>Alle immagini è stata sottratta la media, quindi per ricostruirne una bisogna rimetterla. Si parte dall'immagine media \(\bar{\Xv}\) e si aggiunge ogni componente, moltiplicata per il numero corrispondente del codice:</p>
+  <div class="math-block">\[\tilde{\Xv}=\bar{\Xv}+\sum_{i=1}^{M}z_i\,\mathbf b_i\]</div>
+  <p>È la decodifica di prima, scritta una direzione per volta. Quante componenti servono? Lo dicono gli autovalori, cioè la varianza che ciascuna cattura.</p>
+  <figure data-fig="scree">
+    <figcaption>Gli autovalori in ordine decrescente, come quota della varianza totale: le barre gialle sono le singole componenti, la linea rosa la somma fino a quel punto. Le prime componenti contano molto, le ultime quasi nulla.</figcaption>
+  </figure>
+  <figure data-fig="recon">
+    <figcaption>Otto immagini e le loro ricostruzioni a partire da \(M\) coefficienti. Con pochi numeri si riconosce già la cifra; i dettagli arrivano dopo.</figcaption>
+  </figure>
+  <p>Ridurre le dimensioni serve a visualizzare i dati in due dimensioni, a velocizzare altri algoritmi togliendo features ridondanti, e a togliere rumore, che di solito vive nelle componenti con poca varianza.</p>
+  <p>Un limite: encoder e decoder della PCA sono lineari, una moltiplicazione per una matrice. Se li si sostituisce con due reti neurali si ottiene un <em>autoencoder</em>, che vedremo nella lezione 16; con reti lineari si ritrova la PCA.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="14"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>la PCA descrive i dati con le loro coordinate lungo gli autovettori della matrice di covarianza con gli autovalori più grandi: sono le direzioni di massima varianza, e quelle che perdono meno nella ricostruzione.</b></p>
+  <p>La PCA riassume ogni dato con pochi numeri. Un altro modo di riassumere è dire a quale <em>gruppo</em> appartiene: è il clustering.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

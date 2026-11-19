@@ -1,0 +1,201 @@
+<article class="lesson" data-n="3" id="lezione-3" data-title="Qual è la retta che spiega meglio i dati?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 3</p>
+  <h1>Qual è la retta che spiega meglio i dati?</h1>
+  <p class="desc">I minimi quadrati ordinari (OLS): la formula chiusa, la geometria che c'è sotto e il motivo probabilistico per cui gli errori si elevano proprio al quadrato.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 2 abbiamo imparato a minimizzare un costo a piccoli passi. Ora lo applichiamo al modello più semplice che dipenda davvero dall'input: una retta.</p>
+  <p>Ogni punto qui sotto è una persona: in orizzontale gli anni di istruzione, in verticale il reddito annuo. Trascina i due estremi della retta gialla finché ti sembra quella che descrive meglio i dati.</p>
+  <figure data-fig="line" data-opts='{}'>
+    <figcaption>Quando pensi di aver trovato la retta giusta, chiediti: giusta secondo quale criterio? Poi premi il pulsante e confronta.</figcaption>
+  </figure>
+  <p>A occhio si arriva vicino, ma «a occhio» non è un criterio. Per dire quale retta è la migliore serve un numero che le metta in ordine. Il resto della lezione costruisce quel numero e ne trova il minimo.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Due ipotesi per cominciare</h2>
+  <p>Abbiamo \(N\) dati di training, ciascuno una coppia fatta di un input e della sua risposta, e vogliamo una funzione che preveda la risposta dall'input. Per rendere il problema trattabile partiamo da due semplificazioni, che poi toglieremo.</p>
+  <p>La prima: <b>input e output sono ciascuno un solo numero</b>. Così ogni dato è un punto e il problema si disegna su un piano.</p>
+  <p>La seconda: <b>l'approssimazione lineare</b>. Chiamiamo <em>funzione di regressione</em> la risposta media che corrisponde a ciascun input: è ciò che vorremmo conoscere. Supponiamo che si lasci approssimare ragionevolmente da una retta.</p>
+  <p>Questa seconda è un'ipotesi di modello. Le relazioni reali sono raramente lineari, ma un'approssimazione lineare spesso basta: quando la relazione è quasi lineare nell'intervallo dei dati osservati, quando si trasformano le features (polinomi, logaritmi) per catturare la non linearità, e quando il modello lineare fa da mattone in architetture più complesse.</p>
+  <p>Con queste due ipotesi la <em>classe di ipotesi</em>, cioè l'insieme dei modelli fra cui scegliere, è la famiglia delle rette. Una retta è decisa da due numeri: quanto sale la previsione per ogni unità di input in più, e quanto vale quando l'input è zero.</p>
+  <div class="math-block">\[\Yh \;=\; \Mm\,\Xs+\Bi\]</div>
+  <p>Il cappello su \(\Yh\) ricorda che è una previsione, non la risposta vera; \(\Mm\) è la pendenza (detta anche coefficiente, o peso) e \(\Bi\) il <em>bias</em>, l'intercetta. Con pendenza 3 e intercetta 5, per l'input 10 la previsione è 3 · 10 + 5 = 35. <b>Ogni coppia pendenza-intercetta è un'ipotesi; imparare significa sceglierne una.</b></p>
+  <figure data-fig="fan">
+    <figcaption>Nel primo riquadro ventotto rette possibili sui dati dell'apertura; nel secondo le stesse rette, ognuna ridotta a un punto nel piano dei parametri. Scegliere una retta è scegliere un punto.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Un numero per ogni retta</h2>
+  <p>Per dire che una retta è migliore di un'altra serve un numero che misuri quanto bene spiega i dati. Usiamo l'errore quadratico medio delle due lezioni precedenti, e lo ricostruiamo qui per una retta, su quattro dati piccoli: gli input 1, 2, 3, 4 con risposte 2, 2, 4, 4.</p>
+  <figure data-fig="build" data-opts='{"id":"l03_sse"}'>
+    <figcaption>I punti verdi sono i quattro dati, la retta gialla è il modello. I segmenti rosa sono gli errori, i quadrati rosa i loro costi; la tabella accanto riporta gli stessi numeri dato per dato.</figcaption>
+  </figure>
+  <figure data-fig="line" data-opts='{"squares":true}'>
+    <figcaption>Ora prova tu, sui dati dell'apertura. Ogni errore è la distanza verticale fra il punto e la retta; il suo costo è l'area del quadrato costruito su quella distanza. Il costo della retta è l'area media.</figcaption>
+  </figure>
+  <p>Questa media si chiama anche <b>rischio empirico</b>. «Rischio» è la perdita che ci si aspetta usando una certa ipotesi; «empirico» vuol dire calcolato sui dati che abbiamo.</p>
+  <p>Quello che vorremmo minimizzare è il rischio <em>vero</em>: la stessa media dei quadrati, ma su tutti i dati che la realtà potrebbe produrre, ciascuno pesato con la sua probabilità. Quella distribuzione di probabilità non la conosciamo. Abbiamo solo un campione finito, e usiamo la media sul campione come stima: è l'Empirical Risk Minimization della lezione 2.</p>
+  <p>Se i dati sono estratti in modo indipendente dalla stessa distribuzione, la legge dei grandi numeri dice che il rischio empirico si avvicina a quello vero man mano che i dati aumentano. <b>È questo che dà speranza che minimizzare l'errore sui dati visti porti a un'ipotesi che funziona su quelli non visti.</b> Quando e come accada davvero è l'argomento della lezione 4.</p>
+  <figure data-fig="lln">
+    <figcaption>Dati simulati da una distribuzione nota, così il rischio vero si può calcolare. L'asse orizzontale è in scala logaritmica.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Il fondo della conca si trova a mano</h2>
+  <p>Cerchiamo la pendenza e l'intercetta con il costo più basso. Conviene guardare il costo come una funzione di quei due numeri: un'altezza sopra ogni punto del piano dei parametri.</p>
+  <figure data-fig="surface">
+    <figcaption>Nel secondo riquadro ogni punto del piano è una retta: il colore è il suo costo, dal più basso (scuro) al più alto. Trascina il punto giallo e guarda nel primo riquadro la retta corrispondente. La conca ha un solo fondo.</figcaption>
+  </figure>
+  <p>Il costo è una funzione strettamente convessa dei due parametri, quindi ha un unico minimo globale.<sup><a href="#n3-1">1</a></sup> E dalla lezione 2 sappiamo che per una funzione convessa basta trovare il punto in cui il gradiente è nullo.</p>
+  <p>Il gradiente qui ha due componenti: quanto cambia il costo spostando di poco l'intercetta, e quanto cambia spostando di poco la pendenza. Calcoliamole sui quattro dati di prima, partendo dalla retta di prova, e poi chiediamo che valgano zero.</p>
+  <figure data-fig="build" data-opts='{"id":"l03_norm"}'>
+    <figcaption>La retta gialla è quella corrente, la tratteggiata arancione è la stessa retta dopo una piccola spinta; le frecce mostrano di quanto si sposta ogni previsione. La croce bianca è il punto delle medie, il triangolo verde acqua la pendenza finale.</figcaption>
+  </figure>
+  <figure data-fig="slices">
+    <figcaption>Le stesse due sensibilità sui dati dell'apertura. Sono due sezioni della conca: una muovendo solo la pendenza, l'altra solo l'intercetta. Le derivate parziali sono le pendenze delle due tangenti.</figcaption>
+  </figure>
+  <details class="rev"><summary>I passaggi che portano alla formula di m*</summary><div class="in">
+    <p>Annullando le due derivate (e togliendo il fattore \(2/N\)):</p>
+    <div class="math-block">\[\Mm\sum_i\Xs_i^2+\Bi\sum_i\Xs_i-\sum_i\Xs_i\Yy_i=0 \qquad\quad \Mm\sum_i\Xs_i+N\Bi-\sum_i\Yy_i=0\]</div>
+    <p>Dalla seconda, \(\Bi=\bar{\Yy}-\Mm\bar{\Xs}\). Sostituendo nella prima e usando \(\sum_i\Xs_i=N\bar{\Xs}\):</p>
+    <div class="math-block">\[\Mm\Big(\sum_i\Xs_i^2-N\bar{\Xs}^2\Big)=\sum_i\Xs_i\Yy_i-N\bar{\Xs}\bar{\Yy}\]</div>
+    <p>Ora basta osservare che \(\sum_i(\Xs_i-\bar{\Xs})^2=\sum_i\Xs_i^2-N\bar{\Xs}^2\) e che \(\sum_i(\Xs_i-\bar{\Xs})(\Yy_i-\bar{\Yy})=\sum_i\Xs_i\Yy_i-N\bar{\Xs}\bar{\Yy}\): dividendo si ottiene la formula.</p>
+  </div></details>
+  <p>Le due equazioni «sensibilità uguale a zero» sono le <b>equazioni normali</b> della regressione lineare semplice. Per obiettivi quadratici come questo, annullare le derivate parziali è condizione necessaria e sufficiente di ottimalità: il punto trovato è il minimo globale. Nessun passo di discesa, nessun learning rate: due formule.</p>
+  <h3>Che cosa dicono le due formule</h3>
+  <p>La formula dell'intercetta dice che la retta di regressione passa sempre per il punto delle medie: la retta migliore attraversa il centro della nuvola.</p>
+  <figure data-fig="line" data-opts='{"ols":true,"dragPts":true}'>
+    <figcaption>Qui la retta è sempre quella dei minimi quadrati e sono i dati a muoversi: trascina un punto. La retta passa sempre per la croce, il punto delle medie.</figcaption>
+  </figure>
+  <p>Quella della pendenza si legge meglio dividendo sopra e sotto per il numero di dati. Sopra compare la <em>covarianza</em>, che misura quanto input e risposta si allontanano insieme dalle loro medie; sotto la <em>varianza</em> dell'input, che misura quanto l'input si sparpaglia attorno alla sua.</p>
+  <div class="math-block">\[\Mm^*=\frac{\mathrm{Cov}(\Xs,\Yy)}{\mathrm{Var}(\Xs)}\]</div>
+  <p><b>La pendenza è il rapporto fra quanto input e risposta variano insieme e quanto l'input varia da solo.</b> Se sono correlati positivamente la pendenza è positiva, se negativamente è negativa, se sono scorrelati è zero: una retta orizzontale.</p>
+  <figure data-fig="covrect">
+    <figcaption>Trascina i dati. I rettangoli verdi spingono la pendenza verso l'alto, quelli rossi verso il basso; i punti lontani dalla media hanno rettangoli più grandi e quindi contano di più.</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="3a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Con più di una variabile la formula non cambia forma</h2>
+  <p>Togliamo la prima ipotesi. Ogni dato ha ora più features, diciamo \(d\): le raccogliamo in un vettore \(\Xv_i\). Al posto dell'unica pendenza serve un peso per ogni feature, e anche i pesi stanno in un vettore, \(\Wv\). La previsione è la somma di ogni feature per il suo peso:</p>
+  <div class="math-block">\[\Yh_i\;=\;\Wv^\top\Xv_i\;=\;\sum_{j=1}^{d}\Ws_j\,\Xs_{ij}\]</div>
+  <p>La scritta \(\Wv^\top\Xv_i\) è solo il modo compatto di indicare quella somma. Con due features che valgono 3 e 4 e pesi 2 e 0,5, la previsione è 2 · 3 + 0,5 · 4 = 8.</p>
+  <figure data-fig="plane2">
+    <figcaption>Con due features il modello è un piano e gli errori sono le distanze verticali dal piano. Con più features non si disegna più, ma l'algebra è la stessa.</figcaption>
+  </figure>
+  <p>E l'intercetta? Si assorbe con un trucco: a ogni dato si aggiunge una feature finta che vale sempre 1, messa al primo posto. Il suo peso viene moltiplicato per 1 e sommato: è l'intercetta. Da qui in poi assumiamo che sia già stato fatto.</p>
+  <p>Per trattare tutti i dati insieme li si impila. La <b>design matrix</b> \(\Xm\) è una tabella con una riga per dato e una colonna per feature; \(\Yv\) è il vettore di tutte le risposte. Le previsioni su tutti i dati si scrivono allora con un solo prodotto, \(\Xm\Wv\).</p>
+  <figure data-fig="matmul">
+    <figcaption>Un esempio con quattro dati e due features. Premi una riga di \(\Xm\): ogni previsione è il prodotto scalare fra quella riga e i pesi.</figcaption>
+  </figure>
+  <p>Anche il costo si scrive in modo compatto. Togliendo le previsioni dalle risposte resta il vettore degli errori, e la somma dei quadrati delle sue componenti è il quadrato della sua lunghezza, che si indica con le doppie barre:<sup><a href="#n3-3">3</a></sup></p>
+  <div class="math-block">\[\cL(\Wv)\;=\;\sum_{i=1}^{N}(\Yy_i-\Wv^\top\Xv_i)^2\;=\;\lVert\Yv-\Xm\Wv\rVert_2^2\]</div>
+  <p>Minimizzare il costo vuol dire rendere il più corto possibile il vettore degli errori. La strada è la stessa di prima: una sensibilità per ogni peso, tutte uguali a zero. Rifacciamola sui quattro dati di prima, scritti come tabella.</p>
+  <figure data-fig="build" data-opts='{"id":"l03_mat"}'>
+    <figcaption>Le due colonne blu sono la design matrix dei quattro dati: la colonna di 1 e la colonna degli input. In giallo le previsioni con i pesi correnti, in verde le risposte, in rosa gli errori.</figcaption>
+  </figure>
+  <p>L'ultima riga vale se \(\Xm^\top\Xm\) è invertibile. <b>È la stessa formula del caso scalare, scritta per vettori</b>: funziona identica con due features o con duecento.</p>
+  <details class="rev"><summary>Come si calcola il gradiente</summary><div class="in">
+    <p>Si sviluppa il quadrato, usando \(\lVert z\rVert_2^2=z^\top z\):</p>
+    <div class="math-block">\[\cL(\Wv)=(\Yv-\Xm\Wv)^\top(\Yv-\Xm\Wv)=\Yv^\top\Yv-2\,\Yv^\top\Xm\Wv+\Wv^\top\Xm^\top\Xm\Wv\]</div>
+    <p>Poi servono due identità: \(\nabla_{\Wv}(a^\top\Wv)=a\) per ogni vettore \(a\), e \(\nabla_{\Wv}(\Wv^\top A\Wv)=2A\Wv\) per ogni matrice simmetrica \(A\). Poiché \(\Xm^\top\Xm\) è simmetrica:</p>
+    <div class="math-block">\[\Gr\cL(\Wv)=-2\Xm^\top\Yv+2\Xm^\top\Xm\Wv=2\Xm^\top(\Xm\Wv-\Yv)\]</div>
+  </div></details>
+  <p>Trovati i pesi, che cosa prevede il modello sui dati di training? Basta moltiplicare la design matrix per i pesi appena trovati:</p>
+  <div class="math-block">\[\hat{\Yv}=\Xm\Wv^*=\Xm(\Xm^\top\Xm)^{-1}\Xm^\top\Yv=H\Yv\]</div>
+  <p>Tutto ciò che sta davanti a \(\Yv\) è una sola matrice, che dipende solo dalle features: la si chiama \(H\), <em>hat matrix</em>, perché «mette il cappello» alle risposte, cioè trasforma quelle osservate in quelle previste.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>I minimi quadrati sono una proiezione</h2>
+  <p>La formula ha una lettura geometrica. Pensa alle risposte come a un unico vettore in uno spazio con una coordinata per ogni dato: con mille dati, mille dimensioni. Anche ogni colonna della design matrix è un vettore di quello spazio.</p>
+  <p>Qualunque previsione si ottiene combinando le colonne, ciascuna moltiplicata per il suo peso. Tutti i punti raggiungibili così formano lo <b>spazio delle colonne</b>: ha tante dimensioni quante sono le features, di solito molte meno dei dati. È un sottospazio sottile dentro uno spazio enorme.</p>
+  <p>In generale il vettore delle risposte non sta in quel sottospazio: non esiste una relazione lineare esatta fra features e output. Il meglio che si può fare è trovare il punto del sottospazio più vicino.</p>
+  <figure data-fig="projy">
+    <figcaption>Il caso più piccolo possibile: due dati e una sola feature, quindi lo spazio delle colonne è una retta nel piano. Muovi il peso: la distanza dal vettore delle risposte è minima esattamente quando il residuo è perpendicolare alla retta.</figcaption>
+  </figure>
+  <p>Quel punto più vicino è la <b>proiezione ortogonale</b> delle risposte sullo spazio delle colonne. Le equazioni normali dicono proprio questo: ogni colonna, moltiplicata per il vettore dei residui, dà zero.</p>
+  <div class="math-block">\[\Xm^\top(\Yv-\hat{\Yv})\;=\;\mathbf 0\]</div>
+  <p>Un prodotto scalare nullo fra due vettori vuol dire che sono perpendicolari: il vettore dei residui è ortogonale a ogni colonna della design matrix. <b>La regressione ai minimi quadrati trova la proiezione ortogonale del vettore degli output sullo spazio generato dalle features.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando la formula si rompe</h2>
+  <p>Tutto dipende dal poter invertire \(\Xm^\top\Xm\), una matrice quadrata con una riga e una colonna per ogni feature. Ci sono tre casi importanti in cui non si può.</p>
+  <p>Il primo è la <b>multicollinearità perfetta</b>: due o più features sono perfettamente correlate, e le colonne della design matrix non sono linearmente indipendenti. Se per esempio la prima feature è sempre il doppio della seconda, ciò che si toglie al peso dell'una si può restituire all'altra: infiniti vettori di pesi danno le stesse previsioni, e la soluzione non è unica.</p>
+  <p>Il secondo è la <b>codifica ridondante</b>, il problema annunciato nella lezione 1. Con la codifica one-hot, se si include un indicatore per ogni categoria <em>e</em> l'intercetta, gli indicatori sommano a 1, che è proprio la colonna dell'intercetta.</p>
+  <p>Il terzo è il <b>regime ad alta dimensione</b>: quando le features sono più dei dati, come spesso accade con immagini o dati genomici, la matrice è necessariamente singolare, cioè non invertibile.</p>
+  <figure data-fig="collin">
+    <figcaption>Due features, quindi due pesi. Con features scorrelate la conca ha un fondo netto; più sono correlate, più si allunga in un canale.</figcaption>
+  </figure>
+  <p>Nella figura della proiezione questo corrisponde a un fatto semplice: la proiezione esiste ed è unica comunque, ma ci sono più modi di scriverla come combinazione delle colonne.</p>
+  <p>I rimedi sono tre. Il primo è la <b>regolarizzazione ridge</b>: prima di invertire si aggiunge un piccolo numero positivo \(\Rl\) a tutti gli elementi sulla diagonale di \(\Xm^\top\Xm\). La matrice diventa definita positiva, quindi invertibile, e l'operazione equivale a penalizzare la norma \(\ell_2\) dei pesi (lezione 6): è il secondo cursore della figura.</p>
+  <p>Il secondo è la <b>selezione delle features</b>: si tolgono quelle ridondanti o molto correlate. Il terzo è la <b>riduzione della dimensione</b>: si proiettano le features in uno spazio più piccolo, per esempio con la PCA, una tecnica della parte unsupervised del corso.</p>
+  <p><b>La formula chiusa richiede che le features portino informazioni davvero distinte.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Formula o discesa?</h2>
+  <p>Anche quando la formula funziona, calcolarla ha un costo. Chiamiamo \(N\) il numero di dati e \(d\) quello delle features. I passi sono quattro, e due dominano.</p>
+  <p>Formare \(\Xm^\top\Xm\) richiede un numero di operazioni dell'ordine di \(Nd^2\); invertirla, dell'ordine di \(d^3\). Con mille features il solo cubo vale un miliardo di operazioni.</p>
+  <p>Gli altri due passi pesano molto meno: formare \(\Xm^\top\Yv\) costa nell'ordine di \(Nd\), la moltiplicazione finale di \(d^2\).</p>
+  <p>L'alternativa è il gradient descent della lezione 2: si parte da pesi qualsiasi e si fa un passo dalla parte opposta al gradiente, quello del riquadro precedente diviso per \(N\) perché qui si usa la media. Lo step size \(\Et\) accorcia il passo.</p>
+  <div class="math-block">\[\Wv_{t+1}\;=\;\Wv_t-\frac{2\Et}{N}\,\Xm^\top(\Xm\Wv_t-\Yv)\]</div>
+  <p>Ogni iterazione costa solo nell'ordine di \(Nd\) e non richiede nessuna inversione. In cambio bisogna regolare il learning rate e possono servire molte iterazioni.</p>
+  <figure data-fig="cost3">
+    <figcaption>Ordini di grandezza del numero di operazioni, senza costanti: \(Nd^2+d^3\) per la formula chiusa, \(T\cdot Nd\) per \(T\) iterazioni di gradient descent. Quando \(d\) cresce, il termine \(d^3\) diventa proibitivo.</figcaption>
+  </figure>
+  <p>La regola pratica delle dispense è questa. La <b>formula chiusa</b> conviene quando le features sono in numero moderato (sotto il migliaio è di solito sicuro), \(\Xm^\top\Xm\) è ben condizionata, serve la soluzione esatta e i dati stanno in memoria.</p>
+  <p>I <b>metodi iterativi</b> (GD o SGD) convengono quando le features sono moltissime (più di diecimila), i dati sono moltissimi (più di un milione), \(\Xm^\top\Xm\) è mal condizionata o singolare, si accetta una soluzione approssimata ma rapida, o i dati arrivano in sequenza.</p>
+
+  <p><b>La formula chiusa è esatta ma scala male con il numero di features; la discesa è approssimata ma scala.</b> Molte librerie, come scikit-learn, scelgono da sole in base alle dimensioni del problema.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Perché proprio i quadrati?</h2>
+  <p>Finora l'errore quadratico è stato una scelta: l'abbiamo preso e minimizzato. Ma c'è una ragione più profonda, che viene dalla probabilità.</p>
+  <p>Cambiamo domanda. Invece di «quali pesi danno l'errore più piccolo?», chiediamoci: <em>quali pesi rendono più probabili i dati che abbiamo osservato?</em> I pesi che rispondono a questa domanda si chiamano <b>stimatore di massima verosimiglianza</b> (MLE); la «verosimiglianza» è la probabilità dei dati osservati, vista come funzione dei pesi.</p>
+  <p>Per usarlo bisogna dire come sono generati i dati. L'ipotesi standard in regressione è che la risposta sia la previsione lineare più un rumore gaussiano, cioè distribuito a campana, indipendente da un dato all'altro:</p>
+  <div class="math-block">\[\Yy_i=\Wv^\top\Xv_i+\Eps_i,\qquad \Eps_i\sim\mathcal N(0,\Sg^2)\]</div>
+  <p>La seconda scritta dice che il rumore \(\Eps_i\) ha media zero e varianza \(\Sg^2\): \(\Sg\) è la larghezza della campana. Sommare una costante a una gaussiana ne sposta solo il centro, quindi ogni risposta ha una sua campana, centrata sulla previsione. Vediamo che probabilità assegna ai quattro dati di prima.</p>
+  <figure data-fig="build" data-opts='{"id":"l03_mle"}'>
+    <figcaption>Su ogni dato è disegnata in viola, in verticale, la campana centrata sulla retta. La barra bianca è la densità all'altezza del punto: più il punto è lontano dalla retta, più è corta. Accanto, gli stessi numeri e i due pezzi del logaritmo.</figcaption>
+  </figure>
+  <figure data-fig="line" data-opts='{"lik":true}'>
+    <figcaption>Ora prova tu, sui dati dell'apertura. Trascina la retta: la log-verosimiglianza è massima esattamente dove la somma dei quadrati è minima, qualunque sia la larghezza \(\Sg\) della campana.</figcaption>
+  </figure>
+  <p>Il passaggio al logaritmo non è solo una comodità. Le somme si derivano più facilmente dei prodotti, e soprattutto si evita di moltiplicare numeri piccolissimi: con molti dati il prodotto delle densità diventa così piccolo che un computer non riesce più a rappresentarlo.</p>
+  <figure data-fig="logsum">
+    <figcaption>Rumore gaussiano standard. La curva è il logaritmo in base 10 del prodotto delle prime \(N\) densità: scende in linea retta, e attorno a \(10^{-323}\) il prodotto non è più rappresentabile.</figcaption>
+  </figure>
+  <p>Riassumendo: i pesi che rendono massima la log-verosimiglianza sono gli stessi che rendono minima la somma dei quadrati. La scritta \(\arg\max\) indica i pesi in cui il massimo viene raggiunto, e \(\arg\min\) quelli del minimo.</p>
+  <div class="math-block">\[\arg\max_{\Wv}\ \log p(\Yv\mid\Xm,\Wv)\;=\;\arg\min_{\Wv}\ \sum_{i=1}^{N}(\Yy_i-\Wv^\top\Xv_i)^2\]</div>
+  <p><b>La regressione lineare con errore quadratico è la stima di massima verosimiglianza quando il rumore è gaussiano.</b> Elevare al quadrato è ciò che la campana di Gauss impone.</p>
+  <p>Cambiando ipotesi sul rumore cambia la loss. Un rumore di Laplace (una distribuzione a punta, con code più pesanti della gaussiana) porta alla loss \(\ell_1\), cioè al MAE della lezione 2. Distribuzioni a code pesanti motivano le loss robuste, che danno meno peso agli outlier.<sup><a href="#n3-2">2</a></sup></p>
+  <figure data-fig="noise2loss">
+    <figcaption>Nel primo riquadro due ipotesi sul rumore. Nel secondo il meno logaritmo di ciascuna densità, a meno di costanti: è la loss che ne discende.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="3"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>la retta dei minimi quadrati è tre cose insieme: il minimo di una conca convessa, la proiezione ortogonale degli output sullo spazio delle features, e la stima più verosimile se il rumore è gaussiano.</b></p>
+  <p>Una retta però può solo fare la retta. Nella prossima lezione le diamo il modo di piegarsi, e scopriamo che un modello più potente non sempre sbaglia di meno.</p>
+  <div class="notes">
+    <p id="n3-1"><sup>1</sup> Le dispense lasciano la domanda al lettore («do you see why?»). La risposta sta nelle regole della lezione 2: ogni termine \((\Mm\Xs_i+\Bi-\Yy_i)^2\) è la funzione convessa \(z^2\) composta con una funzione affine dei parametri, e una somma di funzioni convesse è convessa. La convessità è stretta quando gli \(\Xs_i\) non sono tutti uguali; se lo fossero, il denominatore di \(\Mm^*\) sarebbe zero.</p>
+    <p id="n3-2"><sup>2</sup> Le dispense accennano anche a un legame con la teoria dell'informazione, che tornerà più avanti: la log-verosimiglianza negativa si può leggere come una <em>cross-entropy</em> fra la distribuzione dei dati osservati e quella del modello, e minimizzarla equivale a minimizzare la divergenza di Kullback-Leibler fra le due.</p>
+    <p id="n3-3"><sup>3</sup> Qui il costo è la somma dei quadrati, senza dividere per \(N\) come nella sezione sulla retta: il punto di minimo è lo stesso, perché dividere per una costante positiva non lo sposta.</p>
+  </div>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

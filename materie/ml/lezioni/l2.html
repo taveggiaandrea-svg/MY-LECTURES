@@ -1,0 +1,274 @@
+<article class="lesson" data-n="2" id="lezione-2" data-title="Come si trova il fondo di una valle senza vederla?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 2</p>
+  <h1>Come si trova il fondo di una valle senza vederla?</h1>
+  <p class="desc">Funzioni di costo, minimi e convessità, e l'idea su cui si regge quasi tutto il machine learning moderno: scendere seguendo la pendenza.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 1 abbiamo detto che imparare significa regolare i parametri di un modello in modo da minimizzare una funzione obiettivo. Qui vediamo che cosa sia quella funzione e come se ne trova il minimo.</p>
+  <p>Cominciamo dal modello più povero possibile: prevede <em>sempre lo stesso numero</em> \(\Ws\), qualunque sia l'input. Hai quattro osservazioni: 1, 2, 3 e 4. Trascina \(\Ws\): dove lo metteresti?</p>
+  <figure data-fig="cost" data-opts='{}'>
+    <figcaption>L'esempio delle slide. I segmenti rosa sono gli errori; la tabella riporta la somma dei loro quadrati per i valori interi di \(\Ws\), e la curva la mostra per tutti gli altri. Poi aggiungi la quinta osservazione, 20, e guarda dove si sposta il minimo.</figcaption>
+  </figure>
+  <p>Con quattro dati il costo è minimo in 2,5, la loro media. Con il quinto dato il minimo salta a 6: un valore più grande di quattro osservazioni su cinque. Un solo punto anomalo si è trascinato dietro il modello. Vedremo fra poco che dipende dal modo in cui abbiamo deciso di contare gli errori.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il costo è una scelta, non un dato</h2>
+  <p>Abbiamo dei dati, cioè coppie di input \(\Xs_i\) e risposta giusta \(\Yy_i\), e un modello con dei parametri, che raccogliamo in un vettore \(\Wv\). Vogliamo un solo numero che dica quanto sono buone le previsioni fatte con quei parametri.</p>
+  <p>Lo si costruisce in due mosse. Per ogni dato si calcola l'<em>errore</em> \(e_i\), la differenza fra la risposta giusta e la previsione. Poi una funzione, la <em>loss</em> \(\cl\), trasforma ogni errore in un costo, e si fa la media di tutti i costi.</p>
+  <figure data-fig="build" data-opts='{"id":"cost"}'>
+    <figcaption>Il costo costruito un pezzo alla volta, sull'esempio dei quattro dati 1, 2, 3, 4. Le barre rosa sono i costi dei singoli errori.</figcaption>
+  </figure>
+  <figure data-fig="permean">
+    <figcaption>Lo stesso conto su un altro modello, con un solo parametro: la pendenza di una retta. A sinistra gli errori sui singoli dati; a destra il costo di ciascuno e la media, che è il numero da minimizzare.</figcaption>
+  </figure>
+  <p>D'ora in poi \(\cL(\Wv)\) è questo: il costo che si paga scegliendo i parametri \(\Wv\). Allenare un modello significa cercare il \(\Wv\) che lo rende minimo. Lo schema si chiama <b>Empirical Risk Minimization</b> (ERM): si minimizza l'errore medio sui dati che si hanno, al posto dell'errore medio su tutti i dati possibili, che non si può calcolare.</p>
+  <p>Che forma dare a \(\cl\)? Due proprietà sono spesso desiderabili: la <em>simmetria</em> attorno a zero (errori positivi e negativi pesano uguale) e il fatto di trattare in modo simile errori «grandi» ed errori «molto grandi», per limitare l'influenza degli outlier. Nessuna delle due è un obbligo matematico: in medicina, per esempio, le loss sono volutamente asimmetriche, perché i due tipi di errore non costano uguale.</p>
+  <figure data-fig="losses">
+    <figcaption>Le quattro funzioni di costo mostrate nelle slide. Trascina l'errore: più la curva sale piano lontano da zero, meno un outlier riesce a spostare il minimo.</figcaption>
+  </figure>
+  <p>Le due scelte più comuni si chiamano MSE e MAE. Si costruiscono allo stesso modo e differiscono in un solo passaggio.</p>
+  <figure data-fig="build" data-opts='{"id":"msemae"}'>
+    <figcaption>Le due loss sugli stessi quattro errori. In rosa i quadrati, in arancione i valori assoluti, sulla stessa scala.</figcaption>
+  </figure>
+  <figure data-fig="cost" data-opts='{"mae":true,"five":true}'>
+    <figcaption>La stessa figura con le due curve di costo al variare di \(\Ws\). Con l'outlier, il minimo dell'MSE finisce a 6; quello del MAE resta a 3, in mezzo ai dati.</figcaption>
+  </figure>
+  <p>L'MSE eleva gli errori al quadrato: un errore \(e_i=14\) costa \(14^2=196\), e basta da solo a dominare la somma e spostare il minimo. Il MAE cresce linearmente, quindi è più robusto, ma ha un difetto: non è derivabile in zero. <b>Elevare al quadrato è utile quando i grandi errori sono davvero inaccettabili, ed è dannoso quando gli outlier sono solo rumore o misure corrotte.</b><sup><a href="#n2-1">1</a></sup></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Che cosa stiamo cercando, esattamente?</h2>
+  <p>Prima di parlare di algoritmi serve chiarire che tipo di punto vogliamo. Un minimo <em>locale</em> è un punto più basso di tutti quelli che gli stanno abbastanza vicino. Un minimo <em>globale</em> è più basso di tutti, ovunque.</p>
+  <figure data-fig="locglob">
+    <figcaption>Trascina il punto giallo lungo la curva e allarga la fascia gialla, il suo vicinato. Nell'avvallamento di destra il punto vince finché il vicinato è stretto; allargandolo compare un punto più basso.</figcaption>
+  </figure>
+  <p>La distinzione conta perché un algoritmo che guarda solo attorno a sé può fermarsi in un minimo locale senza accorgersi che altrove c'è di meglio.</p>
+  <figure data-fig="minima3">
+    <figcaption>I tre casi delle slide: un unico minimo globale, infiniti minimi globali tutti alla stessa altezza, più minimi locali di cui uno solo globale.</figcaption>
+  </figure>
+  <p>C'è però una famiglia di funzioni in cui un minimo locale che non sia anche globale non può esistere: le funzioni <b>convesse</b>. Una funzione è convessa se, presi due punti qualsiasi sul suo grafico, il segmento che li unisce (la <em>corda</em>) non scende mai sotto il grafico. Per scriverlo servono due punti, \(x\) e \(y\), e un modo per indicare un punto qualunque fra i due.</p>
+  <figure data-fig="build" data-opts='{"id":"convex"}'>
+    <figcaption>La definizione costruita sul disegno: il punto giallo scorre fra i due estremi, il punto rosa lo segue sul grafico, quello verde acqua sulla corda.</figcaption>
+  </figure>
+  <figure data-fig="chord">
+    <figcaption>Ora prova tu: trascina i due punti. Nella funzione convessa la corda non scende mai sotto il grafico. In quella non convessa basta trovare una coppia di punti per cui succede.</figcaption>
+  </figure>
+  <p>Nella formula, \(\alpha=0\) dà il punto \(x\) e \(\alpha=1\) dà \(y\): facendo scorrere \(\alpha\) si percorre tutto il segmento. C'è poi una seconda lettura, equivalente quando la funzione è liscia: la retta tangente in un punto qualsiasi sta tutta sotto il grafico. Conoscere la pendenza in un punto dà quindi un'informazione su tutta la funzione.</p>
+  <figure data-fig="tangent">
+    <figcaption>La stessa proprietà vista dalle tangenti: per una funzione convessa, la tangente in un punto resta sotto il grafico ovunque.</figcaption>
+  </figure>
+  <p><b>Per una funzione convessa ogni minimo locale è anche globale.</b> Se poi la corda sta sempre strettamente sopra il grafico (funzione <em>strettamente</em> convessa), il punto di minimo è unico.</p>
+  <details class="rev"><summary>Come si riconosce una funzione convessa</summary><div class="in">
+    <p>Queste regole discendono tutte dalla definizione, e spesso bastano per stabilire la convessità delle funzioni obiettivo del machine learning (per esempio MSE e MAE con un modello lineare).</p>
+    <p>Le norme sono convesse. Se \(f\) e \(g\) sono convesse e \(\lambda\ge0\), lo sono anche \(f+g\) e \(\lambda f\), e lo è \(\max\{f,g\}\). Infine, se \(f\) è convessa lo è anche \(x\mapsto f(Ax+b)\), per qualunque matrice \(A\) e vettore \(b\) di dimensioni compatibili.</p>
+
+  </div></details>
+</div></section>
+
+<section><div class="col">
+  <h2>Provare tutto non funziona</h2>
+  <p>Come si trova il \(\Wv\) che rende minimo \(\cL(\Wv)\)? L'approccio più ingenuo è la <b>grid search</b>: per ogni parametro si sceglie un elenco di valori, si calcola il costo per tutte le combinazioni e si tiene la migliore.</p>
+  <figure data-fig="gridpts">
+    <figcaption>Dieci valori per parametro. Ogni parametro in più moltiplica per dieci il numero di punti da provare.</figcaption>
+  </figure>
+  <p>È semplicissima, non richiede nessuna ipotesi sul costo, si parallelizza bene (ogni valutazione è indipendente) e non usa informazioni locali come le derivate. Vale la pena capire perché fallisce.</p>
+  <figure data-fig="grid">
+    <figcaption>Con 10 valori per parametro e \(d\) parametri servono \(10^d\) valutazioni: ogni parametro aggiunge uno zero. Già con pochi parametri il numero diventa impraticabile.</figcaption>
+  </figure>
+  <p>I modelli moderni hanno da centomila a dieci miliardi di parametri. Oltre all'esplosione del costo c'è il «dilemma della risoluzione»: una griglia rada manca i minimi, una fitta è infattibile. E lo sforzo è speso in modo uniforme, anche lontanissimo dalle zone buone.</p>
+  <p><b>La grid search muore con la dimensione</b>; resta in uso solo dove i parametri sono pochi, come nella scelta degli iperparametri.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Scendere seguendo la pendenza</h2>
+  <p>L'alternativa è usare un'informazione che la grid search ignora: la pendenza locale. Immagina di essere in montagna nella nebbia. Non vedi la valle, ma senti sotto i piedi da che parte il terreno scende. Fai un passo da quella parte, e ripeti.</p>
+  <p>I metodi costruiti su questa idea si chiamano <b>metodi del primo ordine</b>. Per capirli serve un solo oggetto matematico, la pendenza, e conviene costruirlo un parametro alla volta.</p>
+  <h3>Un parametro: la pendenza</h3>
+  <p>Torniamo al modello che prevede sempre lo stesso numero, sui dati 1, 2, 3, 4. Mettiti in un punto della curva del costo e sposta il parametro \(\Ws\) di pochissimo. Di quanto cambia \(\cL\)?</p>
+  <figure data-fig="nudge1">
+    <figcaption>Trascina il punto giallo e riduci lo spostamento. Il rapporto fra variazione del costo e spostamento si stabilizza su un numero: la pendenza della retta tangente.</figcaption>
+  </figure>
+  <p>Quel numero è la <b>derivata</b> del costo, che si scrive \(d\cL/d\Ws\): il rapporto fra un piccolo cambiamento di \(\cL\) e il piccolo spostamento di \(\Ws\) che lo ha causato. Dice quanto il costo è sensibile al parametro, e in che verso. Se è negativa conviene aumentare il parametro; se è positiva, diminuirlo. In entrambi i casi ci si muove dalla parte opposta al segno della derivata.</p>
+  <h3>Più parametri: il gradiente</h3>
+  <p>Con due parametri il costo è una superficie, e la disegniamo vista dall'alto: ogni curva azzurra unisce i punti con lo stesso costo, come le curve di livello di una carta topografica. Ora di sensibilità ce ne sono due, una per parametro: si sposta \(\Ws_1\) tenendo fermo \(\Ws_2\), e si guarda come cambia il costo; poi il contrario.</p>
+  <figure data-fig="build" data-opts='{"id":"grad"}'>
+    <figcaption>Le due sensibilità, una alla volta, e la freccia che le riunisce.</figcaption>
+  </figure>
+  <figure data-fig="gradparts">
+    <figcaption>Ora prova in altri punti: trascina il punto bianco. Le due frecce lungo gli assi sono le sensibilità ai due parametri; il gradiente è la freccia che le ha come componenti. È sempre perpendicolare alla curva di livello e punta verso l'esterno, dove il costo cresce.</figcaption>
+  </figure>
+  <p>Il simbolo \(\Gr\cL(\Wv)\) si legge «gradiente di \(\cL\) in \(\Wv\)»: il punto conta, perché in un altro punto le sensibilità sono diverse. Con un milione di parametri il gradiente ha un milione di componenti, ma l'idea non cambia: una derivata parziale \(\partial\cL/\partial\Ws_j\) per ogni parametro.</p>
+  <h3>Da che parte si scende</h3>
+  <p>\(\Gr\cL\) indica la salita più ripida. Per scendere non serve andare esattamente dalla parte opposta: basta una direzione che formi con il gradiente un angolo maggiore di 90 gradi.</p>
+  <figure data-fig="descdir">
+    <figcaption>Trascina la freccia gialla. Tutte le direzioni nella metà verde fanno scendere il costo, purché il passo sia abbastanza piccolo; la più ripida è l'opposto del gradiente.</figcaption>
+  </figure>
+  <p><b>L'opposto del gradiente, \(-\Gr\cL\), è sempre una direzione di discesa</b>, tranne dove il gradiente è nullo.</p>
+  <details class="rev"><summary>Perché basta l'angolo</summary><div class="in">
+    <p>Chiamiamo \(u\) la direzione e \(\alpha\) la lunghezza del passo. Per il teorema di Taylor, per \(\alpha\) piccolo</p>
+    <div class="math-block">\[\cL(\Wv_0+\alpha u)\;\approx\;\cL(\Wv_0)+\alpha\,\langle\Gr\cL(\Wv_0),\,u\rangle\]</div>
+    <p>Il costo scende se il prodotto scalare fra gradiente e direzione è negativo, cioè se l'angolo fra i due supera i 90 gradi. Con \(u=-\Gr\cL\) il prodotto vale \(-\lVert\Gr\cL\rVert^2\), sempre negativo.</p>
+  </div></details>
+  <p>Attenzione a che cosa <em>non</em> è garantito: che un passo di qualunque lunghezza faccia scendere. La pendenza descrive la superficie solo vicino al punto in cui la si misura.</p>
+  <figure data-fig="steplen">
+    <figcaption>Un solo passo nella direzione opposta al gradiente, di lunghezza variabile. Passi corti fanno scendere; oltre una certa lunghezza si scavalca la valle e si risale dall'altra parte.</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="2a"></div>
+  <h3>L'algoritmo</h3>
+  <p>Mettendo insieme i pezzi: si parte da un punto qualsiasi, si calcola il gradiente, si fa un passo dalla parte opposta, e si ripete. È il <b>gradient descent</b>.</p>
+  <figure data-fig="build" data-opts='{"id":"gd"}'>
+    <figcaption>Un solo passo, costruito pezzo per pezzo. La freccia tratteggiata è il passo che si farebbe senza accorciarlo.</figcaption>
+  </figure>
+  <p>L'indice \(t\) conta i passi: da \(\Wv_0\) si ottiene \(\Wv_1\), da \(\Wv_1\) si ottiene \(\Wv_2\), e così via finché i passi diventano trascurabili.</p>
+  <figure data-fig="gdsteps">
+    <figcaption>Nove passi di gradient descent. A ogni passo: gradiente, direzione opposta accorciata, spostamento.</figcaption>
+  </figure>
+  <p>Le scelte da fare sono tre: il punto iniziale \(\Wv_0\); lo <em>step size</em> \(\Et\), detto anche <em>learning rate</em>, che accorcia o allunga il passo; e quando fermarsi.</p>
+  <h3>Dove ci si ferma</h3>
+  <p>L'algoritmo si ferma da solo dove \(\Gr\cL(\Wv)=0\), perché lì il passo ha lunghezza zero. Un punto così si chiama <b>punto stazionario</b>. In ogni minimo locale il gradiente è nullo; ma non vale il contrario.</p>
+  <figure data-fig="stat3">
+    <figcaption>In tutti e tre i punti rosa il gradiente è nullo: un minimo, un massimo e una sella, dove la funzione sale in una direzione e scende nell'altra.</figcaption>
+  </figure>
+  <p>Qui la convessità torna utile. <b>Se il costo è convesso, un punto con gradiente nullo è sempre un minimo globale</b>: trovare un punto stazionario basta. Se non lo è, dove si arriva dipende da dove si parte.</p>
+  <figure data-fig="init">
+    <figcaption>Trascina il punto di partenza su una funzione non convessa. Il gradient descent scende sempre, ma dove arriva dipende da dove comincia.</figcaption>
+  </figure>
+  <p>In pratica ci si ferma quando il gradiente è piccolo, oppure in base alla prestazione sul validation set, a un numero massimo di <em>epoche</em> (un'epoca è un passaggio completo sul dataset) o all'assenza di miglioramenti.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quanto deve essere lungo il passo?</h2>
+  <p>Riprendiamo il modello che prevede una costante. Lì la pendenza del costo ha una forma semplice: è proporzionale alla distanza di \(\Ws\) dalla media dei dati, che chiamiamo \(\bar{\Yy}\). Più si è lontani dalla media, più la curva è ripida e più il passo è lungo.</p>
+  <p>Con il costo scritto come nelle slide la pendenza è esattamente \(\Ws-\bar{\Yy}\), e la regola del gradient descent diventa</p>
+  <div class="math-block">\[\Ws_{t+1}-\bar{\Yy}\;=\;(1-\Et)\,(\Ws_t-\bar{\Yy})\]</div>
+  <p>A ogni passo la distanza dalla media viene moltiplicata per \(1-\Et\). Muovi \(\Et\) e guarda i primi passi.</p>
+  <figure data-fig="gd1">
+    <figcaption>Gradient descent sui dati 1, 2, 3, 4 partendo da zero. Con \(\Et=1\) il fattore è zero e si arriva alla media in un solo passo; fra 1 e 2 il fattore è negativo ma più piccolo di 1, e si scavalca il minimo avvicinandosi lo stesso; oltre 2 ogni passo allontana.</figcaption>
+  </figure>
+  <p><b>Lo step size \(\Et\) decide tutto: troppo grande e i passi scavalcano il minimo e divergono, troppo piccolo e il progresso è lentissimo.</b> È uno degli iperparametri più influenti dell'intero training.</p>
+  <p>Lo step size si può tenere <b>costante</b>: semplice e spesso efficace. Più la curvatura del costo è forte, più lo step sicuro è piccolo.<sup><a href="#n2-2">2</a></sup> Oppure lo si fa <b>decrescere</b> a ogni passo, dividendolo per il numero di passi fatti, \(\Et_t=c/t\), o più dolcemente per la sua radice quadrata, \(\Et_t=c/\sqrt t\). Una terza via è lo <b>step decay</b>: lo step resta fermo per un certo numero di epoche e poi viene moltiplicato per un fattore fisso, tipicamente fra 0,8 e 0,9.</p>
+  <figure data-fig="sched">
+    <figcaption>Le quattro regole a confronto, partendo dallo stesso valore. Più lo step cala in fretta, più gli ultimi passi sono prudenti.</figcaption>
+  </figure>
+  <p>In pratica si sceglie spesso il più grande step che non fa divergere e lo si riduce gradualmente, regolandolo sul validation set. Esistono poi ottimizzatori (AdaGrad, RMSprop, Adam) che adattano uno step diverso per ogni parametro.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando la valle è stretta</h2>
+  <p>In una dimensione basta uno step ben scelto. In più dimensioni nasce un problema nuovo: <b>uno step buono in una direzione può essere pessimo in un'altra.</b></p>
+  <p>L'esempio delle slide usa due costi con due parametri. Nel primo le curve di livello sono ellissi poco schiacciate. Nel secondo sono strette e lunghe: il costo sale ripidamente lungo un parametro e dolcemente lungo l'altro, come una valle con le pareti quasi verticali. Il primo è \(2\Ws_1^2+\Ws_2^2\), il secondo \(10\Ws_1^2+\Ws_2^2\): cambia solo quanto pesa \(\Ws_1\).</p>
+  <figure data-fig="gd2" data-opts='{}'>
+    <figcaption>Venti passi di gradient descent. Sulla prima funzione lo step 0,105 va bene. Sulla seconda lo stesso step è troppo grande: i passi rimbalzano fra le pareti e si allontanano. Riducendolo a 0,055 si converge, ma lungo la direzione piatta si avanza piano.</figcaption>
+  </figure>
+  <p>Per capire che cosa succede conviene guardare le due direzioni separatamente. In una valle come questa il gradient descent tratta ogni direzione per conto suo: a ogni passo la distanza dal minimo lungo quella direzione viene moltiplicata per un numero fisso, che dipende dallo step size e da quanto la valle è curva lì.</p>
+  <figure data-fig="build" data-opts='{"id":"factor"}'>
+    <figcaption>Una direzione sola, quella piatta della valle stretta, con step size 0,055.</figcaption>
+  </figure>
+  <p>Ora le due direzioni insieme, con lo step size che puoi cambiare.</p>
+  <figure data-fig="percoord">
+    <figcaption>La valle stretta dell'esempio, una direzione per riga. Gli archi sono i primi nove passi. Uno step che fa avanzare bene nella direzione piatta fa rimbalzare o divergere in quella ripida; uno step prudente per la ripida rende lentissima la piatta.</figcaption>
+  </figure>
+  <p>Chiamiamo \(\lambda\) la curvatura della valle in una direzione. Perché ci si avvicini al minimo il fattore \(1-\Et\lambda\) deve stare fra −1 e 1 in <em>tutte</em> le direzioni: lo step massimo è quindi dettato dalla curvatura più grande, \(\Et\lt 2/\lambda_{\max}\), e nelle direzioni piatte il fattore resta vicino a 1.</p>
+  <p>Il rapporto fra la curvatura più grande e la più piccola si chiama <b>numero di condizionamento</b>, \(\kappa=\lambda_{\max}/\lambda_{\min}\). Un valore grande significa curve di livello molto allungate: rimbalzi nelle direzioni ripide e lentezza in quelle piatte.<sup><a href="#n2-3">3</a></sup></p>
+  <p>Il messaggio pratico delle slide: <b>normalizzare le features di input</b> (per esempio con <code>StandardScaler</code> di scikit-learn). Features su scale molto diverse producono proprio valli strette e lunghe.</p>
+  <figure data-fig="normfeat">
+    <figcaption>Lo stesso problema di regressione con due features, prima e dopo averle riportate alla stessa scala. Con le curve di livello quasi circolari, venticinque passi bastano.</figcaption>
+  </figure>
+  <h3>Un aiuto: il momentum</h3>
+  <p>Un trucco molto usato è mescolare la direzione del gradiente corrente con il passo appena fatto. L'idea: se l'aggiornamento precedente era buono, conviene continuare in quella direzione, come una palla che rotolando prende velocità. Quanto conta il passato lo decide un numero \(\beta\) fra 0 e 1.</p>
+  <figure data-fig="build" data-opts='{"id":"mom"}'>
+    <figcaption>Il momentum su una retta: passo normale, spinta, nuovo punto.</figcaption>
+  </figure>
+  <figure data-fig="gd2" data-opts='{"mom":true,"preset":2}'>
+    <figcaption>La valle stretta con step 0,055 e il termine di momentum \(\beta\). Con \(\beta=0\) è il gradient descent di prima; aumentandolo, i passi lungo la direzione piatta si sommano.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>E se i dati sono milioni?</h2>
+  <p>Finora abbiamo ignorato quanto costa calcolare il gradiente. Il costo è una media su tutti i dati, e quindi lo è anche il suo gradiente: ogni esempio \(n\) «tira» i parametri in una sua direzione, \(\Gr\cl_n\), e il gradiente \(\Gr\cL\) è la media di tutte queste spinte.</p>
+  <p>Con milioni di dati, calcolare tutte le spinte a ogni passo costa troppo. Lo <b>stochastic gradient descent</b> (SGD) ne usa <em>una sola</em>.</p>
+  <figure data-fig="build" data-opts='{"id":"sgd"}'>
+    <figcaption>Dal gradiente completo a quello di un solo esempio. La freccia gialla cambia a ogni estrazione.</figcaption>
+  </figure>
+  <p>Funziona perché la freccia di un esempio a caso, \(\Gr\cl_{i_t}\), è <em>in media</em> quella giusta, \(\Gr\cL\). Non è garantito che ogni singolo passo faccia scendere il costo: si baratta la discesa certa con passi che costano \(N\) volte meno.</p>
+  <p>Il compromesso più usato sta in mezzo: il <b>mini-batch</b>. Si fa la media dei gradienti su un gruppetto casuale di \(B\) esempi. Con un esempio solo è SGD, rumorosissimo ed economicissimo; con tutti è il gradient descent completo.</p>
+  <figure data-fig="sgd">
+    <figcaption>Lo stesso problema di regressione, visto nello spazio dei due parametri. Il gradiente completo scende liscio; con batch piccoli il percorso è rumoroso ma ogni passo costa molto meno.</figcaption>
+  </figure>
+  <p>Fare la media su un batch più grande riduce il rumore, rende l'allenamento più stabile e sfrutta le GPU, ottimizzate per calcoli su batch. <b>SGD rinuncia alla precisione di ogni passo per farne moltissimi a basso costo.</b></p>
+  <p>Il rumore non è solo un prezzo da pagare. Soprattutto nel deep learning, può aiutare ad allontanarsi da certi punti di sella.</p>
+  <p>Inoltre, fra i tanti minimi possibili, tende a favorire quelli che generalizzano meglio. Si parla di <em>regolarizzazione implicita</em>: «regolarizzare» significa limitare la libertà del modello perché generalizzi meglio (lezione 6), e qui succede senza che nessuno lo chieda. Infine spesso ci si ferma prima della convergenza completa (<em>early stopping</em>), che è a sua volta una forma di regolarizzazione.</p>
+  <p>Un consiglio pratico dalle slide: invece di estrarre gli esempi con reinserimento, conviene <em>rimescolare</em> il dataset e scorrerlo. Migliora le prestazioni e attenua i problemi dovuti a dati correlati.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando la pendenza non esiste</h2>
+  <p>Non tutte le funzioni obiettivo sono derivabili ovunque. Il valore assoluto \(|\Ws|\) ha uno spigolo in zero; la <em>hinge loss</em>, che incontreremo con le SVM, ne ha uno dove passa da una retta inclinata a zero. Sugli spigoli la pendenza non è una sola, e il gradiente non c'è.</p>
+  <figure data-fig="hinge">
+    <figcaption>La hinge loss vale zero da un certo punto in poi e cresce in linea retta prima. Nel punto di raccordo le due pendenze non coincidono.</figcaption>
+  </figure>
+  <p>Per le funzioni convesse c'è un rimedio. Abbiamo visto che una funzione convessa liscia sta sempre sopra le sue tangenti. Su uno spigolo la tangente non è unica, ma di rette che passano per quel punto restando sotto il grafico ce ne sono tante. La pendenza \(g\) di ciascuna si chiama <b>subgradiente</b>.</p>
+  <figure data-fig="subg">
+    <figcaption>Il valore assoluto. Lontano da zero c'è una sola retta che resta sotto il grafico, con pendenza −1 o 1. Nello spigolo vanno bene tutte le pendenze fra −1 e 1.</figcaption>
+  </figure>
+  <p>L'insieme di tutti i subgradienti in un punto si chiama <em>subdifferenziale</em>; dove la funzione è liscia contiene solo il gradiente. L'algoritmo è lo stesso di prima, con un subgradiente qualsiasi al posto del gradiente: \(\Wv_{t+1}=\Wv_t-\Et\,g_t\). <b>Funziona, ma converge più lentamente</b>: sugli spigoli non c'è una direzione «migliore», e il metodo deve gestire questa ambiguità. Quando la funzione è liscia, i metodi basati sul gradiente restano preferibili.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando non tutti i punti sono permessi</h2>
+  <p>A volte i parametri non possono stare dove vogliono: devono restare dentro un insieme di punti ammissibili, che chiamiamo \(C\). Nel machine learning capita spesso. Possono dover essere non negativi; avere una lunghezza complessiva limitata, per non crescere troppo; sommare a 1, quando rappresentano probabilità (l'insieme si chiama <em>simplesso</em>); oppure stare ciascuno fra un minimo e un massimo.</p>
+
+  <figure data-fig="csets">
+    <figcaption>I quattro vincoli dell'elenco, per due parametri. Il simplesso in due dimensioni è un segmento: i due pesi sono non negativi e sommano a 1.</figcaption>
+  </figure>
+  <p>Il guaio è che un passo di discesa può portare fuori dall'insieme. Ci sono due strade: mantenere i punti ammissibili per costruzione, oppure permettere le violazioni e farle pagare.</p>
+  <h3>Prima strada: proiettare</h3>
+  <p>La <b>proiezione</b> di un punto \(\Wv\) su \(C\), che si scrive \(\Pi_C(\Wv)\), è il punto di \(C\) più vicino. Perché esista e sia una sola l'insieme dev'essere <em>convesso</em>: presi due suoi punti, tutto il segmento che li unisce gli appartiene. Tutti e quattro gli insiemi della figura lo sono.</p>
+  <figure data-fig="proj">
+    <figcaption>Trascina il punto. Dentro l'insieme la proiezione coincide con il punto; fuori, è il punto dell'insieme più vicino.</figcaption>
+  </figure>
+  <p>Il <b>projected gradient descent</b> alterna due mosse: un passo normale di discesa, che può uscire da \(C\), e la proiezione \(\Pi_C\), che riporta dentro. Tutti i punti visitati sono ammissibili. È pratico solo se proiettare costa poco.</p>
+  <figure data-fig="pgd">
+    <figcaption>L'insieme ammissibile è un disco, e il minimo senza vincoli sta fuori. Ogni passo di discesa esce; ogni proiezione riporta dentro.</figcaption>
+  </figure>
+  <h3>Seconda strada: penalizzare</h3>
+  <p>Invece di vietare le uscite le si fa pagare: al costo si aggiunge una <em>penalità</em> che vale zero dentro l'insieme e cresce man mano che ci si allontana. Poi si minimizza il totale senza vincoli.</p>
+  <figure data-fig="build" data-opts='{"id":"pen"}'>
+    <figcaption>Il costo (rosa), la penalità (arancione) e la loro somma (gialla) mentre la severità cresce.</figcaption>
+  </figure>
+  <p>Una scelta comune per \(P(\Wv)\) è il quadrato della distanza da \(C\). Alzando la severità \(\rho\), il minimo del problema penalizzato si avvicina a quello del problema vincolato. Conviene quando proiettare è costoso, o quando si accettano piccole violazioni in cambio di un costo più basso.</p>
+  <figure data-fig="penalty">
+    <figcaption>Un caso con un solo parametro, che deve restare fra −1 e 1, mentre il costo avrebbe il minimo in 3. La penalità è il quadrato della distanza dall'intervallo ammesso.</figcaption>
+  </figure>
+  <p><b>I vincoli si gestiscono rientrando a ogni passo oppure pagando una multa per ogni uscita.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>E fuori dalla convessità?</h2>
+  <p>Tutte le garanzie di questa lezione valgono per funzioni convesse. Le funzioni obiettivo delle reti neurali non lo sono, e le slide chiudono proprio con l'immagine di un loro paesaggio: una distesa di picchi e avvallamenti.</p>
+  <figure data-fig="landscape">
+    <figcaption>Una superficie non convessa disegnata per questa pagina. Le slide mostrano il paesaggio di loss di una rete neurale vera, da Li et al., «Visualizing the loss landscape of neural nets».</figcaption>
+  </figure>
+  <p>Lì possono esserci molti minimi locali e punti di sella, punti iniziali diversi portano a soluzioni diverse, e trovare il minimo globale è in generale intrattabile. <b>Si usano comunque gli stessi metodi di discesa: senza la garanzia di arrivare al fondo, ma con ottimi risultati in pratica.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="2"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>una volta fissati modello e costo, imparare è scendere lungo l'opposto del gradiente; quanto lungo fare il passo è la scelta che decide se si arriva.</b></p>
+  <p>Nella prossima lezione applichiamo tutto al modello più importante del corso, la retta. Scopriremo che lì il minimo si può scrivere con una formula, senza fare nemmeno un passo.</p>
+  <div class="notes">
+    <p id="n2-1"><sup>1</sup> Le slide mostrano anche altre due loss, Huber e Tukey, che si comportano come il quadrato per errori piccoli e crescono più lentamente (Huber) o smettono di crescere (Tukey) per errori grandi. Il confronto fra le curve è presentato come un compromesso fra aspetti computazionali e statistici.</p>
+    <p id="n2-2"><sup>2</sup> Le slide lo precisano così: una funzione è \(\beta\)-smooth se la sua pendenza non può cambiare più in fretta di \(\beta\) per unità di spostamento. Per una funzione convessa e \(\beta\)-smooth, uno step size non superiore a \(1/\beta\) garantisce che il costo scenda a ogni passo.</p>
+    <p id="n2-3"><sup>3</sup> Per \(f(\Wv)=10\Ws_1^2+\Ws_2^2\) gli autovalori della matrice delle derivate seconde sono 20 e 2: quindi \(\kappa=10\) e la soglia di convergenza è \(\Et\lt 2/20=0{,}1\). Lo step 0,105 la supera di poco, ed è per questo che i passi lungo \(\Ws_1\) si allargano invece di stringersi.</p>
+  </div>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

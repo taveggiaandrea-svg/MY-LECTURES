@@ -1,0 +1,103 @@
+<article class="lesson" data-n="15" id="lezione-15" data-title="Come si trovano i gruppi senza etichette?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 15</p>
+  <h1>Come si trovano i gruppi senza etichette?</h1>
+  <p class="desc">Il clustering: che cosa vuol dire «simili», come si costruisce una gerarchia di gruppi, e come funziona k-means, con i suoi limiti.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Dividere i clienti in segmenti, i pixel di una foto in regioni, i geni in famiglie con comportamento simile. In tutti questi casi nessuno ci dice quali sono i gruppi: vanno trovati. Il <b>clustering</b> organizza i dati in gruppi, detti <em>cluster</em>, in modo che i membri di un gruppo si somiglino fra loro e siano diversi dai membri degli altri.</p>
+  <figure data-fig="whatis">
+    <figcaption>Nel primo riquadro quello che l'algoritmo riceve: punti senza etichette. Nel secondo quello che un occhio umano considererebbe la risposta giusta.</figcaption>
+  </figure>
+  <p>È un problema mal definito, e conviene dirlo subito. Non esiste «il» raggruppamento giusto: dipende da che cosa si intende per simili, e dallo scopo. Servono due ingredienti: una misura di distanza fra due dati, e un algoritmo che la usi per formare i gruppi.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Che cosa vuol dire vicino</h2>
+  <p>Per dire che due dati si somigliano serve un numero che misuri quanto sono diversi: una <b>distanza</b>. Perché meriti il nome le si chiedono poche cose di buon senso. Non è mai negativa, e vale zero solo fra un oggetto e se stesso. È simmetrica: da A a B è lunga quanto da B ad A.</p>
+  <p>Spesso si chiede anche la <em>disuguaglianza triangolare</em>: andare da A a B facendo tappa in un terzo punto C non può accorciare la strada.</p>
+  <p>Per dati fatti di numeri non c'è una sola distanza possibile, ma una famiglia intera, detta di Minkowski. La costruiamo su due punti del piano.</p>
+  <figure data-fig="build" data-opts='{"id":"l15_mink"}'>
+    <figcaption>La distanza di Minkowski costruita su due punti: \(\Xv\) in blu e \(\mathbf y\) in bianco. In arancione il percorso lungo gli assi, in verde acqua quello in linea d'aria. Alla fine il punto giallo sulla riga graduata mostra come cambia la distanza al crescere dell'esponente \(p\).</figcaption>
+  </figure>
+  <p>L'esponente \(p\) decide quanto contano le differenze grandi rispetto alle piccole. Con esponente 1 contano tutte allo stesso modo: è la distanza di Manhattan. Con esponente 2 si ha la distanza euclidea, quella in linea d'aria. Al crescere di \(p\) pesa sempre di più la coordinata in cui i due punti differiscono di più, e al limite conta solo quella: è la distanza di Chebyshev.</p>
+  <figure data-fig="unitballs">
+    <figcaption>Ora prova tu: trascina B e cambia l'esponente. La stessa coppia di punti ha distanze diverse a seconda della metrica. La linea gialla è il «cerchio» della metrica scelta, cioè l'insieme dei punti che distano da A quanto B: un rombo con \(p=1\), un cerchio con \(p=2\), un quadrato al limite.</figcaption>
+  </figure>
+  <p>Per vettori molto lunghi e quasi tutti fatti di zeri, come quelli che rappresentano i testi, spesso interessa la direzione del vettore e non la sua lunghezza. Si usa allora la <em>similarità del coseno</em>:</p>
+  <div class="math-block">\[\cos\theta=\frac{\Xv\cdot\mathbf y}{\lVert\Xv\rVert\,\lVert\mathbf y\rVert}\]</div>
+  <p>È il prodotto scalare dei due vettori diviso per le loro lunghezze, cioè il coseno dell'angolo \(\theta\) fra i due: guarda l'angolo e ignora la lunghezza. Non c'è una regola generale: la distanza giusta va scelta conoscendo il problema.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Costruire una gerarchia</h2>
+  <p>Il primo algoritmo non chiede nemmeno quanti gruppi si vogliono. Il <b>clustering gerarchico agglomerativo</b> parte con ogni dato in un gruppo a sé. Poi ripete: trova i due gruppi più vicini, li fonde in uno, e ricalcola le distanze fra il gruppo nuovo e gli altri. Si ferma quando resta un gruppo solo.</p>
+  <p>Resta da decidere che cosa sia la distanza fra due <em>gruppi</em>. Ci sono tre scelte comuni, dette criteri di <em>linkage</em>: il single linkage usa la distanza fra i due punti più vicini, uno per gruppo; il complete linkage quella fra i due più lontani; l'average linkage la media su tutte le coppie.</p>
+  <figure data-fig="linkage">
+    <figcaption>Gli stessi due gruppi, uno blu e uno arancione, e tre modi di misurarne la distanza. Le linee gialle sono le coppie di punti che entrano nel conto: una sola nei primi due riquadri, tutte nel terzo.</figcaption>
+  </figure>
+  <p>Il single linkage tende a creare gruppi lunghi e sottili, perché basta una coppia di punti vicini per unire due gruppi. Il complete linkage produce gruppi compatti. L'average linkage è il più usato ed è meno sensibile al rumore.</p>
+  <p>La storia delle fusioni si disegna come un albero, il <b>dendrogramma</b>: le foglie sono i dati, e ogni fusione è un ponte orizzontale posto all'altezza della distanza a cui è avvenuta.</p>
+  <figure data-fig="agglo">
+    <figcaption>Quattordici punti, average linkage. A ogni passo la linea tratteggiata indica i due gruppi che stanno per unirsi.</figcaption>
+  </figure>
+  <h3>Un esempio da fare a mano</h3>
+  <p>Quattro punti dalle slide: A in (1; 6), B in (1; 4), C in (1; 1) e D in (5; 1), con la distanza di Manhattan. La prima fusione è sempre A con B, a distanza 2. Da lì i tre criteri divergono.</p>
+  <figure data-fig="abcd">
+    <figcaption>In alto i punti e la tabella delle distanze. In basso i tre dendrogrammi. Con il single linkage C dista 3 da {A,B} (basta B), meno del 4 che lo separa da D; con il complete linkage dista 5 e si unisce prima a D; con l'average linkage dista 4, alla pari con D, e la parità è risolta unendolo a D.</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="15a"></div>
+  <h3>Leggere il dendrogramma</h3>
+  <p>Il dendrogramma contiene tutti i raggruppamenti possibili, da \(N\) gruppi a uno. Per ottenerne uno si taglia l'albero a una certa altezza: ogni ramo tagliato è un gruppo. Dove i ponti sono molto alti rispetto a quelli sotto, i gruppi sono ben separati.</p>
+  <figure data-fig="cut">
+    <figcaption>Due nuvole e un punto isolato. Alza e abbassa il taglio, la linea bianca tratteggiata nel secondo riquadro: il numero di gruppi cambia, e nel primo riquadro i punti prendono il colore del ramo a cui restano attaccati.</figcaption>
+  </figure>
+  <p>Un ramo che resta solo fino quasi in cima segnala un dato molto diverso da tutti gli altri.</p>
+  <p>Il metodo ha due difetti. Deve confrontare tutte le coppie di dati, quindi con \(N\) dati il costo cresce almeno come \(N^2\). E non torna mai sui propri passi: una fusione sbagliata resta.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>k-means</h2>
+  <p>Il secondo algoritmo è il più usato in assoluto. Bisogna dirgli in anticipo quanti gruppi vogliamo: questo numero si chiama \(K\). Ogni gruppo è rappresentato da un punto solo, il suo <b>centroide</b>, che fa da dato tipico del gruppo.</p>
+  <p>Prima dell'algoritmo serve un modo per dire se una scelta di gruppi e centroidi è buona o cattiva. L'idea è che sia buona quando ogni dato sta vicino al proprio centroide. La trasformiamo in un numero, su cinque dati messi in fila.</p>
+  <figure data-fig="build" data-opts='{"id":"l15_J"}'>
+    <figcaption>La distorsione costruita su cinque dati lungo una retta. I dati hanno il colore del loro gruppo, blu o arancione; le croci sotto la retta sono i due centroidi. Le barre rosa sono i quadrati delle distanze fra ogni dato e il suo centroide, e \(J\) è la loro somma. Negli ultimi passi si muovono prima i centroidi, poi un dato cambia gruppo.</figcaption>
+  </figure>
+  <p>Le due mosse viste alla fine sono l'intero algoritmo. Si parte da \(K\) centroidi scelti a caso, per esempio \(K\) dati qualsiasi. Poi si alternano due passi: nel passo di <em>assegnazione</em> ogni dato va al centroide più vicino; nel passo di <em>aggiornamento</em> ogni centroide si sposta nella media dei dati che gli sono stati assegnati. Ci si ferma quando nulla cambia più.</p>
+  <figure data-fig="kmeans">
+    <figcaption>Ora in due dimensioni, con tre centroidi partiti male, tutti in basso. Nel primo riquadro i due passi che si alternano: i punti prendono il colore del centroide più vicino, poi le croci si spostano. Nel secondo riquadro la distorsione \(J\) dopo ciascun passo.</figcaption>
+  </figure>
+  <p>Perché la distorsione scende sempre? L'assegnazione la rende minima rispetto ai gruppi, a centroidi fermi: ogni dato sceglie il centroide che gli dà il quadrato più piccolo. L'aggiornamento la rende minima rispetto ai centroidi, a gruppi fermi, perché il punto che minimizza la somma dei quadrati delle distanze da un insieme di punti è la loro media.</p>
+  <p>\(J\) quindi non può mai salire. E poiché i modi di dividere \(N\) dati in \(K\) gruppi sono in numero finito, l'algoritmo si ferma sempre.</p>
+  <h3>Si ferma, ma non sempre nel posto giusto</h3>
+  <p>\(J\) non è convessa. k-means trova un minimo locale, e quale dipende da dove partono i centroidi.</p>
+  <figure data-fig="kinit">
+    <figcaption>Quattro gruppi evidenti e \(K=4\). Premi più volte: ogni volta i centroidi partono da quattro dati presi a caso, i cerchi tratteggiati, e finiscono nelle croci. Nel secondo riquadro la distorsione finale di ogni tentativo: in giallo la più bassa trovata finora.</figcaption>
+  </figure>
+  <p>Il rimedio è semplice: si esegue l'algoritmo molte volte con partenze diverse e si tiene il risultato con la distorsione più bassa. Esistono anche metodi di inizializzazione più furbi, come k-means++.</p>
+  <h3>Quanti gruppi</h3>
+  <p>\(K\) va scelto da noi. La distorsione da sola non aiuta: più gruppi si usano più scende, fino a zero con un gruppo per dato. Si guarda allora <em>come</em> scende: finché si aggiungono gruppi che esistono davvero la distorsione crolla, oltre scende poco. Si sceglie il \(K\) in cui la curva fa un «gomito».</p>
+  <figure data-fig="elbow">
+    <figcaption>I dati della figura sui passi di k-means. Per ogni \(K\) la distorsione migliore su dodici partenze. Il punto giallo segna il gomito.</figcaption>
+  </figure>
+  <h3>Dove k-means sbaglia</h3>
+  <p>Assegnare ogni punto al centroide più vicino significa dividere lo spazio con confini dritti, in zone convesse. Se i gruppi veri non hanno quella forma, k-means non può trovarli.</p>
+  <figure data-fig="kfail">
+    <figcaption>Due situazioni dalle slide in cui i gruppi trovati da k-means non sono quelli che vorremmo.</figcaption>
+  </figure>
+  <p>k-means è semplice e veloce: ogni passo costa in proporzione al numero di dati per il numero di gruppi. In cambio richiede \(K\), dipende dall'inizializzazione, è sensibile ai dati anomali, gli outlier (che spostano le medie) e funziona solo dove ha senso calcolare una media.</p>
+  <p>Per forme non convesse esistono altri metodi: i modelli a misture di gaussiane, che danno a ogni punto una probabilità di appartenere a ciascun gruppo; lo spectral clustering, che lavora su una matrice di somiglianze; DBSCAN, che cerca regioni dense e sa etichettare i punti isolati come rumore.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="15"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>il clustering dipende dalla distanza scelta; il metodo gerarchico fonde via via i gruppi più vicini e produce un dendrogramma, k-means alterna assegnazione e media e scende sempre nella distorsione, ma solo fino a un minimo locale.</b></p>
+  <p>PCA e clustering comprimono i dati con strumenti semplici. Nella prossima lezione la compressione la impara una rete neurale.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

@@ -1,0 +1,128 @@
+<article class="lesson" data-n="18" id="lezione-18" data-title="Come si impara una strategia dalle ricompense?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 18</p>
+  <h1>Come si impara una strategia dalle ricompense?</h1>
+  <p class="desc">Il reinforcement learning: stati, azioni e ricompense; il valore di una situazione; l'equazione di Bellman; e Q-learning, che impara a comportarsi bene senza conoscere le regole del mondo.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Una slot machine, dopo ogni tiro, è identica a prima. Una partita a scacchi no: ogni mossa cambia la posizione, e dalla posizione dipende che cosa si potrà fare dopo. Nel <b>reinforcement learning</b> un <em>agente</em> agisce in un <em>ambiente</em>: a ogni passo osserva la situazione in cui si trova, sceglie un'azione, riceve una ricompensa e si ritrova in una situazione nuova.</p>
+  <p>Rispetto all'apprendimento supervisionato nessuno indica l'azione giusta: c'è solo un numero, la ricompensa. Può arrivare tardi, molte mosse dopo la decisione che l'ha meritata, e capire a quale mossa attribuirla è il problema dell'<em>assegnazione del credito</em>. E i dati non sono indipendenti: quello che l'agente vede dipende da quello che ha fatto.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il modello: stati, azioni, ricompense</h2>
+  <p>Il modello matematico si chiama <b>processo decisionale di Markov</b>, o MDP. Ha quattro ingredienti. Gli <em>stati</em> sono le situazioni possibili, e le <em>azioni</em> le mosse fra cui scegliere. Ogni azione fatta in uno stato dà una <em>ricompensa</em>, un numero. Infine le probabilità di <em>transizione</em> dicono dove si finisce: l'esito di un'azione può non essere certo.</p>
+  <figure data-fig="student">
+    <figcaption>L'esempio delle slide: la giornata di uno studente. I cerchi sono gli stati (in giallo quello in cui ti trovi), le frecce le azioni con la loro ricompensa; il quadrato «A letto» chiude la giornata. Andare al pub ha un esito casuale: le linee tratteggiate indicano dove si finisce e con quale probabilità. Riesci a ottenere +6?</figcaption>
+  </figure>
+  <p>Più avanti useremo le iniziali: \(s\) per uno stato, \(a\) per un'azione, e \(r(s,a)\) per la ricompensa di quell'azione in quello stato. Per lo studente, «Studia» in «Lezione 3» vale +10.</p>
+  <p>Lo stato in cui si arriva si indica con \(s'\), e la probabilità di arrivarci con \(p(s,a,s')\). Dal pub si torna a «Lezione 1» con probabilità 0,2, e a ciascuna delle altre due lezioni con probabilità 0,4.</p>
+  <p>Lo stato deve contenere tutto ciò che serve per prevedere il seguito. È la <b>proprietà di Markov</b>: dato lo stato presente, il futuro non dipende da come ci si è arrivati. Per lo studente nello stato «Lezione 2» non conta se prima è passato da Facebook. Scegliere che cosa mettere nello stato è parte del problema.</p>
+  <figure data-fig="rat">
+    <figcaption>L'esempio delle slide. Un topo ha visto due sequenze di segnali (luce in giallo, leva in arancione, campanello in blu), una finita con una scossa e una con del formaggio. Oggi ne vede una terza: che cosa si aspetta dipende da che cosa considera «stato».</figcaption>
+  </figure>
+  <p>Una <b>policy</b>, che si indica con \(\pi\), è la strategia dell'agente: una regola che a ogni stato associa un'azione, oppure una probabilità per ciascuna azione. Grazie alla proprietà di Markov basta guardare lo stato presente: una policy che ricordasse tutta la storia non potrebbe fare meglio.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Che cosa si vuole massimizzare</h2>
+  <p>L'agente non vuole la ricompensa immediata più alta, ma la somma di tutte quelle che verranno. Sommarle e basta, però, ha due difetti: se l'interazione non finisce mai la somma può crescere senza limite, e un premio lontano, che potrebbe non arrivare, conterebbe quanto uno sicuro adesso. Per questo le ricompense lontane si pesano meno. Il numero che ne risulta si chiama <b>ritorno</b>.</p>
+  <figure data-fig="build" data-opts='{"id":"l18_ret"}'>
+    <figcaption>Il ritorno costruito sul piano dello studente che parte da «Lezione 1» e studia tre volte. Per ogni mossa la barra grigia è la ricompensa e quella gialla la stessa ricompensa dopo lo sconto; sotto, in arancione, il peso con cui viene contata.</figcaption>
+  </figure>
+  <figure data-fig="discount">
+    <figcaption>Ora prova tu, sullo stesso piano: −2, −2, +10. In grigio le ricompense, in giallo le ricompense scontate; sotto ogni mossa il peso e il risultato. Abbassa \(\Gk\): la ricompensa finale conta sempre meno.</figcaption>
+  </figure>
+  <p>Con \(\Gk\) vicino a 0 l'agente è miope e guarda solo il prossimo passo; vicino a 1 è lungimirante. Lo sconto tiene finita la somma anche se l'interazione non termina mai, e rappresenta l'incertezza sul futuro: \(\Gk\) si può leggere come la probabilità che il processo continui un altro passo.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il valore di uno stato</h2>
+  <p>Il ritorno dà un voto a una sequenza di mosse. A un agente serve un voto per le <em>situazioni</em>: quanto è buono trovarsi qui? Il <b>valore</b> di uno stato sotto una policy, \(V^\pi(s)\), è il ritorno che ci si aspetta in media partendo da quello stato e seguendo quella policy.</p>
+  <p>Per vederlo usiamo un mondo più semplice dello studente: una griglia. Le mosse sono su, giù, destra, sinistra, con esito certo; contro un muro o un bordo si resta fermi. Entrando in una casella con un numero si riceve quella ricompensa e l'<em>episodio</em>, cioè la partita, finisce; tutte le altre mosse danno 0. C'è un premio grande, uno piccolo, e una buca. Lo sconto è 0,9.</p>
+  <figure data-fig="vpi">
+    <figcaption>Lo stesso mondo, due policy: nel primo riquadro si muove a caso, nel secondo si seguono le frecce gialle. In ogni casella il suo valore, su fondo verde se positivo e rosso se negativo. Muovendosi a caso le caselle vicine alla buca hanno valore negativo: prima o poi ci si cade. Con la policy migliore tutte le caselle valgono di più.</figcaption>
+  </figure>
+  <p>Il valore ottimo, \(V^*\), è quello della policy migliore. Per calcolarlo si sfrutta un'osservazione: il meglio che si può ottenere da uno stato è la migliore azione adesso, più il meglio che si può ottenere dallo stato in cui si arriva. Scritta in simboli è l'<b>equazione di Bellman</b>. La costruiamo su una casella sola.</p>
+  <figure data-fig="build" data-opts='{"id":"l18_bell"}'>
+    <figcaption>L'equazione di Bellman sulla casella accanto alla buca, bordata di giallo. Nelle altre caselle il loro valore ottimo. Le frecce sono le quattro mosse; sul lato, per ciascuna, il conto «ricompensa + 0,9 · valore della casella di arrivo». Il bordo verde acqua segna la casella in cui porta la mossa «su».</figcaption>
+  </figure>
+  <p>Riletta: il valore di uno stato è il massimo, fra le azioni, della ricompensa immediata più il valore scontato di dove si arriva. Nella griglia le mosse hanno esito certo, quindi la somma sugli stati di arrivo ha un termine solo.</p>
+  <figure data-fig="bellman">
+    <figcaption>Ora prova tu sulle altre caselle. In ogni casella il valore ottimo. Tocca una casella: sui quattro lati compare quanto vale ciascuna mossa, cioè ricompensa più 0,9 per il valore della casella di arrivo; in giallo la migliore.</figcaption>
+  </figure>
+  <p>Nota la casella accanto alla buca: muoversi a destra vale −1, e il suo valore resta alto solo perché l'equazione prende il massimo. Conoscendo \(V^*\) la policy ottima è immediata: in ogni stato si sceglie l'azione che realizza quel massimo.</p>
+  <h3>Calcolarlo: value iteration</h3>
+  <p>L'equazione ha un problema: definisce \(V^*\) in termini di se stesso, perché per conoscere il valore di una casella servono quelli delle vicine, e viceversa. Si risolve per tentativi successivi: si parte da valori tutti nulli e si usa l'equazione come regola di aggiornamento, per tutti gli stati insieme, più volte.</p>
+  <div class="math-block">\[V_{n+1}(s)=\max_a\Big(r(s,a)+\Gk\sum_{s'}p(s,a,s')\,V_n(s')\Big)\]</div>
+  <p>È la stessa formula con un contatore in più: \(V_n\) sono i valori dopo \(n\) passaggi, e quelli nuovi si calcolano tutti a partire da quelli del passaggio precedente.</p>
+  <figure data-fig="vi">
+    <figcaption>Value iteration sulla griglia. In ogni casella il valore corrente; le frecce indicano la mossa migliore secondo i valori correnti. All'inizio le caselle in alto a sinistra puntano al premio piccolo, l'unico di cui hanno notizia; poi cambiano idea.</figcaption>
+  </figure>
+  <p>Un'alternativa, <em>policy iteration</em>, alterna due passi: calcola il valore della policy corrente, poi la migliora scegliendo in ogni stato l'azione migliore rispetto a quel valore. Entrambi sono metodi di <em>pianificazione</em>: richiedono di conoscere \(r\) e \(p\), le regole del mondo.</p>
+  <div class="quiz" data-quiz="18a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Imparare senza conoscere le regole</h2>
+  <p>Di solito le regole non si conoscono, o gli stati sono troppi per elencarli. L'agente può solo provare e osservare. Qui il valore degli stati non basta più: per scegliere un'azione bisognerebbe sapere in quale stato porta, cioè conoscere le probabilità di transizione.</p>
+  <p>Conviene allora imparare direttamente il valore di ogni coppia stato-azione, la funzione \(Q\). Il suo valore ottimo, \(Q^*\), è il ritorno atteso facendo una certa azione in un certo stato e comportandosi poi in modo ottimo: sono i numeri sui quattro lati nella figura di prima. Anche \(Q^*\) soddisfa un'equazione di Bellman:</p>
+  <div class="math-block">\[Q^*(s,a)=r(s,a)+\Gk\sum_{s'}p(s,a,s')\max_{a'}Q^*(s',a')\]</div>
+  <p>Si legge come prima: ricompensa immediata, più il valore scontato di dove si arriva. La differenza è che il massimo ora sta dentro: è la scelta della mossa successiva, \(a'\), nello stato di arrivo.</p>
+  <p>Con \(Q^*\) in mano la policy ottima non richiede alcun modello: in ogni stato si sceglie l'azione con il valore più alto, e quel massimo è proprio il valore ottimo dello stato.</p>
+  <p><b>Q-learning</b> stima \(Q^*\) dall'esperienza. Tiene una tabella con un numero per ogni coppia stato-azione, inizialmente zero. A ogni passo l'agente fa una mossa, riceve una ricompensa e arriva in un nuovo stato. Questa singola esperienza suggerisce un valore per la mossa appena fatta, e la tabella si corregge un po' in quella direzione.</p>
+  <figure data-fig="build" data-opts='{"id":"l18_q"}'>
+    <figcaption>La regola di Q-learning costruita su una mossa. Nel riquadro con le caselle: la casella accanto alla buca e quella sopra, ciascuna divisa in quattro spicchi, uno per mossa, con il valore che la tabella le assegna in quel momento (numeri d'esempio); il cerchio giallo è l'agente. Sulla retta accanto: il vecchio valore della mossa (bianco), il bersaglio (verde acqua) e il nuovo valore (giallo).</figcaption>
+  </figure>
+  <p>Riletta: il nuovo valore è una media fra il vecchio e il <em>bersaglio</em>, e il tasso di apprendimento \(\Et\) dice quanto pesa il bersaglio.</p>
+  <details class="rev"><summary>Da dove viene la regola</summary>
+    <p>Si vuole che \(Q(s,a)\) soddisfi l'equazione scritta sopra. Si misura lo scarto con una loss quadratica, \(\tfrac12\big(Q(s,a)-y\big)^2\), dove \(y=r+\gamma\,\mathbb E\big[\max_{a'}Q^*(s',a')\big]\). Un passo di gradient descent rispetto a \(Q(s,a)\) dà \(Q(s,a)-\Et\,(Q(s,a)-y)=(1-\Et)Q(s,a)+\Et\,y\). Il valore atteso in \(y\) non si conosce: lo si sostituisce con l'unico campione disponibile, lo stato \(s'\) appena osservato, e \(Q^*\) con la stima corrente.</p>
+  </details>
+  <figure data-fig="qlearn">
+    <figcaption>Ora la stessa regola, mossa dopo mossa: ventidue episodi sulla griglia, con tasso di apprendimento 0,5. Ogni casella è divisa in quattro spicchi, uno per mossa, colorati secondo \(Q\). L'agente non sa nulla: i primi episodi sono tentativi alla cieca. Poi il verde si propaga all'indietro dal premio, un passo per volta.</figcaption>
+  </figure>
+  <p>Il bersaglio usa l'azione migliore nello stato successivo, anche se l'agente poi ne fa un'altra. Per questo Q-learning è <em>off-policy</em>: impara la policy ottima mentre ne segue una diversa. I metodi <em>on-policy</em>, come SARSA, usano invece l'azione effettivamente scelta. Q-learning converge a \(Q^*\) se ogni coppia stato-azione viene visitata infinite volte e il tasso di apprendimento si riduce nel tempo, ma non troppo in fretta.</p>
+  <h3>Di nuovo: esplorare</h3>
+  <p>La prima condizione riporta al dilemma della lezione scorsa. Un agente che sceglie sempre la mossa con il valore più alto in tabella rinforza i propri errori: trovato per caso il premio piccolo, continua a tornarci e non scopre mai quello grande. Il rimedio è lo stesso: ε-greedy, cioè con probabilità \(\Eps\) una mossa a caso, altrimenti la migliore secondo \(Q\).</p>
+  <figure data-fig="explore">
+    <figcaption>Dalla partenza il premio grande è a tre mosse, quello piccolo a quattro. Ogni barra è un valore di \(\Eps\): in verde la quota di prove in cui l'agente impara ad arrivare al premio grande, in arancione quella in cui si accontenta del piccolo. Senza esplorazione quasi metà delle prove resta sulla strada sbagliata.</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="18b"></div>
+  <h3>Quando la tabella non basta</h3>
+  <p>Una tabella funziona con dodici caselle. Un videogioco ha più stati di quanti se ne possano elencare. Si sostituisce allora la tabella con una funzione \(Q_\theta(s,a)\) con parametri \(\theta\), per esempio una rete neurale, che generalizza da stati visti a stati simili. È il <b>deep Q-learning</b>; la rete si chiama <em>deep Q-network</em>, DQN.</p>
+  <p>Allenare una rete su dati che essa stessa produce è instabile, e DQN aggiunge due accorgimenti. Il primo: le transizioni (stato, azione, ricompensa, stato di arrivo) vengono salvate in una <em>replay memory</em>, e la rete si allena su mini-batch estratti a caso da lì. Così gli esempi non sono consecutivi e correlati.</p>
+  <p>Il secondo: il bersaglio, lo stesso di Q-learning, viene calcolato con una copia congelata della rete, \(\hat Q\), aggiornata solo ogni tanto. Così non si muove a ogni passo.</p>
+  <p>La loss è il quadrato della differenza fra bersaglio e \(Q_\theta(s,a)\); le azioni si scelgono con ε-greedy. Così una rete ha imparato a giocare ai videogiochi Atari guardando solo i pixel.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Le lezioni da 14 a 18 in una tabella</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Lezione</th><th>Concetto</th><th>Idea</th><th>Formula</th></tr></thead>
+    <tbody>
+      <tr><td>14</td><td>PCA</td><td>Proiettare sulle direzioni in cui i dati variano di più: gli autovettori della covarianza</td><td>\(S\,\mathbf b=\lambda\,\mathbf b\)</td></tr>
+      <tr><td>15</td><td>Clustering gerarchico</td><td>Fondere via via i due gruppi più vicini; il risultato è un dendrogramma</td><td>nessuna</td></tr>
+      <tr><td>15</td><td>k-means</td><td>Alternare assegnazione al centroide più vicino e media; la distorsione non sale mai</td><td>\(J=\sum_i\lVert\Xv_i-\boldsymbol\mu_{c_i}\rVert^2\)</td></tr>
+      <tr><td>16</td><td>Autoencoder</td><td>Ricostruire l'input attraverso una strettoia</td><td>\(\min\sum_i\lVert\Xv_i-f(g(\Xv_i))\rVert^2\)</td></tr>
+      <tr><td>16</td><td>VAE</td><td>Codice casuale e penalità KL: uno spazio latente da cui generare</td><td>\(z=\mu+\sigma\Eps\)</td></tr>
+      <tr><td>17</td><td>Regret</td><td>Quanto si è perso rispetto al braccio migliore</td><td>\(R_T=\sum_a\Delta_a\mathbb E[N_a(T)]\)</td></tr>
+      <tr><td>17</td><td>UCB</td><td>Giocare il braccio con il limite superiore di confidenza più alto</td><td>\(\hat\mu_t(a)+\sqrt{2\log T/N_t(a)}\)</td></tr>
+      <tr><td>17</td><td>Hedge</td><td>Pesi che calano esponenzialmente con la perdita, scelta a caso</td><td>\(w\leftarrow w\,e^{-\Et\ell}\)</td></tr>
+      <tr><td>18</td><td>Bellman</td><td>Il valore di uno stato è la migliore mossa più il valore di dove porta</td><td>\(V^*(s)=\max_a\big(r+\gamma\sum_{s'}p\,V^*(s')\big)\)</td></tr>
+      <tr><td>18</td><td>Q-learning</td><td>Spostare \(Q(s,a)\) verso ricompensa più miglior valore successivo</td><td>\(Q\leftarrow(1-\Et)Q+\Et(r+\gamma\max_{a'}Q')\)</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="18"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>il valore di una situazione è la ricompensa immediata della mossa migliore più il valore scontato della situazione successiva; Q-learning impara questi valori dall'esperienza, una mossa alla volta, senza conoscere le regole.</b></p>
+  <p>Con questa lezione il percorso del corso è completo: dalla retta dei minimi quadrati a un agente che impara da solo.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

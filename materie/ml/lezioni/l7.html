@@ -1,0 +1,154 @@
+<article class="lesson" data-n="7" id="lezione-7" data-title="Come si prevede un sì o un no?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 7</p>
+  <h1>Come si prevede un sì o un no?</h1>
+  <p class="desc">La classificazione: perché la regressione lineare non basta, come la sigmoide trasforma un punteggio in una probabilità, e come si giudica un classificatore.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Una banca vuole sapere quali clienti non ripagheranno il debito della carta di credito. Di ogni cliente conosce il saldo da pagare e il reddito; la risposta è un sì o un no: insolvente oppure no.</p>
+  <p>Quando la risposta \(\Yy\) è una categoria e non un numero, il problema si chiama <b>classificazione</b>. Con due sole categorie, dette <em>classi</em>, le si indica per convenzione con \(\Yy=1\) (qui: insolvente) e \(\Yy=0\) (solvente).</p>
+  <figure data-fig="defscat">
+    <figcaption>Duecentoquaranta clienti simulati sul modello del dataset <em>Default</em> usato a lezione: in orizzontale il saldo, in verticale il reddito. In arancione gli insolventi, in blu i solventi. Muovi la soglia: chi ha un saldo più alto della linea bianca viene previsto insolvente; il bordo bianco segna i clienti sbagliati.</figcaption>
+  </figure>
+  <p>Gli insolventi stanno quasi tutti a destra: il saldo dice molto, il reddito quasi niente. La regola più semplice è una soglia sul saldo. Nessuna soglia è perfetta, perché le due nuvole si sovrappongono; ma alcune sbagliano molto meno di altre.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Un classificatore è un confine</h2>
+  <p>Un classificatore divide lo spazio delle features in due zone, una per classe. La linea che le separa è il <b>confine di decisione</b>. Se il confine è una retta (un piano, in più dimensioni) il classificatore si dice <b>lineare</b>.</p>
+  <p>Per scriverlo bastano gli ingredienti della regressione: un vettore di pesi \(\Wv\) e un'intercetta \(\Ws_0\). Con questi si calcola per ogni cliente un <em>punteggio</em>, la somma delle sue features moltiplicate per i pesi, più l'intercetta. Poi si guarda solo il segno:</p>
+  <div class="math-block">\[\text{prevedi } 1 \ \text{ se }\ \Wv^\top\Xv+\Ws_0\ge 0,\qquad \text{altrimenti } 0\]</div>
+  <p>Il punteggio è positivo da un lato del confine, negativo dall'altro, e zero esattamente sopra. Per esempio, con un solo peso 4 e intercetta −6, un cliente con saldo 2 ha punteggio 4 · 2 − 6 = 2: positivo, quindi previsto insolvente.</p>
+  <figure data-fig="linbound">
+    <figcaption>Due features, due classi (blu la classe 0, arancione la classe 1). La linea bianca è il confine, la zona colorata è quella in cui si prevede 1. La freccia gialla è \(\Wv\): è perpendicolare al confine e punta verso quella zona. Ruotare \(\Wv\) ruota il confine; cambiare \(\Ws_0\) lo trasla.</figcaption>
+  </figure>
+  <p>Resta la domanda di sempre: come si trovano \(\Wv\) e \(\Ws_0\) a partire dai dati?</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Primo tentativo: la regressione lineare</h2>
+  <p>L'idea più pigra: trattare 0 e 1 come numeri qualsiasi, adattare una retta con i minimi quadrati (lezione 3) e prevedere 1 quando la retta supera 0,5.</p>
+  <figure data-fig="olsclass">
+    <figcaption>Una sola feature, il saldo; i clienti stanno in basso (risposta 0) o in alto (risposta 1). La retta gialla è quella dei minimi quadrati; la linea tratteggiata bianca è la soglia che ne deriva, dove la retta vale 0,5. Aggiungi clienti insolventi con saldo altissimo, che nessuno sbaglierebbe, e guarda la soglia.</figcaption>
+  </figure>
+  <p>Ci sono due problemi. Il primo: la retta esce dall'intervallo fra 0 e 1, quindi il suo valore non si può leggere come una probabilità. Il secondo è più grave: i nuovi clienti sono facilissimi da classificare, eppure spostano la soglia e fanno sbagliare altri. La loss quadratica punisce la retta anche quando prevede 3 per un cliente la cui risposta è 1: <b>punisce le previsioni «troppo giuste»</b>.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Secondo tentativo: contare gli errori</h2>
+  <p>Allora misuriamo direttamente quello che ci interessa. La <b>loss 0-1</b> vale 1 se la previsione è sbagliata e 0 se è giusta; il costo totale è il numero di errori. Proviamo a minimizzarlo sulla soglia del saldo.</p>
+  <figure data-fig="zeroone">
+    <figcaption>In alto i clienti lungo l'asse del saldo, in basso il numero di errori per ogni possibile soglia (curva rosa); il punto giallo è la soglia scelta. La curva è una scala: fra un cliente e il successivo non cambia.</figcaption>
+  </figure>
+  <p>Una scala è piatta quasi ovunque: il gradiente è zero e non indica da che parte andare. Il gradient descent della lezione 2 qui è cieco, e in più dimensioni trovare il minimo esatto è un problema intrattabile. Serve una funzione di costo liscia.</p>
+  <h3>Che cosa farebbe un classificatore ideale</h3>
+  <p>Prima di cercarla, chiediamoci qual è il meglio possibile. Immagina di conoscere, per ogni cliente, la probabilità che la sua risposta sia 1 date le sue features: si scrive \(P(\Yy=1\mid\Xv)\), dove la barra verticale si legge «sapendo che». Allora la regola che sbaglia meno è ovvia: scegliere la classe più probabile. Si chiama <b>classificatore di Bayes</b>.</p>
+  <figure data-fig="bayes">
+    <figcaption>In alto come si distribuisce il saldo nelle due classi. In basso la probabilità di essere insolvente dato il saldo. Il classificatore di Bayes prevede 1 dove questa supera ½; l'area chiara in alto sono gli errori che restano comunque.</figcaption>
+  </figure>
+  <p>Nella realtà questa probabilità non la conosciamo. Ma la figura suggerisce la strada: <b>invece di prevedere direttamente la classe, stimiamo la probabilità</b>, e poi la confrontiamo con una soglia.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La sigmoide: da un punteggio a una probabilità</h2>
+  <p>Abbiamo già un numero per ogni cliente: il punteggio lineare. Ma può valere −7 o 300, mentre una probabilità deve stare fra 0 e 1. Serve una funzione che schiacci l'intera retta dei numeri in quell'intervallo.</p>
+  <p>Tagliare il punteggio a 0 e a 1 non va bene: nascerebbero tratti piatti, e abbiamo appena visto che dove il costo è piatto il gradiente non dice niente. Serve una curva liscia, che salga sempre. La più usata è la <b>sigmoide</b>, e si costruisce in tre mosse.</p>
+  <figure data-fig="build" data-opts='{"id":"l07_sigmoid"}'>
+    <figcaption>La sigmoide costruita una mossa alla volta. La curva gialla è la funzione a ogni passo, i due punti bianchi seguono i punteggi 1 e −1, la fascia verde è l'intervallo fra 0 e 1. All'ultima mossa il grafico si ingrandisce sulla fascia.</figcaption>
+  </figure>
+  <figure data-fig="sigmoid">
+    <figcaption>Ora prova tu: muovi il punteggio. Per punteggi molto negativi la sigmoide vale quasi 0, per punteggi molto positivi quasi 1, e in zero vale esattamente ½. Il punto pieno è \(z\), quello vuoto è \(-z\): la simmetria dice che i due valori sommano sempre a 1.</figcaption>
+  </figure>
+  <p>Il modello che hai visto nascere nell'ultimo passo, la sigmoide applicata al punteggio lineare, si chiama <b>regressione logistica</b>. Nonostante il nome, è un metodo di classificazione.</p>
+  <p>Con una sola feature i parametri sono due: il peso \(\Ws\) decide quanto è ripida la salita, l'intercetta \(\Ws_0\) dove avviene. Prova ad adattarla a mano ai clienti della banca.</p>
+  <figure data-fig="logit1d">
+    <figcaption>I clienti stanno in basso se solventi (blu) e in alto se insolventi (arancione). La curva gialla è la probabilità di insolvenza prevista per ogni saldo. La linea tratteggiata segna dove vale ½, cioè dove il punteggio è zero: \(\Xs=-\Ws_0/\Ws\). Il numero sotto misura quanto la curva è in disaccordo con i dati: cerca di abbassarlo. Fra poco vedremo come è fatto.</figcaption>
+  </figure>
+  <h3>Il confine resta una retta</h3>
+  <p>Alla fine serve comunque una classe, non una probabilità. Si sceglie una soglia \(t\) e si prevede 1 quando la probabilità la supera. La sigmoide sale sempre: chiedere che la probabilità superi una soglia è come chiedere che il punteggio superi un'altra soglia, quella che la sigmoide manda in \(t\).</p>
+  <div class="math-block">\[\sigma(\Wv^\top\Xv+\Ws_0)\ge t\quad\Longleftrightarrow\quad \Wv^\top\Xv+\Ws_0\ \ge\ \log\frac{t}{1-t}\]</div>
+  <p>La condizione è di nuovo «punteggio maggiore di un numero fisso»: un classificatore lineare. Con la soglia a ½ quel numero è zero, e ritroviamo il confine dell'inizio. Con un'altra soglia il confine si sposta parallelamente a se stesso, ma resta una retta.</p>
+  <figure data-fig="logit2d">
+    <figcaption>Il colore è la probabilità prevista: blu vicino a 0, arancione vicino a 1. La linea bianca è il confine per la soglia \(t\) scelta. Moltiplicare tutti i pesi per uno stesso numero non sposta il confine a ½: rende solo più netto il passaggio.</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="7a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Come si trovano i pesi</h2>
+  <p>Ci serve un costo liscio che dica quanto una scelta dei pesi è in disaccordo con i dati. Usiamo il principio di massima verosimiglianza della lezione 3: i pesi migliori sono quelli che rendono più probabili i dati osservati.</p>
+  <p>Chiamiamo \(p_i\) la probabilità di insolvenza che il modello assegna al cliente numero \(i\), cioè la sigmoide del suo punteggio. Per alleggerire le formule l'intercetta è inglobata in \(\Wv\) aggiungendo una feature costante, come nella lezione 3. Il costo si costruisce partendo da una domanda: quanto ci ha preso il modello?</p>
+  <figure data-fig="build" data-opts='{"id":"l07_logloss"}'>
+    <figcaption>La log loss costruita su quattro clienti: due insolventi e due solventi. Le barre verdi sono le probabilità che il modello aveva dato alla risposta vera, quelle verde acqua i loro logaritmi (negativi, verso il basso), quelle rosa i costi dopo il cambio di segno.</figcaption>
+  </figure>
+  <p>Guardiamo da vicino il costo di un solo cliente insolvente: paga \(-\log p\).</p>
+  <figure data-fig="logloss">
+    <figcaption>Il costo di un cliente con \(\Yy=1\) in funzione della probabilità \(p\) assegnata alla risposta giusta. In rosa la log loss, in grigio la loss quadratica \((1-p)^2\) per confronto.</figcaption>
+  </figure>
+  <p>Se il modello è sicuro e ha ragione (probabilità vicina a 1) il costo è quasi zero, e non cresce mai per essere «troppo giusti»: il difetto della regressione lineare è sparito. Se è sicuro e ha torto (probabilità vicina a 0) il costo esplode. La loss quadratica, invece, per l'errore più grave possibile fa pagare al massimo 1.</p>
+  <h3>Il gradiente ha una forma familiare</h3>
+  <p>Per scendere lungo la log loss serve il suo gradiente: per ogni peso, di quanto cambia il costo se lo sposto di poco. Il peso non agisce sul costo direttamente: cambia il punteggio, che cambia la probabilità, che cambia il costo. Seguiamo la spinta lungo questa catena, per un cliente e un peso.</p>
+  <figure data-fig="build" data-opts='{"id":"l07_grad"}'>
+    <figcaption>La catena delle dipendenze per un cliente insolvente con saldo 2. Ogni riquadro è una quantità; i numeri sopra le frecce dicono per quanto si moltiplica un piccolo spostamento passando da una all'altra; sotto i riquadri c'è lo spostamento che arriva a ciascuna quando il peso sale di 0,01.</figcaption>
+  </figure>
+  <p>Il risultato ha la stessa struttura dei minimi quadrati: (previsione − risposta) × input, sommato sui dati. Se il modello ha già ragione la differenza è quasi zero e quel cliente non spinge più; se sbaglia di molto, spinge forte.</p>
+  <p>La log loss è convessa, quindi ogni minimo è globale (lezione 2). Però, a differenza dei minimi quadrati, annullare il gradiente non dà una formula chiusa: si usa il gradient descent.</p>
+  <details class="rev"><summary>Lo stesso gradiente, ricavato con un conto diretto</summary>
+    <p>Scrivendo \(z_i=\Wv^\top\Xv_i\) e usando \(\log\sigma(z)=z-\log(1+e^{z})\) e \(\log(1-\sigma(z))=-\log(1+e^{z})\), la log loss diventa \(\cL(\Wv)=\sum_i\big[\log(1+e^{z_i})-\Yy_i z_i\big]\). La derivata di \(\log(1+e^{z})\) rispetto a \(z\) è \(e^{z}/(1+e^{z})=\sigma(z)\), e la derivata di \(z_i\) rispetto a \(\Wv\) è \(\Xv_i\). Quindi ogni termine contribuisce \((\sigma(z_i)-\Yy_i)\Xv_i\).</p>
+  </details>
+  <figure data-fig="logitgd">
+    <figcaption>Il gradient descent sui clienti della banca. Nel primo riquadro la sigmoide a ogni passo, nel secondo la log loss media che scende.</figcaption>
+  </figure>
+  <h3>Quando i dati sono troppo facili</h3>
+  <p>C'è un caso curioso. Se le classi sono <em>linearmente separabili</em>, cioè esiste un confine che non sbaglia nessun punto, il minimo non esiste. Ogni volta che si raddoppiano i pesi la sigmoide diventa più ripida, tutte le probabilità si avvicinano a 0 o 1 dalla parte giusta e la log loss scende ancora, senza fermarsi mai.</p>
+  <figure data-fig="separable">
+    <figcaption>Dati separabili. In giallo la regressione logistica senza multa: la sigmoide tende a un gradino e la grandezza del peso cresce senza fermarsi. In arancione la stessa con la multa ridge: si ferma.</figcaption>
+  </figure>
+  <p>Pesi enormi significano previsioni sempre sicurissime, anche a un passo dal confine: è overfitting. Il rimedio è quello della lezione 6: aggiungere alla log loss la multa ridge \(\Rl\lVert\Wv\rVert_2^2\), che fa pagare i pesi grandi.</p>
+  <h3>Più di due classi</h3>
+  <p>Con più di due classi, diciamo \(K\), si dà a ciascuna un proprio vettore di pesi e quindi un proprio punteggio: \(z_k\) per la classe numero \(k\). Servono altrettante probabilità, tutte positive e con somma 1. Si ripete l'idea della sigmoide: l'esponenziale rende positivo ogni punteggio, e dividere per il totale fa tornare la somma a 1. È la <b>softmax</b>:</p>
+  <div class="math-block">\[P(\Yy=k\mid\Xv)=\frac{e^{z_k}}{\sum_{j=1}^{K}e^{z_j}}\]</div>
+  <figure data-fig="softmax">
+    <figcaption>Tre classi, come le tre specie di iris della lezione 1: muovi i tre punteggi e guarda le tre probabilità. L'esponenziale rende positivi i punteggi; dividere per la somma li fa sommare a 1. Conta solo la differenza fra i punteggi.</figcaption>
+  </figure>
+  <p>Con due classi la softmax coincide con la sigmoide applicata alla differenza dei due punteggi.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quanto è buono un classificatore?</h2>
+  <p>Un classificatore binario può sbagliare in due modi diversi, e conviene tenerli separati. Incrociando la previsione con la realtà si ottengono quattro caselle, la <b>matrice di confusione</b>: veri positivi (TP, previsto 1 ed era 1), veri negativi (TN, previsto 0 ed era 0), falsi positivi (FP, previsto 1 ma era 0: un falso allarme) e falsi negativi (FN, previsto 0 ma era 1: un caso sfuggito).</p>
+  <figure data-fig="confusion">
+    <figcaption>I clienti della banca ordinati per probabilità di insolvenza prevista dalla regressione logistica. Sposta la soglia \(t\): la matrice e le misure si aggiornano.</figcaption>
+  </figure>
+  <p>Dalle quattro caselle si ricavano le misure più usate, e ciascuna risponde a una domanda diversa. Quante previsioni sono giuste, in tutto? È l'<b>accuratezza</b>. Di tutti gli insolventi veri, quanti ne ho trovati? È la <b>recall</b> (o sensibilità), \(TP/(TP+FN)\). Di tutti gli allarmi lanciati, quanti erano giustificati? È la <b>precision</b>, \(TP/(TP+FP)\).</p>
+  <p>Le ultime due guardano i negativi. Di tutti i solventi veri, quanti ne ho riconosciuti? È la <b>specificità</b>, \(TN/(TN+FP)\). Quelli che restano sono i falsi allarmi: la loro quota è il <b>tasso di falsi positivi</b>, \(FP/(FP+TN)\), abbreviato FPR.</p>
+  <p>Abbassando la soglia si trovano più insolventi (la recall sale) ma si lanciano più falsi allarmi (la precision scende). Non esiste una soglia giusta in assoluto: dipende da quale errore costa di più.</p>
+  <div class="quiz" data-quiz="7b"></div>
+  <h3>Tutte le soglie in un colpo: la curva ROC</h3>
+  <p>Per giudicare il modello senza impegnarsi su una soglia, le si prova tutte. Per ogni \(t\) si segna un punto: in orizzontale il tasso di falsi positivi, in verticale la recall. La curva che ne esce si chiama <b>ROC</b>.</p>
+  <figure data-fig="roc">
+    <figcaption>Nel primo riquadro i punteggi delle due classi e la soglia; nel secondo il punto corrispondente sulla curva ROC. Un modello perfetto passa per l'angolo con zero falsi positivi e recall 1; uno che tira a caso sta sulla diagonale.</figcaption>
+  </figure>
+  <p>L'area sotto la curva, detta <b>AUC</b>, riassume tutto in un numero: 1 per il modello perfetto, 0,5 per quello che tira a caso. Si può leggere così: è la probabilità che un positivo preso a caso riceva un punteggio più alto di un negativo preso a caso.</p>
+  <h3>Quando una classe è rara</h3>
+  <p>Su mille clienti, dieci sono insolventi. Un modello che risponde sempre «solvente» ha un'accuratezza del 99%, e non serve a niente.</p>
+  <figure data-fig="imbal">
+    <figcaption>Mille clienti, uno per quadratino. Nel primo riquadro il modello che dice sempre no; nel secondo uno che segnala trenta clienti, otto dei quali davvero insolventi.</figcaption>
+  </figure>
+  <p>Con classi sbilanciate l'accuratezza inganna; servono recall e precision. Ma due numeri sono scomodi per confrontare modelli, e la media semplice si lascia ingannare: un modello che segnala tutti ha recall 1 e precision quasi zero, eppure la media direbbe 0,5. Le si combina allora nell'<b>F1</b>, la loro media armonica, che è alta solo se lo sono entrambe:</p>
+  <div class="math-block">\[F_1=\frac{2\cdot\text{precision}\cdot\text{recall}}{\text{precision}+\text{recall}}\qquad\qquad F_\beta=\frac{(1+\beta^2)\cdot\text{precision}\cdot\text{recall}}{\beta^2\cdot\text{precision}+\text{recall}}\]</div>
+  <p>Nell'esempio dei mille clienti la precision è 8 / 30 ≈ 0,27 e la recall 8 / 10 = 0,8: la F1 vale 0,4. La seconda formula, \(F_\beta\), permette di dire quale delle due conta di più: con \(\beta\) maggiore di 1 pesa di più la recall (meglio un falso allarme che un caso sfuggito), con \(\beta\) minore di 1 la precision.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="7"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>la regressione logistica passa un punteggio lineare attraverso la sigmoide per ottenere una probabilità, e trova i pesi minimizzando la log loss; il confine resta una retta.</b></p>
+  <p>Quando i dati sono separabili, però, di rette che non sbagliano ce ne sono infinite. La regressione logistica non ne preferisce nessuna. La prossima lezione parte da qui: quale conviene scegliere?</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

@@ -1,0 +1,106 @@
+<article class="lesson" data-n="6" id="lezione-6" data-title="Come si impedisce a un modello di esagerare?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 6</p>
+  <h1>Come si impedisce a un modello di esagerare?</h1>
+  <p class="desc">La regolarizzazione: lasciare al modello tutta la sua flessibilità, ma fargli pagare ogni peso grande. Ridge, lasso e la geometria che li distingue.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 5 abbiamo imparato a scegliere fra modelli di complessità diversa. Ma la complessità si regolava a scatti, cambiando il grado del polinomio. Qui vediamo un modo più fine.</p>
+  <p>Sotto c'è un polinomio di grado 9 adattato a dodici punti. Senza freni passa vicino a tutti e oscilla fra l'uno e l'altro. Il cursore regola un freno, che chiamiamo \(\Rl\) (lambda) e che costruiremo fra poco. Muovilo: il grado non cambia mai.</p>
+  <figure data-fig="ridgefit">
+    <figcaption>Nel primo riquadro i dodici punti (bianchi) e la curva del polinomio (gialla); nel secondo la grandezza dei suoi dieci pesi, una barra per peso. Aumentando \(\Rl\) i pesi si rimpiccioliscono e la curva si calma; con \(\Rl\) enorme diventa quasi una retta orizzontale.</figcaption>
+  </figure>
+  <p>Guarda le barre con \(\Rl\) al minimo: per passare da tutti i punti il polinomio usa pesi enormi, positivi e negativi, che si compensano a vicenda. Basta spostare di poco un dato perché quell'equilibrio salti. <b>Pesi grandi sono il segno di un modello che sta inseguendo il rumore.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Far pagare la complessità</h2>
+  <p>Se i pesi grandi sono il sintomo, perché non vietarli? Perché a volte servono davvero: un divieto secco butterebbe via anche i modelli buoni. Meglio farli <em>pagare</em>. Al costo di sempre, che misura l'errore sui dati, si somma un secondo numero che cresce quando i pesi crescono, e si minimizza il totale:</p>
+  <div class="math-block">\[\min_{\Wv}\ \big\{\,\cL(\Wv)+R(\Wv)\,\big\}\]</div>
+  <p>Il primo termine è la funzione di costo delle lezioni precedenti. Il secondo, \(R\), si chiama <b>regolarizzatore</b>: misura quanto è complesso il modello descritto dai pesi. Il modello può ancora usare pesi grandi per abbassare l'errore, ma solo se il guadagno supera la multa. È un modo di preferire le spiegazioni semplici.</p>
+  <p>Se il regolarizzatore è derivabile, tutto quello che sappiamo sul gradient descent (lezione 2) continua a valere. Qui ne parliamo per i modelli lineari, ma la stessa idea si applica a molti altri modelli.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Ridge: la multa è il quadrato dei pesi</h2>
+  <p>Resta da decidere come misurare «quanto sono grandi i pesi» con un solo numero. Sommarli non funziona: un peso +1000 e uno −1000 darebbero zero. La scelta più comune è sommare i loro quadrati. Con l'errore quadratico della lezione 3 si ottiene la <b>ridge regression</b>.</p>
+  <figure data-fig="build" data-opts='{"id":"l06_ridge"}'>
+    <figcaption>Il costo ridge costruito un pezzo alla volta su due modelli candidati. Le barre rosa sono l'errore sui dati, i quadrati arancioni sono i quadrati dei due pesi, la parte arancione delle barre è la multa. Il riquadro bianco segna chi ha il totale più basso.</figcaption>
+  </figure>
+  <p>La somma dei quadrati dei pesi si scrive anche \(\lVert\Wv\rVert_2^2\), e si legge «norma due al quadrato». Il numero \(\Rl\) è un iperparametro: non lo trova il modello, lo scegliamo noi. Se vale zero si torna ai minimi quadrati; se è grande conta quasi solo la multa.</p>
+  <p>Un dettaglio: nella multa la somma parte dal peso numero 1. L'intercetta \(\Ws_0\) non viene penalizzata, perché sposta tutta la curva in alto o in basso e non c'entra con la sua complessità.</p>
+  <p>Che cosa succede ai singoli pesi al crescere di \(\Rl\)? Prendiamo un problema con dieci features, di cui solo tre servono davvero a prevedere la risposta.</p>
+  <figure data-fig="ridgepath">
+    <figcaption>Ogni linea è il peso di una feature al variare di \(\Rl\), che cresce da sinistra a destra su scala logaritmica. Colorati i pesi delle tre features utili, grigi gli altri sette. Tutti si avvicinano a zero insieme, ma nessuno ci arriva.</figcaption>
+  </figure>
+  <p><b>L'effetto di ridge è rimpicciolire tutti i pesi, riducendo così il rischio di overfitting.</b></p>
+  <h3>Quanto deve valere λ</h3>
+  <p>Rimpicciolire i pesi rende il modello più rigido: è la stessa manopola del compromesso fra bias e varianza della lezione 4, solo continua. Con \(\Rl\) piccolo il modello dipende molto dal campione (varianza alta); con \(\Rl\) grande non riesce più a seguire la funzione vera (bias alto).</p>
+  <figure data-fig="lamU">
+    <figcaption>Il polinomio di grado 9 al variare di \(\Rl\): in blu il bias², in verde acqua la varianza, in rosso l'errore di test atteso, stimati su 300 dataset simulati. La croce bianca segna il minimo dell'errore; la linea tratteggiata viola è l'errore irriducibile, sotto cui non si scende.</figcaption>
+  </figure>
+  <p>Il valore migliore sta in mezzo, e in pratica non si conosce: lo si sceglie con la cross-validation della lezione 5, provando una griglia di valori.</p>
+  <div class="quiz" data-quiz="6a"></div>
+  <h3>Si calcola come prima, e funziona sempre</h3>
+  <p>Nel grafico dei dieci pesi tutti si rimpicciolivano e nessuno arrivava a zero. Per capire perché, e per trovare il minimo del nuovo costo, basta guardare un peso solo. Immagina che senza multa il suo valore migliore sia \(a\), e che allontanarsene costi \(\tfrac12(\Ws-a)^2\). Chiediamoci: se sposto di poco il peso, di quanto cambiano errore e multa?</p>
+  <figure data-fig="build" data-opts='{"id":"l06_shrink"}'>
+    <figcaption>Un solo peso, con valore migliore senza multa pari a 2 (linea tratteggiata rosa). In rosa l'errore, in arancione la multa, in bianco la loro somma; il punto giallo è il peso. Sotto il grafico le due frecce indicano da che parte scendono errore e multa: più sono lunghe, più la pendenza è forte.</figcaption>
+  </figure>
+  <p>Con molti pesi il ragionamento è identico, solo scritto con i vettori. Il gradiente del nuovo costo è la somma di due gradienti, uno per termine:</p>
+  <div class="math-block">\[\Gr\big(\cL+R\big)(\Wv)=-\frac1N\Xm^\top(\Yv-\Xm\Wv)+2\Rl\Wv\]</div>
+  <p>Il primo pezzo è il gradiente dell'errore della lezione 3. Il secondo è la pendenza della multa: ogni peso viene spinto verso zero con una forza proporzionale al peso stesso.</p>
+  <p>Si può usare il gradient descent, oppure annullare il gradiente e risolvere, come nella lezione 3. Si ottiene di nuovo una formula chiusa:</p>
+  <div class="math-block">\[\Wv^*=(\Xm^\top\Xm+2N\Rl\, I)^{-1}\Xm^\top\Yv\]</div>
+  <p>È la formula dei minimi quadrati con un'aggiunta. \(I\) è la matrice identità (uno sulla diagonale, zero altrove): alla diagonale della matrice da invertire si somma quindi un numero positivo. È il «dividere per un numero più grande» di prima, in versione matriciale.</p>
+  <p>Spesso il fattore \(2N\) viene assorbito in \(\Rl\), e nella parentesi si scrive soltanto \(\Xm^\top\Xm+\Rl I\).</p>
+  <p>C'è un regalo in più. Nella lezione 3 la formula si rompeva quando la matrice \(\Xm^\top\Xm\) non era invertibile, per esempio con due features identiche: la funzione di costo aveva un canale piatto, con infiniti minimi. Sommando un multiplo positivo dell'identità la matrice diventa sempre invertibile.</p>
+  <figure data-fig="valley2">
+    <figcaption>Il costo in funzione di due pesi, quando le due features sono identiche. Nel primo riquadro i minimi quadrati: un canale con infiniti minimi, problema mal posto. Nel secondo lo stesso costo con il termine ridge: una conca con un solo fondo.</figcaption>
+  </figure>
+  <p><b>Con ridge la soluzione esiste ed è unica, qualunque siano i dati.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Lasso: la multa è il valore assoluto</h2>
+  <p>Il quadrato non è l'unico modo di togliere il segno ai pesi prima di sommarli: c'è anche il valore assoluto. La somma dei valori assoluti dei pesi si scrive \(\lVert\Wv\rVert_1\), «norma uno». Usandola come multa al posto dei quadrati si ottiene il <b>lasso</b>:</p>
+  <div class="math-block">\[\min_{\Wv}\ \frac{1}{2N}\sum_{i=1}^{N}\big(\Yy_i-\Xv_i^\top\Wv\big)^2+\Rl\sum_{j=1}^{d}|\Ws_j|\]</div>
+  <p>Sembra una variazione da poco. Rifacciamo l'esperimento delle dieci features con i due metodi affiancati.</p>
+  <figure data-fig="paths2">
+    <figcaption>Gli stessi dati, le stesse dieci features: nel primo riquadro i pesi con ridge, nel secondo con il lasso, al crescere di \(\Rl\). Colorate le tre features utili, grigie le altre. Con ridge i pesi inutili restano piccoli ma diversi da zero. Con il lasso, superato un certo \(\Rl\), diventano esattamente zero e restano solo le tre features utili.</figcaption>
+  </figure>
+  <p>Un modello in cui molti pesi sono esattamente zero si dice <b>sparso</b>. È un vantaggio per l'interpretabilità: il lasso non solo stima i pesi, ma dice anche quali features si possono buttare. In ridge, invece, tutte le features restano nel modello finale: un peso arriverebbe a zero solo con \(\Rl\) infinito.</p>
+  <h3>Perché il valore assoluto azzera e il quadrato no</h3>
+  <p>Riprendiamo il peso singolo di prima, con valore migliore \(a\) senza multa. Con ridge la spinta della multa era proporzionale al peso, e vicino a zero si spegneva. Rifacciamo lo stesso conto con il valore assoluto.</p>
+  <figure data-fig="build" data-opts='{"id":"l06_lasso"}'>
+    <figcaption>Lo stesso peso di prima, con la multa del lasso: in rosa l'errore, in arancione la multa (ora a forma di V), in bianco la somma, in giallo il peso. Sotto il grafico la freccia arancione, la pendenza della multa, ha sempre la stessa lunghezza.</figcaption>
+  </figure>
+  <figure data-fig="shrink1d">
+    <figcaption>Ora prova tu, con le due multe affiancate: nel primo riquadro il lasso, nel secondo ridge. In rosa il costo senza multa, in arancione la multa, in bianco la loro somma; il punto giallo è il minimo. Porta verso zero il valore senza multa \(a\): con il lasso il minimo si incolla a zero prima che lui ci arrivi; con ridge lo segue rimpicciolito, e vale zero solo se è zero anche lui.</figcaption>
+  </figure>
+  <p>Tutto sta nella forma delle due multe vicino a zero. Il quadrato lì è piatto: l'ultimo pezzetto di peso costa quasi niente, quindi non conviene mai toglierlo del tutto. Il valore assoluto ha pendenza costante \(\Rl\) fino in fondo: se il guadagno sull'errore è più piccolo di \(\Rl\), conviene azzerare il peso. <b>Ridge rimpicciolisce in proporzione; il lasso toglie una quantità fissa e, se non basta, azzera.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Un budget per i pesi</h2>
+  <p>C'è un secondo modo di scrivere gli stessi due problemi, utile perché si può disegnare. Invece di far pagare i pesi, si fissa un <em>budget</em> \(s\): un tetto alla loro grandezza complessiva. Poi si minimizza l'errore sui dati senza sforare:</p>
+  <div class="math-block">\[\text{ridge:}\ \ \min_{\Wv}\sum_{i=1}^{N}(\Yy_i-\Wv^\top\Xv_i)^2\ \ \text{con}\ \sum_{j}\Ws_j^2\le s \qquad\quad \text{lasso:}\ \ \text{lo stesso, con}\ \sum_{j}|\Ws_j|\le s\]</div>
+  <p>A parole: l'errore è quello di sempre, ma i pesi ammessi sono solo quelli la cui somma dei quadrati (ridge) o dei valori assoluti (lasso) non supera il budget. Le due scritture sono equivalenti: a ogni \(\Rl\) corrisponde un budget che dà la stessa soluzione, e più la multa è forte più il budget è piccolo. È un problema vincolato come quelli della lezione 2.</p>
+  <figure data-fig="budget">
+    <figcaption>Le ellissi rosa sono le curve di livello dell'errore, con il minimo senza vincoli al centro. La zona azzurra sono i pesi ammessi dal budget: un cerchio per ridge (primo riquadro), un rombo per il lasso (secondo riquadro). La soluzione, il punto giallo, è il punto della zona azzurra che tocca l'ellisse più piccola.</figcaption>
+  </figure>
+  <p>Riduci il budget. Il cerchio è liscio: le ellissi lo toccano in un punto qualsiasi del bordo, quasi mai su un asse. Il rombo ha gli spigoli proprio sugli assi, e uno spigolo «sporge»: le ellissi finiscono spesso per toccarlo lì. Stare su un asse significa che l'altro peso è zero.</p>
+  <p><b>Sono gli spigoli del rombo a produrre i pesi nulli del lasso.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="6"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>regolarizzare significa aggiungere al costo una multa sui pesi; con il quadrato (ridge) i pesi si rimpiccioliscono tutti, con il valore assoluto (lasso) molti diventano esattamente zero.</b></p>
+  <p>Fin qui la risposta da prevedere era sempre un numero. Dalla prossima lezione diventa una categoria: sì o no, malato o sano. Scopriremo che la regressione lineare, usata così com'è, non funziona, e che cosa mettere al suo posto.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

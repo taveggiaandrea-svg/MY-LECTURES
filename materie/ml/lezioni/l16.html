@@ -1,0 +1,132 @@
+<article class="lesson" data-n="16" id="lezione-16" data-title="Come impara una rete senza etichette?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 16</p>
+  <h1>Come impara una rete senza etichette?</h1>
+  <p class="desc">L'autoencoder: una rete che impara a copiare il proprio input passando per una strettoia. E la sua versione probabilistica, il VAE, che sa anche inventare dati nuovi.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Una rete neurale impara riducendo l'errore fra la sua uscita e una risposta giusta. Senza etichette la risposta giusta non c'è. L'idea dell'<b>autoencoder</b> è usare come risposta giusta l'input stesso: la rete riceve un'immagine e deve restituire la stessa immagine.</p>
+  <p>Detto così sembra inutile: basterebbe copiare. Ma la rete è costruita con una strettoia nel mezzo. Una prima metà, l'<b>encoder</b>, trasforma l'input \(\Xv\) in un vettore con molti meno numeri, detto <em>codice</em> o rappresentazione <em>latente</em> (cioè nascosta: nessuno la osserva direttamente). Una seconda metà, il <b>decoder</b>, deve ricostruire l'input partendo solo dal codice: quello che produce è la <em>ricostruzione</em>, \(\tilde{\Xv}\).</p>
+  <figure data-fig="aeidea">
+    <figcaption>Un autoencoder già allenato sulle immagini simulate della lezione 14 (griglie 12×12 di «0», «1» e «7»; quelle fra cui scegli non le ha mai viste). L'immagine entra nell'encoder, diventa un codice di otto numeri (le barre gialle) e il decoder la ricostruisce da quelli soltanto.</figcaption>
+  </figure>
+  <p>Otto numeri non bastano a ricordare 144 pixel qualsiasi. Bastano però se le immagini si somigliano, perché allora si può descriverle con poche caratteristiche: quale cifra è, quanto è inclinata, quanto è spesso il tratto. Nessuno dice alla rete quali caratteristiche usare: le trova da sola, perché sono quelle che permettono di ricostruire meglio.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Allenarlo</h2>
+  <p>Encoder e decoder sono due reti come quelle della lezione 12, attaccate una all'altra. Per allenarle serve, come sempre, un numero da rendere piccolo. Lo costruiamo seguendo un'immagine lungo il suo percorso.</p>
+  <figure data-fig="build" data-opts='{"id":"l16_ae"}'>
+    <figcaption>L'obiettivo dell'autoencoder costruito un pezzo alla volta, con la stessa rete della figura precedente. In alto il percorso di un'immagine: il dato (etichetta blu), il codice (barre gialle: una barra per numero, verso l'alto se positivo), la ricostruzione (etichetta verde). In rosa la loss: prima quella di questa immagine, poi, in basso, quelle di otto immagini, con la linea tratteggiata sulla loro media.</figcaption>
+  </figure>
+  <p>Riletta a parole: si cercano i pesi che rendono minima la distanza media fra ogni dato e la sua ricostruzione. È un problema supervisionato in cui l'etichetta di ogni dato è il dato stesso, quindi si risolve con backpropagation e gradient descent, senza cambiare nulla.</p>
+  <figure data-fig="aetrain">
+    <figcaption>Ora guarda quel minimo mentre viene cercato. L'allenamento dell'autoencoder con otto numeri nel mezzo. In basso l'errore di ricostruzione medio (un'epoca è un passaggio completo sui dati di training; sull'asse non sono equidistanti). Con i pesi casuali esce rumore; dopo poche epoche la stessa macchia per ogni immagine; poi la rete impara a distinguerle.</figcaption>
+  </figure>
+  <p>La macchia dei primi passi è la media di tutte le immagini: è la migliore risposta possibile per chi non ha ancora imparato a usare il codice.</p>
+  <h3>Quale loss</h3>
+  <p>Resta da decidere come misurare la distanza fra due immagini. La scelta più semplice è l'errore quadratico: la somma dei quadrati delle differenze, pixel per pixel. Va bene per dati continui qualsiasi.</p>
+  <p>Se i valori stanno fra 0 e 1, come le intensità dei pixel, si usa spesso la <em>binary cross-entropy</em>: la loss della regressione logistica (lezione 7), applicata a ogni pixel \(j\) e sommata su tutti i \(d\) pixel.</p>
+  <div class="math-block">\[\cl(\Xv,\tilde{\Xv})=-\sum_{j=1}^{d}\Big[\Xs_j\log\tilde{\Xs}_j+(1-\Xs_j)\log(1-\tilde{\Xs}_j)\Big]\]</div>
+  <p>Per ogni pixel ci sono due addendi: il primo pesa quanto il pixel vero è acceso, il secondo quanto è spento. Nella regressione logistica il valore vero era un'etichetta 0 o 1; qui \(\Xs_j\) è un numero intermedio. Funziona lo stesso, perché il minimo resta dove deve stare: nel punto in cui il pixel ricostruito è uguale a quello vero.</p>
+  <figure data-fig="bce1">
+    <figcaption>Un solo pixel. In ascissa il valore ricostruito, in ordinata la loss: in rosa la binary cross-entropy, in grigio l'errore quadratico; la linea tratteggiata segna il valore vero. Sposta il valore vero: il fondo della curva rosa lo segue. La cross-entropy punisce molto più dell'errore quadratico le ricostruzioni vicine a 0 o a 1 quando sono sbagliate.</figcaption>
+  </figure>
+  <details class="rev"><summary>Perché il minimo è in \(\tilde{\Xs}=\Xs\)</summary>
+    <p>Per un pixel la loss è \(-\Xs\log\tilde{\Xs}-(1-\Xs)\log(1-\tilde{\Xs})\). La derivata rispetto a \(\tilde{\Xs}\) è \(-\Xs/\tilde{\Xs}+(1-\Xs)/(1-\tilde{\Xs})=(\tilde{\Xs}-\Xs)/\big(\tilde{\Xs}(1-\tilde{\Xs})\big)\). Si annulla solo per \(\tilde{\Xs}=\Xs\), è negativa prima e positiva dopo: quello è il minimo.</p>
+  </details>
+  <p>La loss decide anche l'ultimo strato del decoder. Con valori fra 0 e 1 si mette una sigmoide, che produce proprio numeri in quell'intervallo; con valori non negativi senza un tetto si usa una ReLU (lezione 12), che lascia passare i numeri positivi e porta a zero quelli negativi.</p>
+  <p>Come in ogni rete si può poi aggiungere una penalità sui pesi: la somma dei quadrati (L2) per tenerli piccoli, o dei valori assoluti (L1) per azzerarne molti. Un'altra tecnica tipica è legare i pesi: il decoder usa le matrici dell'encoder trasposte, e i parametri da imparare si dimezzano.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quanto stretta la strettoia</h2>
+  <p>Quanti numeri dare al codice, cioè quanto stretto fare il <em>collo di bottiglia</em>, è la scelta più importante. Troppo larga e la rete può copiare senza capire nulla; troppo stretta e perde informazione che serve.</p>
+  <figure data-fig="bottleneck">
+    <figcaption>Tre autoencoder con un solo strato nascosto, di 2, 8 e 32 numeri. Con 2 le ricostruzioni sono sfocate e alcune cifre si confondono; con 32 sono quasi perfette.</figcaption>
+  </figure>
+  <p>Sulle cifre scritte a mano di MNIST, immagini di 784 pixel, le slide riportano lo stesso andamento: con 8 numeri alcune cifre vengono ricostruite come cifre diverse, con 16 sono riconoscibili, con 64 nitide.</p>
+  <p>Il numero che misura tutto questo è l'<b>errore di ricostruzione</b> di un dato: la somma dei quadrati delle differenze fra il dato e la sua ricostruzione. In simboli si scrive \(\mathrm{RE}(\Xv)=\lVert\Xv-\tilde{\Xv}\rVert^2\), dove le doppie barre indicano la lunghezza di un vettore (nelle figure è diviso per il numero di pixel).</p>
+  <p>Tolto il decoder, l'encoder da solo è un metodo per ridurre la dimensione, come la PCA. La differenza è che la PCA sa solo proiettare su direzioni dritte, mentre l'encoder usa attivazioni non lineari e può seguire strutture curve.</p>
+  <div class="quiz" data-quiz="16a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Due usi dell'errore di ricostruzione</h2>
+  <p>Un autoencoder impara a ricostruire bene solo dati simili a quelli su cui è stato allenato. Questo difetto diventa uno strumento per il <b>rilevamento di anomalie</b>: un dato con errore di ricostruzione insolitamente alto è probabilmente diverso da tutti gli altri.</p>
+  <figure data-fig="anomaly">
+    <figcaption>All'autoencoder allenato sulle cifre viene mostrata anche una scarpa stilizzata, come nell'esempio delle slide. Il decoder conosce solo cifre e prova a ricostruirla con quelle.</figcaption>
+  </figure>
+  <p>Il metodo funziona quando le anomalie sono rare. Se nei dati di allenamento ce ne fossero molte, la rete imparerebbe a ricostruire anche quelle.</p>
+  <p>Il secondo uso è il <b>denoising autoencoder</b>. In allenamento si sporca l'input con del rumore, ma si chiede di ricostruire l'immagine pulita. Copiare non serve più: per riuscirci la rete deve imparare che aspetto hanno i dati veri.</p>
+  <figure data-fig="denoise">
+    <figcaption>Un autoencoder allenato così, su immagini di test. In ingresso riceve solo la riga in alto.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Il limite: non sa inventare</h2>
+  <p>Il decoder trasforma un codice in un'immagine. Viene spontaneo usarlo per <em>generare</em>: scegliere un codice a caso e vedere che cosa esce. Con un autoencoder normale funziona male, perché nessuno gli ha chiesto di organizzare lo spazio dei codici.</p>
+  <p>I codici dei dati occupano isole di forma irregolare; in mezzo ci sono vuoti dove il decoder non è mai stato allenato, e non si sa da quale regione estrarre. Il rimedio è una variante, il <b>variational autoencoder</b> o VAE, che la figura mette subito a confronto.</p>
+  <figure data-fig="vaelatent">
+    <figcaption>Due reti con codice di due numeri, così da poterlo disegnare: ogni punto colorato è il codice di un'immagine, e il colore dice quale cifra è. Trascina i punti bianchi: sotto ogni riquadro compare l'immagine che il decoder produce da quel codice. Nel primo riquadro, l'autoencoder; nel secondo, il VAE. Nell'autoencoder i codici formano isole dalla forma imprevedibile, e nei vuoti (dove parte il punto) il decoder dà forme incerte; nel VAE riempiono una nuvola attorno all'origine (i cerchi hanno raggio 1 e 2), e si sa dove pescare.</figcaption>
+  </figure>
+  <p>Nel VAE cambiano due cose.</p>
+  <p>La prima: l'encoder non restituisce un punto ma una <em>distribuzione</em>. Per ogni dato, e per ogni coordinata del codice, produce una media \(\mu\) e una deviazione standard \(\sigma\): descrivono una gaussiana, cioè una curva a campana centrata nella media e larga quanto la deviazione standard. Il codice viene estratto a caso da quella campana.</p>
+  <p>Il decoder riceve così, per la stessa immagine, codici ogni volta un po' diversi, e deve ricostruirla da tutti: una piccola zona intera dello spazio latente finisce per corrispondere a quell'immagine, non un punto solo.</p>
+  <p>La seconda: alla loss si aggiunge un termine che spinge ogni campana prodotta dall'encoder verso la <em>gaussiana standard</em>, quella con media zero e deviazione standard uno in ogni coordinata (si scrive \(\mathcal N(0,I)\)). La penalità si costruisce guardando in che modi una campana può essere diversa da quella standard.</p>
+  <figure data-fig="build" data-opts='{"id":"l16_vae"}'>
+    <figcaption>La loss del VAE costruita su una coordinata del codice. La curva gialla è la campana prodotta dall'encoder per un'immagine, con media 1,5 e deviazione standard 0,6; quella bianca tratteggiata è la gaussiana standard. La freccia arancione misura quanto la campana è lontana da zero, i due segmenti orizzontali ne confrontano la larghezza; sul lato i due pezzi della penalità e il loro totale.</figcaption>
+  </figure>
+  <p>Il secondo addendo ha un nome: è la <em>divergenza di Kullback-Leibler</em> (KL, in simboli \(D_{\mathrm{KL}}\)), una misura di quanto due distribuzioni differiscono. In generale non si calcola a mano; fra due gaussiane ha la formula esplicita che abbiamo appena costruito. Il primo addendo conserva l'informazione, il secondo mette ordine nello spazio latente.</p>
+  <figure data-fig="kl">
+    <figcaption>Ora prova tu, su una coordinata del codice. In giallo la campana prodotta dall'encoder, tratteggiata in bianco la gaussiana standard. Sposta media e deviazione standard: la penalità cresce sia quando la curva gialla si allontana da zero, sia quando diventa troppo stretta o troppo larga.</figcaption>
+  </figure>
+  <p>I due termini tirano in direzioni opposte, e servono entrambi. Con la sola ricostruzione l'encoder sceglierebbe una deviazione standard quasi nulla e si tornerebbe all'autoencoder normale. Con la sola KL tutte le immagini avrebbero la stessa campana, quella standard, e il decoder non potrebbe distinguerle. Insieme costringono le nuvole delle diverse immagini a stare vicine all'origine, una accanto all'altra, senza vuoti.</p>
+  <p>Cambiata di segno, questa loss si chiama ELBO (<em>evidence lower bound</em>): è un limite inferiore al logaritmo della probabilità che il modello assegna ai dati, e minimizzare la loss significa alzarlo.</p>
+  <div class="quiz" data-quiz="16b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Far passare il gradiente attraverso il caso</h2>
+  <p>C'è un ostacolo tecnico. La backpropagation deve sapere di quanto cambia l'uscita se si sposta di poco \(\mu\) o \(\sigma\). Ma fra loro e l'uscita c'è un'estrazione a caso, e «estrarre un numero» non è un'operazione che si possa derivare: non c'è una formula da seguire all'indietro.</p>
+  <p>Il <b>reparameterization trick</b> sposta il caso fuori dalla rete: il numero casuale si estrae prima, senza usare i parametri, e la rete lo riceve come un dato qualsiasi.</p>
+  <figure data-fig="build" data-opts='{"id":"l16_rep"}'>
+    <figcaption>Il trucco costruito sull'esempio delle slide, con media 5 e deviazione standard 2. Sulla prima retta la gaussiana standard (viola) e il rumore estratto, il punto viola; sulla seconda la campana voluta dall'encoder (gialla) e il codice, il punto giallo. La linea tratteggiata collega il rumore al codice che ne deriva.</figcaption>
+  </figure>
+  <p>Il codice ha la stessa distribuzione di prima, ma ora è una formula ordinaria di media e deviazione standard, con due sensibilità ben definite: rispetto alla media vale 1, rispetto alla deviazione standard vale \(\Eps\). Il gradiente può attraversarla.</p>
+  <figure data-fig="reparam">
+    <figcaption>Ora prova tu, con gli stessi numeri di partenza. Sulla prima retta il rumore estratto (viola), sulla seconda il codice che ne risulta (giallo). Cambia media e deviazione standard: il punto giallo si sposta in modo liscio, a rumore fermo. Il pulsante estrae un rumore nuovo.</figcaption>
+  </figure>
+  <p>In pratica l'encoder non produce la deviazione standard ma il logaritmo del suo quadrato, \(\log\sigma^2\). Il motivo: una deviazione standard deve essere positiva, mentre quel logaritmo può essere un numero qualsiasi, e una rete produce numeri qualsiasi. Per riavere \(\sigma\) si dimezza il logaritmo e si applica l'esponenziale.</p>
+  <h3>Generare</h3>
+  <p>Allenato il VAE, l'encoder si può mettere da parte. Per creare un dato nuovo si estrae un codice dalla gaussiana standard e lo si passa al decoder. Funziona perché la loss ha spinto i codici dei dati veri a riempire proprio quella regione.</p>
+  <figure data-fig="manifold">
+    <figcaption>Il decoder del VAE applicato a una griglia di codici. Nessuna di queste immagini è nei dati. Muovendosi nello spazio latente una cifra si trasforma gradualmente in un'altra.</figcaption>
+  </figure>
+  <p>In uno spazio così ordinato hanno senso anche le operazioni fra codici. L'esempio delle slide usa volti: codice di un uomo con gli occhiali, meno quello di un uomo senza, più quello di una donna, e il decoder restituisce una donna con gli occhiali.</p>
+  <p>Il prezzo si vede nella griglia: le immagini di un VAE sono un po' sfocate, perché ogni codice deve andare bene per più immagini vicine. Modelli generativi più recenti producono immagini più nitide; il VAE resta il punto di partenza per capirli.</p>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Autoencoder</th><th>VAE</th></tr></thead>
+    <tbody>
+      <tr><th>L'encoder produce</th><td>un vettore \(\mathbf z\)</td><td>una distribuzione: \(\boldsymbol\mu\) e \(\boldsymbol\sigma\)</td></tr>
+      <tr><th>Loss</th><td>ricostruzione</td><td>ricostruzione + KL</td></tr>
+      <tr><th>Spazio latente</th><td>irregolare, con vuoti</td><td>continuo, attorno all'origine</td></tr>
+      <tr><th>Generare dati nuovi</th><td>non affidabile</td><td>naturale: \(\mathbf z\sim\mathcal N(0,I)\)</td></tr>
+      <tr><th>Serve soprattutto per</th><td>comprimere, ripulire, trovare anomalie</td><td>generare e interpolare</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="16"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>un autoencoder impara una rappresentazione compatta perché deve ricostruire l'input attraverso una strettoia; un VAE aggiunge del caso nel codice e una penalità KL, e così ottiene uno spazio latente ordinato da cui si possono generare dati nuovi.</b></p>
+  <p>Fin qui i dati erano sempre già raccolti. Nelle ultime due lezioni chi impara deve anche decidere, e le sue decisioni determinano quali dati vedrà.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

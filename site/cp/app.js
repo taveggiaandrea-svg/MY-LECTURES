@@ -1282,17 +1282,18 @@ document.querySelectorAll('figure').forEach(f=>{
 })();
 /* ---------- Navigazione fra le lezioni: una alla volta, figure montate alla prima apertura ---------- */
 const lessons=[...document.querySelectorAll('.lesson')],links=[...document.querySelectorAll('.top nav a')];
-const LAST=lessons.length,done={};
-lessons.forEach(l=>{
-  const n=+l.dataset.n,nav=l.querySelector('.navend');if(!nav)return;
-  const card=(m,cls,lab)=>{const t=lessons[m-1].dataset.title;
+/* le lezioni si cercano per numero (data-n), così una materia può cominciare da una lezione 0 */
+const NUMS=lessons.map(l=>+l.dataset.n),byN=n=>lessons[NUMS.indexOf(n)],done={};
+lessons.forEach((l,i)=>{
+  const nav=l.querySelector('.navend');if(!nav)return;
+  const card=(m,cls,lab)=>{const t=byN(m).dataset.title;
     return '<a class="'+cls+'" href="#lezione-'+m+'" data-go="'+m+'"><span class="th" aria-hidden="true">'+(THUMB[m]||'')+'</span><span class="tx"><small>'+lab+'</small>'+m+' · '+t+'</span></a>'};
-  nav.innerHTML=(n>1?card(n-1,'prev',UI.prev):'')+(n<LAST?card(n+1,'next',UI.next):'');
+  nav.innerHTML=(i>0?card(NUMS[i-1],'prev',UI.prev):'')+(i<NUMS.length-1?card(NUMS[i+1],'next',UI.next):'');
 });
 function show(n,scroll){
   lessons.forEach(l=>{l.hidden=+l.dataset.n!==n});
   links.forEach(a=>{if(+a.dataset.go===n){a.setAttribute('aria-current','page');try{a.scrollIntoView({block:'nearest',inline:'nearest'})}catch(_){}}else a.removeAttribute('aria-current')});
-  if(!done[n]){done[n]=true;const art=lessons[n-1];
+  if(!done[n]){done[n]=true;const art=byN(n);
     renderMath(art);
     try{if(INIT[n])INIT[n]()}catch(e){console.error(e)}
     art.querySelectorAll('[data-quiz]').forEach(q=>{const f=QZ[q.dataset.quiz];if(f)quiz(q,f())});
@@ -1305,7 +1306,7 @@ document.addEventListener('click',e=>{
   try{history.replaceState(null,'','#lezione-'+n)}catch(_){}
   show(n,true);
 });
-(function(){const m=location.hash.match(/lezione-(\d+)/);show(m?clamp(+m[1],1,LAST):1,false)})();
+(function(){const m=location.hash.match(/lezione-(\d+)/);show(m&&NUMS.includes(+m[1])?+m[1]:NUMS[0],false)})();
 renderMath(document.querySelector('footer'));
 
 /* ---------- Ask AI: domande a Gemini sulla lezione aperta; la chiave resta solo in questo browser ---------- */

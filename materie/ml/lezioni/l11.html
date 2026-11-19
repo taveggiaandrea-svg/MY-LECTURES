@@ -1,0 +1,105 @@
+<article class="lesson" data-n="11" id="lezione-11" data-title="Che cosa sa fare un solo neurone?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 11</p>
+  <h1>Che cosa sa fare un solo neurone?</h1>
+  <p class="desc">Due modi opposti di classificare: guardare i vicini (k-NN) oppure imparare una retta un errore alla volta, come fa il perceptron, il mattone delle reti neurali.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Limoni e arance, descritti da due numeri: larghezza e altezza. Le arance sono quasi tonde, i limoni più alti che larghi. Per decidere che cos'è un frutto nuovo ci sono due strade. La prima è tracciare un confine, come nelle lezioni 7 e 8. La seconda non costruisce nessun confine: cerca fra i frutti già noti quelli più simili al nuovo.</p>
+  <p>È il metodo <b>k-NN</b> (<em>k nearest neighbors</em>) incontrato nella lezione 1. Non ha parametri da imparare: «allenarlo» significa soltanto conservare i dati. Per classificare un punto si trovano i \(\Kk\) punti di training più vicini e si prende la classe più frequente fra loro.</p>
+  <figure data-fig="voronoi">
+    <figcaption>Lo sfondo è la classe che k-NN assegnerebbe a ogni punto del piano. Fra i dati c'è un limone anomalo, finito in mezzo alle arance: un'etichetta sbagliata o un frutto strano.</figcaption>
+  </figure>
+  <p>Con \(\Kk=1\) il piano si divide in celle, una per ogni punto di training: la cella contiene tutte le posizioni più vicine a quel punto che a qualunque altro. Questo disegno si chiama <em>diagramma di Voronoi</em>, e il confine fra le classi è fatto dai bordi fra celle di classe diversa. Il risultato è un confine molto flessibile, ma un solo dato sbagliato basta a creare un'isola di errori. Facendo votare più vicini, il dato anomalo viene messo in minoranza.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quanti vicini</h2>
+  <p>\(\Kk\) è un iperparametro. Se è troppo piccolo il modello insegue il rumore. Se è troppo grande finisce per interrogare punti lontani, che con il punto da classificare non c'entrano più.</p>
+  <figure data-fig="kchoice">
+    <figcaption>Un problema con un confine curvo e qualche etichetta sbagliata. L'errore di training è minimo con \(\Kk=1\), perché ogni punto è il vicino di se stesso; quello di validation ha il minimo altrove.</figcaption>
+  </figure>
+  <p>Il valore giusto si sceglie con un validation set o con la cross-validation (lezione 5). Con due classi conviene un \(\Kk\) dispari, così il voto non finisce mai in parità.</p>
+  <div class="quiz" data-quiz="11a"></div>
+  <h3>Quando funziona, e quanto costa</h3>
+  <p>Con molti dati k-NN funziona sorprendentemente bene. Sul dataset MNIST, 60 000 immagini di cifre scritte a mano da 28 × 28 pixel, batte un classificatore lineare e si avvicina a metodi molto più elaborati.</p>
+  <figure data-fig="mnisterr">
+    <figcaption>Errori di test su MNIST riportati nelle slide. Le barre grigie sono altri metodi, per confronto: un classificatore lineare, la SVM con kernel della lezione 9 e due reti neurali, che incontreremo dalla prossima lezione. Le versioni di k-NN migliorano cambiando solo il modo di misurare la distanza fra due immagini.</figcaption>
+  </figure>
+  <p>I suoi limiti sono tre. È sensibile alle etichette sbagliate, come abbiamo visto. È lento al momento di prevedere: per ogni punto nuovo bisogna calcolare la distanza da tutti i dati, e il costo cresce con il loro numero (strutture come i <em>k-d tree</em> accelerano la ricerca, ma non fanno miracoli). E soffre quando le features sono molte.</p>
+  <figure data-fig="curse">
+    <figcaption>Duecento punti presi a caso e un punto di riferimento. In alto le loro distanze dal riferimento, in proporzione a quella del più lontano. In basso il rapporto fra la distanza del più vicino e quella del più lontano.</figcaption>
+  </figure>
+  <p>Con poche features il più vicino è davvero vicino. Con centinaia, tutti i punti finiscono quasi alla stessa distanza: «il più vicino» è appena più vicino del più lontano, e smette di essere un'informazione utile.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Un modello ispirato al cervello</h2>
+  <p>L'altra strada è imparare un confine. Il modello da cui partono le reti neurali è una semplificazione estrema di un neurone biologico. Il cervello umano ne contiene circa 86 miliardi, e simularlo resta fuori portata: perfino del verme <em>C. elegans</em>, che di neuroni ne ha 302 e di cui si conoscono tutti i collegamenti, non esiste ancora un modello funzionante. Ci si accontenta di imitare il principio.</p>
+  <p>Un neurone riceve segnali da altri neuroni attraverso i <em>dendriti</em>, li somma nel corpo cellulare dando a ciascuno un peso diverso, e se la somma supera una soglia emette un impulso lungo l'<em>assone</em>, che diventa a sua volta input per altri neuroni. La risposta è «tutto o niente».</p>
+  <figure data-fig="allornone">
+    <figcaption>Sotto la soglia il neurone tace. Sopra la soglia emette impulsi sempre della stessa ampiezza: uno stimolo più forte non produce un impulso più grande.</figcaption>
+  </figure>
+  <p>Togliendo tutta la biologia resta uno schema in quattro passi: input, pesi, somma, output. Ogni pezzo risponde a qualcosa che il neurone vero fa. Lo costruiamo un pezzo alla volta, su un neurone con tre input.</p>
+  <figure data-fig="build" data-opts='{"id":"l11_neuron"}'>
+    <figcaption>I cerchi blu sono i tre input, il cerchio bianco è il neurone, quello verde l'output. I collegamenti gialli hanno peso positivo, quello rosso peso negativo; lo spessore è il contributo di quell'input alla somma. Dentro il neurone il numero cambia a ogni pezzo aggiunto: prima la somma pesata, poi la somma più il bias.</figcaption>
+  </figure>
+  <p>Riletto a parole: ogni input ha un peso, che rappresenta la forza del collegamento. Il neurone calcola la somma pesata più una costante, il <em>bias</em>, e risponde 1 se il risultato è positivo, 0 altrimenti. Il risultato \(a\) si chiama <em>attivazione</em>; la funzione \(f\) che la trasforma in output è la <em>funzione di attivazione</em>, qui un gradino. Ora cambia tu gli input.</p>
+  <figure data-fig="neuron">
+    <figcaption>Lo stesso neurone: tre input che puoi regolare, tre pesi fissi (uno negativo, in rosso) e un bias. Lo spessore di ogni collegamento è il contributo di quell'input alla somma; l'output diventa verde quando l'attivazione supera lo zero.</figcaption>
+  </figure>
+  <p>Questo modello è il <b>perceptron</b>. Visto dal machine learning non è nulla di nuovo: «somma pesata più bias, maggiore di zero» è il classificatore lineare delle lezioni 7 e 8. Il confine è la retta dei punti con attivazione esattamente zero; il vettore dei pesi \(\Wv\) le è perpendicolare, e il bias la allontana dall'origine.</p>
+  <p>Spesso le due classi si indicano con +1 e −1 invece che con 1 e 0. Allora al posto del gradino si usa la funzione segno, \(\operatorname{sgn}\), che vale +1 per argomenti positivi e −1 altrimenti:</p>
+  <div class="math-block">\[\Yy=\operatorname{sgn}(\Wv^\top\Xv+\Bi)\]</div>
+  <p>Qui \(\Wv^\top\Xv\) è la somma pesata scritta in modo compatto: pesi e input raccolti in due vettori, moltiplicati componente per componente e sommati.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Imparare dagli errori</h2>
+  <p>La novità sta in come si trovano i pesi. Per comodità si ingloba il bias nei pesi: a ogni dato si aggiunge un input costante uguale a 1, e il suo peso \(\Ws_0\) fa da bias. Così c'è un solo vettore \(\Wv\) da correggere, e il <em>punteggio</em> di un punto è semplicemente la somma dei pesi per i suoi input.</p>
+  <p>Poi si parte da pesi qualsiasi e si ripete: si prende un esempio, con il suo input \(\Xv_k\) e la sua classe \(\Yy_k\); se è classificato bene non si fa nulla; se è classificato male si correggono i pesi. Come? Costruiamo la correzione su un punto dell'esempio delle slide.</p>
+  <figure data-fig="build" data-opts='{"id":"l11_update"}'>
+    <figcaption>I punti arancioni sono di classe +1, i blu di classe −1; la retta bianca è il confine e la zona colorata è quella in cui si prevede +1. La freccia gialla è il vettore dei pesi, quella blu l'input del punto cerchiato. La freccia bianca è la correzione intera, quella arancione la stessa correzione accorciata dal learning rate. Il cerchio passa da rosso a verde quando il punto finisce dalla parte giusta.</figcaption>
+  </figure>
+  <p>Riletta a parole: ai pesi si somma l'input del punto sbagliato, girato dalla parte della sua classe e accorciato dal <em>learning rate</em> \(\Et\). Per un esempio di classe +1 con punteggio negativo succede l'opposto di quanto visto: l'input si somma e il punteggio cresce di \(\Et\lVert\Xv_k\rVert^2\), cioè learning rate per lunghezza al quadrato dell'input. In entrambi i casi il confine ruota verso la parte giusta. Ci si ferma quando tutti gli esempi sono classificati bene.</p>
+  <div class="quiz" data-quiz="11b"></div>
+  <figure data-fig="plearn">
+    <figcaption>L'esempio svolto nelle slide, per intero: sei punti, learning rate 0,2, pesi iniziali (0; 1; 0,5) con il bias al primo posto. A ogni passo viene esaminato il punto cerchiato, in verde se è classificato bene e in rosso se è sbagliato; la zona colorata è quella in cui si prevede +1 e la freccia gialla è il vettore dei pesi.</figcaption>
+  </figure>
+  <p>Tre correzioni bastano. Nota che ogni correzione può rovinare la classificazione di altri punti: l'algoritmo non migliora a ogni passo, eppure arriva in fondo.</p>
+  <h3>Arriva sempre in fondo?</h3>
+  <p>Sì, se i dati sono linearmente separabili (cioè se esiste un confine dritto che li classifica tutti bene, lezione 8), e si può dire anche in quanti errori al massimo.</p>
+  <p>Servono due misure. La prima dice quanto i dati sono sparsi: supponi che tutti i punti stiano entro una distanza \(R\) dall'origine. La seconda dice quanto le classi sono staccate: supponi che esista un confine dritto che le separa tenendo ogni punto ad almeno una distanza \(\Gk\) da sé. Questa distanza è il <em>margine</em>. Allora il perceptron commette al più</p>
+  <div class="math-block">\[\frac{R^2}{\Gk^2}\ \text{ errori.}\]</div>
+  <details class="rev"><summary>L'ipotesi sul margine in formule</summary><div class="in">
+    <p>Esiste un vettore \(\Wv^*\) di lunghezza 1 tale che \(\Yy_t(\Wv^{*\top}\Xv_t)\ge\Gk\) per ogni punto \(t\): ogni punto sta dalla parte giusta del confine definito da \(\Wv^*\), a distanza almeno \(\Gk\).</p>
+  </div></details>
+  <p>Dopo l'ultimo errore i pesi non cambiano più e classificano bene tutto il training set. Il limite non dipende dal numero di dati né dal numero di features: conta solo quanto le classi sono staccate rispetto a quanto i dati sono sparsi.</p>
+  <figure data-fig="pbound">
+    <figcaption>Avvicina le due classi: il margine \(\Gk\) si riduce, il limite cresce, e crescono anche gli errori che il perceptron commette prima di fermarsi. Gli errori veri restano sempre sotto il limite.</figcaption>
+  </figure>
+  <h3>Dove un solo neurone non arriva</h3>
+  <p>Se i dati non sono separabili, l'algoritmo non si ferma mai. L'esempio classico è la funzione XOR, che vale 1 quando esattamente uno dei due input vale 1.</p>
+  <figure data-fig="xor">
+    <figcaption>I quattro casi dello XOR: i punti arancioni hanno output 1, i blu 0. Prova tutte le rette che vuoi.</figcaption>
+  </figure>
+  <p>Un secondo esempio dalle slide, più vicino ai problemi reali. Due motivi, A e B, disegnati su una striscia di 16 caselle che si richiude su se stessa. Si vuole riconoscere A da B ovunque si trovi lungo la striscia, come si vorrebbe riconoscere un oggetto ovunque compaia in un'immagine.</p>
+  <figure data-fig="shiftpat">
+    <figcaption>In alto i due motivi, traslati della quantità scelta. In basso la media di ciascun motivo su tutte le 16 traslazioni possibili.</figcaption>
+  </figure>
+  <p>Le due medie sono identiche: ogni casella vale ¼. Ora, un classificatore lineare che desse punteggio positivo a tutte le traslazioni di A lo darebbe anche alla loro media, perché il punteggio di una media è la media dei punteggi. Per la stessa ragione dovrebbe dare punteggio negativo alla media delle traslazioni di B. Ma è lo stesso vettore: contraddizione. Nessun classificatore lineare risolve il problema.</p>
+  <p>Un neurone, da solo, sa fare soltanto tagli dritti. Per questi problemi servono più neuroni collegati fra loro, con uno strato intermedio fra input e output.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="11"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>il perceptron è un classificatore lineare che corregge i pesi solo quando sbaglia; se i dati sono separabili si ferma dopo al più \(R^2/\Gk^2\) errori, altrimenti non ce la fa.</b></p>
+  <p>La regola del perceptron funziona per un neurone con il gradino. Per collegare molti neuroni e allenarli tutti insieme serve un'altra idea: sostituire il gradino con una funzione derivabile e usare il gradient descent. È l'argomento della prossima lezione.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

@@ -1,0 +1,8 @@
+{
+  "titolo": "30412 Machine Learning",
+  "breve": "Machine Learning",
+  "descrizione": "Dal costo e dall'ottimizzazione ai minimi quadrati, bias e varianza, regolarizzazione, classificazione, SVM e kernel, alberi, reti neurali, PCA, clustering, autoencoder, bandits e reinforcement learning.",
+  "fonte": "A. Celli, slide e dispense di 30412 Machine Learning (Bocconi)",
+  "ordine": 4,
+  "miniatura": 12
+}

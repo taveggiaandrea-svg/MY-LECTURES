@@ -1,0 +1,130 @@
+<article class="lesson" data-n="12" id="lezione-12" data-title="Come impara una rete di neuroni?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 12</p>
+  <h1>Come impara una rete di neuroni?</h1>
+  <p class="desc">Il multilayer perceptron: perché servono più strati, che cosa fanno le funzioni di attivazione, e come la backpropagation calcola tutte le derivate in un colpo.</p>
+</div></section>
+
+<section><div class="col">
+  <p>La lezione 11 si è chiusa su un fallimento: un neurone solo non sa calcolare lo XOR. Ma i neuroni si possono collegare. Mettiamone due in mezzo, fra gli input e l'output, e scegliamo i pesi a mano.</p>
+  <figure data-fig="xornet">
+    <figcaption>Due neuroni «nascosti» \(h_1\) e \(h_2\), ciascuno con la sua retta, e un neurone di output che li combina. Tutti e tre usano il gradino. Scegli un input e segui il calcolo.</figcaption>
+  </figure>
+  <p>Il primo neurone nascosto si accende se almeno un input vale 1; il secondo solo se valgono 1 entrambi. L'output si accende quando il primo è acceso e il secondo no: esattamente lo XOR. Ognuno dei tre fa un taglio dritto, ma insieme ritagliano una fascia.</p>
+  <p>C'è un secondo modo di leggere la stessa rete. I due neuroni nascosti trasformano ogni input \((\Xs_1,\Xs_2)\) in una nuova coppia di numeri \((h_1,h_2)\). In queste nuove coordinate il problema diventa facile.</p>
+  <figure data-fig="featspace">
+    <figcaption>I quattro punti dello XOR, prima nelle coordinate degli input e poi in quelle delle unità nascoste.</figcaption>
+  </figure>
+  <p>È la stessa idea delle feature map delle lezioni 4 e 9: cambiare coordinate finché basta un classificatore lineare. La differenza è che lì le nuove features si sceglievano a mano; qui sono neuroni, con pesi che si possono imparare. <b>Una rete impara insieme le features e il classificatore che le usa.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Com'è fatta una rete</h2>
+  <p>Le unità si organizzano in <em>strati</em>. Lo strato di input contiene le features; quello di output dà la previsione; in mezzo stanno uno o più <b>strati nascosti</b>. I collegamenti vanno solo in avanti, da uno strato al successivo: per questo si parla di rete <em>feed-forward</em>. Se ogni unità è collegata a tutte quelle dello strato precedente, lo strato si dice <em>fully connected</em>, e una rete fatta così è un <b>multilayer perceptron</b> (MLP).</p>
+  <figure data-fig="mlpdiag">
+    <figcaption>Un MLP con tre input e due output. Ogni linea è un peso; ogni unità nascosta o di output ha anche un bias.</figcaption>
+  </figure>
+  <p>Che cosa calcola uno strato? Ogni sua unità fa una somma pesata di tutti gli input, aggiunge il proprio bias e passa il risultato in una funzione, la <em>funzione di attivazione</em>, che indichiamo con \(\phi\). I pesi di uno strato sono tanti: conviene raccoglierli in una tabella \(W\), con una riga per ogni unità e una colonna per ogni input, e mettere i bias in una colonna \(\mathbf{b}\). Così tutto lo strato si scrive in una riga:</p>
+  <div class="math-block">\[\phi(W\Xv+\mathbf{b})\]</div>
+  <p>Si legge da dentro a fuori: prima le somme pesate di tutte le unità, poi i bias, infine l'attivazione applicata a ciascun risultato. Se gli input sono \(N\) e le unità \(M\), la tabella ha tante righe quante sono le unità e tante colonne quanti sono gli input. La rete intera è la composizione dei suoi strati: l'output del primo è l'input del secondo, e così via.</p>
+  <h3>Le funzioni di attivazione</h3>
+  <p>Il gradino della lezione 11 ha un difetto: è piatto ovunque, quindi la sua derivata è zero e il gradient descent non ha nulla a cui aggrapparsi. Nelle reti lo si sostituisce con funzioni derivabili. Le più usate sono la logistica \(\sigma(a)=1/(1+e^{-a})\) della lezione 7; la tangente iperbolica, che ha la stessa forma ma va da −1 a 1; e la ReLU, \(\max(0,a)\): zero per input negativi, l'identità per quelli positivi.</p>
+  <figure data-fig="activ">
+    <figcaption>Le funzioni di attivazione delle slide. In ascissa la somma pesata \(a\), in ordinata l'output dell'unità.</figcaption>
+  </figure>
+  <p>La logistica è una versione morbida del gradino, e moltiplicando pesi e bias per un fattore \(\beta\) grande la si può avvicinare al gradino quanto si vuole. Quello che si poteva fare con i gradini si può quindi rifare con unità derivabili.</p>
+  <figure data-fig="beta">
+    <figcaption>\(\sigma(\beta a)\) al crescere di \(\beta\): la salita diventa sempre più ripida.</figcaption>
+  </figure>
+  <p>Una sola scelta è vietata: l'attivazione lineare negli strati nascosti. Se ogni strato si limita a moltiplicare per la sua tabella di pesi, la rete moltiplica l'input per una tabella dopo l'altra, \(W^{(L)}\cdots W^{(1)}\Xv\). Ma il prodotto di tante tabelle è ancora una sola tabella: cento strati lineari valgono quanto uno.</p>
+  <figure data-fig="linstack">
+    <figcaption>Due reti con gli stessi pesi casuali, un input, due strati nascosti da quattro unità e un output. Cambia solo l'attivazione.</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="12a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Che cosa può rappresentare</h2>
+  <p>Con attivazioni non lineari, moltissimo. Il <b>teorema di approssimazione universale</b> dice che una rete con un solo strato nascosto può approssimare qualunque funzione continua su una regione limitata, con la precisione che si vuole, purché abbia abbastanza unità. La forma della rete è una somma di unità nascoste, ciascuna con il suo peso di uscita:</p>
+  <div class="math-block">\[h(\Xv)=\sum_{j=1}^{k}\Ws_j^{\text{out}}\,\sigma(\Wv_j^\top\Xv+\Bi_j)\]</div>
+  <p>Dentro la \(\sigma\) c'è un neurone qualsiasi: somma pesata degli input più bias. Fuori, i \(k\) neuroni vengono moltiplicati ciascuno per il proprio peso di uscita e sommati.</p>
+  <figure data-fig="univ">
+    <figcaption>Ogni unità nascosta contribuisce con un gradino morbido, posto in un punto diverso e moltiplicato per il suo peso di uscita. Sommandoli si costruisce la curva.</figcaption>
+  </figure>
+  <p>Il teorema va letto con cautela. Dice che una rete adatta <em>esiste</em>, ma non quante unità servono, né come trovare i pesi, né se una data architettura ci riuscirà. In pratica si è visto che aggiungere strati aumenta molto ciò che una rete può rappresentare, a parità di parametri.</p>
+  <p>Il prezzo di questa potenza è la convessità. Per i modelli lineari il costo aveva un solo minimo; per una rete no. Rispetto ai classificatori lineari si guadagna in espressività e si perde la garanzia di trovare il minimo globale.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Come si calcolano le derivate</h2>
+  <p>Si allena una rete come ogni altro modello: si sceglie una loss derivabile, per esempio la quadratica \(\cl=\tfrac12(\Yy-\Yh)^2\), e si scende lungo il gradiente del costo medio. Per farlo serve, per ogni peso di ogni strato, un numero: di quanto cambia il costo se sposto quel peso di poco. Con milioni di pesi, provare a spostarli uno alla volta è impensabile.</p>
+  <p>La <b>backpropagation</b> calcola tutti questi numeri insieme. Per capire come, partiamo dalla rete più semplice che esista: tre unità in fila, una per strato, e un solo esempio con input 1 e risposta giusta 1. I pesi sono due, 0,4 e 1,5; il bias per ora lo lasciamo da parte. Cominciamo dal fondo e chiediamoci da che cosa dipende il costo.</p>
+  <figure data-fig="build" data-opts='{"id":"l12_dep"}'>
+    <figcaption>La catena delle dipendenze, costruita a ritroso dal costo. Ogni casella è una quantità con il suo valore su questo esempio: in giallo il peso, in blu l'output dell'unità precedente, in bianco la somma pesata e l'output dell'ultima unità, in verde la risposta giusta, in rosa il costo. Le frecce dicono chi dipende da chi. Nell'ultimo passo il peso sale da 1,5 a 1,6: segui la spinta mentre attraversa le caselle una dopo l'altra.</figcaption>
+  </figure>
+  <p>D'ora in poi usiamo questi nomi. Per ogni unità, \(a\) è la somma pesata dei suoi input e \(z=\sigma(a)\) è il suo output: la logistica applicata alla somma. Il numero fra parentesi in alto indica lo strato: \(z^{(0)}\) è l'input della rete.</p>
+  <p>La catena suggerisce la scorciatoia. Il peso muove la somma pesata, la somma muove l'output, l'output muove il costo. Se di ogni anello so quanto amplifica o smorza una piccola spinta, mi basta moltiplicare i tre numeri. È la regola della catena.</p>
+  <figure data-fig="build" data-opts='{"id":"l12_sens"}'>
+    <figcaption>Una spinta di 0,1 al peso segue la catena. Sopra ogni freccia, in arancione, il fattore per cui la spinta viene moltiplicata in quel passaggio; sotto ogni casella, di quanto si sposta quella quantità (la barra ne dà la misura; in rosa quando lo spostamento è negativo). Nella formula ogni frazione è una di queste sensibilità, e sotto c'è quanto vale. La stima finale, un costo più basso di 0,0036, è vicina al calo di 0,0035 ottenuto prima rifacendo tutti i conti: l'accordo migliora quanto più la spinta è piccola.</figcaption>
+  </figure>
+  <p>Il risultato si legge così: <b>errore dell'unità di arrivo per output dell'unità di partenza</b>. Il segnale di errore \(\delta\) di un'unità dice quanto cambia la loss se cambia la sua somma pesata, e non dipende dal peso che stiamo guardando.</p>
+  <p>Resta il peso del primo strato. La sua catena è più lunga, ma l'ultimo tratto è lo stesso che abbiamo appena percorso: non serve rifarlo, basta riprendere il \(\delta\) dell'ultima unità e portarlo indietro di uno strato.</p>
+  <figure data-fig="build" data-opts='{"id":"l12_back"}'>
+    <figcaption>La stessa rete disegnata come tre unità in fila; dentro ogni cerchio la somma pesata \(a\) e l'output \(z\), sui collegamenti i pesi in giallo. Le frecce rosa vanno all'indietro: il segnale di errore dell'ultima unità viene moltiplicato per il peso del collegamento e per la pendenza della logistica, e diventa il segnale di errore dell'unità nascosta. In verde acqua le due derivate ottenute.</figcaption>
+  </figure>
+  <h3>Con più unità per strato</h3>
+  <p>In una rete vera ogni strato ha molte unità, e servono gli indici: \(l\) per lo strato, \(j\) per l'unità che riceve, \(i\) per quella che manda, che sta nello strato precedente. Il peso che le collega si scrive \(\Ws_{ji}^{(l)}\). La somma pesata di un'unità raccoglie gli output di tutte le unità dello strato prima, ciascuno con il suo peso:</p>
+  <div class="math-block">\[a_j^{(l)}=\sum_i \Ws_{ji}^{(l)}\,z_i^{(l-1)}\]</div>
+  <p>Gli input della rete sono \(z^{(0)}=\Xv\), e il bias è inglobato nei pesi con un input costante \(z_0=1\), come nella lezione 11.</p>
+  <p>Il <em>segnale di errore</em> si definisce come prima, uno per unità: \(\delta_j^{(l)}=\partial\cl/\partial a_j^{(l)}\). E la regola per le derivate non cambia, perché un peso influenza la loss solo attraverso la somma pesata dell'unità in cui arriva:</p>
+  <div class="math-block">\[\frac{\partial\cl}{\partial \Ws_{ji}^{(l)}}=\delta_j^{(l)}\,z_i^{(l-1)}\]</div>
+  <p>Cambia solo il passo all'indietro. Un'unità nascosta ora manda il suo output a tutte le unità dello strato successivo, e ognuna le rimanda il proprio errore attraverso il peso che le collega. Questi contributi si sommano, e poi si moltiplica per la pendenza della logistica, come prima:</p>
+  <div class="math-block">\[\delta_j^{(l)}=\sigma'\big(a_j^{(l)}\big)\sum_k \Ws_{kj}^{(l+1)}\,\delta_k^{(l+1)}\]</div>
+  <p>Si parte dal fondo. Nell'esempio qui sotto l'output \(\Yh\) è lineare, senza logistica: il fattore della pendenza vale 1 e il suo segnale di errore è semplicemente \(\delta=-(\Yy-\Yh)\), previsione meno risposta giusta.</p>
+  <figure data-fig="backprop">
+    <figcaption>Ora la stessa cosa su una rete con due input, due unità nascoste e un output lineare. Prima il passaggio in avanti (blu), in cui si calcolano e si conservano tutti gli \(a\) e gli \(z\); poi quello all'indietro (rosa), in cui si calcolano i \(\delta\) e da questi le derivate (verde acqua); infine un passo di discesa, in cui i pesi gialli si spostano.</figcaption>
+  </figure>
+  <details class="rev"><summary>Da dove viene la formula ricorsiva</summary>
+    <p>La loss dipende da \(a_j^{(l)}\) solo attraverso le somme pesate \(a_k^{(l+1)}\) dello strato successivo. Per la regola della catena, \(\delta_j^{(l)}=\sum_k \frac{\partial\cl}{\partial a_k^{(l+1)}}\frac{\partial a_k^{(l+1)}}{\partial a_j^{(l)}}=\sum_k\delta_k^{(l+1)}\frac{\partial a_k^{(l+1)}}{\partial a_j^{(l)}}\). Poiché \(a_k^{(l+1)}=\sum_c \Ws_{kc}^{(l+1)}\sigma(a_c^{(l)})\), l'ultima derivata vale \(\Ws_{kj}^{(l+1)}\sigma'(a_j^{(l)})\). Sostituendo si ottiene la formula.</p>
+  </details>
+  <p>Un passaggio in avanti e uno all'indietro bastano per avere tutte le derivate: il costo è paragonabile a quello di calcolare l'output. È questo che rende allenabili reti con milioni di pesi.</p>
+  <figure data-fig="bptrain">
+    <figcaption>Una rete con quattro unità nascoste allenata con la backpropagation su un problema di tipo XOR: due classi disposte a scacchiera.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Un costo pieno di buche</h2>
+  <p>Il gradient descent si ferma dove il gradiente è zero. Un punto così si chiama <em>stazionario</em>, e non è necessariamente un minimo.</p>
+  <figure data-fig="saddle">
+    <figcaption>I tre tipi di punto stazionario di una funzione di due variabili. Nel punto di sella il costo sale in una direzione e scende in un'altra.</figcaption>
+  </figure>
+  <p>Con un costo convesso l'unico punto stazionario è il minimo globale, e nella lezione 2 avevamo visto che con uno step size abbastanza piccolo il costo scende a ogni passo fino a raggiungerlo. Il costo di una rete ha invece molti minimi locali e punti di sella, e dove si arriva dipende da dove si parte.</p>
+  <figure data-fig="inits">
+    <figcaption>Ogni linea è un allenamento della stessa rete da pesi iniziali diversi. Alcuni scendono fino in fondo, altri si fermano prima.</figcaption>
+  </figure>
+  <h3>Gradienti stimati su pochi esempi</h3>
+  <p>Il gradiente esatto è una media su tutti i dati: con dataset grandi ogni singolo passo costa troppo. Come nella lezione 2, lo si stima su un sottoinsieme estratto a caso, il <b>mini-batch</b>, di \(m\) esempi. Con \(m\) piccolo ogni passo costa poco ma la stima è rumorosa; con \(m\) grande è il contrario.</p>
+  <figure data-fig="minibatch">
+    <figcaption>Un problema di regressione con 256 dati. In giallo il costo usando mini-batch della dimensione scelta; tratteggiato quello che si ottiene usando tutti i dati a ogni passo.</figcaption>
+  </figure>
+  <p>Quanto allo step size: se è troppo grande il costo diverge. Una regola pratica delle slide è trovare il valore a cui comincia a divergere e usarne circa la metà.</p>
+  <h3>Fermarsi prima</h3>
+  <p>Una rete con molti parametri, allenata a lungo, finisce per imparare anche il rumore. Il rimedio più semplice è tenere d'occhio l'errore su un validation set durante l'allenamento e fermarsi quando smette di scendere: <b>early stopping</b>.</p>
+  <figure data-fig="earlystop">
+    <figcaption>Una rete con 24 unità nascoste allenata su 14 punti rumorosi. L'errore di training continua a scendere; quello di validation tocca un minimo e poi risale.</figcaption>
+  </figure>
+  <p>Fermarsi presto ha un effetto simile alla multa ridge della lezione 6: i pesi non fanno in tempo a diventare grandi. Le due cose si possono anche combinare, aggiungendo al costo il termine \(\tfrac{\Rl}{2}\lVert\Wv\rVert^2\), dove \(\Rl\) regola la forza della penalità come nella lezione 6.</p>
+  <p>Resta un dettaglio: finora l'output era uno solo. Con \(K\) classi, come le dieci cifre di MNIST, la soluzione più semplice è «uno contro tutti»: \(K\) output, ciascuno allenato a dire sì o no per la propria classe. Ce n'è una migliore, ed è l'argomento della prossima lezione.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="12"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>una rete è una composizione di strati non lineari che impara le proprie features; la backpropagation ne calcola tutte le derivate con un passaggio in avanti e uno all'indietro, e il gradient descent fa il resto, senza garanzia di minimo globale.</b></p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

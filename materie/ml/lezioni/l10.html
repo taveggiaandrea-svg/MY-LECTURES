@@ -1,0 +1,123 @@
+<article class="lesson" data-n="10" id="lezione-10" data-title="Come si sceglie la domanda giusta?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 10</p>
+  <h1>Come si sceglie la domanda giusta?</h1>
+  <p class="desc">Entropia e alberi di decisione: misurare l'incertezza in bit, scegliere la domanda che la riduce di più, e combinare molti alberi in una foresta.</p>
+</div></section>
+
+<section><div class="col">
+  <p>I modelli delle lezioni da 3 a 9 cercano tutti dei pesi. Un <b>albero di decisione</b> funziona in un altro modo: classifica un dato facendogli una serie di domande semplici, una dopo l'altra, come nel gioco in cui si indovina un personaggio con domande a cui si risponde sì o no.</p>
+  <figure data-fig="treeidea">
+    <figcaption>Sedici dati di due classi. Il primo nodo, la <em>radice</em>, li contiene tutti. Ogni domanda divide un nodo in due <em>nodi figli</em>. I nodi in fondo, che non vengono più divisi, sono le <em>foglie</em>.</figcaption>
+  </figure>
+  <p>Per classificare un dato nuovo lo si fa scendere dalla radice a una foglia seguendo le risposte, e si prevede la classe più numerosa in quella foglia. Una buona domanda, quindi, è una che produce figli meno mescolati del padre.</p>
+  <p>Per scegliere fra due domande serve un numero che misuri <em>quanto</em> un gruppo è mescolato. Il candidato più ovvio, la quota di punti in minoranza, non basta: una domanda può rendere i figli molto più puri senza cambiare quella quota, e sembrerebbe inutile. Una misura più sensibile viene dalla teoria dell'informazione.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quanta informazione porta un evento</h2>
+  <p>«Domani sorge il sole» non ti dice nulla che non sapessi. «Domani nevica a Palermo» ti dice molto. Più un evento è improbabile, più apprenderlo è informativo.</p>
+  <p>Vogliamo trasformare questa idea in un numero: quanta informazione porta un evento \(x\), sapendo solo la sua probabilità \(P(x)\). Lo costruiamo con gli eventi più semplici che ci sono, i lanci di una moneta.</p>
+  <figure data-fig="build" data-opts='{"id":"l10_bit"}'>
+    <figcaption>Tre eventi sempre più rari: una testa, due teste di fila, tre teste di fila (le monete gialle). Le barre grigie sono l'inverso della probabilità; quando entra il logaritmo diventano rosa e misurano i bit. Le altezze passano da 2, 4, 8 a 1, 2, 3.</figcaption>
+  </figure>
+  <p>Riletta a parole: il <b>contenuto informativo</b> di un evento è il logaritmo in base 2 di «uno su la sua probabilità», e si misura in <b>bit</b>. Un evento certo porta zero bit; uno che ha probabilità ½, come l'esito di una moneta, porta esattamente un bit. Ora prova tu con una probabilità qualsiasi.</p>
+  <figure data-fig="surprise">
+    <figcaption>La curva rosa è il contenuto informativo in funzione della probabilità; il punto giallo è l'evento che scegli con il cursore, i punti bianchi tre esempi. Verso probabilità 1 ci sono gli eventi quasi certi, che non sorprendono; verso probabilità 0 la curva sale senza limite.</figcaption>
+  </figure>
+  <h3>Perché proprio il logaritmo</h3>
+  <p>Il logaritmo non è una scelta fra tante: si può dimostrare che è l'unica sensata. Basta chiedere quattro cose a una misura dell'informazione. Che un evento certo valga zero. Che eventi meno probabili valgano di più. Che la misura sia continua, cioè che probabilità quasi uguali diano valori quasi uguali. E che l'informazione di due eventi indipendenti si sommi.</p>
+  <p>L'ultima richiesta è quella decisiva, ed è quella vista con le monete: le probabilità di eventi indipendenti si moltiplicano, e la funzione che trasforma i prodotti in somme è il logaritmo. Resta libera solo la base, che fissa l'unità di misura: con la base 2 l'unità è il bit.</p>
+  <details class="rev"><summary>Le quattro richieste in formule</summary><div class="in">
+    <p>Chiama \(I(p)\) l'informazione portata da un evento di probabilità \(p\). Le richieste sono: \(I(1)=0\); \(I\) decrescente in \(p\); \(I\) continua; e, per due eventi indipendenti di probabilità \(p\) e \(q\), \(I(pq)=I(p)+I(q)\). Ne segue \(I(p)=-C\ln p\) con \(C\gt 0\). Scegliere \(C=1/\ln 2\) dà \(I(p)=\log_2(1/p)\), cioè i bit.</p>
+  </div></details>
+  <div class="quiz" data-quiz="10a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Entropia: la sorpresa media</h2>
+  <p>Un singolo evento ha il suo contenuto informativo. Ma di solito non sappiamo in anticipo quale evento capiterà: abbiamo una <em>variabile casuale</em>, cioè una quantità che può assumere più valori, ciascuno con la sua probabilità. La chiamiamo \(Y\).</p>
+  <p>A un nodo di un albero, \(Y\) è la classe di un punto preso a caso. La domanda diventa: quanta sorpresa dobbiamo aspettarci <em>in media</em>? Costruiamo la risposta su un sacchetto di palline di due colori.</p>
+  <figure data-fig="build" data-opts='{"id":"l10_ent"}'>
+    <figcaption>Otto palline, sei blu e due arancioni. Per ogni colore un rettangolo: la larghezza è la sorpresa di quel colore, l'altezza la sua probabilità, l'area il suo contributo alla media. Il blu sorprende poco ma capita spesso; l'arancione sorprende molto ma capita di rado.</figcaption>
+  </figure>
+  <p>Riletta a parole: l'<b>entropia</b> è la sorpresa media. Ogni valore possibile contribuisce con la sua sorpresa, pesata per quanto spesso capita. Per convenzione un valore con probabilità zero contribuisce zero. Un esempio dalle slide: la prossima lettera di un testo inglese.</p>
+  <figure data-fig="letters">
+    <figcaption>Le 26 lettere e lo spazio in un testo inglese. Le lettere rare portano molti bit ma capitano di rado; quelle frequenti ne portano pochi. La media pesata, 4,1 bit, è l'entropia.</figcaption>
+  </figure>
+  <p>L'entropia ha anche una lettura pratica: è il numero medio di bit necessari per comunicare il valore di \(Y\) con il codice più efficiente possibile. Ma per noi conta soprattutto come misura di incertezza. Il caso più semplice è una moneta che dà testa con probabilità \(p\) e croce con probabilità \(1-p\). I valori possibili sono due, quindi la somma ha due termini, uno per faccia:</p>
+  <div class="math-block">\[H=p\,\log_2\frac{1}{p}+(1-p)\,\log_2\frac{1}{1-p}\]</div>
+  <p>È la formula di prima con due soli valori: sorpresa della testa per quanto spesso esce, più lo stesso per la croce.</p>
+  <figure data-fig="coin">
+    <figcaption>Nel primo riquadro la curva rosa è l'entropia della moneta al variare della probabilità di testa; il punto giallo è il valore scelto con il cursore. Nel secondo riquadro quaranta lanci con quella probabilità: gialle le teste (T), grigie le croci (C).</figcaption>
+  </figure>
+  <p>L'entropia è massima, un bit, quando le due facce sono equiprobabili: è la situazione in cui si è più incerti sull'esito. Scende a zero quando l'esito è sicuro. <b>Più la distribuzione è piatta, più l'entropia è alta; più è concentrata su un valore, più è bassa.</b> Un nodo con metà punti per classe ha entropia 1; un nodo puro ha entropia 0. È il numero che cercavamo.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quanto vale una domanda</h2>
+  <p>Con i dati al posto delle probabilità vere si usano le frequenze: la probabilità di una classe è la quota di esempi che hanno quella classe. Una domanda sulla feature \(X\) divide gli esempi in gruppi, uno per ogni risposta. Una buona domanda lascia gruppi poco incerti.</p>
+  <p>Per dare un voto alla domanda servono tre cose: l'incertezza di prima, quella che resta dopo, e la differenza. Le costruiamo su sei esempi con due features, \(X_1\) e \(X_2\), che valgono vero (V) o falso (F), cominciando dalla domanda su \(X_1\).</p>
+  <figure data-fig="build" data-opts='{"id":"l10_ig"}'>
+    <figcaption>I sei quadrati sono le risposte \(Y\) dei sei esempi: verde = V, rosso = F. La domanda \(X_1\) li fa scendere in due gruppi, quattro da una parte e due dall'altra. In giallo la quota di esempi finita in ciascun gruppo e, alla fine, il guadagno.</figcaption>
+  </figure>
+  <p>La media pesata delle entropie dei gruppi ha un nome e un simbolo suoi: <b>entropia condizionata</b>, \(H(Y\mid X)\), l'incertezza su \(Y\) che resta dopo aver saputo \(X\). Con questo simbolo l'<b>information gain</b> si scrive in una riga:</p>
+  <div class="math-block">\[IG(X)=H(Y)-H(Y\mid X)\]</div>
+  <p>Incertezza di prima meno incertezza di dopo. Ora prova tu, anche con l'altra domanda.</p>
+  <figure data-fig="igtable">
+    <figcaption>La tabella contiene i sei esempi; clicca su una \(Y\) per cambiarla. I due blocchi accanto mostrano che cosa succede dividendo secondo \(X_1\) o secondo \(X_2\): i quadrati sono le risposte \(Y\) finite in ciascun gruppo (verde = V, rosso = F), con l'entropia del gruppo e, sotto, il guadagno in giallo.</figcaption>
+  </figure>
+  <p>Con i dati di partenza, \(X_1\) mette quattro righe in un gruppo puro e lascia tutta l'incertezza in un gruppo di due: guadagno 0,32 bit. \(X_2\) lascia un gruppo di tre mescolato: guadagno 0,19. Si sceglie \(X_1\).</p>
+  <p>L'information gain non è mai negativo, e vale zero solo quando ogni gruppo ha le stesse proporzioni di classi del gruppo di partenza: una domanda così non ha insegnato nulla.</p>
+  <div class="quiz" data-quiz="10b"></div>
+  <h3>Un esempio con tre features</h3>
+  <p>Sei oggetti descritti da colore, forma e dimensione, tre di classe + e tre di classe −. L'entropia di partenza è 1 bit. Quale domanda conviene fare per prima?</p>
+  <figure data-fig="shapes">
+    <figcaption>Gli stessi sei oggetti raggruppati secondo ciascuna feature; sotto ogni gruppo la sua entropia. Il colore crea due gruppi puri su tre.</figcaption>
+  </figure>
+  <p>La forma non serve a niente: in entrambi i gruppi le classi restano metà e metà. La dimensione aiuta, il colore di più. Alla radice si mette la domanda sul colore.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Far crescere un albero</h2>
+  <p>Con features numeriche le domande hanno la forma «questa feature è minore di una certa soglia?». Le soglie possibili sono infinite, ma le divisioni diverse sono poche: spostare la soglia fra due punti consecutivi non cambia chi sta da una parte e chi dall'altra. Basta ordinare i punti lungo quella feature e provare una soglia fra ogni coppia di vicini.</p>
+  <figure data-fig="sweep">
+    <figcaption>In alto quaranta punti visti lungo una sola feature. In basso l'information gain di ogni soglia candidata. Si ripete il conto per ogni feature e si tiene la coppia (feature, soglia) con il guadagno più alto.</figcaption>
+  </figure>
+  <p>L'albero si costruisce dall'alto verso il basso. Si sceglie la domanda migliore per la radice; i punti con risposta «sì» vanno al figlio di sinistra, gli altri a quello di destra; poi si ripete la stessa procedura su ciascun figlio, usando solo i suoi punti.</p>
+  <p>È un algoritmo <em>greedy</em>: a ogni passo prende la scelta migliore sul momento, senza tornare indietro. Trovare il più piccolo albero che classifica bene tutti i dati richiederebbe di provare un numero di alberi che cresce in modo esponenziale, quindi ci si accontenta di questo.</p>
+  <figure data-fig="rects">
+    <figcaption>Ogni domanda taglia una zona con una retta orizzontale o verticale: lo spazio finisce diviso in rettangoli, uno per foglia. Aumenta la profondità e guarda rettangoli e albero crescere insieme.</figcaption>
+  </figure>
+  <h3>Quando fermarsi</h3>
+  <p>Con abbastanza domande un albero può isolare ogni singolo punto e classificare alla perfezione qualunque training set. È lo stesso problema della lezione 4: il modello impara anche il rumore.</p>
+  <figure data-fig="depthU">
+    <figcaption>Gli stessi dati della figura precedente. L'errore di training scende fino a zero; quello di test scende, poi risale.</figcaption>
+  </figure>
+  <p>Per questo si fissa un criterio di arresto: una profondità massima, oppure non dividere un nodo che è già quasi puro, oppure non dividere se il guadagno è quasi zero. Le soglie di questi criteri sono iperparametri, da scegliere con un validation set. In alternativa si fa crescere l'albero fino in fondo e poi lo si <em>pota</em>, eliminando le divisioni che non migliorano l'errore di validation. In una foglia rimasta mescolata si prevede la classe di maggioranza.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Molti alberi sbagliano meno di uno</h2>
+  <p>Gli alberi sono facili da capire, da costruire e da usare. Il loro difetto è la varianza: basta cambiare pochi dati e l'albero cambia molto. Un rimedio generale è l'<b>ensemble learning</b>: allenare molti modelli diversi e combinare le previsioni, con un voto di maggioranza per la classificazione o una media per la regressione.</p>
+  <p>La ragione è statistica. Immagina \(n\) quantità casuali non correlate, cioè che sbagliano ciascuna per conto suo, tutte con la stessa media e la stessa varianza \(\sigma^2\) (la varianza misura quanto una quantità oscilla attorno alla sua media). La loro media ha ancora lo stesso valore atteso, ma oscilla molto meno:</p>
+  <div class="math-block">\[\text{varianza della media}=\frac{\sigma^2}{n}\]</div>
+  <p>La varianza si divide per il numero di quantità mediate: gli errori casuali dei singoli si compensano.</p>
+  <p>Perché funzioni, gli alberi devono essere diversi fra loro. Una <b>random forest</b> li rende diversi in due modi. Ogni albero vede un campione diverso, ottenuto pescando a caso dai dati con reinserimento (<em>bagging</em>). E a ogni divisione può scegliere solo fra alcune features estratte a caso.</p>
+  <figure data-fig="forest">
+    <figcaption>Nel primo riquadro un albero cresciuto fino in fondo: confine frastagliato. Nel secondo il voto di una random forest sugli stessi dati; dove il colore è tenue gli alberi sono in disaccordo.</figcaption>
+  </figure>
+  <p>Quanti punti dare a ogni albero e quante features considerare a ogni divisione sono iperparametri, da scegliere con la cross-validation della lezione 5.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="10"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>un albero sceglie a ogni nodo la domanda che riduce di più l'entropia delle classi; lasciato crescere impara il rumore, e una foresta di alberi diversi ne media gli errori.</b></p>
+  <p>Gli alberi tagliano lo spazio con rette parallele agli assi. La prossima lezione riparte dai confini obliqui dei classificatori lineari per arrivare, un passo alla volta, alle reti neurali: si comincia da un solo neurone.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

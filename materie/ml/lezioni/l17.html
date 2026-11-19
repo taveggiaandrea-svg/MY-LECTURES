@@ -1,0 +1,105 @@
+<article class="lesson" data-n="17" id="lezione-17" data-title="Come si sceglie quando non si sa quale scelta è buona?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 17</p>
+  <h1>Come si sceglie quando non si sa quale scelta è buona?</h1>
+  <p class="desc">I multi-armed bandit: imparare mentre si decide. Il regret, il dilemma fra esplorare e sfruttare, l'algoritmo UCB, e che cosa cambia se l'ambiente è un avversario.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Un medico ha tre terapie per la stessa malattia e non sa quale funzioni meglio. I pazienti arrivano uno alla volta. Per ciascuno deve sceglierne una, e vede soltanto se <em>quella</em> ha funzionato: delle altre due non saprà mai nulla. Vuole guarire più pazienti possibile, non scoprire la terapia migliore a fine studio. È il problema posto da Thompson nel 1933.</p>
+  <p>La versione giocattolo usa le slot machine, che in inglese si chiamano «banditi a un braccio»: da qui il nome <b>multi-armed bandit</b>. Ci sono più macchine, dette <em>bracci</em> (il loro numero si indica con \(K\)), ciascuna con una sua probabilità di vincita che non conosciamo.</p>
+  <figure data-fig="slots">
+    <figcaption>Trenta tiri, tre macchine con probabilità di vincita diverse e nascoste. Sotto ogni macchina un pallino per tiro (verde se ha vinto) e la media osservata; alla fine compaiono le probabilità vere. Prova a vincere il più possibile.</figcaption>
+  </figure>
+  <p>Giocando si sente subito la tensione. Ogni tiro su una macchina poco provata dà informazione, ma rischia di essere sprecato: è <b>esplorazione</b>. Ogni tiro sulla macchina che finora sembra migliore incassa, ma se la stima è sbagliata non lo scopriremo mai: è <b>sfruttamento</b> (<em>exploitation</em>).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Misurare quanto si è perso</h2>
+  <p>Per dire se una strategia è buona serve un numero. Fissiamo prima le regole. Il gioco dura un certo numero di round. A ogni round chi impara sceglie un braccio e riceve una ricompensa fra 0 e 1, estratta a caso da una distribuzione che dipende solo dal braccio.</p>
+  <p>La media di quella distribuzione è il valore vero del braccio: quanto rende in media ogni suo tiro. Contare le vincite non basta per giudicare una strategia, perché dipendono da quanto sono generose le macchine. Conviene misurare quanto si è <em>perso</em> rispetto a chi avesse giocato sempre il braccio migliore: è il <b>regret</b>.</p>
+  <figure data-fig="build" data-opts='{"id":"l17_regret"}'>
+    <figcaption>Il regret costruito su trenta tiri. Ogni barra è un tiro, alta quanto la media della macchina giocata e colorata per macchina (blu la migliore, arancione la seconda, verde la terza). La linea bianca tratteggiata è quello che rende in media ogni tiro della macchina migliore. Le zone rosa sono ciò che manca per arrivarci: la loro area è il regret.</figcaption>
+  </figure>
+  <p>Le due scritture dicono la stessa cosa. La prima confronta i totali; la seconda mostra che il regret si accumula solo tirando bracci sbagliati, ognuno pesato per il suo <em>gap</em>: nell'esempio, 0,2 · 10 + 0,4 · 5 = 4. Un regret che cresce in proporzione al numero di round \(T\) significa che si continua a sbagliare con la stessa frequenza. L'obiettivo è un regret <em>sublineare</em>: diviso per \(T\) deve tendere a zero, cioè l'errore medio per round deve sparire.</p>
+  <h3>Due strategie ingenue</h3>
+  <p>La prima è solo esplorazione: giocare tutti i bracci a turno. Ogni braccio riceve la stessa quota di tiri, il numero di round diviso per il numero di bracci, e il regret è quella quota per la somma dei gap. Con le tre macchine di prima e trenta round: dieci tiri a testa, e 10 · (0 + 0,2 + 0,4) = 6. Raddoppiando i round raddoppia anche il regret: è lineare. Si impara tutto e non si usa mai.</p>
+  <p>La seconda è solo sfruttamento, e si chiama <em>follow the leader</em>: si tiene per ogni braccio la media delle ricompense osservate, che indichiamo con \(\hat\mu\), e, dopo aver provato ogni braccio una volta, si gioca sempre quello con la media più alta. Sembra ragionevole, ma può bloccarsi.</p>
+  <p>Prendiamo due macchine: la 1 paga 1 o 0 con probabilità ½, la 2 paga sempre ¼. La migliore è la 1. Se però il suo primo tiro dà 0, la sua media osservata è 0, minore di ¼, e non verrà giocata mai più: la stima sbagliata non ha modo di correggersi.</p>
+  <figure data-fig="ftl">
+    <figcaption>L'esempio delle due macchine, sessanta round. In ordinata il regret accumulato. Ogni linea gialla è una partita di follow the leader; la linea blu è l'esplorazione uniforme, per confronto. Quelle piatte hanno trovato la macchina giusta; le altre no, e non se ne accorgono.</figcaption>
+  </figure>
+  <p>Succede in circa metà delle partite, quindi anche il regret atteso di follow the leader è lineare. Serve un compromesso.</p>
+  <div class="quiz" data-quiz="17a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Prima esplorare, poi sfruttare</h2>
+  <p>Il compromesso più semplice separa le due fasi. <b>Explore-then-commit</b> gioca ogni braccio un numero fisso di volte, che chiamiamo \(T_0\), poi sceglie quello con la media osservata più alta e non lo cambia più. Tutto sta nel decidere \(T_0\).</p>
+  <figure data-fig="etc">
+    <figcaption>Due macchine con probabilità di vincita 0,5 e 0,7, mille round. In ascissa i tiri di prova per macchina; in blu il regret dovuto all'esplorazione, in arancione quello dovuto a una scelta finale sbagliata, in giallo la loro somma. Pochi tiri di prova costano poco ma lasciano spesso scegliere la macchina sbagliata; molti tiri di prova rendono sicura la scelta ma sprecano round.</figcaption>
+  </figure>
+  <p>Il minimo dipende dal gap, che non conosciamo. Esiste però una scelta che non lo richiede, e usa solo il numero di round \(T\) e il numero di bracci \(K\):</p>
+  <div class="math-block">\[T_0=\Big(\frac{T}{K}\Big)^{2/3}(\log T)^{1/3}\]</div>
+  <p>I tiri di prova crescono con la lunghezza del gioco, ma meno che in proporzione: con mille round e due macchine sono circa 120 a testa. Con questa scelta si dimostra un regret dell'ordine di \(K^{1/3}T^{2/3}\), a meno di un fattore logaritmico: sublineare, ma lontano dal meglio possibile. Si sa infatti che nessun algoritmo può garantire meno di circa \(\sqrt{KT}\) su tutti i problemi.</p>
+  <p>Una variante mescola le due fasi invece di separarle. <b>ε-greedy</b> a ogni round gioca un braccio a caso con probabilità \(\Eps\), e altrimenti quello con la media osservata più alta. Non si blocca mai, ma se \(\Eps\) resta costante continua a sprecare una frazione fissa dei round anche quando ormai conosce la risposta: il regret torna lineare, con pendenza proporzionale a \(\Eps\).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>L'ottimismo come regola</h2>
+  <p>Entrambi i metodi esplorano alla cieca: trattano allo stesso modo un braccio provato cento volte e uno provato due. L'algoritmo <b>UCB</b> (<em>upper confidence bound</em>) esplora dove serve.</p>
+  <p>Per ogni braccio non tiene solo la media osservata ma un <em>intervallo di confidenza</em>: una fascia attorno alla media dentro cui il valore vero sta quasi certamente. La fascia si stringe man mano che il braccio viene giocato. Poi UCB gioca il braccio il cui estremo superiore è più alto.</p>
+  <figure data-fig="build" data-opts='{"id":"l17_ucb"}'>
+    <figcaption>L'indice di UCB costruito su due macchine, in un gioco di cento round. I punti bianchi sono le medie osservate, le fasce colorate gli intervalli di confidenza (tagliati a zero in basso), i trattini gialli gli estremi superiori con il loro valore. Il riquadro giallo indica la macchina che UCB gioca.</figcaption>
+  </figure>
+  <p>I due addendi hanno un ruolo ciascuno: la media osservata è lo sfruttamento, il margine è l'esplorazione. È il principio dell'<em>ottimismo davanti all'incertezza</em>: comportarsi come se ogni braccio valesse il massimo compatibile con quello che si è visto.</p>
+  <p>Un braccio può avere il limite superiore alto per due motivi: perché la sua media è alta, e allora giocarlo conviene; o perché è stato provato poco, e allora giocarlo stringe l'intervallo e l'ottimismo si corregge da solo.</p>
+  <figure data-fig="ucb">
+    <figcaption>Ora guardalo giocare: UCB su tre macchine con probabilità di vincita 0,3, 0,5 e 0,7 (le linee gialle tratteggiate, nascoste a chi gioca). I punti bianchi sono le medie osservate, le fasce gli intervalli di confidenza. Il riquadro giallo indica la macchina giocata a ogni round. Gli intervalli vanno ben oltre 1 all'inizio: con una sola osservazione non si sa quasi nulla.</figcaption>
+  </figure>
+  <p>Un braccio cattivo smette di essere giocato quando il suo intervallo scende sotto quello del migliore, e questo richiede un numero di tiri che cresce solo come \(\log T\). Il regret di UCB è dell'ordine di \(\sqrt{KT\log T}\), quasi il limite inferiore.</p>
+  <figure data-fig="etcucb">
+    <figcaption>Due macchine, mille round, regret atteso al variare del gap \(\Delta\) (qui le ricompense sono gaussiane, come nel grafico delle slide). Ogni scelta di tiri di prova per explore-then-commit va bene per certi gap e male per altri. UCB non ha nulla da regolare e non è mai lontano dalla migliore.</figcaption>
+  </figure>
+  <figure data-fig="compare">
+    <figcaption>Le tre strategie nel tempo. ε-greedy sale in linea retta; explore-then-commit paga tutto all'inizio e poi si ferma (proseguendo, ε-greedy lo supererebbe); UCB rallenta sempre di più.</figcaption>
+  </figure>
+  <div class="quiz" data-quiz="17b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Se l'ambiente gioca contro</h2>
+  <p>Fin qui ogni braccio aveva una media fissa. Nella pubblicità online o nei mercati non è detto: quello che rende oggi può non rendere domani, magari proprio in reazione alle nostre scelte. Nel modello <b>avversario</b> non si assume nulla: a ogni round l'ambiente decide liberamente una perdita fra 0 e 1 per ogni braccio (si ragiona in perdite: la perdita è 1 meno la ricompensa). Il regret si misura contro il miglior braccio fisso, scelto col senno di poi.</p>
+  <p>Cominciamo dal caso più facile, il <em>problema degli esperti</em>: dopo ogni round si vedono le perdite di tutti i bracci, non solo di quello scelto. Anche così, qualunque strategia deterministica fallisce: l'avversario può calcolare in anticipo quale braccio sceglieremo e mettere la perdita lì.</p>
+  <figure data-fig="advdet">
+    <figcaption>Follow the leader su due macchine contro un avversario che ne conosce la regola. In ordinata la perdita accumulata: in rosso quella di chi impara, in blu e in verde quelle delle due macchine.</figcaption>
+  </figure>
+  <p>L'unica difesa è non essere prevedibili: scegliere a caso, con probabilità che l'avversario conosce ma il cui esito non può indovinare. L'algoritmo <b>Hedge</b> tiene un peso per ogni braccio, inizialmente 1, e gioca ogni braccio con probabilità proporzionale al suo peso: il peso diviso per la somma di tutti i pesi. Dopo aver visto le perdite, riduce ogni peso tanto più quanto il braccio ha perso.</p>
+  <figure data-fig="build" data-opts='{"id":"l17_hedge"}'>
+    <figcaption>Un round di Hedge su due macchine. Le barre sono i pesi (il contorno tratteggiato segna il peso iniziale, 1); sopra ciascuna la perdita decisa dall'avversario, accanto il fattore per cui il peso viene moltiplicato. La striscia in fondo mostra le probabilità con cui le due macchine vengono giocate: blu la 1, verde la 2.</figcaption>
+  </figure>
+  <p>Il tasso di apprendimento \(\Et\) (il learning rate) decide quanto in fretta ci si fida di quello che si è visto.</p>
+  <figure data-fig="hedge">
+    <figcaption>Ora prova tu a regolare \(\Et\). Due macchine, quaranta round. La curva gialla è la probabilità con cui Hedge gioca la macchina 1; sotto, in rosso, le perdite decise dall'avversario. Nei primi venti l'avversario alterna le perdite per ingannare chi segue il leader; negli ultimi venti la macchina 1 non perde mai. Con \(\Et\) grande Hedge cade nella trappola; con \(\Et\) piccolo non ci cade, ma poi impara troppo lentamente.</figcaption>
+  </figure>
+  <p>La teoria indica \(\Et=\sqrt{\log K/T}\), che garantisce un regret al più dell'ordine di \(\sqrt{T\log K}\) contro qualsiasi avversario.</p>
+  <h3>Con il solo braccio giocato: EXP3</h3>
+  <p>Nel problema dei bandit si vede soltanto la perdita del braccio scelto, e la regola di Hedge chiede quelle di tutti. <b>EXP3</b> le sostituisce con una stima: per il braccio giocato usa la perdita osservata divisa per la probabilità con cui lo si è giocato; per tutti gli altri usa zero. Poi aggiorna i pesi come Hedge.</p>
+  <p>La divisione compensa il fatto che i bracci giocati di rado vengono osservati di rado. Un braccio con perdita 0,5 giocato con probabilità 0,2 riceve la stima 0,5 / 0,2 = 2,5 una volta su cinque e 0 le altre quattro: in media 0,2 · 2,5 = 0,5, il valore vero.</p>
+  <figure data-fig="ipw">
+    <figcaption>Un braccio con perdita sempre 0,5 (la linea rosa tratteggiata). Le righe grigie sono le stime nei round in cui viene giocato, la curva gialla la loro media fin lì. Più raramente lo si gioca, più le stime sono rare e alte; la loro media resta attorno al valore vero, ma oscilla di più.</figcaption>
+  </figure>
+  <p>Una stima rumorosa ma corretta in media basta per avere ancora un regret sublineare. Rispetto al machine learning visto finora cambiano quindi tre cose: si decide mentre si impara, senza separazione fra training e test; si usa il caso per non essere prevedibili; e si lavora con un'informazione parziale.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="17"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>chi impara decidendo deve dividere i tiri fra provare e incassare; UCB lo fa giocando il braccio con il limite superiore di confidenza più alto, e ottiene un regret che cresce molto più lentamente del numero di round.</b></p>
+  <p>Una slot machine è sempre nella stessa situazione. Nell'ultima lezione le azioni cambiano anche lo stato in cui ci si trova.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

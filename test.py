@@ -15,7 +15,7 @@ async def block(r):
     await (r.continue_() if r.request.url.startswith('http://127.0.0.1') else r.abort())
 CHECK="""(sel)=>{const a=document.querySelector(sel);const txt=a.innerText;
  return {sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth,kerr:a.querySelectorAll('.katex-error').length,
- nan:(a.innerHTML.match(/NaN|undefined|Infinity/g)||[]).length,raw:(txt.match(/\\\\[a-zA-Z]{2,}/g)||[]).slice(0,5),
+ nan:(a.innerHTML.replace(/data:[^"')\\s]+/g,'').match(/NaN|undefined|Infinity/g)||[]).length,raw:(txt.match(/\\\\[a-zA-Z]{2,}/g)||[]).slice(0,5),
  empty:[...a.querySelectorAll('.stage .w')].filter(w=>!w.children.length).map(w=>w.id),lists:a.querySelectorAll('ul,ol,li').length,
  figs:a.querySelectorAll('figure').length,quiz:a.querySelectorAll('.q').length}}"""
 async def main():
@@ -35,8 +35,8 @@ async def main():
             if shots: await pg.screenshot(path=os.path.join(SHOTS,'home_%d.png'%w),full_page=True)
             await pg.close()
             for s in subs:
-                n=len(re.findall(r'class="lesson"',open(os.path.join(SITE,s,'index.html'),encoding='utf-8').read()))
-                for k in range(1,n+1):
+                nums=[int(x) for x in re.findall(r'class="lesson" data-n="(\d+)"',open(os.path.join(SITE,s,'index.html'),encoding='utf-8').read())]
+                for k in nums:
                     pg=await b.new_page(viewport={'width':w,'height':900});errs=[]
                     pg.on('pageerror',lambda e:errs.append(str(e)))
                     pg.on('console',lambda m:errs.append(m.text) if m.type=='error' else None)

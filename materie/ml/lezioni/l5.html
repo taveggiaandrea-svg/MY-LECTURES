@@ -1,0 +1,121 @@
+<article class="lesson" data-n="5" id="lezione-5" data-title="Come si sceglie un modello senza barare?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 5</p>
+  <h1>Come si sceglie un modello senza barare?</h1>
+  <p class="desc">Hold-out e cross-validation: come stimare l'errore su dati nuovi avendo un solo campione, e quanto fidarsi di quella stima.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 4 abbiamo visto che l'errore su dati nuovi ha la forma di una U: troppo poca complessità sbaglia per bias, troppa per varianza. Ma per disegnare quella U abbiamo usato la funzione vera e centinaia di dataset simulati. Nella realtà c'è un solo campione.</p>
+  <p>Qui sotto ci sono trenta punti e un polinomio adattato con i minimi quadrati. L'unico numero che puoi calcolare è l'errore sui punti stessi. Muovi il grado: quale sceglieresti in base a quel numero?</p>
+  <figure data-fig="trainonly">
+    <figcaption>L'errore sui dati usati per adattare la curva scende a ogni grado in più. Se fosse il criterio di scelta, vincerebbe sempre il modello più complesso.</figcaption>
+  </figure>
+  <p>Scegliere il grado di un polinomio è un esempio di <b>model selection</b>: decidere fra più classi di modelli, o fra più valori di un <em>iperparametro</em>, cioè di una manopola che l'algoritmo di training non regola da solo. Il grado è un iperparametro; lo era anche il \(\Kk\) di k-NN nella lezione 1.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il numero che vorremmo e quello che abbiamo</h2>
+  <p>Abbiamo un campione \(S\): un certo numero di coppie input-output, estratte in modo indipendente da una sorgente che non conosciamo, la distribuzione \(\mathcal D\). Con il campione costruiamo un modello, che scriviamo \(\Ff_S\) per ricordare da quali dati viene. Quello che ci interessa è quanto sbaglierà su un punto nuovo, estratto dalla stessa sorgente.</p>
+  <p>Il numero che vorremmo è quindi la loss media su <em>tutti</em> i punti che la sorgente può produrre. Si chiama <b>rischio vero</b>:</p>
+  <div class="math-block">\[\cL_{\mathcal D}(\Ff)\;=\;\mathbb E_{(\Xs,\Yy)\sim\mathcal D}\big[\cl(\Yy,\Ff(\Xs))\big]\]</div>
+  <p>Si legge così: \(\cl\) è la loss su un punto, per esempio il quadrato della differenza fra output e previsione; \(\mathbb E\) è la media, e il pedice dice che i punti sono estratti dalla sorgente. Ma la sorgente è sconosciuta: questo numero non si può calcolare.</p>
+  <p>Il numero che abbiamo è la stessa media fatta su un insieme finito di punti. Si chiama <b>rischio empirico</b>, ed è il costo della lezione 2:</p>
+  <div class="math-block">\[\cL_S(\Ff)\;=\;\frac{1}{|S|}\sum_{(\Xs,\Yy)\in S}\cl(\Yy,\Ff(\Xs))\]</div>
+  <p>Qui \(|S|\) è il numero di punti dell'insieme. Per la legge dei grandi numeri (lezione 3) questa media si avvicina al rischio vero quando i punti sono tanti. Ma c'è una condizione nascosta.</p>
+  <p>Se valutiamo il modello sugli stessi dati con cui l'abbiamo costruito otteniamo l'<b>errore di training</b>, \(\cL_S(\Ff_S)\). Quei dati vengono usati due volte, una per scegliere la curva e una per giudicarla: è come correggere un compito conoscendo già le risposte.</p>
+  <figure data-fig="gap">
+    <figcaption>Per ogni grado, l'errore di training (barra grigia) e l'errore vero (barra rossa), stimato su 4000 punti nuovi che in una situazione reale non avremmo. La distanza fra le due barre è l'ottimismo dell'errore di training.</figcaption>
+  </figure>
+  <p><b>Un modello va valutato su dati che non ha visto durante il training.</b> Tutto il resto della lezione è un modo di procurarsi quei dati.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettere da parte dei dati</h2>
+  <p>Il metodo più semplice si chiama <b>hold-out</b>. Si divide il campione in due parti che non si sovrappongono: un training set \(S_{tr}\), con cui si adatta il modello, e un test set \(S_{te}\) (detto anche validation set), con cui lo si valuta.</p>
+  <p>L'errore sul test set è calcolato su dati «freschi», quindi ci aspettiamo che sia vicino al rischio vero. Per scegliere fra più modelli si fa così: si allenano tutti sul training set, si calcola per ciascuno l'errore sul test set, e si tiene quello con l'errore più basso.</p>
+  <figure data-fig="holdsel">
+    <figcaption>Gli stessi trenta punti: 24 per il training (bianchi) e 6 messi da parte (arancioni). Nel primo riquadro i dati e, in giallo, il polinomio del grado scelto; nel secondo, ogni barra è l'errore di un grado sui 6 punti arancioni, e la più bassa è evidenziata.</figcaption>
+  </figure>
+  <p>Premi «Rimescola» qualche volta. Il grado scelto cambia: con soli 6 punti, il giudizio dipende molto da quali punti sono finiti nel test set. È il prezzo da pagare per aver diviso i dati, e va in due direzioni opposte.</p>
+  <figure data-fig="splitprice">
+    <figcaption>Un polinomio di grado 3 su 40 punti, con 300 suddivisioni casuali per ogni proporzione. Più dati vanno al test, più la stima è stabile (banda arancione stretta), ma il modello, allenato su meno punti, peggiora davvero (linea rossa che sale).</figcaption>
+  </figure>
+  <p>Se il test set è troppo piccolo, la stima dell'errore oscilla molto. Se è troppo grande, restano pochi dati per il training e il modello peggiora. Le proporzioni usate di solito sono 80%-20% oppure 70%-30%; con dataset molto grandi basta una percentuale più piccola, perché anche quella contiene molti esempi.</p>
+  <p><b>L'hold-out baratta un po' di qualità del modello con una stima onesta del suo errore.</b> Una volta scelto il modello, lo si può riallenare su tutti i dati: migliora, ma a quel punto non resta più nessun dato messo da parte per stimarne l'errore.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quanto fidarsi dell'errore di test?</h2>
+  <p>L'errore di test è una media su pochi punti estratti a caso. Con un altro test set sarebbe uscito un numero un po' diverso. Di quanto può essere lontano dal rischio vero?</p>
+  <p>La risposta viene da un risultato di probabilità, la <b>disuguaglianza di Hoeffding</b>. Riguarda le medie: se fai la media di tante quantità indipendenti, ciascuna costretta fra un valore minimo e uno massimo, la probabilità che la media si allontani dal suo valore atteso più di una soglia fissata cala in modo esponenziale con il numero di quantità.</p>
+  <p>Il test set è proprio questo caso: le quantità sono le loss sui singoli punti di test, la loro media è l'errore di test, il valore atteso è il rischio vero. Costruiamo la fascia che ne esce, un fattore alla volta.</p>
+  <figure data-fig="build" data-opts='{"id":"l05_band"}'>
+    <figcaption>La fascia costruita un fattore alla volta. La linea rossa è il rischio vero; la collina grigia mostra dove cadono gli errori di test al variare del test set; la fascia azzurra è la distanza massima garantita dalla formula. Nell'angolo in alto, i numeri del passo corrente.</figcaption>
+  </figure>
+  <p>Mettendo i tre fattori sotto un'unica radice si ottiene la forma delle dispense. Se la loss ha valori fra \(a\) e \(b\), con probabilità almeno \(1-\delta\) vale</p>
+  <div class="math-block">\[\big|\cL_{\mathcal D}(\Ff)-\cL_{S_{te}}(\Ff)\big|\;\le\;\sqrt{\frac{(b-a)^2\log(2/\delta)}{2N_{te}}}\]</div>
+  <p>È la <b>concentrazione dell'errore di test</b>: più punti di test ci sono, più l'errore di test resta stretto attorno al rischio vero.</p>
+  <details class="rev"><summary>L'enunciato preciso di Hoeffding, e come se ne ricava la fascia</summary><div class="in">
+    <p>Se \(\Theta_1,\dots,\Theta_N\) sono indipendenti, con la stessa distribuzione, media \(\mu\) e valori in \([a,b]\), allora per ogni \(\epsilon\gt 0\):</p>
+    <div class="math-block">\[\Pr\Big[\Big|\frac1N\sum_{i=1}^{N}\Theta_i-\mu\Big|\ge\epsilon\Big]\;\le\;2\exp\!\Big(-\frac{2N\epsilon^2}{(b-a)^2}\Big)\]</div>
+    <p>La probabilità di sbagliare di più di \(\epsilon\) cala in modo esponenziale con \(N\). Per il test set, ogni \(\Theta_i\) è la loss su un punto di test, la media è l'errore di test e \(\mu\) è il rischio vero. Chiamando \(\delta\) il membro di destra, cioè la probabilità di errore che siamo disposti a tollerare, e ricavando \(\epsilon\) si ottiene la radice scritta sopra.</p>
+  </div></details>
+  <figure data-fig="hoeff">
+    <figcaption>Ora prova tu. Un classificatore che sbaglia davvero il 20% delle volte (linea rossa), messo alla prova su 2000 test set diversi. L'istogramma grigio mostra gli errori di test ottenuti; la fascia azzurra è quella garantita dalla formula. Gli errori che cadono fuori sono sempre meno di \(\delta\).</figcaption>
+  </figure>
+  <p>La formula dice tre cose. La larghezza della fascia cala come uno diviso la radice del numero di punti di test: per dimezzarla ne servono quattro volte tanti. Chiedere più sicurezza, cioè \(\delta\) più piccolo, allarga la fascia, ma poco, perché \(\delta\) sta dentro un logaritmo. E riordinando si ottiene un limite superiore calcolabile per l'errore vero: errore di test più la mezza larghezza della fascia.</p>
+  <div class="quiz" data-quiz="5a"></div>
+  <h3>E se i modelli da confrontare sono tanti?</h3>
+  <p>C'è una sottigliezza. La garanzia vale per <em>un</em> modello fissato prima di guardare il test set. Ma nella model selection guardiamo l'errore di test di \(p\) modelli e teniamo il migliore: fra tanti, qualcuno può essere andato bene per fortuna.</p>
+  <p>Le dispense dimostrano che la scelta resta buona. Vediamo perché su due soli modelli: quello che scegliamo e quello che avremmo dovuto scegliere.</p>
+  <figure data-fig="build" data-opts='{"id":"l05_sel"}'>
+    <figcaption>La garanzia costruita su due modelli. I pallini arancioni sono gli errori di test, i rombi rossi i rischi veri; i rettangoli arancioni sono le fasce attorno agli errori di test, la linea bianca tratteggiata il tetto garantito per il rischio vero del modello scelto. Il test set ha 500 punti e la loss vale 0 o 1.</figcaption>
+  </figure>
+  <p>È la <b>garanzia per la model selection</b>, e vale con probabilità almeno \(1-\delta\). Il prezzo di aver confrontato tanti modelli sullo stesso test set è tutto in quel \(p\) dentro il logaritmo.</p>
+  <figure data-fig="logp">
+    <figcaption>La penalità da pagare per aver confrontato \(p\) modelli sullo stesso test set, cioè le due fasce, al crescere di \(p\). Cresce come \(\sqrt{\log p}\): passare da 10 a 1000 modelli la aumenta di poco.</figcaption>
+  </figure>
+  <details class="rev"><summary>Da dove viene il log p</summary><div class="in">
+    <p>Si chiede che la fascia di Hoeffding valga per tutti i \(p\) modelli insieme. Per ciascuno la probabilità che fallisca è al più \(\delta/p\), a patto di usare \(\log(2p/\delta)\) al posto di \(\log(2/\delta)\). La probabilità che fallisca per almeno uno è al più la somma delle singole probabilità (<em>union bound</em>), cioè \(p\cdot\delta/p=\delta\).</p>
+    <p>Quando la fascia, di mezza larghezza \(\epsilon\), vale per tutti: il rischio vero di \(\hat m\) supera il suo errore di test al più di \(\epsilon\); l'errore di test di \(\hat m\) è per definizione non più alto di quello di \(m^*\); e l'errore di test di \(m^*\) supera il suo rischio vero al più di \(\epsilon\). Mettendo in fila i tre passaggi si ottiene \(2\epsilon\).</p>
+  </div></details>
+  <p><b>Scegliere il modello con l'errore di test più basso è una procedura affidabile, purché il test set sia abbastanza grande.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Usare tutti i dati, ma mai nello stesso momento</h2>
+  <p>L'hold-out ha un difetto: il 20-30% dei dati non viene mai usato per il training. Quando i dati sono pochi è uno spreco che si paga. La <b>k-fold cross-validation</b> lo evita usando ogni punto sia per il training sia per la validazione, ma mai nello stesso giro.</p>
+  <p>Si divide il campione in \(k\) gruppi di dimensione simile, detti <em>fold</em>. Poi si fa un giro per ogni fold: in ciascuno un fold diverso fa da test set e tutti gli altri da training set. L'errore del modello è la media degli errori ottenuti nei \(k\) giri.</p>
+  <figure data-fig="build" data-opts='{"id":"l05_cv"}'>
+    <figcaption>L'errore di cross-validation costruito un pezzo alla volta, con \(k=5\) sui trenta punti di questa lezione e un polinomio di grado 3. Ogni riga è un giro: il blocco arancione è il fold messo da parte, quelli grigi il training. Le barre rosa sono gli errori dei singoli giri, la linea bianca tratteggiata la loro media.</figcaption>
+  </figure>
+  <figure data-fig="kfold">
+    <figcaption>Gli stessi cinque giri visti sui dati. Nel primo riquadro, a ogni giro i punti arancioni sono messi da parte e il polinomio giallo viene riadattato sugli altri; nel secondo si accumulano gli errori dei giri, e alla fine la linea tratteggiata ne segna la media.</figcaption>
+  </figure>
+  <p>Per scegliere fra più modelli si ripete la procedura per ciascuno e si tiene quello con l'errore medio più basso. Il vantaggio rispetto all'hold-out si vede rimescolando i dati.</p>
+  <figure data-fig="cvsel">
+    <figcaption>Nel primo riquadro l'errore stimato con un solo hold-out, nel secondo con la 5-fold: ogni linea arancione è l'errore stimato per i vari gradi in uno di venti rimescolamenti degli stessi trenta punti. Le curve della cross-validation sono più raccolte, e il grado scelto cambia meno.</figcaption>
+  </figure>
+  <p>Facendo la media su \(k\) suddivisioni la stima è meno sensibile al caso; ogni punto viene usato per il test esattamente una volta; e ogni modello è allenato su quasi tutti i dati, una frazione \((k-1)/k\). Il prezzo è il tempo: ogni modello va allenato \(k\) volte. I giri sono però indipendenti, quindi si possono eseguire in parallelo.</p>
+  <p>Il caso estremo è \(k=N\), un fold per ogni punto, detto <b>leave-one-out</b>: si lascia fuori un punto alla volta. Ogni training set contiene tutti i punti tranne uno, ma i giri sono tanti quanti i dati. Conviene quando i dati sono pochissimi (decine o centinaia) e il training costa poco.</p>
+  <div class="quiz" data-quiz="5b"></div>
+  <h3>Quando una classe è rara</h3>
+  <p>Nella classificazione può capitare che una classe sia molto più rara dell'altra. Dividendo a caso, qualche fold può restarne quasi privo, e il suo errore non dice più niente. La <b>cross-validation stratificata</b> costruisce i fold in modo che ognuno conservi le proporzioni delle classi dell'intero dataset.</p>
+  <figure data-fig="strat">
+    <figcaption>Trenta esempi, di cui sei della classe rara (arancione), divisi in cinque fold; il numero in fondo a ogni riga conta gli esempi rari del fold. Nel primo riquadro la divisione casuale, in cui i sei possono finire distribuiti male; nel secondo quella stratificata, in cui ogni fold ne riceve quasi lo stesso numero.</figcaption>
+  </figure>
+  <p><b>La cross-validation dà una stima più stabile dell'hold-out usando tutti i dati, e si paga in tempo di calcolo.</b></p>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="5"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <b>l'errore che conta è quello su dati mai usati per decidere qualcosa, e lo si stima mettendo da parte dei dati: una volta sola con l'hold-out, a turno con la cross-validation.</b></p>
+  <p>Finora la complessità si regolava a scatti: grado 2, grado 3, grado 4. Nella prossima lezione compare una manopola continua, che lascia al modello tutta la sua flessibilità ma gliela fa pagare. Il suo valore si sceglierà proprio con gli strumenti di oggi.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>
