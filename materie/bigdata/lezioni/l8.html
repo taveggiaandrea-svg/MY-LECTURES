@@ -1,0 +1,103 @@
+<article class="lesson" data-n="8" id="lezione-8" data-title="Where do the raw data go?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lesson 8 · A. Rezzani, slides</p>
+  <h1>Where do the raw data go?</h1>
+  <p class="desc">Big Data architectures: the data lake, how it differs from the data warehouse, how the two work together in the company's information system, and the newer idea of data virtualization.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Lessons 5 to 7 built the toolbox: HDFS to store huge files cheaply, Spark to process them, streaming, graphs and machine learning on top. Lesson 1 described the classic home of company data, the <strong>data warehouse</strong> (DWH): structured, cleaned data loaded by ETL processes (extract, transform, load) and ready for fast queries. Where do the new tools fit next to it? The lecture's answer is the <strong>data lake</strong>.</p>
+  <p>Gartner, a research and advisory firm, defines it as a collection of storage instances holding data assets in addition to the original sources, kept in a near-exact or exact copy of the source format. Its purpose is to give the most skilled analysts an unrefined view of the data, so they can explore refinement and analysis techniques free of the compromises built into a data warehouse or a data mart.</p>
+  <p class="stmt"><strong>Data lake.</strong> In the lecturer's own definition, a repository that holds a vast amount of raw data in its native format, structured, semi-structured and unstructured, together with a vast amount of processed or semi-processed data. The structure is not defined until the data are needed (<strong>schema on read</strong>). It provides data for reporting, analytics and machine learning, and it is mostly based on Hadoop and Spark.</p>
+  <p>The raw data come from everywhere: web and clickstream, machine logs, devices and sensors, images, audio and video, social networks, relational databases, healthcare and financial data. Cleansing, aggregation and governance turn part of them into processed data, stored in the lake too. The technologies follow the life of the data.</p>
+  <figure>
+    <div class="w" id="b8tech"></div>
+    <figcaption>The lecture's map of data lake technologies, redrawn: the four phases of the data's life in the lake, with the Spark and Hadoop tools of lessons 5 to 7 that serve each one.</figcaption>
+  </figure>
+  <p>The lecture names four kinds of users of the lake: data scientists, analysts, applications and business users.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Decide the schema before or after?</h2>
+  <p>The deepest difference from a warehouse is when the structure is decided. A DWH uses <strong>schema on write</strong>: before inserting data we must define the tables, and every row must fit them. A data lake writes to a file system, so the schema, if needed, is defined when the data are read.</p>
+  <figure>
+    <div class="w" id="b8schema"></div>
+    <figcaption>The same three incoming sales records in the two worlds (an example added here, in the format of the course's sales.csv). In the first panel the warehouse table exists first, and the record whose value is "n/a" cannot be loaded. In the second the lake stores all three lines as they are; each reader applies a schema when it reads, and two readers can read the same file differently.</figcaption>
+  </figure>
+  <p><strong>Schema on write protects the warehouse; schema on read keeps everything for later.</strong> The lecture sums up the comparison in five points.</p>
+  <div class="scroll"><table><thead><tr><th></th><th>Data warehouse</th><th>Data lake</th></tr></thead><tbody>
+    <tr><td>Data</td><td>structured</td><td>structured and unstructured</td></tr>
+    <tr><td>State</td><td>processed</td><td>raw and processed</td></tr>
+    <tr><td>Schema</td><td>on write: tables defined before inserting</td><td>on read: defined, if needed, when reading</td></tr>
+    <tr><td>Storage</td><td>expensive for large volumes</td><td>designed for low cost</td></tr>
+    <tr><td>Data temperature</td><td>suitable for hot data</td><td>suitable for hot and cold data</td></tr></tbody></table></div>
+  <p><span class="k-orange">Hot data</span> are the more recent or more accessed data; <span class="k-blue">cold data</span> the older or less accessed ones. Cost is where the lake wins most clearly, as a chart from Hortonworks, the Hadoop distributor of lesson 5, shows.</p>
+  <figure>
+    <div class="w" id="b8cost"></div>
+    <figcaption>Fully loaded cost per raw terabyte of data, from minimum to maximum, after the Hortonworks chart in the lecture. The values are read approximately from the chart, which has no numbers on its bars: cloud storage and Hadoop cost a small fraction of a NAS (network-attached storage), of an engineered system (an appliance that bundles hardware and database software), of a SAN (storage area network) or of an MPP database (massively parallel processing). The slide's last axis label reads $180,000, although the even grid spacing gives $100,000; the redraw follows the spacing.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="8a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>A lake is adopted one step at a time</h2>
+  <p>Companies rarely start with a lake at the centre of everything. The lecture describes four steps, each building on the one below.</p>
+  <figure>
+    <div class="w" id="b8steps"></div>
+    <figcaption>The four steps of data lake adoption, after the lecture's pyramid: from a cheap staging area at the base to the main component of the information system at the top.</figcaption>
+  </figure>
+  <p>Read from the base, the lake starts as a cheap place where data from the operational systems land, separate from everything else; it then becomes a laboratory for data scientists; then the warehouses lean on it to keep their cold data, thanks to its low storage costs; and finally most of the company's data flows pass through it.</p>
+  <div class="quiz inq" data-quiz="8b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>The warehouse stays: who does what</h2>
+  <p>The lake does not replace the warehouse; the architecture changes around it. In traditional Business Intelligence (BI), data from the sources go through ETL into the DWH, and a semantic layer (the business view of the data: measures, dimensions, names users understand) feeds the reports. In what the lecture calls BI 2.0, emerging sources join the traditional ones and the lake sits next to the warehouse.</p>
+  <figure>
+    <div class="w" id="b8arch"></div>
+    <figcaption>Traditional BI and BI 2.0, after the lecture's diagram. In the second panel the new sources go straight into the data lake (data ingestion), which exchanges data with the warehouse; data quality and data governance belong to the lake, and the semantic layer now serves advanced analytics too.</figcaption>
+  </figure>
+  <p>The data flows change accordingly. Data from the traditional sources can still go through ETL, but some or all of the ETL procedures can move into the lake, which becomes the repository of raw data and the place where transformations happen. Data from the new sources go directly to the lake, where they can be processed or used in complex analytical tasks such as machine learning; the results can then be moved to the warehouse.</p>
+  <p>The <strong>warehouse</strong> still holds the <span class="k-orange">hot</span> data coming from the ETL processes, whether they read the sources directly or the lake, and the distilled data coming from the analyses run on the lake. It allows low-latency, interactive queries and keeps the reporting systems built on it working. The <strong>lake</strong> holds all the raw data and the final processed data; the hot part is pushed to the warehouse, while the <span class="k-blue">cold</span> part stays in the lake, available with a longer latency. With more detail and a longer history, it supplies the warehouse, data scientists (for both descriptive reports and predictive models) and corporate applications.</p>
+  <p>The lecture calls the movement from lake to warehouse <strong>data distillation</strong>: the lake allows more detailed and complex analyses on much more data, and the results are often small enough to be transferred to the warehouse and injected into the BI workflow.</p>
+  <figure>
+    <div class="w" id="b8distill"></div>
+    <figcaption>Data distillation, animated. Press play: a Spark job reads a large amount of raw data in the lake (the dots, which stay where they are), computes a small result, and the result enters the warehouse, where the usual BI reports can use it. The sizes are illustrative.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="8c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>A lake takes whatever you give it</h2>
+  <p>That is its strength and its problem. Without rules a lake fills with data nobody can find or trust, and many users with different profiles must be able to use it. The lecture names four <strong>critical success factors</strong>: data governance and a data quality process against the first problem, metadata management (part of governance) and training of data scientists and end users against the second.</p>
+  <p>A <strong>data governance policy</strong> maps the data sources (applications, input services), the data flows (how data are loaded into the lake) and the output services (the warehouse, applications, output data services), and manages the <strong>metadata</strong>, the data about the data, which make it easy to search the lake and interpret its content.</p>
+  <p>The <strong>data quality process</strong> has a less obvious rule: quality rules should be applied to the output data, not to the input. A filter at the entrance would keep out data of medium quality that could still be useful for certain applications.</p>
+  <figure>
+    <div class="w" id="b8qual"></div>
+    <figcaption>Two ways to handle quality, with records of high, medium and low quality. In the first panel a filter at the entrance lets only high-quality records into the lake, and the medium ones are lost. In the second every record enters with a quality label, and each user decides: the reporting system takes only high quality, a data scientist also accepts medium.</figcaption>
+  </figure>
+  <p><strong>Label the quality and let the final user decide.</strong> That is the lecture's recommendation: put a quality label on the data rather than filtering them out.</p>
+  <div class="quiz inq" data-quiz="8d"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Or leave the data where they are</h2>
+  <p>A newer trend avoids copying altogether. <strong>Data virtualization</strong> is a logical data layer that integrates the enterprise data siloed in different systems, manages them in one place for security and governance, and delivers them to business users in real time.</p>
+  <figure>
+    <div class="w" id="b8virt"></div>
+    <figcaption>Two ways to give users one view of three source systems. In the first panel ETL copies the data into a central store, and queries run there. In the second a virtualization layer stores nothing: each query is translated and sent to the sources, which do the work, and the answers travel over the network.</figcaption>
+  </figure>
+  <p>The pros, according to the lecture: cost savings, since storing and maintaining data is cheaper than replicating them and transforming them into other formats and places; logical abstraction, since heterogeneous sources can interact more easily; easier governance, since rules are applied centrally to all the data; a bridge between structured and unstructured data; and higher productivity, since less time goes into integrating sources. The cons follow from the second panel: it relies on the storage, memory and CPUs of the sources, can require big memory and computation resources, increases network traffic, needs a high initial investment and can be slow for complex tasks.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Test yourself</h2>
+  <div class="quiz" data-quiz="8"></div>
+</div></section>
+
+<section><div class="col">
+  <p>If only one thing from this lesson stays with you: <strong>the lake keeps everything, raw and cheap, with the schema decided at reading time; the warehouse keeps the hot, distilled data for fast queries</strong>, and governance decides whether the lake stays usable.</p>
+  <p>Lesson 9 steps back to ask why all this matters for business: how data warehouses and Big Data feed predictive and generative AI.</p>
+  <nav class="navend" aria-label="Other lessons"></nav>
+</div></section>
+</article>

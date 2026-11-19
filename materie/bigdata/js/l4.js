@@ -116,15 +116,19 @@ QZ['4a']=()=>[{q:'A BASE system has just accepted a new address on node 1. A rea
   e:'Under eventual consistency a node may hold the old value right after a write; it answers anyway and converges once replication completes.',h:'Recall the three words of BASE and the second panel of the figure.'}];
 QZ['4b']=()=>[{q:'A Year column contains the years 2009 to 2013. How many bits does each dictionary code need?',o:['2','5','13','3'],a:3,
   e:'Five distinct values: 2 bits give only 4 codes, 3 bits give 8, so the ceiling of log₂ 5 is 3.',h:'How many different codes can 2 bits write, and is that enough?'}];
+QZ['4c']=()=>[{q:'In a relational schema with tables Person, Movie, Directed (person_id, movie_id) and ActedIn (person_id, movie_id), how many JOINs does the query "films directed by Ava Reyes, with their actors" need?',o:['1','2','4','6'],a:2,
+  e:'Person (director) → Directed → Movie → ActedIn → Person (actor): five table references, four joins. A graph database follows the two kinds of edges directly.',h:'Write the chain of tables from the director to the actors.'}];
 QZ['4']=()=>[
-  {q:'A NoSQL database is called horizontally scalable because…',o:['its tables can have as many columns as needed','it can be moved to a more powerful server','adding servers increases computing power and storage','it compresses columns'],a:2,
-   e:'Horizontal scalability means adding servers to the cluster to gain power and storage.',h:'Look back at the cluster figure: what changed from one panel to the next?'},
+  {q:'A Country column has 1,000,000 rows and 200 distinct values. With dictionary encoding, how many bits does each code need, and about how much space do the codes take?',o:['200 bits; about 25 MB','7 bits; about 0.9 MB','8 bits; about 1 MB','8 bits; about 8 MB'],a:2,
+   e:'7 bits give only 128 codes, so 200 values need ⌈log₂ 200⌉ = 8 bits, one byte: 1,000,000 codes take about 1,000,000 bytes, 1 MB, plus a small dictionary.',h:'Find the smallest power of 2 that reaches 200, then convert bits to bytes.'},
   {q:'A transfer withdraws 100 from A, then the server crashes before the deposit to B. Which ACID property makes sure the withdrawal is undone?',o:['Atomicity','Durability','Isolation','Consistency'],a:0,
    e:'Atomicity is the all or nothing property: either both the withdrawal and the deposit happen, or neither does.',h:'Reread the four one-line meanings and match each to what went wrong here.'},
   {q:'In which NoSQL family does each record carry its own field names, can contain nested records, and need not match the structure of the others?',o:['Key-value','Graph oriented','Column-oriented','Document oriented'],a:3,
    e:'Self-describing, nestable records with no schema constraints are documents in JSON or XML, as in MongoDB and CouchDB.',h:'Compare the four panels of the models figure.'},
   {q:'A column of 1,200 rows holds the codes 0, 1, 2 and 3, 300 times each. Sorted, how many run-length triples does it need?',o:['1,200','300','2','4'],a:3,
    e:'Sorted, the column is 300 zeros, then 300 ones, 300 twos and 300 threes: four runs, four triples.',h:'Picture the sorted column: where does a new run start?'},
-  {q:'Two vectors point in exactly the same direction, but one is twice as long. What is their cosine similarity?',o:['1','0.5','2','0'],a:0,
-   e:'Cosine similarity depends only on the angle, which is zero here, so it is 1; the Euclidean distance instead grows with the length.',h:'Which part of the formula would change if one vector were made longer?'}
+  {q:'Take a = (3, 4), b = (6, 8) and c = (4, −3). Which statement is true?',o:['b is closer to a than c both by cosine and by distance, with cosine 0.5','a and c have cosine similarity 1','a and b have cosine 1 and Euclidean distance 5; a and c have cosine 0','All three have the same cosine similarity'],a:2,
+   e:'b = 2a points the same way: cosine 1, distance √(3² + 4²) = 5. a · c = 12 − 12 = 0, so a and c are perpendicular: cosine 0.',h:'Check whether b is a multiple of a, and compute the dot product of a and c.'},
+  {q:'Which pairing of data and consistency model fits the lesson\'s discussion?',o:['Bank balances: BASE; social likes: ACID','Bank balances: ACID; a counter of likes on a social network: BASE','Both need BASE','Both need ACID, or the data are lost'],a:1,
+   e:'A transfer must be all or nothing and always consistent (ACID); a like counter can be briefly stale on some nodes and become consistent later (BASE), in exchange for availability and scale.',h:'Ask where a temporarily wrong value would be acceptable.'}
 ];

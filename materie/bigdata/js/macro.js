@@ -53,3 +53,12 @@ const colX=(x0,cols,j)=>x0+cols.slice(0,j).reduce((a,c)=>a+c.w,0);
 /* a table panel inside a .duo/.trio grid, centred in a viewBox at least minW wide so text keeps the same size across panels */
 function tabCell(host,title,t,note,minW,extra,H){const W=Math.max(minW||330,t.w+8),dx=(W-t.w)/2-4;
   return cell(host,title,'<g transform="translate('+dx+',0)">'+t.s+(extra||'')+'</g>',W,H||t.h+8,title,note)}
+/* lessons 5 to 9: animation helpers */
+const lerp=(a,b,t)=>a+(b-a)*t;
+const stepAt=(steps,t)=>{let acc=0;for(let i=0;i<steps.length;i++){if(t<acc+steps[i]||i===steps.length-1)return {i,u:clamp((t-acc)/steps[i],0,1)};acc+=steps[i]}};
+const OKC=GRN,FAILC=RED,SHC=ORG,ACTC=PINK;
+/* a small box with centred text lines */
+const box=(x,y,w,h,lines,o)=>{o=o||{};let s=rect(x,y,w,h,o.f||'#0d0d0d',o.st||'#666',o.sw?' stroke-width="'+o.sw+'"':'');const n=lines.length,fs=o.fs||13.5;
+  lines.forEach((l,i)=>{s+=tx(x+w/2,y+h/2+(i-(n-1)/2)*(fs+4)+fs*.36,l,{s:i===0?fs:fs-1,f:i===0?(o.c||'#fff'):(o.c2||GRAY),w:i===0&&o.b?600:undefined})});return s};
+/* lessons 5 to 9: wide single figures keep a readable size on phones */
+const wideFigs=n=>$('#lezione-'+n).querySelectorAll('figure .w > div').forEach(d=>{if(d.querySelector(':scope > svg'))d.classList.add('wscroll')});

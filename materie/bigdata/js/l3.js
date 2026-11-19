@@ -106,16 +106,19 @@ QZ['3a']=()=>[{q:'After <code>Customers c LEFT JOIN Sales s ON c.customer_id = s
   e:'s.customer_id = NULL is UNKNOWN on every row, Bianchi\'s included, and WHERE drops UNKNOWN: zero rows. IS NULL would return Bianchi.',h:'What does comparing anything with NULL using = return, and which outcomes does WHERE keep?'}];
 QZ['3b']=()=>[{q:'Same moving average. What is its value on Anders\' fourth order (625.2)?',o:['974.6','1036.33','887.25','625.2'],a:1,
   e:'The window holds his orders 2, 3 and 4: (1813 + 670.8 + 625.2) / 3 = 1036.33.',h:'Work out which of his orders fall in the window of the fourth one, then average them.'}];
+QZ['3c']=()=>[{q:'If the WHERE of the second panel were <code>quantity &gt;= 10</code> instead of <code>quantity &gt; 10</code>, which products would pass <code>HAVING SUM(i.quantity) &gt; 60</code>?',o:['Only Chef Anton\'s Cajun Seasoning','Chang and Chef Anton\'s Cajun Seasoning','Chai, Chang and Chef Anton\'s Cajun Seasoning','None'],a:1,
+  e:'With >= 10 the items of exactly 10 come back: Chang becomes 10 + 40 + 15 = 65, Chai 12 + 15 = 27, Aniseed Syrup 10 + 35 = 45, Cajun stays 65. Chang and Cajun pass.',h:'Find the items with quantity exactly 10 and add them back to their products.'}];
 QZ['3']=()=>[
   {q:'With the lecture\'s buyers and sales (no extra sale), how many rows does <code>buyers LEFT OUTER JOIN sales</code> return?',o:['4','5','6','20'],a:2,
    e:'Adam and Pil have two sales each, Eva one, and Lucy none but still one row with NULLs: 2 + 2 + 1 + 1 = 6.',h:'Count the result rows buyer by buyer; a buyer with no sales still appears once.'},
   {q:'With t1 = {(1,\'a\'), (2,\'b\')} and t2 = {(1,\'a\'), (3,\'c\')}, how many rows do UNION and UNION ALL return?',o:['4 and 4','3 and 3','2 and 4','3 and 4'],a:3,
    e:'Both tables contain (1, \'a\'): UNION ALL keeps all four rows, UNION removes the duplicate and returns three.',h:'Write out the four rows and look for one that appears in both tables.'},
-  {q:'Why can\'t you write <code>WHERE SUM(quantity) &gt; 60</code> to keep the products sold in more than 60 units?',
-   o:['Because WHERE filters rows before the aggregation, when the sums do not exist yet.','Because SUM ignores NULL values.','Because SUM can only appear in ORDER BY.','You can: WHERE and HAVING are interchangeable.'],a:0,
-   e:'WHERE runs before grouping and cannot see aggregates. A condition on SUM goes in HAVING, which runs after GROUP BY.',h:'Think about the order in which the clauses are processed.'},
+  {q:'On the course OrderItem table, <code>SELECT orderid, SUM(quantity) FROM OrderItem GROUP BY orderid HAVING COUNT(*) &gt;= 2</code> returns how many rows, and which order has the largest sum?',o:['9 rows; order 2','6 rows; order 5','6 rows; order 2','3 rows; order 5'],a:1,
+   e:'Orders 1 to 6 have two or more items (order 1 has three); orders 7, 8 and 9 have one item each and are dropped by HAVING. The sums are 27, 49, 45, 21, 50 and 21: order 5 (35 + 15 = 50) is the largest, just above order 2 (49).',h:'Count the items of each order first, then add their quantities.'},
   {q:'<code>WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders o2 WHERE o2.customerid = o.customerid)</code> contains which kind of subquery?',o:['Self-contained','An EXISTS test','Table-valued','Correlated'],a:3,
    e:'The inner query uses o.customerid from the outer row, so it is correlated and evaluated again for each outer row.',h:'Look for a column of the outer query used inside the inner one.'},
   {q:'In the lecture\'s LAG example, what is PreviousPurchase on Trujillo\'s order of 1444.8?',o:['1863.4','3730','0','2490.5'],a:1,
-   e:'Trujillo\'s orders in date order are 1863.4, 3730, 1444.8, 2490.5. On the third, LAG(TotalAmount, 1, 0) returns the second: 3730.',h:'LAG with n = 1 looks one row back inside the same partition, in OrderDate order.'}
+   e:'Trujillo\'s orders in date order are 1863.4, 3730, 1444.8, 2490.5. On the third, LAG(TotalAmount, 1, 0) returns the second: 3730.',h:'LAG with n = 1 looks one row back inside the same partition, in OrderDate order.'},
+  {q:'On Trujillo\'s third order, what is the running total <code>SUM(TotalAmount) OVER (PARTITION BY customerid ORDER BY OrderDate ROWS UNBOUNDED PRECEDING)</code>, and what share is it of <code>SUM(TotalAmount) OVER (PARTITION BY customerid)</code> on the same row?',o:['7038.2, about 74%','5593.4, about 59%','7038.2, about 52%','9528.7, 100%'],a:0,
+   e:'Running total: 1863.4 + 3730 + 1444.8 = 7038.2. The partition total is Trujillo\'s whole 9528.7, and 7038.2 / 9528.7 ≈ 0.74.',h:'The first window stops at the current row; the second covers the whole partition.'}
 ];

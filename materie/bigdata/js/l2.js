@@ -134,8 +134,10 @@ QZ['2']=()=>[
    e:'Dimensions are denormalized (first normal form) for simple reading; fact tables, with measures and keys, are normalized (third normal form).',h:'Think about which kind of table is long and thin, made of keys and numbers, and which collects every attribute of one entity.'},
   {q:'On the five course customers, after <code>UPDATE Customers SET city = \'milan\';</code> how many customers live in Milan?',o:['1','5','2','0, the statement is refused'],a:1,
    e:'With no WHERE, UPDATE sets the city of every row: all five customers now live in Milan.',h:'Which part of an UPDATE limits the rows it touches, and is it there?'},
-  {q:'In <code>SELECT * FROM Sales WHERE price*quantity &gt; 10</code>, what is the predicate?',o:['price*quantity','WHERE','price*quantity &gt; 10','Sales'],a:2,
-   e:'A predicate is a logical condition, true or false for each row; price*quantity alone is an expression, and WHERE is the clause.',h:'Recall the definitions of clause, expression and predicate.'},
+  {q:'On the six course sales, how many rows does <code>WHERE price*quantity &gt; 4 AND customer_id &lt;&gt; 1 OR product_name = \'abc\'</code> return?',o:['3','4','5','6'],a:2,
+   e:'AND is evaluated before OR. The AND part holds for sales 3 (15), 4 (8) and 6 (4.5); sale 2 has amount exactly 4 and sales 1 and 5 belong to customer 1. The OR adds the abc sales 2, 4 and 5. Together: sales 2, 3, 4, 5 and 6, five rows; only sale 1 is left out.',h:'Evaluate AND before OR, and compute each amount; watch the sale whose amount is exactly 4.'},
   {q:'In the small warehouse of the lesson, which customer does surrogate key cust_key = 1 point to?',o:['Marco Rossi, business key 1','John Doe, business key 2','Mark Smith, business key 3','Mario Bianchi, business key 5'],a:3,
-   e:'Surrogate keys follow the load order (Bianchi, Doe, Jane, Rossi, Smith), so key 1 is Mario Bianchi, whose business key is 5.',h:'A surrogate key is created by ETL in load order, not copied from the source.'}
+   e:'Surrogate keys follow the load order (Bianchi, Doe, Jane, Rossi, Smith), so key 1 is Mario Bianchi, whose business key is 5.',h:'A surrogate key is created by ETL in load order, not copied from the source.'},
+  {q:'With the Sales table defined in the lesson and customers 1 to 5, how many constraints does <code>INSERT INTO Sales VALUES (7, \'2018-09-04\', 9, \'abc\', 0, 2.00)</code> break?',o:['None','One','Two','Three'],a:2,
+   e:'Customer 9 does not exist, so the foreign key (referential integrity) fails; quantity 0 breaks CHECK (quantity &gt; 0) (domain integrity). sales_id 7 is new, so the primary key is fine: two constraints.',h:'Check the new row column by column against the CREATE TABLE.'}
 ];

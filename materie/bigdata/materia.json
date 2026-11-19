@@ -1,8 +1,8 @@
 {
   "titolo": "30416 Big Data and Databases",
   "breve": "Big Data",
-  "descrizione": "Lessons 1 to 4: the data analytics timeline, relational databases and SQL, advanced SQL, NoSQL databases and the Big Data toolbox.",
-  "fonte": "A. Rezzani, slides and SQL scripts of 30416 Big Data and Databases, lessons 1 to 4 (Bocconi)",
+  "descrizione": "Lessons 1 to 9: the data analytics timeline, relational databases and SQL, NoSQL and the Big Data toolbox, Hadoop, Spark and its stack, data lakes, and the data behind predictive and generative AI.",
+  "fonte": "A. Rezzani, slides, SQL and Spark scripts of 30416 Big Data and Databases, lessons 1 to 8, and L. Molteni, slides of lesson 9 (Bocconi)",
   "ordine": 2,
   "miniatura": 3,
   "lingua": "en"

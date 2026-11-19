@@ -64,6 +64,7 @@ HAVING <span class="k-orange">SUM(i.quantity) &gt; 60</span>;</pre>
     <figcaption>Total quantity per product in the OrderItem table of the course database (Cajun is Chef Anton's Cajun Seasoning; Gumbo Mix has no items, so it forms no group). The orange line is HAVING SUM &gt; 60. In the first panel all items count; in the second WHERE quantity &gt; 10 removes the small items before the sums.</figcaption>
   </figure>
   <p>With no WHERE, only Chang (71) and Chef Anton's Cajun Seasoning (65) pass HAVING, the lecture's result. <code>COUNT(DISTINCT customerid)</code> on Orders counts different values instead of rows: 2, since only Anders and Trujillo placed orders.</p>
+  <div class="quiz inq" data-quiz="3c"></div>
 </div></section>
 
 <section><div class="col">
