@@ -67,7 +67,7 @@ Lo schema ricalca le lezioni scritte di 3b1b sulle reti neurali.
 ## 3. Struttura della pagina
 
 - **Un solo file HTML**, una lezione per capitolo o per blocco di slide. Ogni lezione è un `<article class="lesson" data-n="N" id="lezione-N" data-title="Titolo">`; se ne vede una alla volta (le altre hanno `hidden`). La lezione corrente va nell'hash `#lezione-N` (con `history.replaceState`), letto al caricamento.
-- **Barra superiore sticky**, scura e traslucida in entrambi i temi, con una griglia prospettica animata dietro il titolo (codice in appendice A): nome del corso a sinistra, link alle lezioni («1 · Nome breve») e pulsante sole/luna a destra. Su telefono il nome sparisce e i link scorrono in orizzontale.
+- **Barra superiore sticky**, scura e traslucida in entrambi i temi, con una griglia animata dietro il titolo: un canvas che disegna una griglia mentre subisce lentamente trasformazioni lineari (codice in `shared/topgrid.js`, stile in appendice A): nome del corso a sinistra, link alle lezioni («1 · Nome breve») e pulsante sole/luna a destra. Su telefono il nome sparisce e i link scorrono in orizzontale.
 - **Ogni lezione è una pila di `<section>` a tutta larghezza** con sfondo alternato; dentro, una colonna centrale `.col`. La prima sezione (`.hero`) è una fascia azzurrina con capitolo, titolo e descrizione, centrati.
 - **In fondo a ogni lezione**: sezione «Mettiti alla prova» con il quiz finale, frase di chiusura, due grandi link «Lezione precedente / successiva» con miniatura e titolo (generati dallo script).
 - **Ogni lezione ha una miniatura**: un piccolo SVG 108x72 su fondo nero che richiama la sua figura principale.
@@ -335,13 +335,8 @@ h3{font-size:1.25rem;font-weight:500;margin-top:1.2rem}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(0,0,0,.78);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);color:#fff;
   display:flex;align-items:center;gap:1.2rem;padding:1.05rem 1.6rem;font-family:var(--sans);font-size:1.02rem;line-height:1.3;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.07)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.top{background:#000}}
-.top::before{content:"";position:absolute;left:-40px;top:-30px;width:560px;height:260px;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(88,160,230,.34) 1px,transparent 1px),linear-gradient(90deg,rgba(88,160,230,.34) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.13) 1px,transparent 1px);
-  background-size:184px 184px,184px 184px,46px 46px,46px 46px;
-  transform:perspective(420px) rotateX(58deg) rotateZ(-9deg);transform-origin:0 0;
-  animation:topgrid 26s linear infinite;will-change:background-position;
-  -webkit-mask-image:radial-gradient(ellipse 70% 80% at 12% 10%,#000 0%,rgba(0,0,0,.5) 45%,transparent 78%);mask-image:radial-gradient(ellipse 70% 80% at 12% 10%,#000 0%,rgba(0,0,0,.5) 45%,transparent 78%)}
-@keyframes topgrid{from{background-position:0 0,0 0,0 0,0 0}to{background-position:184px 184px,184px 184px,184px 184px,184px 184px}}
+.top .tg{position:absolute;left:0;top:0;width:620px;height:100%;pointer-events:none;z-index:0;
+  -webkit-mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.75) 35%,transparent 96%);mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.75) 35%,transparent 96%)}
 .top>*{position:relative;z-index:1}
 .top .name{font-family:var(--serif);font-weight:400;font-size:1.45rem;letter-spacing:.005em;margin-right:auto;white-space:nowrap;color:#fff;text-decoration:none}
 .top .right{display:flex;align-items:center;justify-content:flex-end;gap:.4rem;min-width:0;flex:0 1 auto}
@@ -465,7 +460,7 @@ footer .col{gap:.6rem}
   .btn{padding:.6rem .75rem}
   .stage{padding:1.1rem .8rem}
 }
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}.top::before{animation:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 
 .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;width:100%;align-items:start}
 .trio>div{display:flex;flex-direction:column;align-items:center;gap:.5rem;min-width:0}

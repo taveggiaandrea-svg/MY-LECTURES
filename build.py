@@ -73,6 +73,7 @@ def build_subject(mid):
             js.append(open(p, encoding='utf-8').read())
     js += [rd('materie', mid, 'js', 'l%d.js' % n) for n in nums if os.path.exists(os.path.join(HERE, 'materie', mid, 'js', 'l%d.js' % n))]
     js.append(rd('shared', 'boot.js'))
+    js.append(rd('shared', 'topgrid.js'))
     write(os.path.join(SITE, mid, 'index.html'), page)
     write(os.path.join(SITE, mid, 'app.js'), '(function(){\n' + '\n'.join(js) + '\n})();\n')
     titles = [re.search(r'data-title="([^"]*)"', rd('materie', mid, 'lezioni', 'l%d.html' % n)).group(1) for n in nums]
@@ -113,7 +114,7 @@ def build_home(subjects):
             '<section><div class="col">\n<h2>Materie</h2>\n<div class="subjects">\n' + cards + '</div>\n</div></section>\n</main>\n'
             '<footer><div class="col"><p>Rielaborazioni a scopo di studio personale. Le fonti di ogni materia sono indicate in fondo alle sue lezioni; '
             'alcune licenze non permettono di distribuire opere derivate, quindi questo sito non va reso pubblico.</p></div></footer>\n'
-            '<script>' + rd('shared', 'home.js') + '</script>\n</body>\n</html>\n')
+            '<script>' + rd('shared', 'home.js') + rd('shared', 'topgrid.js') + '</script>\n</body>\n</html>\n')
     write(os.path.join(SITE, 'index.html'), page)
 
 def main():

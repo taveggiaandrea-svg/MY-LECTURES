@@ -13,6 +13,7 @@ shared/style.css     foglio di stile comune (non duplicarlo nelle materie)
 shared/core.js       colori, macro KaTeX, funzioni di base, quiz, player, componenti (piani, alberi, matrici)
 shared/boot.js       riquadri neri, tema, navigazione fra le lezioni, montaggio pigro
 shared/home.js       tema della pagina iniziale
+shared/topgrid.js    griglia animata nella barra superiore (una griglia che subisce lente trasformazioni lineari), in tutte le pagine
 materie/<id>/
   materia.json       titolo, breve, descrizione, fonte, ordine nella pagina iniziale, numero della miniatura, lingua (facoltativa, "it" se manca)
   top.html           barra superiore della materia (il nome porta alla pagina iniziale) e apertura di <main>
