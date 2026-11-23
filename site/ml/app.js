@@ -94,17 +94,25 @@ function player(host,dur,onFrame){
   sc.addEventListener('input',()=>{stop();pos=+sc.value;show()});
   show();return {stop,play,seek(k){stop();pos=k;show()}};
 }
-/* quiz a scelta multipla: si sceglie, poi «Verifica» */
+/* quiz a scelta multipla: si sceglie, poi «Verifica».
+   La risposta verificata resta salvata in questo browser (localStorage) e alla visita successiva ricompare già verificata;
+   la chiave contiene materia, quiz e domanda, più un'impronta del testo, così una domanda riscritta non eredita la vecchia risposta. */
+const quizKey=(root,i,q)=>{let h=5381;for(const c of q.q+'|'+q.o.join('|'))h=(h*33^c.charCodeAt(0))>>>0;
+  return 'quiz|'+(location.pathname.split('/').filter(Boolean)[0]||'')+'|'+(root.dataset.quiz||'')+'|'+i+'|'+h.toString(36)};
 function quiz(root,qs){
-  qs.forEach(q=>{
+  qs.forEach((q,qi)=>{
     const box=el('div','q');box.append(el('p','',q.q));
     const opts=el('div','opts'),fb=el('div','fb'),chk=btn(UI.check);chk.classList.add('solid','chk');fb.setAttribute('aria-live','polite');
-    let sel=null;
+    let sel=null;const key=quizKey(root,qi,q);
     const bsq=q.o.map((t,i)=>{const b=btn(t,true);b.onclick=()=>{sel=i;bsq.forEach((x,j)=>{press(x,j===i);x.classList.remove('right','wrong')});fb.innerHTML=''};opts.append(b);return b});
-    chk.onclick=()=>{if(sel===null){fb.innerHTML=UI.pickFirst;return}
-      press(bsq[sel],false);bsq[sel].classList.add(sel===q.a?'right':'wrong');
-      fb.innerHTML=sel===q.a?'<b>'+UI.right+'</b> '+q.e:'<b>'+UI.wrong+'</b> '+q.h};
+    const verify=save=>{if(sel===null){fb.innerHTML=UI.pickFirst;return}
+      press(bsq[sel],false);bsq[sel].classList.add(sel===q.a?'right':'wrong');box.classList.add('done');
+      fb.innerHTML=sel===q.a?'<b>'+UI.right+'</b> '+q.e:'<b>'+UI.wrong+'</b> '+q.h;
+      if(save)try{localStorage.setItem(key,String(sel))}catch(e){}};
+    chk.onclick=()=>verify(true);
     box.append(opts,chk,fb);root.append(box);
+    let v=null;try{v=localStorage.getItem(key)}catch(e){}
+    if(v!==null&&+v>=0&&+v<bsq.length){sel=+v;verify(false)}
   });
 }
 const INIT={},QZ={},THUMB={};
@@ -5946,6 +5954,7 @@ function show(n,scroll){
   }
   if(scroll)window.scrollTo(0,0);
   if(typeof paintBar==='function')paintBar();
+  if(typeof paintProgress==='function')paintProgress();
 }
 document.addEventListener('click',e=>{
   const a=e.target.closest('[data-go]');if(!a)return;
@@ -5956,7 +5965,7 @@ document.addEventListener('click',e=>{
 (function(){const m=location.hash.match(/lezione-(\d+)/);show(m&&NUMS.includes(+m[1])?+m[1]:NUMS[0],false)})();
 renderMath(document.querySelector('footer'));
 
-/* ---------- Barra di scorrimento come mappa: domande in azzurro velato, riepiloghi in grigio più chiaro, teoria nel colore della barra ----------
+/* ---------- Barra di scorrimento come mappa: domande in azzurro molto velato, riepiloghi in ambra velato, teoria nel colore della barra ----------
    La barra rappresenta tutta la pagina: un punto a quota y sta a y/altezza della pagina lungo la barra, la stessa regola del cursore. */
 var paintBar=(function(){
   let raf=0;const root=document.documentElement;
@@ -5980,6 +5989,27 @@ var paintBar=(function(){
   try{new ResizeObserver(go).observe(document.body)}catch(e){}
   window.addEventListener('resize',go);
   try{new MutationObserver(go).observe(root,{attributes:true,attributeFilter:['data-theme']})}catch(e){}
+  return go})();
+
+/* ---------- Avanzamento della lezione: percentuale a decine (0%, 10%, … 100%) ----------
+   Su schermi larghi l'etichetta segue il cursore della barra di scorrimento; su telefono sta in basso a sinistra.
+   La percentuale misura quanto della lezione aperta è passato sopra il bordo inferiore dello schermo. */
+var paintProgress=(function(){
+  const tag=el('div','prog');tag.setAttribute('aria-hidden','true');document.body.append(tag);
+  let raf=0;const root=document.documentElement;
+  function paint(){raf=0;
+    const art=lessons.find(l=>!l.hidden);if(!art){tag.hidden=true;return}tag.hidden=false;
+    const sy=window.scrollY,vh=window.innerHeight,H=root.scrollHeight,top=art.getBoundingClientRect().top+sy,h=art.offsetHeight;
+    let p=Math.min(1,Math.max(0,(sy+vh-top)/h));if(sy+vh>=H-2)p=1;
+    tag.textContent=Math.floor(p*10+1e-9)*10+'%';
+    if(window.innerWidth>=900){
+      /* centro del cursore: (scroll + metà schermo) / altezza pagina, riportato all'altezza dello schermo */
+      const c=(sy+vh/2)/H*vh,hd=(document.querySelector('.top')||{offsetHeight:0}).offsetHeight;
+      tag.style.top=Math.round(Math.min(vh-72,Math.max(hd+8,c-14)))+'px';tag.classList.remove('low')}
+    else{tag.style.top='';tag.classList.add('low')}}
+  const go=()=>{if(!raf)raf=requestAnimationFrame(paint)};
+  window.addEventListener('scroll',go,{passive:true});window.addEventListener('resize',go);
+  try{new ResizeObserver(go).observe(document.body)}catch(e){}
   return go})();
 
 /* ---------- Ask AI: domande a Gemini sulle lezioni della materia; la chiave resta solo in questo browser ----------

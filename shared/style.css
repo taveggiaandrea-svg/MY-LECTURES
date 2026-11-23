@@ -258,9 +258,9 @@ pre.code .kw{color:var(--theme)}
 table.tight th,table.tight td{padding:.45rem .5rem}
 table.tight th.n{white-space:normal}
 /* barra di scorrimento della pagina come mappa della lezione aperta: teoria nel grigio della barra,
-   domande in un azzurro velato (l'azzurro del sito mescolato al grigio della barra, come i pulsanti), riepiloghi in un grigio più chiaro; i colori li calcola boot.js in --sbar */
-:root{--sb-text:#2b2b2b;--sb-recap:#454545;--sb-quiz:color-mix(in srgb,var(--theme) 45%,var(--sb-text));--sb-thumb:#e6e6e6;--sb-edge:#000}
-:root[data-theme="light"]{--sb-text:#ececec;--sb-recap:#d4d4d4;--sb-quiz:color-mix(in srgb,var(--theme) 45%,var(--sb-text));--sb-thumb:#4a4a4a;--sb-edge:#fff}
+   domande in un azzurro molto velato (24% dell'azzurro del sito nel grigio della barra), riepiloghi in un ambra altrettanto velato; i colori li calcola boot.js in --sbar */
+:root{--sb-text:#2b2b2b;--sb-recap:color-mix(in srgb,#e6b566 20%,var(--sb-text));--sb-quiz:color-mix(in srgb,var(--theme) 24%,var(--sb-text));--sb-thumb:#e6e6e6;--sb-edge:#000}
+:root[data-theme="light"]{--sb-text:#ececec;--sb-recap:color-mix(in srgb,#c98a1c 22%,var(--sb-text));--sb-quiz:color-mix(in srgb,var(--theme) 24%,var(--sb-text));--sb-thumb:#4a4a4a;--sb-edge:#fff}
 html::-webkit-scrollbar{width:13px}
 html::-webkit-scrollbar-track{background:var(--sbar,var(--sb-text))}
 html::-webkit-scrollbar-thumb{background:var(--sb-thumb);border:1px solid var(--sb-edge);border-radius:7px;min-height:40px}
@@ -277,3 +277,9 @@ html::-webkit-scrollbar-thumb:hover{background:var(--fg)}
 .dqa{white-space:pre-wrap;color:var(--gray);font-size:.92rem;margin-top:.5rem}
 .dq .btn{font-size:.85rem;min-height:2rem;padding:.35rem .7rem}
 .domlink{font-family:var(--sans);margin-top:1.4rem}
+/* avanzamento della lezione accanto al cursore della barra di scorrimento */
+.prog{position:fixed;right:6px;z-index:25;font:500 .78rem/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--fg);
+  background:color-mix(in srgb,var(--band) 82%,transparent);border:1px solid var(--frame);border-radius:999px;padding:.38rem .55rem;
+  pointer-events:none;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:top .08s linear}
+.prog.low{top:auto;right:auto;left:14px;bottom:14px}
+.prog[hidden]{display:none}
