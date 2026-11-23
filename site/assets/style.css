@@ -254,9 +254,9 @@ pre.code .kw{color:var(--theme)}
 table.tight th,table.tight td{padding:.45rem .5rem}
 table.tight th.n{white-space:normal}
 /* barra di scorrimento della pagina come mappa della lezione aperta: teoria nel grigio della barra,
-   domande nell'azzurro del sito, riepiloghi in un grigio azzurrato; i colori li calcola boot.js in --sbar */
-:root{--sb-text:#2b2b2b;--sb-recap:#3b4b58;--sb-thumb:#e6e6e6;--sb-edge:#000}
-:root[data-theme="light"]{--sb-text:#ececec;--sb-recap:#c9dbe9;--sb-thumb:#4a4a4a;--sb-edge:#fff}
+   domande in un azzurro velato (l'azzurro del sito mescolato al grigio della barra, come i pulsanti), riepiloghi in un grigio più chiaro; i colori li calcola boot.js in --sbar */
+:root{--sb-text:#2b2b2b;--sb-recap:#454545;--sb-quiz:color-mix(in srgb,var(--theme) 45%,var(--sb-text));--sb-thumb:#e6e6e6;--sb-edge:#000}
+:root[data-theme="light"]{--sb-text:#ececec;--sb-recap:#d4d4d4;--sb-quiz:color-mix(in srgb,var(--theme) 45%,var(--sb-text));--sb-thumb:#4a4a4a;--sb-edge:#fff}
 html::-webkit-scrollbar{width:13px}
 html::-webkit-scrollbar-track{background:var(--sbar,var(--sb-text))}
 html::-webkit-scrollbar-thumb{background:var(--sb-thumb);border:1px solid var(--sb-edge);border-radius:7px;min-height:40px}

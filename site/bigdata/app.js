@@ -1594,13 +1594,13 @@ document.addEventListener('click',e=>{
 (function(){const m=location.hash.match(/lezione-(\d+)/);show(m&&NUMS.includes(+m[1])?+m[1]:NUMS[0],false)})();
 renderMath(document.querySelector('footer'));
 
-/* ---------- Barra di scorrimento come mappa: domande in azzurro, riepiloghi in grigio azzurrato, teoria nel colore della barra ----------
+/* ---------- Barra di scorrimento come mappa: domande in azzurro velato, riepiloghi in grigio più chiaro, teoria nel colore della barra ----------
    La barra rappresenta tutta la pagina: un punto a quota y sta a y/altezza della pagina lungo la barra, la stessa regola del cursore. */
 var paintBar=(function(){
   let raf=0;const root=document.documentElement;
   function paint(){raf=0;
     const art=lessons.find(l=>!l.hidden);if(!art)return;
-    const cs=getComputedStyle(root),T=cs.getPropertyValue('--sb-text').trim(),Q=cs.getPropertyValue('--theme').trim(),R=cs.getPropertyValue('--sb-recap').trim();
+    const cs=getComputedStyle(root),T=cs.getPropertyValue('--sb-text').trim(),Q=cs.getPropertyValue('--sb-quiz').trim()||cs.getPropertyValue('--theme').trim(),R=cs.getPropertyValue('--sb-recap').trim();
     const H=root.scrollHeight,sy=window.scrollY,parts=[];
     const add=(e,c)=>{const r=e.getBoundingClientRect();if(r.height>0)parts.push([(r.top+sy)/H*100,(r.bottom+sy)/H*100,c])};
     art.querySelectorAll(':scope > section.recap').forEach(s=>add(s,R));
