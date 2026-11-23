@@ -49,7 +49,8 @@ function renderMath(root){
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
   prev:'Lezione precedente',next:'Lezione successiva',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
-  askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulla lezione fornita. Se la domanda esce dalla lezione, dillo.'};
+  askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
+  askFmt:'Scrivi le formule in LaTeX fra \\( \\) o \\[ \\], mai con il simbolo del dollaro.'};
 const $=s=>document.querySelector(s);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e};
 const btn=(label,html)=>{const b=el('button','btn');b.type='button';if(html)b.innerHTML=label;else b.textContent=label;return b};
@@ -5949,29 +5950,91 @@ document.addEventListener('click',e=>{
 (function(){const m=location.hash.match(/lezione-(\d+)/);show(m&&NUMS.includes(+m[1])?+m[1]:NUMS[0],false)})();
 renderMath(document.querySelector('footer'));
 
-/* ---------- Ask AI: domande a Gemini sulla lezione aperta; la chiave resta solo in questo browser ---------- */
+/* ---------- Ask AI: domande a Gemini sulle lezioni della materia; la chiave resta solo in questo browser ----------
+   Veloce: risposta in streaming (il testo compare mentre arriva), ragionamento al livello «low»,
+   modelli non disponibili ricordati e saltati. Contesto: la lezione aperta per intero, la mappa del corso
+   e i passaggi delle altre lezioni più vicini alla domanda (o le lezioni citate per numero), così la richiesta resta piccola. */
 (function(){
   const b=el('button','askbtn',UI.ask),p=el('div','askp');b.type='button';p.hidden=true;
   p.innerHTML='<div class="askh"><b>'+UI.ask+'</b><button type="button" class="askx" aria-label="×">×</button></div><div class="asko" aria-live="polite"></div>'+
     '<textarea rows="3" aria-label="'+UI.ask+'"></textarea><div class="ctl"><button type="button" class="btn solid">'+UI.askSend+'</button><button type="button" class="btn askk">'+UI.askKey+'</button></div>';
   document.body.append(b,p);
   const o=p.querySelector('.asko'),ta=p.querySelector('textarea'),go=p.querySelector('.solid');
-  const key=ask=>{let k='';try{k=localStorage.getItem('gemini-key')||''}catch(e){}
-    if(!k||ask){k=(prompt(UI.askPrompt)||'').trim();if(k)try{localStorage.setItem('gemini-key',k)}catch(e){}}return k};
+  const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k)||'';localStorage.setItem(k,v)}catch(e){return ''}};
+  const key=ask=>{let k=ls('gemini-key');if(!k||ask){k=(prompt(UI.askPrompt)||'').trim();if(k)ls('gemini-key',k)}return k};
   b.onclick=()=>{p.hidden=!p.hidden;if(!p.hidden)ta.focus()};
   p.querySelector('.askx').onclick=()=>{p.hidden=true};
-  p.querySelector('.askk').onclick=()=>key(true);
+  p.querySelector('.askk').onclick=()=>{ls('gemini-skip','');key(true)};
+
+  /* testo pulito di un nodo: niente figure, pulsanti o quiz; le formule già disegnate tornano in TeX */
+  const BLK='p,h1,h2,h3,h4,li,div,figcaption,summary,tr,td,th,br,section,details';
+  function clean(node){const c=node.cloneNode(true);
+    c.querySelectorAll('.stage,svg,canvas,script,style,button,input,select,.navend,.q,.ctl').forEach(x=>x.remove());
+    c.querySelectorAll('.katex-display,.katex').forEach(k=>{if(!k.isConnected&&!c.contains(k))return;
+      const a=k.querySelector('annotation'),d=k.classList.contains('katex-display');
+      k.replaceWith(a?(d?'\\['+a.textContent+'\\]':'\\('+a.textContent+'\\)'):k.textContent)});
+    c.querySelectorAll(BLK).forEach(x=>x.append('\n'));
+    return c.textContent.replace(/[ \t ]+/g,' ').replace(/\s*\n\s*/g,'\n').trim()}
+  /* le lezioni a pezzi (una <section> ciascuno), calcolate una volta sola */
+  let CH=null,MAP='';
+  function index(){if(CH)return;CH=[];
+    MAP=lessons.map(l=>{const hs=[...l.querySelectorAll('h2')].map(h=>h.textContent.trim()).join('; ');
+      return l.dataset.n+' · '+l.dataset.title+(hs?' ('+hs+')':'')}).join('\n');
+    lessons.forEach(l=>l.querySelectorAll(':scope > section').forEach(s=>{const t=clean(s);if(t.length>80)CH.push({n:+l.dataset.n,t})}))}
+  /* ricerca per parole: radici di 5 lettere, pesate per rarità */
+  const words=t=>(t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').match(/[a-z0-9]{4,}/g)||[]).map(w=>w.slice(0,5));
+  function related(q,cur,budget){
+    const qs=[...new Set(words(q))];if(!qs.length)return [];
+    const df={};CH.forEach(c=>{c.w=c.w||new Set(words(c.t));qs.forEach(w=>{if(c.w.has(w))df[w]=(df[w]||0)+1})});
+    return CH.filter(c=>c.n!==cur).map(c=>({c,s:qs.reduce((a,w)=>a+(c.w.has(w)?Math.log(1+CH.length/df[w]):0),0)/Math.sqrt(1+c.t.length/1500)}))
+      .filter(x=>x.s>0).sort((a,b)=>b.s-a.s).filter(x=>(budget-=x.c.t.length)>0).map(x=>x.c)}
+  function context(q,cur){index();
+    const art=byN(cur),parts=['COURSE: '+document.title+'\nLESSONS:\n'+MAP,'OPEN LESSON '+cur+':\n'+clean(art).slice(0,40000)];
+    /* lezioni citate per numero nella domanda: intere */
+    const named=[...new Set([...q.matchAll(/\b(?:lezione|lezioni|lesson|lessons|lez\.?|l)\s*(\d{1,2})\b/gi)].map(m=>+m[1]))].filter(n=>n!==cur&&NUMS.includes(n)).slice(0,3);
+    named.forEach(n=>parts.push('LESSON '+n+':\n'+clean(byN(n)).slice(0,30000)));
+    if(!named.length){const r=related(q,cur,14000);
+      if(r.length)parts.push('EXCERPTS FROM OTHER LESSONS:\n'+r.map(c=>'[lesson '+c.n+'] '+c.t).join('\n\n'))}
+    return parts.join('\n\n')}
+
+  /* risposta leggibile: grassetto, codice, elenchi, formule con KaTeX */
+  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function show(t,final){if(!final){o.textContent=t;return}
+    o.innerHTML=esc(t).replace(/```[a-z]*\n?([\s\S]*?)```/g,'<code class="askc">$1</code>').replace(/`([^`\n]+)`/g,'<code>$1</code>')
+      .replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/^[ \t]*[*-] /gm,'• ').replace(/^#{1,4} +(.*)$/gm,'<b>$1</b>');
+    renderMath(o)}
+
+  /* modelli in ordine di preferenza; quelli che rispondono «non esiste» vengono ricordati e saltati */
+  const MODELS=[['gemini-4-hydrogen',{thinkingLevel:'low'}],['gemini-3.5-flash',{thinkingLevel:'low'}],['gemini-2.5-flash',{thinkingBudget:0}]];
+  let hist=[],histN=null,ctrl=null;
   go.onclick=async()=>{const q=ta.value.trim(),k=q&&key();if(!k)return;
-    const art=lessons.find(l=>!l.hidden),ctx=(art?art.innerText:'').slice(0,30000);
-    o.textContent='…';go.disabled=true;
-    try{let j;const body=JSON.stringify({systemInstruction:{parts:[{text:UI.askSys}]},contents:[{role:'user',parts:[{text:'LESSON:\n'+ctx+'\n\nQUESTION: '+q}]}]});
-      /* modelli in ordine di preferenza: se uno non esiste o non è disponibile si passa al successivo */
-      for(const m of ['gemini-4-hydrogen','gemini-3.5-flash','gemini-2.5-flash']){
-        const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},body});
-        j=await r.json();if(r.ok||(r.status!==404&&r.status!==400))break}
-      o.textContent=j.candidates&&j.candidates[0].content?j.candidates[0].content.parts.map(x=>x.text||'').join(''):((j.error&&j.error.message)||'Error')}
-    catch(e){o.textContent=String(e)}
-    go.disabled=false};
+    const cur=(lessons.find(l=>!l.hidden)||lessons[0]).dataset.n|0;
+    if(histN!==cur){hist=[];histN=cur}
+    if(ctrl)ctrl.abort();ctrl=new AbortController();const sig=ctrl.signal;
+    o.textContent='…';go.disabled=true;ta.value='';
+    const contents=[{role:'user',parts:[{text:context(q,cur)}]},{role:'model',parts:[{text:'OK.'}]},...hist,{role:'user',parts:[{text:q}]}];
+    const skip=ls('gemini-skip').split(',');let txt='',err='';
+    try{for(const [m,th] of MODELS){if(skip.includes(m))continue;
+        const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':streamGenerateContent?alt=sse',{method:'POST',signal:sig,
+          headers:{'Content-Type':'application/json','x-goog-api-key':k},
+          body:JSON.stringify({systemInstruction:{parts:[{text:UI.askSys+' '+UI.askFmt}]},contents,generationConfig:{thinkingConfig:th,maxOutputTokens:2048}})});
+        if(!r.ok){let j={};try{j=await r.json()}catch(e){}err=(j.error&&j.error.message)||('HTTP '+r.status);
+          if(/api key/i.test(err))break;
+          if(r.status===404){skip.push(m);ls('gemini-skip',skip.filter(Boolean).join(','))}
+          if([400,404,429,500,503].includes(r.status))continue;break}
+        err='';const rd=r.body.getReader(),dec=new TextDecoder();let buf='';
+        for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});
+          let i;while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);
+            if(!line.startsWith('data:'))continue;
+            try{const j=JSON.parse(line.slice(5)),c=j.candidates&&j.candidates[0];
+              if(c&&c.content&&c.content.parts)txt+=c.content.parts.filter(x=>!x.thought).map(x=>x.text||'').join('');
+              if(j.error)err=j.error.message}catch(e){}}
+          show(txt,false)}
+        break}
+      if(txt){show(txt,true);hist.push({role:'user',parts:[{text:q}]},{role:'model',parts:[{text:txt}]});hist=hist.slice(-6)}
+      else o.textContent=err||'Error'}
+    catch(e){if(e.name!=='AbortError')o.textContent=txt||String(e)}
+    if(!sig.aborted)go.disabled=false};
   ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();go.click()}});
 })();
 

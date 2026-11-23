@@ -11,7 +11,7 @@ Leggere prima `METODO.md`: contiene tutte le regole di scrittura, di stile, di d
 ```
 shared/style.css     foglio di stile comune (non duplicarlo nelle materie)
 shared/core.js       colori, macro KaTeX, funzioni di base, quiz, player, componenti (piani, alberi, matrici)
-shared/boot.js       riquadri neri, tema, navigazione fra le lezioni, montaggio pigro
+shared/boot.js       riquadri neri, tema, navigazione fra le lezioni, montaggio pigro, assistente «Chiedi all'AI» (Gemini in streaming, lezione aperta + mappa del corso + estratti delle altre lezioni)
 shared/home.js       tema della pagina iniziale
 shared/topgrid.js    griglia animata nella barra superiore (una griglia che subisce lente trasformazioni lineari), in tutte le pagine
 materie/<id>/

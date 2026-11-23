@@ -248,3 +248,5 @@ pre.code .kw{color:var(--theme)}
 /* wide figures that scroll sideways on narrow screens instead of shrinking their text */
 .wscroll{overflow-x:auto;overflow-y:hidden}
 .wscroll>svg{min-width:560px}
+.asko code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em}
+.asko .askc{display:block;white-space:pre;overflow-x:auto;background:var(--bg);border:1px solid var(--rule);padding:.4rem .5rem;margin:.3rem 0}
