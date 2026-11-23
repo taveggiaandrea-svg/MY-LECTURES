@@ -35,6 +35,7 @@ function show(n,scroll){
     art.querySelectorAll('[data-quiz]').forEach(q=>{const f=QZ[q.dataset.quiz];if(f)quiz(q,f())});
   }
   if(scroll)window.scrollTo(0,0);
+  if(typeof paintBar==='function')paintBar();
 }
 document.addEventListener('click',e=>{
   const a=e.target.closest('[data-go]');if(!a)return;
@@ -44,6 +45,32 @@ document.addEventListener('click',e=>{
 });
 (function(){const m=location.hash.match(/lezione-(\d+)/);show(m&&NUMS.includes(+m[1])?+m[1]:NUMS[0],false)})();
 renderMath(document.querySelector('footer'));
+
+/* ---------- Barra di scorrimento come mappa: domande in azzurro, riepiloghi in grigio azzurrato, teoria nel colore della barra ----------
+   La barra rappresenta tutta la pagina: un punto a quota y sta a y/altezza della pagina lungo la barra, la stessa regola del cursore. */
+var paintBar=(function(){
+  let raf=0;const root=document.documentElement;
+  function paint(){raf=0;
+    const art=lessons.find(l=>!l.hidden);if(!art)return;
+    const cs=getComputedStyle(root),T=cs.getPropertyValue('--sb-text').trim(),Q=cs.getPropertyValue('--theme').trim(),R=cs.getPropertyValue('--sb-recap').trim();
+    const H=root.scrollHeight,sy=window.scrollY,parts=[];
+    const add=(e,c)=>{const r=e.getBoundingClientRect();if(r.height>0)parts.push([(r.top+sy)/H*100,(r.bottom+sy)/H*100,c])};
+    art.querySelectorAll(':scope > section.recap').forEach(s=>add(s,R));
+    art.querySelectorAll('.quiz').forEach(q=>{const s=q.closest('section');
+      /* il quiz finale colora tutta la sua sezione («Mettiti alla prova»), quelli nel testo solo il proprio blocco */
+      add(!q.classList.contains('inq')&&s&&s.querySelectorAll('.quiz').length===1&&!s.querySelector('figure')?s:q,Q)});
+    parts.sort((a,b)=>a[0]-b[0]);
+    let g=[],at=0;const f=v=>v.toFixed(3)+'%';
+    parts.forEach(([a,b,c])=>{if(a>at)g.push(T+' '+f(at),T+' '+f(a));g.push(c+' '+f(Math.max(a,at)),c+' '+f(b));at=Math.max(at,b)});
+    g.push(T+' '+f(at),T+' 100%');
+    root.style.setProperty('--sbar','linear-gradient(to bottom,'+g.join(',')+')');
+    /* Chrome non ridisegna la barra quando cambia solo la variabile: un cambio di overflow la forza */
+    const y=window.scrollY;root.style.overflowY='hidden';void root.offsetWidth;root.style.overflowY='';if(window.scrollY!==y)window.scrollTo(0,y)}
+  const go=()=>{if(!raf)raf=requestAnimationFrame(paint)};
+  try{new ResizeObserver(go).observe(document.body)}catch(e){}
+  window.addEventListener('resize',go);
+  try{new MutationObserver(go).observe(root,{attributes:true,attributeFilter:['data-theme']})}catch(e){}
+  return go})();
 
 /* ---------- Ask AI: domande a Gemini sulle lezioni della materia; la chiave resta solo in questo browser ----------
    Veloce: risposta in streaming (il testo compare mentre arriva), ragionamento al livello «low»,

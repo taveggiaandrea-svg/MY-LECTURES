@@ -133,7 +133,7 @@
   <p>In the 2020s the trend topics are Big Data again (new versions of Hadoop and Spark), predictive analytics and <strong>cloud computing</strong>: renting platforms (PaaS, platform as a service) or raw infrastructure (IaaS, infrastructure as a service) instead of buying servers, with resources that scale at low prices. Traditional sources such as ERPs and CRMs now keep a deeper level of detail, and new sources keep arriving: scientific and medical equipment, distributed control systems in plants, high frequency trading, social media, Internet of Things devices.</p>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lesson 1 at a glance</h2>
   <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
   <h3>Basic vocabulary</h3>
@@ -324,7 +324,7 @@ ORDER BY quantity DESC;</pre>
   <div class="quiz inq" data-quiz="2c"></div>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lesson 2 at a glance</h2>
   <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
   <h3>Relational databases</h3>
@@ -485,7 +485,7 @@ WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders o2
   <div class="quiz inq" data-quiz="3b"></div>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lesson 3 at a glance</h2>
   <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
   <h3>Combining tables</h3>
@@ -630,7 +630,7 @@ RETURN m.title, a.name</pre>
   </figure>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lesson 4 at a glance</h2>
   <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
   <h3>Distributed systems and NoSQL</h3>
@@ -668,7 +668,7 @@ RETURN m.title, a.name</pre>
   <div class="quiz" data-quiz="4"></div>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lessons 1 to 4 at a glance</h2>
   <div class="scroll"><table><thead><tr><th>Lesson</th><th>Concept</th><th>Idea to keep</th><th>In one line</th></tr></thead><tbody>
     <tr><td>1</td><td>Data warehouse and ETL</td><td>Analysis moves off the operational systems onto integrated, cleansed data</td><td>Extract, Transform, Load</td></tr>
@@ -789,7 +789,7 @@ RETURN m.title, a.name</pre>
   <p>Kafka, which the lecture names here without detail, is a platform that moves streams of events between systems. The key idea: learn the Hadoop concepts (HDFS, name node and data nodes, partitioning, data locality, that is running the computation where the data are, YARN), because they explain why every modern distributed system looks the way it does, not MapReduce mastery.</p>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lesson 5 at a glance</h2>
   <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
   <h3>HDFS</h3>
@@ -929,7 +929,7 @@ spark.sql("select product, sum(value) as qt_tot from sales group by product")</p
   <div class="quiz inq" data-quiz="6d"></div>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lesson 6 at a glance</h2>
   <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
   <h3>Spark and its cluster</h3>
@@ -1053,7 +1053,7 @@ query = (streamingCountsDF.writeStream.format("memory")
   <div class="quiz inq" data-quiz="7d"></div>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lesson 7 at a glance</h2>
   <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
   <h3>Structured Streaming</h3>
@@ -1190,7 +1190,7 @@ query = (streamingCountsDF.writeStream.format("memory")
   <p>The pros, according to the lecture: cost savings, since storing and maintaining data is cheaper than replicating them and transforming them into other formats and places; logical abstraction, since heterogeneous sources can interact more easily; easier governance, since rules are applied centrally to all the data; a bridge between structured and unstructured data; and higher productivity, since less time goes into integrating sources. The cons follow from the second panel: it relies on the storage, memory and CPUs of the sources, can require big memory and computation resources, increases network traffic, needs a high initial investment and can be slow for complex tasks.</p>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lesson 8 at a glance</h2>
   <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
   <h3>The data lake</h3>
@@ -1371,7 +1371,7 @@ query = (streamingCountsDF.writeStream.format("memory")
   <p>SMOTE, in the fraud row, creates synthetic examples of the rare class so that the model sees enough frauds to learn from; lift and gain charts measure how much better than random a score ranks the customers who respond. ARIMA is a classic time-series model, XGBoost a widely used implementation of gradient boosted trees, and Regression Learner the KNIME node that fits a linear regression.</p>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lesson 9 at a glance</h2>
   <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
   <h3>Predictive and generative AI</h3>
@@ -1421,7 +1421,7 @@ query = (streamingCountsDF.writeStream.format("memory")
   <div class="quiz" data-quiz="9"></div>
 </div></section>
 
-<section><div class="col">
+<section class="recap"><div class="col">
   <h2>Lessons 5 to 9 at a glance</h2>
   <div class="scroll"><table><thead><tr><th>Lesson</th><th>Concept</th><th>Idea to keep</th><th>In one line</th></tr></thead><tbody>
     <tr><td>5</td><td>HDFS</td><td>Files cut into blocks, each replicated on different racks</td><td>128 MB blocks × 3 copies</td></tr>
