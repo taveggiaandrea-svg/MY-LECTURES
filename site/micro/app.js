@@ -2243,7 +2243,7 @@ document.addEventListener('click',e=>{
 (function(){const m=location.hash.match(/lezione-(\d+)/);show(m&&NUMS.includes(+m[1])?+m[1]:NUMS[0],false)})();
 renderMath(document.querySelector('footer'));
 
-/* ---------- Barra di scorrimento come mappa: domande in azzurro velato, riepiloghi in grigio più chiaro, teoria nel colore della barra ----------
+/* ---------- Barra di scorrimento come mappa: domande in azzurro molto velato, riepiloghi in ambra velato, teoria nel colore della barra ----------
    La barra rappresenta tutta la pagina: un punto a quota y sta a y/altezza della pagina lungo la barra, la stessa regola del cursore. */
 var paintBar=(function(){
   let raf=0;const root=document.documentElement;
