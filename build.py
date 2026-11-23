@@ -108,11 +108,28 @@ def build_home(subjects):
             '<section class="hero"><div class="col">\n  <p class="chap">Un posto solo per tutte le materie</p>\n'
             '  <h1>Le mie lezioni</h1>\n  <p class="desc">Lezioni interattive costruite dalle fonti di ciascun corso: '
             'figure da guardare, formule colorate, quiz per verificarsi.</p>\n</div></section>\n'
-            '<section><div class="col">\n<h2>Materie</h2>\n<div class="subjects">\n' + cards + '</div>\n</div></section>\n</main>\n'
+            '<section><div class="col">\n<h2>Materie</h2>\n<div class="subjects">\n' + cards + '</div>\n'
+            '<p class="domlink"><a href="domande/">Le domande fatte a «Chiedi all\'AI»</a></p>\n</div></section>\n</main>\n'
             '<footer><div class="col"><p>Rielaborazioni a scopo di studio personale. Le fonti di ogni materia sono indicate in fondo alle sue lezioni; '
             'alcune licenze non permettono di distribuire opere derivate, quindi questo sito non va reso pubblico.</p></div></footer>\n'
             '<script>' + rd('shared', 'home.js') + rd('shared', 'topgrid.js') + '</script>\n</body>\n</html>\n')
     write(os.path.join(SITE, 'index.html'), page)
+
+def build_questions():
+    """Pagina privata con l'archivio delle domande all'assistente (i dati vengono da /api/domande, nel Worker)."""
+    page = (head("Domande all'AI", '../') +
+            '<header class="top solo">\n  <a class="name" href="../">Le mie lezioni</a>\n  <div class="right">\n'
+            '  <button class="tog" id="tog" type="button"></button>\n  </div>\n</header>\n<main>\n'
+            '<section class="hero"><div class="col">\n  <p class="chap">Archivio di «Chiedi all\'AI»</p>\n'
+            '  <h1>Che cosa ho chiesto all\'AI?</h1>\n  <p class="desc">Ogni domanda fatta all\'assistente, con la lezione da cui è nata e la risposta: '
+            'serve a capire quali dubbi sorgono e a scrivere le prossime lezioni in modo che la risposta ci sia già.</p>\n</div></section>\n'
+            '<section><div class="col">\n<h2>Dove nascono le domande</h2>\n<div id="domstat"></div>\n</div></section>\n'
+            '<section><div class="col">\n<h2>Tutte le domande</h2>\n<div class="domctl"><select id="dommat" aria-label="Materia"></select>'
+            '<input id="domq" type="search" placeholder="Cerca nel testo" aria-label="Cerca">'
+            '<a class="btn" href="../api/domande?formato=csv" download>Esporta CSV</a><a class="btn" href="../api/domande" target="_blank" rel="noopener">JSON</a></div>\n'
+            '<div id="dom"><p>Caricamento…</p></div>\n</div></section>\n</main>\n'
+            '<script>' + rd('shared', 'home.js') + rd('shared', 'domande.js') + rd('shared', 'topgrid.js') + '</script>\n</body>\n</html>\n')
+    write(os.path.join(SITE, 'domande', 'index.html'), page)
 
 def main():
     katex_assets()
@@ -126,6 +143,7 @@ def main():
         print('materia', mid, len(nums), 'lezioni')
     subjects.sort(key=lambda s: s[1].get('ordine', 99))
     build_home(subjects)
+    build_questions()
     print('sito scritto in', SITE)
 
 if __name__ == '__main__':

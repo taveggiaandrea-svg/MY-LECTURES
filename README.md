@@ -24,7 +24,9 @@ materie/<id>/
   js/lN.js           INIT[N]=function(){...} per le figure; QZ['Na']=()=>[...] per i quiz
   js/shared.js       (facoltativo) componenti della materia usati da più lezioni, caricati dopo thumbs.js
   style.css          (facoltativo) stile proprio della materia, caricato dopo shared/style.css: solo ciò che manca, mai una copia
-build.py             costruisce site/ (pagina iniziale + una pagina per materia)
+shared/domande.js    pagina «Domande all'AI» (site/domande/): legge l'archivio delle domande all'assistente
+build.py             costruisce site/ (pagina iniziale, una pagina per materia, pagina delle domande)
+worker/index.js      password del sito e archivio /api/domande (Durable Object con SQLite)
 test.py              test in browser di tutto il sito
 site/                il sito pubblicato: si genera con build.py, non si modifica a mano
 ```
@@ -46,3 +48,7 @@ Aggiungere `lezioni/lN.html` e `js/lN.js`, un link in `top.html`, una miniatura 
 Il sito è un Worker di Cloudflare (`wrangler.jsonc`): a ogni push su `main` Cloudflare esegue `npx wrangler deploy` e pubblica la cartella `site/`. Indirizzo: https://my-lectures.taveggiaandrea.workers.dev/.
 
 Va tenuto privato: alcune fonti hanno licenze che non permettono di distribuire opere derivate. Ogni richiesta passa prima da `worker/index.js`, che chiede utente e password (autenticazione HTTP Basic). Le credenziali sono i segreti `SITE_USER` e `SITE_PASSWORD`, impostati nel pannello Cloudflare (Worker my-lectures, Settings, Variables and secrets) e mai scritti nel repository. Se mancano, il sito resta chiuso a tutti. Per provarlo in locale: un file `.dev.vars` (escluso da git) con le due variabili e `npx wrangler dev`. In più le pagine hanno `noindex` e `robots.txt` blocca i motori di ricerca.
+
+## Archivio delle domande all'assistente
+
+Ogni domanda fatta a «Chiedi all'AI» viene salvata, con materia, lezione, risposta e modello, nell'archivio `/api/domande` del Worker: un Durable Object con SQLite dichiarato in `wrangler.jsonc`, che Cloudflare crea da solo al primo deploy (nessuna impostazione nel pannello). Sta dietro la stessa password del sito. La pagina `domande/` mostra quante domande nascono da ogni lezione, l'elenco completo con ricerca e cancellazione, e l'esportazione in CSV o JSON (`/api/domande?formato=csv`). Serve a capire quali dubbi sorgono e a scrivere le lezioni future in modo che la risposta ci sia già: prima di scrivere o rivedere una lezione, leggere le domande della materia.

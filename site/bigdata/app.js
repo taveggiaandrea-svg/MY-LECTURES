@@ -1680,14 +1680,19 @@ var paintBar=(function(){
      Se un modello non manda la prima parola entro WAIT ms si passa al successivo; quelli che rispondono «non esiste» vengono ricordati e saltati. */
   const MODELS=[['gemini-3.5-flash-lite',{thinkingLevel:'low'}],['gemini-3.1-flash-lite',{thinkingLevel:'low'}],['gemini-3.5-flash',{thinkingLevel:'low'}]],WAIT=8000;
   let hist=[],histN=null,ctrl=null;
+  /* archivio: ogni domanda, con la lezione da cui nasce e la risposta, va a /api/domande sul server del sito
+     (dietro la stessa password); serve a capire che domande sorgono e a migliorare le lezioni future */
+  function save(q,n,ans,model,err){try{const l=byN(n);
+    fetch('/api/domande',{method:'POST',keepalive:ans.length<60000,headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({materia:location.pathname.split('/').filter(Boolean)[0]||'',corso:document.title,lezione:n,titolo:l?l.dataset.title:'',domanda:q,risposta:ans,modello:model,errore:err})}).catch(()=>{})}catch(e){}}
   go.onclick=async()=>{const q=ta.value.trim(),k=q&&key();if(!k)return;
     const cur=(lessons.find(l=>!l.hidden)||lessons[0]).dataset.n|0;
     if(histN!==cur){hist=[];histN=cur}
     if(ctrl)ctrl.abort();ctrl=new AbortController();const sig=ctrl.signal;
     o.textContent='…';go.disabled=true;ta.value='';
     const contents=[{role:'user',parts:[{text:context(q,cur)}]},{role:'model',parts:[{text:'OK.'}]},...hist,{role:'user',parts:[{text:q}]}];
-    const skip=ls('gemini-skip').split(',');let txt='',err='';
-    try{for(const [m,th] of MODELS){if(skip.includes(m))continue;if(sig.aborted)break;
+    const skip=ls('gemini-skip').split(',');let txt='',err='',used='';
+    try{for(const [m,th] of MODELS){if(skip.includes(m))continue;if(sig.aborted)break;used=m;
         /* ogni modello ha il suo interruttore: si spegne se la prima parola non arriva entro WAIT ms */
         const one=new AbortController(),stop=()=>one.abort();sig.addEventListener('abort',stop);
         let slow=false,timer=setTimeout(()=>{slow=true;one.abort()},WAIT);
@@ -1713,7 +1718,8 @@ var paintBar=(function(){
         finally{clearTimeout(timer);sig.removeEventListener('abort',stop)}}
       if(txt){show(txt,true);hist.push({role:'user',parts:[{text:q}]},{role:'model',parts:[{text:txt}]});hist=hist.slice(-6)}
       else o.textContent=err||'Error'}
-    catch(e){if(e.name!=='AbortError')o.textContent=txt||String(e)}
+    catch(e){if(e.name!=='AbortError'){o.textContent=txt||String(e);err=err||String(e)}}
+    save(q,cur,txt,used,txt?'':err)
     if(!sig.aborted)go.disabled=false};
   ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();go.click()}});
 })();
