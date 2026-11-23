@@ -250,3 +250,6 @@ pre.code .kw{color:var(--theme)}
 .wscroll>svg{min-width:560px}
 .asko code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em}
 .asko .askc{display:block;white-space:pre;overflow-x:auto;background:var(--bg);border:1px solid var(--rule);padding:.4rem .5rem;margin:.3rem 0}
+/* tabelle di dati strette: le intestazioni vanno a capo, così stanno anche su telefono */
+table.tight th,table.tight td{padding:.45rem .5rem}
+table.tight th.n{white-space:normal}

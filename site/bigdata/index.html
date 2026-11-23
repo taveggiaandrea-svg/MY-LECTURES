@@ -433,6 +433,19 @@ FROM buyers LEFT OUTER JOIN sales
   </figure>
   <p>The order matters. WHERE filters <strong>rows</strong> before aggregation, and after GROUP BY the detail rows are lost: only the groups remain. To filter <strong>groups</strong> you need a clause that runs after GROUP BY and can test an aggregate: <span class="k-orange">HAVING</span>.</p>
   <p>The next examples use the course's OrdersDB script: a Customer table (Anders, Trujillo, Moreno), an Orders table with OrderDate, CustomerId and TotalAmount, an OrderItem table with the quantity of each product in each order, and a Product table. Without GROUP BY, <code>SELECT SUM(i.quantity), COUNT(*) FROM OrderItem i</code> returns one row: 240 units over 16 items. Grouped by product, it returns one row per product: Chai 48 units in 5 items, Chang 71 in 4, Aniseed Syrup 56 in 4, Chef Anton's Cajun Seasoning 65 in 3.</p>
+  <p>Here are the 16 rows of OrderItem, one cell per item: each row of the table is an order, each column a product, and the number is the quantity of that product in that order. Cajun is Chef Anton's Cajun Seasoning, as in the figure below. An empty cell means the order does not contain the product; Chef Anton's Gumbo Mix, the fifth product, appears in no order.</p>
+  <div class="scroll"><table class="tight"><thead><tr><th class="n">Order</th><th class="n">Chai</th><th class="n">Chang</th><th class="n">Aniseed Syrup</th><th class="n">Cajun</th></tr></thead><tbody>
+    <tr><td class="n">1</td><td class="n">12</td><td class="n">10</td><td class="n">5</td><td class="n"></td></tr>
+    <tr><td class="n">2</td><td class="n">9</td><td class="n">40</td><td class="n"></td><td class="n"></td></tr>
+    <tr><td class="n">3</td><td class="n"></td><td class="n"></td><td class="n">10</td><td class="n">35</td></tr>
+    <tr><td class="n">4</td><td class="n">15</td><td class="n">6</td><td class="n"></td><td class="n"></td></tr>
+    <tr><td class="n">5</td><td class="n"></td><td class="n"></td><td class="n">35</td><td class="n">15</td></tr>
+    <tr><td class="n">6</td><td class="n">6</td><td class="n">15</td><td class="n"></td><td class="n"></td></tr>
+    <tr><td class="n">7</td><td class="n"></td><td class="n"></td><td class="n">6</td><td class="n"></td></tr>
+    <tr><td class="n">8</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">15</td></tr>
+    <tr><td class="n">9</td><td class="n">6</td><td class="n"></td><td class="n"></td><td class="n"></td></tr>
+    <tr><td>Total<br>(items)</td><td class="n"><strong>48</strong> (5)</td><td class="n"><strong>71</strong> (4)</td><td class="n"><strong>56</strong> (4)</td><td class="n"><strong>65</strong> (3)</td></tr>
+  </tbody></table></div>
 <pre class="code">SELECT p.productname, <span class="k-blue">SUM(i.quantity)</span> TotalQt, <span class="k-blue">COUNT(*)</span> nr_of_sales
 FROM OrderItem i JOIN Product p ON p.id = i.productid
 GROUP BY p.productname
