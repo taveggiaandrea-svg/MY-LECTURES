@@ -91,6 +91,37 @@ spark.sql("select product, sum(value) as qt_tot from sales group by product")</p
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 6 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Spark and its cluster</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Spark</td><td>A fast, in-memory data processing engine with APIs in Scala, Java, Python and R; runs on YARN and integrates with Hadoop; its stack adds Spark SQL, MLlib, GraphX and Spark Streaming</td></tr>
+    <tr><td>Why it is fast</td><td>MapReduce writes to HDFS after every step; Spark reads once, keeps intermediate results in memory and writes only at the end; it is fast on disk too</td></tr>
+    <tr><td>Driver program</td><td>Contains the instructions to execute; it creates the SparkSession, which connects to the cluster through a cluster manager (YARN, Mesos or standalone)</td></tr>
+    <tr><td>Worker nodes and executors</td><td>Workers, generally one per machine, allocate executors: JVM services that create the tasks executing the instructions and give them memory</td></tr>
+    <tr><td>Shuffle</td><td>A data exchange between executors, needed when the program aggregates or sorts</td></tr>
+    <tr><td>master parameter</td><td>Chooses the cluster: local, local[K], local[*], spark://HOST:PORT (7077), mesos://HOST:PORT (5050), yarn</td></tr>
+  </tbody></table></div>
+  <h3>RDDs and lazy execution</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>RDD</td><td>Resilient distributed dataset: Spark's primary abstraction, an immutable, fault-tolerant collection cut into partitions processed in parallel; built from a file system or by parallelizing a collection</td></tr>
+    <tr><td>Partition</td><td>A piece of an RDD, managed by an executor; an executor can manage several partitions</td></tr>
+    <tr><td>Transformation</td><td>Creates a new RDD and adds a step to the DAG, computing nothing (textFile, flatMap, map, reduceByKey)</td></tr>
+    <tr><td>Action</td><td>Executes the DAG and returns a value (collect)</td></tr>
+    <tr><td>DAG and stages</td><td>The directed acyclic graph of the program's steps, cut into stages at every shuffle; stages run in order</td></tr>
+  </tbody></table></div>
+  <h3>DataFrames and Spark SQL</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>DataFrame</td><td>A distributed collection organized into named columns, like a relational table; with a known schema Spark can select, filter, aggregate and join by column, while RDD elements are opaque</td></tr>
+    <tr><td>From RDD to DataFrame</td><td>Declare a schema (StructType) or turn elements into Rows and let Spark infer it</td></tr>
+    <tr><td>Data sources</td><td>JSON, CSV, JDBC connections to relational databases, Parquet (columnar format with metadata)</td></tr>
+    <tr><td>DataFrame API</td><td>select, filter, groupBy with sum, show</td></tr>
+    <tr><td>Temporary view</td><td>createOrReplaceTempView makes a table for SQL that lives as long as the session; dropTempView removes it</td></tr>
+    <tr><td>Persistent table</td><td>saveAsTable stores the DataFrame in the Hive metastore, so it survives restarts</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="6"></div>
 </div></section>

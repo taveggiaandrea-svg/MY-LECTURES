@@ -91,6 +91,39 @@
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 8 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>The data lake</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Data lake (Gartner)</td><td>Storage instances holding data assets in addition to the sources, in a near-exact or exact copy of their format, giving skilled analysts an unrefined view free of the compromises of a warehouse</td></tr>
+    <tr><td>Data lake (lecturer)</td><td>A repository of vast raw data in native format, structured, semi-structured and unstructured, plus processed data; schema on read; feeds reporting, analytics and machine learning; mostly based on Hadoop and Spark</td></tr>
+    <tr><td>Users</td><td>Data scientists, analysts, applications, business users</td></tr>
+    <tr><td>Schema on write vs on read</td><td>Warehouse: tables defined before inserting, every row must fit; lake: the schema, if needed, is defined when reading, so readers can read the same file differently</td></tr>
+    <tr><td>Hot and cold data</td><td>Hot: recent or often accessed; cold: older or rarely accessed</td></tr>
+    <tr><td>Adoption in four steps</td><td>Cheap landing area for operational data, laboratory for data scientists, store of the warehouses' cold data, main component through which most data flows pass</td></tr>
+  </tbody></table></div>
+  <h3>Data warehouse versus data lake</h3>
+  <div class="scroll"><table><thead><tr><th></th><th>Data warehouse</th><th>Data lake</th></tr></thead><tbody>
+    <tr><td>Data</td><td>Structured</td><td>Structured and unstructured</td></tr>
+    <tr><td>State</td><td>Processed</td><td>Raw and processed</td></tr>
+    <tr><td>Schema</td><td>On write</td><td>On read</td></tr>
+    <tr><td>Storage</td><td>Expensive for large volumes</td><td>Designed for low cost</td></tr>
+    <tr><td>Temperature</td><td>Hot data</td><td>Hot and cold data</td></tr>
+    <tr><td>Role in BI 2.0</td><td>Hot and distilled data, low-latency interactive queries, existing reports</td><td>All raw data and final processed data, ETL and transformations, machine learning, cold data at longer latency</td></tr>
+  </tbody></table></div>
+  <h3>Making it work</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>BI 2.0</td><td>New sources go straight into the lake (data ingestion), which sits next to the warehouse and exchanges data with it; the semantic layer also serves advanced analytics</td></tr>
+    <tr><td>Data distillation</td><td>Detailed, complex analyses on much data in the lake give small results that move to the warehouse and into the BI workflow</td></tr>
+    <tr><td>Critical success factors</td><td>Data governance, data quality process, metadata management, training of data scientists and end users</td></tr>
+    <tr><td>Data governance policy</td><td>Maps sources, data flows and output services, and manages the metadata that make the lake searchable</td></tr>
+    <tr><td>Data quality rule</td><td>Apply quality rules to the output, not the input: label the quality and let each user decide</td></tr>
+    <tr><td>Data virtualization</td><td>A logical layer that integrates siloed data without copying them, governs them centrally and delivers them in real time</td></tr>
+    <tr><td>Virtualization pros and cons</td><td>Pros: lower cost, logical abstraction, easier governance, bridge between structured and unstructured data, productivity; cons: relies on the sources' resources, more network traffic, high initial investment, slow for complex tasks</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="8"></div>
 </div></section>

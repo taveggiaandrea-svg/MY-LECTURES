@@ -144,6 +144,46 @@ ORDER BY quantity DESC;</pre>
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 2 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Relational databases</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Relational database and RDBMS</td><td>Data organized in tables (relations) following Codd's relational model (1970), accessed with SQL; the RDBMS is the software that stores, queries, recovers and protects them for many users</td></tr>
+    <tr><td>Table metadata</td><td>A name, one or more columns and a primary key; each field has a name, a data type and a NULL constraint (NULL means no value)</td></tr>
+    <tr><td>Record (row, tuple)</td><td>The values for a single entity, such as one customer</td></tr>
+    <tr><td>Data types</td><td>CHAR(n) fixed length, VARCHAR(n) variable up to n (one extra byte for the length); DATE, DATETIME, TIME; INT family, FLOAT, DECIMAL(precision, scale)</td></tr>
+    <tr><td>Index</td><td>A structure that speeds up retrieval, like the index of a book; without it the RDBMS scans the whole table</td></tr>
+    <tr><td>Other objects</td><td>Views (saved queries that behave like tables), procedures and functions (saved SQL code)</td></tr>
+  </tbody></table></div>
+  <h3>Integrity and normalization</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>Protected by</th><th>What it guarantees</th></tr></thead><tbody>
+    <tr><td>Entity integrity</td><td>Primary key</td><td>No duplicate rows: each row is identified by its key</td></tr>
+    <tr><td>Referential integrity</td><td>Foreign key</td><td>A referencing field is NULL or holds a value present in the linked primary key</td></tr>
+    <tr><td>Domain integrity</td><td>Data types, NULL and CHECK constraints</td><td>All values of a column belong to the same domain and respect the stated rules</td></tr>
+    <tr><td>Normalization</td><td>Normal forms</td><td>Tables decomposed to remove redundancy and its insert, update and delete anomalies: every fact stored once</td></tr>
+    <tr><td>First normal form</td><td>Atomic columns</td><td>Single atomic values of one domain, unique column names, unique records through a primary key</td></tr>
+    <tr><td>Third normal form</td><td>Splitting tables</td><td>First normal form and no transitive dependency: no column depends on another non-key column</td></tr>
+  </tbody></table></div>
+  <h3>OLTP versus data warehouse</h3>
+  <div class="scroll"><table><thead><tr><th></th><th>OLTP database</th><th>Data warehouse</th></tr></thead><tbody>
+    <tr><td>Goal</td><td>Transactions without errors</td><td>A simple model for the analyst</td></tr>
+    <tr><td>Shape</td><td>Fully normalized: many tables, few columns, no redundancy</td><td>Dimensions (denormalized, first normal form) and fact tables (measures plus dimension references, third normal form)</td></tr>
+    <tr><td>Keys</td><td>Primary and foreign keys enforced by the RDBMS</td><td>Surrogate keys created by ETL, business keys kept as columns; usually no foreign keys, since ETL ensures integrity</td></tr>
+    <tr><td>Reports</td><td>Must join many tables</td><td>Join few tables</td></tr>
+  </tbody></table></div>
+  <h3>SQL</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Nature of SQL</td><td>Domain specific and declarative: you describe the result, the optimizer chooses how; dialects add procedural code (T-SQL, PL/SQL, SQL PL, SQL/PSM)</td></tr>
+    <tr><td>Why in a Big Data course</td><td>Most Big Data and NoSQL tools speak it: HiveQL, Phoenix for HBase, Spark SQL, CQL for Cassandra, ODBC drivers</td></tr>
+    <tr><td>Sublanguages</td><td>DQL queries, DDL creates objects (CREATE, DROP), DCL grants permissions, DML inserts, updates and deletes</td></tr>
+    <tr><td>Query, statement, clause, expression, predicate</td><td>A query retrieves data (SELECT); a statement modifies data or structure; a clause is a part of either (WHERE); an expression returns a value; a predicate is a logical condition</td></tr>
+    <tr><td>INSERT, UPDATE, DELETE</td><td>INSERT adds rows (also INSERT … SELECT); UPDATE … SET changes values; DELETE removes rows; without WHERE the last two act on every row</td></tr>
+    <tr><td>SELECT clauses, in order</td><td>SELECT (columns), FROM (tables), WHERE (filters rows), GROUP BY (groups), HAVING (filters groups), ORDER BY (sorts)</td></tr>
+    <tr><td>Select list tools</td><td>Expressions with + - * / % and aliases (AS), functions (YEAR, TRIM, UPPER, ROUND, …), DISTINCT removes duplicates, CASE works as IF THEN ELSE and stops at the first true condition</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="2"></div>
 </div></section>

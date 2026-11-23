@@ -98,6 +98,39 @@ RETURN m.title, a.name</pre>
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 4 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Distributed systems and NoSQL</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Node, rack, cluster</td><td>A node is a single server; a rack is a case holding a bunch of servers; a cluster is a collection of servers, in one or more racks, that behaves as a single machine</td></tr>
+    <tr><td>Distributed system</td><td>Splits the data among its servers and computes on all of them at once</td></tr>
+    <tr><td>Horizontal scalability</td><td>Gain computing power and storage by adding servers instead of buying a bigger one</td></tr>
+    <tr><td>NoSQL database</td><td>Deviates from relational rules: distributed, mostly open source, horizontally scalable, schema free, simple interface (often with SQL on top); usually no ACID guarantees</td></tr>
+    <tr><td>Transaction</td><td>A set of reads or changes that must run with all or nothing logic</td></tr>
+    <tr><td>ACID</td><td>Atomicity (all or nothing), consistency (valid state to valid state), isolation (no half-done work visible), durability (confirmed changes survive failures)</td></tr>
+    <tr><td>BASE</td><td>Basically available (always answers), soft state (not consistent at every moment), eventual consistency (consistent once modifications stop)</td></tr>
+  </tbody></table></div>
+  <h3>The four NoSQL families</h3>
+  <div class="scroll"><table><thead><tr><th>Type</th><th>How it stores data</th></tr></thead><tbody>
+    <tr><td>Key-value store</td><td>Sets of key-value pairs; operations add, remove, modify, find</td></tr>
+    <tr><td>Document database</td><td>Each record is a JSON or XML document carrying both metadata (keys) and data (values), with no schema constraints</td></tr>
+    <tr><td>Column-oriented database</td><td>Derived from Google's Bigtable: data organized by column, each row with a variable number of columns; example HBase, on HDFS, queried in SQL through Phoenix, Hive or Splice Machine</td></tr>
+    <tr><td>Graph database</td><td>Nodes and the relationships between them, with a flexible schema; example Neo4j (ACID, fast node traversal, Cypher language)</td></tr>
+  </tbody></table></div>
+  <h3>Columnar storage, graphs and vectors</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Why store by column</td><td>No wasted space for missing values and high compression, since a column holds repeated values of one type; also used by Exadata, SQL Server column store, SAP HANA, Power Pivot</td></tr>
+    <tr><td>Dictionary encoding</td><td>Distinct values listed once in a dictionary, each value replaced by its position: \(\lceil \log_2 \kk \rceil\) bits per code for \(\kk\) distinct values</td></tr>
+    <tr><td>Run-length encoding</td><td>Each run of identical consecutive values becomes one triple (value, initial position, count); compresses most with many repeated values in a sorted column</td></tr>
+    <tr><td>Property graph</td><td>Nodes are containers of properties (key/value pairs); relationships connect nodes, have a direction and may carry properties; nodes are nouns, relationships verbs</td></tr>
+    <tr><td>Embedding</td><td>A numerical vector produced by a machine learning model from a content (text, image, sound, product), placed so that similar meanings land close together</td></tr>
+    <tr><td>Vector database</td><td>Stores vectors with id and metadata, optimized to find those closest to a query by Euclidean distance, dot product or cosine similarity \(\cos(\qv,\vb) = \frac{\qv \cdot \vb}{\lVert \qv \rVert \, \lVert \vb \rVert}\)</td></tr>
+    <tr><td>Uses of vector databases</td><td>Semantic search, recommendations, RAG (retrieving relevant documents for a generative model)</td></tr>
+    <tr><td>ANN indexes</td><td>Approximate nearest neighbor: explore only a promising part of the space, trading a little accuracy for speed; HNSW builds a layered graph of neighbors, IVF searches only the closest clusters</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="4"></div>
 </div></section>

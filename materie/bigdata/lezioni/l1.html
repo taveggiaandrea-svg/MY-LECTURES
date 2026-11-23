@@ -99,6 +99,40 @@
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 1 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Basic vocabulary</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Database, table, record</td><td>A database is a set of tables and other objects; a table (relation) is a set of records defined by fields with a name and a data type; a record is one line of values for one thing</td></tr>
+    <tr><td>Operational database</td><td>Stores the day-to-day activity of a company in real time, under applications such as an ERP (accounting, procurement, production) and a CRM (interactions with customers)</td></tr>
+    <tr><td>Report</td><td>The formatted result of database queries, useful for decisions: operational (daily, detail plus totals), tactical (daily or weekly totals), strategic (weekly or monthly summary); the higher in the company, the more aggregated and the less frequent</td></tr>
+  </tbody></table></div>
+  <h3>The five phases of data analysis</h3>
+  <div class="scroll"><table><thead><tr><th>Phase</th><th>What it added</th><th>Kind of report</th></tr></thead><tbody>
+    <tr><td>1. RDBMS and SQL (1980s)</td><td>Automatic reports, run directly on the operational databases</td><td>Static, mostly printed</td></tr>
+    <tr><td>2. Data warehouse (1990s)</td><td>A separate analytical database, first a copy, then integrated and cleansed data fed by ETL</td><td>Static</td></tr>
+    <tr><td>3. OLAP (late 1990s)</td><td>Multidimensional cubes with metadata: aggregate questions without SQL, by drag and drop</td><td>Dynamic</td></tr>
+    <tr><td>4. Data mining (from 2000)</td><td>Hidden patterns and predictions of future events</td><td>Predictive</td></tr>
+    <tr><td>5. Big Data (from 2012)</td><td>Distributed platforms such as Hadoop and Spark for data too big or too varied for relational tools</td><td>Predictive, at scale</td></tr>
+  </tbody></table></div>
+  <h3>Key concepts</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Why not analyze the operational database</td><td>Three problems: the same data live in several systems with different formats and versions; the design favours fast single-record writes, not reading millions of rows; reports compete with transactions for the same machine</td></tr>
+    <tr><td>Data warehouse (DWH)</td><td>An analytical database designed to support business decisions, with data consolidated at different levels of aggregation; integrated and cleansed, it is the single source of truth</td></tr>
+    <tr><td>ETL</td><td>Extract from the operational sources, transform with business rules and data quality checks (through a staging area), load into the warehouse; also the name of the tools that do it</td></tr>
+    <tr><td>Business Intelligence (BI)</td><td>Technologies, applications and practices to collect, integrate, analyze and present business information for better decisions: sources, ETL and staging, warehouse, semantic layer (such as OLAP), client tools</td></tr>
+    <tr><td>OLAP</td><td>Online analytical processing: multidimensional structures plus metadata, fast sums, averages and counts along any dimension; the client works like a huge pivot table over the warehouse</td></tr>
+    <tr><td>Data mining</td><td>Discovering hidden, exploitable patterns in large data sets: segmentation, market basket, churn, targeting, demand forecasting; today largely called predictive analytics</td></tr>
+    <tr><td>Descriptive vs predictive analytics</td><td>Descriptive summarizes and describes the past (reports, BI); predictive estimates how likely a future outcome is, with statistics, machine learning and data mining</td></tr>
+    <tr><td>Machine learning</td><td>The science of getting computers to act without being explicitly programmed</td></tr>
+    <tr><td>Big Data</td><td>The three Vs: volume, velocity, variety; the lecture's sharper definition is data that we cannot analyze, or that it is not convenient to analyze, with traditional tools such as relational databases</td></tr>
+    <tr><td>Hadoop and Spark</td><td>Hadoop: distributed file system plus computation engine, with tools for the whole data life cycle; Spark: fast distributed computation engine oriented to analysis</td></tr>
+    <tr><td>Structured, semi-structured, unstructured</td><td>Structured data fit conveniently in a table (ERP data); unstructured do not (post text, medical images); most data called unstructured are in fact semi-structured</td></tr>
+    <tr><td>Cloud computing</td><td>Renting platforms (PaaS) or raw infrastructure (IaaS) instead of buying servers, with resources that scale at low prices</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="1"></div>
 </div></section>

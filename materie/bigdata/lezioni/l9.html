@@ -135,6 +135,51 @@
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 9 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Predictive and generative AI</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Predictive AI</td><td>Uses historical data and traditional machine learning to find patterns and predict future events, always with some uncertainty; can include descriptive, diagnostic and prescriptive analysis</td></tr>
+    <tr><td>Generative AI</td><td>Creates new content: text, images, code, audio</td></tr>
+    <tr><td>Predictive (discriminative) model</td><td>Learns a function that predicts a target variable from the input variables (predictors, features)</td></tr>
+    <tr><td>Generative model</td><td>Captures the main characteristics of the data and their links, to generate entirely new data</td></tr>
+    <tr><td>Where the value is</td><td>Predictive AI is still the primary source of value; adoption is wide (89%) but few companies are high performers (6%): a data and modelling problem, not a tool problem</td></tr>
+    <tr><td>How they combine</td><td>Predictive AI analyses and directs, generative AI acts on the insights: predictive to run today's business, generative to design tomorrow's</td></tr>
+  </tbody></table></div>
+  <h3>Data warehouse and BI</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>BI process</td><td>Collect the company's data, cleanse them, transform data into information, present it in reports and dashboards; in the cloud often ELT, load first and transform inside the warehouse</td></tr>
+    <tr><td>Governance layer</td><td>Master data management, data quality, metadata and lineage, security and privacy under the GDPR</td></tr>
+    <tr><td>Garbage in, garbage out</td><td>No model overcomes inaccurate or distorted input: models, and today language models and agents, need a reliable data environment upstream</td></tr>
+    <tr><td>Data warehousing</td><td>Collecting and managing data from different corporate sources to serve business applications</td></tr>
+    <tr><td>Inmon's four properties</td><td>Integrated (different sources, one homogeneous container), subject-oriented (by subject, not by application), non-volatile (grows with regular loads, users cannot change it), time-variant (periodic snapshots over several years)</td></tr>
+    <tr><td>Data marts and data mesh</td><td>Data marts: smaller environments fed by the warehouse for one business function; data mesh: each domain owns and publishes its own data products on a shared platform</td></tr>
+    <tr><td>Operational database vs warehouse</td><td>Processes and daily operations, current data, normalized, OLTP; against subjects and decisions, aggregated history, denormalized, OLAP</td></tr>
+    <tr><td>Lakehouse</td><td>Warehouse reliability on lake storage; today's AI-ready platforms add feature stores, vector databases and semantic layers</td></tr>
+  </tbody></table></div>
+  <h3>Big Data</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Three pillars since 2016</td><td>Big Data, predictive analytics, prescriptive analytics (rules directly applicable to the business)</td></tr>
+    <tr><td>Sources</td><td>Traditional: operational systems, cloud ERP and CRM, structured and reliable; emergent: IoT, edge, social media, wearables, satellites, logs and more</td></tr>
+    <tr><td>Structured, semi-structured, unstructured</td><td>Fit a table; tags or keys without a rigid schema (JSON, XML, logs); no predefined structure (documents, images, audio, video); 80 to 90% of new enterprise data is unstructured</td></tr>
+    <tr><td>The five Vs</td><td>Volume, variety, velocity, plus value (measured on business KPIs) and veracity (not all data are trustworthy)</td></tr>
+    <tr><td>Three misreadings</td><td>Big Data are not only volume, not only the web, and not all the data: what matters are the relevant ones</td></tr>
+    <tr><td>Pasini's definition</td><td>Potential business knowledge that leverages today's variety, velocity and growing volume to generate new insights and value through proper enablers</td></tr>
+    <tr><td>Enablers</td><td>Data quality, security and privacy; BI, analytics and database platforms; cloud services; management culture and skills</td></tr>
+    <tr><td>Four triggers</td><td>Data from many sources, open-source tools, cheap elastic computing power, falling storage costs</td></tr>
+    <tr><td>Internet of Things</td><td>Networks of connected objects with sensors that exchange data; uses: predictive maintenance, energy optimisation, usage-based pricing</td></tr>
+  </tbody></table></div>
+  <h3>From business question to model</h3>
+  <div class="scroll"><table><thead><tr><th>Idea</th><th>In short</th></tr></thead><tbody>
+    <tr><td>The analysis loop</td><td>Data, analysis, insights, decisions, and decisions generate new data: models must be monitored and retrained</td></tr>
+    <tr><td>Common thread of the eleven cases</td><td>A target variable, historical data from the warehouse, a validated model and a business KPI to improve</td></tr>
+    <tr><td>Always compare against a baseline</td><td>A simple model is a strong benchmark even for a deep learning one, as in Zalando's forecasts</td></tr>
+    <tr><td>Ethics and law</td><td>Inferred sensitive data need consent under the GDPR; the EU AI Act treats HR and recruitment AI as high-risk; a human must evaluate tax-risk cases</td></tr>
+    <tr><td>Typical tasks</td><td>Who will leave: binary classification; fraud: classification on imbalanced data, anomaly detection; next week's sales: regression and time series; customer value: regression and clustering; failures: classification and survival analysis; offer response: propensity scoring</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="9"></div>
 </div></section>

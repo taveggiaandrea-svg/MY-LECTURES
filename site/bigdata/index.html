@@ -134,6 +134,40 @@
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 1 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Basic vocabulary</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Database, table, record</td><td>A database is a set of tables and other objects; a table (relation) is a set of records defined by fields with a name and a data type; a record is one line of values for one thing</td></tr>
+    <tr><td>Operational database</td><td>Stores the day-to-day activity of a company in real time, under applications such as an ERP (accounting, procurement, production) and a CRM (interactions with customers)</td></tr>
+    <tr><td>Report</td><td>The formatted result of database queries, useful for decisions: operational (daily, detail plus totals), tactical (daily or weekly totals), strategic (weekly or monthly summary); the higher in the company, the more aggregated and the less frequent</td></tr>
+  </tbody></table></div>
+  <h3>The five phases of data analysis</h3>
+  <div class="scroll"><table><thead><tr><th>Phase</th><th>What it added</th><th>Kind of report</th></tr></thead><tbody>
+    <tr><td>1. RDBMS and SQL (1980s)</td><td>Automatic reports, run directly on the operational databases</td><td>Static, mostly printed</td></tr>
+    <tr><td>2. Data warehouse (1990s)</td><td>A separate analytical database, first a copy, then integrated and cleansed data fed by ETL</td><td>Static</td></tr>
+    <tr><td>3. OLAP (late 1990s)</td><td>Multidimensional cubes with metadata: aggregate questions without SQL, by drag and drop</td><td>Dynamic</td></tr>
+    <tr><td>4. Data mining (from 2000)</td><td>Hidden patterns and predictions of future events</td><td>Predictive</td></tr>
+    <tr><td>5. Big Data (from 2012)</td><td>Distributed platforms such as Hadoop and Spark for data too big or too varied for relational tools</td><td>Predictive, at scale</td></tr>
+  </tbody></table></div>
+  <h3>Key concepts</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Why not analyze the operational database</td><td>Three problems: the same data live in several systems with different formats and versions; the design favours fast single-record writes, not reading millions of rows; reports compete with transactions for the same machine</td></tr>
+    <tr><td>Data warehouse (DWH)</td><td>An analytical database designed to support business decisions, with data consolidated at different levels of aggregation; integrated and cleansed, it is the single source of truth</td></tr>
+    <tr><td>ETL</td><td>Extract from the operational sources, transform with business rules and data quality checks (through a staging area), load into the warehouse; also the name of the tools that do it</td></tr>
+    <tr><td>Business Intelligence (BI)</td><td>Technologies, applications and practices to collect, integrate, analyze and present business information for better decisions: sources, ETL and staging, warehouse, semantic layer (such as OLAP), client tools</td></tr>
+    <tr><td>OLAP</td><td>Online analytical processing: multidimensional structures plus metadata, fast sums, averages and counts along any dimension; the client works like a huge pivot table over the warehouse</td></tr>
+    <tr><td>Data mining</td><td>Discovering hidden, exploitable patterns in large data sets: segmentation, market basket, churn, targeting, demand forecasting; today largely called predictive analytics</td></tr>
+    <tr><td>Descriptive vs predictive analytics</td><td>Descriptive summarizes and describes the past (reports, BI); predictive estimates how likely a future outcome is, with statistics, machine learning and data mining</td></tr>
+    <tr><td>Machine learning</td><td>The science of getting computers to act without being explicitly programmed</td></tr>
+    <tr><td>Big Data</td><td>The three Vs: volume, velocity, variety; the lecture's sharper definition is data that we cannot analyze, or that it is not convenient to analyze, with traditional tools such as relational databases</td></tr>
+    <tr><td>Hadoop and Spark</td><td>Hadoop: distributed file system plus computation engine, with tools for the whole data life cycle; Spark: fast distributed computation engine oriented to analysis</td></tr>
+    <tr><td>Structured, semi-structured, unstructured</td><td>Structured data fit conveniently in a table (ERP data); unstructured do not (post text, medical images); most data called unstructured are in fact semi-structured</td></tr>
+    <tr><td>Cloud computing</td><td>Renting platforms (PaaS) or raw infrastructure (IaaS) instead of buying servers, with resources that scale at low prices</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="1"></div>
 </div></section>
@@ -291,6 +325,46 @@ ORDER BY quantity DESC;</pre>
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 2 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Relational databases</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Relational database and RDBMS</td><td>Data organized in tables (relations) following Codd's relational model (1970), accessed with SQL; the RDBMS is the software that stores, queries, recovers and protects them for many users</td></tr>
+    <tr><td>Table metadata</td><td>A name, one or more columns and a primary key; each field has a name, a data type and a NULL constraint (NULL means no value)</td></tr>
+    <tr><td>Record (row, tuple)</td><td>The values for a single entity, such as one customer</td></tr>
+    <tr><td>Data types</td><td>CHAR(n) fixed length, VARCHAR(n) variable up to n (one extra byte for the length); DATE, DATETIME, TIME; INT family, FLOAT, DECIMAL(precision, scale)</td></tr>
+    <tr><td>Index</td><td>A structure that speeds up retrieval, like the index of a book; without it the RDBMS scans the whole table</td></tr>
+    <tr><td>Other objects</td><td>Views (saved queries that behave like tables), procedures and functions (saved SQL code)</td></tr>
+  </tbody></table></div>
+  <h3>Integrity and normalization</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>Protected by</th><th>What it guarantees</th></tr></thead><tbody>
+    <tr><td>Entity integrity</td><td>Primary key</td><td>No duplicate rows: each row is identified by its key</td></tr>
+    <tr><td>Referential integrity</td><td>Foreign key</td><td>A referencing field is NULL or holds a value present in the linked primary key</td></tr>
+    <tr><td>Domain integrity</td><td>Data types, NULL and CHECK constraints</td><td>All values of a column belong to the same domain and respect the stated rules</td></tr>
+    <tr><td>Normalization</td><td>Normal forms</td><td>Tables decomposed to remove redundancy and its insert, update and delete anomalies: every fact stored once</td></tr>
+    <tr><td>First normal form</td><td>Atomic columns</td><td>Single atomic values of one domain, unique column names, unique records through a primary key</td></tr>
+    <tr><td>Third normal form</td><td>Splitting tables</td><td>First normal form and no transitive dependency: no column depends on another non-key column</td></tr>
+  </tbody></table></div>
+  <h3>OLTP versus data warehouse</h3>
+  <div class="scroll"><table><thead><tr><th></th><th>OLTP database</th><th>Data warehouse</th></tr></thead><tbody>
+    <tr><td>Goal</td><td>Transactions without errors</td><td>A simple model for the analyst</td></tr>
+    <tr><td>Shape</td><td>Fully normalized: many tables, few columns, no redundancy</td><td>Dimensions (denormalized, first normal form) and fact tables (measures plus dimension references, third normal form)</td></tr>
+    <tr><td>Keys</td><td>Primary and foreign keys enforced by the RDBMS</td><td>Surrogate keys created by ETL, business keys kept as columns; usually no foreign keys, since ETL ensures integrity</td></tr>
+    <tr><td>Reports</td><td>Must join many tables</td><td>Join few tables</td></tr>
+  </tbody></table></div>
+  <h3>SQL</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Nature of SQL</td><td>Domain specific and declarative: you describe the result, the optimizer chooses how; dialects add procedural code (T-SQL, PL/SQL, SQL PL, SQL/PSM)</td></tr>
+    <tr><td>Why in a Big Data course</td><td>Most Big Data and NoSQL tools speak it: HiveQL, Phoenix for HBase, Spark SQL, CQL for Cassandra, ODBC drivers</td></tr>
+    <tr><td>Sublanguages</td><td>DQL queries, DDL creates objects (CREATE, DROP), DCL grants permissions, DML inserts, updates and deletes</td></tr>
+    <tr><td>Query, statement, clause, expression, predicate</td><td>A query retrieves data (SELECT); a statement modifies data or structure; a clause is a part of either (WHERE); an expression returns a value; a predicate is a logical condition</td></tr>
+    <tr><td>INSERT, UPDATE, DELETE</td><td>INSERT adds rows (also INSERT … SELECT); UPDATE … SET changes values; DELETE removes rows; without WHERE the last two act on every row</td></tr>
+    <tr><td>SELECT clauses, in order</td><td>SELECT (columns), FROM (tables), WHERE (filters rows), GROUP BY (groups), HAVING (filters groups), ORDER BY (sorts)</td></tr>
+    <tr><td>Select list tools</td><td>Expressions with + - * / % and aliases (AS), functions (YEAR, TRIM, UPPER, ROUND, …), DISTINCT removes duplicates, CASE works as IF THEN ELSE and stops at the first true condition</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="2"></div>
 </div></section>
@@ -396,6 +470,40 @@ WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders o2
   <div class="eq">\[ \frac{440 + 1813 + 670.8}{3} = 974.6 \]</div>
   <p>The running total uses SUM from <code>UNBOUNDED PRECEDING</code>. <code>SUM(TotalAmount) OVER ()</code>, with nothing in the brackets, puts the grand total 13595.5 on every row; <code>OVER (PARTITION BY customerid)</code> puts each customer's total instead, 4066.8 for Anders and 9528.7 for Trujillo. With ROW_NUMBER ordered by TotalAmount descending, keeping rn = 1 finds each customer's largest order. <code>LEAD</code> works like LAG but looks n rows ahead.</p>
   <div class="quiz inq" data-quiz="3b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Lesson 3 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Combining tables</h3>
+  <div class="scroll"><table><thead><tr><th>Operator</th><th>What it returns</th></tr></thead><tbody>
+    <tr><td>Cartesian product</td><td>All the combinations of rows of two tables, the intermediate result of FROM; the starting point of every join</td></tr>
+    <tr><td>CROSS JOIN</td><td>The whole cartesian product</td></tr>
+    <tr><td>INNER JOIN</td><td>Only the pairs of rows where the ON predicate is true</td></tr>
+    <tr><td>LEFT, RIGHT, FULL OUTER JOIN</td><td>The inner join plus the rows without a partner, padded with NULL: every row of the first table (LEFT), of the second (RIGHT), of both (FULL)</td></tr>
+    <tr><td>UNION</td><td>The rows of two SELECTs with the same columns, one under the other, without duplicates; joins add columns, UNION adds rows</td></tr>
+    <tr><td>UNION ALL</td><td>The same, keeping duplicates; faster when the results cannot overlap</td></tr>
+  </tbody></table></div>
+  <h3>Missing values, groups and subqueries</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Three-valued logic</td><td>Any comparison with NULL, another NULL included, is UNKNOWN; ON, WHERE and HAVING keep only TRUE, so UNKNOWN rows are dropped</td></tr>
+    <tr><td>IS NULL, COALESCE</td><td>Test missing values with IS NULL or IS NOT NULL, never = NULL; COALESCE(x, value) replaces a NULL</td></tr>
+    <tr><td>Aggregate functions</td><td>SUM, MIN, MAX, AVG, COUNT, STDEV, STDEVP, VAR, VARP: many rows into one value; they ignore NULLs, except COUNT(*), which counts rows; COUNT(DISTINCT x) counts different values</td></tr>
+    <tr><td>GROUP BY</td><td>One output row per unique combination of the grouping columns; after grouping the detail rows are lost</td></tr>
+    <tr><td>WHERE vs HAVING</td><td>WHERE filters rows before aggregation; HAVING filters groups after GROUP BY and can test an aggregate</td></tr>
+    <tr><td>Subquery</td><td>A query nested in another, used like an expression; it returns a value (scalar), a list or a table</td></tr>
+    <tr><td>Self-contained vs correlated</td><td>Self-contained: independent of the outer query, runs once; correlated: uses values of the outer query's current row, runs once per row</td></tr>
+    <tr><td>EXISTS, NOT EXISTS</td><td>TRUE if the subquery returns at least one row (or none, for NOT EXISTS)</td></tr>
+  </tbody></table></div>
+  <h3>Analytical (window) functions</h3>
+  <div class="scroll"><table><thead><tr><th>Element</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Idea</td><td>Compute over groups of rows but keep every row, adding the result as a new column</td></tr>
+    <tr><td>OVER (PARTITION BY … ORDER BY …)</td><td>PARTITION BY splits the rows into partitions; ORDER BY orders the rows inside each; OVER () uses all the rows</td></tr>
+    <tr><td>Window</td><td>The rows around the current one that enter the calculation: UNBOUNDED PRECEDING, n PRECEDING, CURRENT ROW, n FOLLOWING, UNBOUNDED FOLLOWING</td></tr>
+    <tr><td>ROW_NUMBER</td><td>Numbers the rows of each partition; keeping number 1 finds, say, each customer's largest order</td></tr>
+    <tr><td>LAG, LEAD</td><td>The value n rows before or after the current one, with a default when there is none</td></tr>
+    <tr><td>Moving average, running total</td><td>AVG over ROWS BETWEEN 2 PRECEDING AND CURRENT ROW; SUM from UNBOUNDED PRECEDING</td></tr>
+  </tbody></table></div>
 </div></section>
 
 <section><div class="col">
@@ -507,6 +615,39 @@ RETURN m.title, a.name</pre>
     <div class="w" id="b4flow"></div>
     <figcaption>The lecture's simplified flow of a vector database, redrawn: ingestion, embedding, record, index, search. The original text can sit in the metadata or in a separate store; the query follows the same embedding step before the search.</figcaption>
   </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Lesson 4 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Distributed systems and NoSQL</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Node, rack, cluster</td><td>A node is a single server; a rack is a case holding a bunch of servers; a cluster is a collection of servers, in one or more racks, that behaves as a single machine</td></tr>
+    <tr><td>Distributed system</td><td>Splits the data among its servers and computes on all of them at once</td></tr>
+    <tr><td>Horizontal scalability</td><td>Gain computing power and storage by adding servers instead of buying a bigger one</td></tr>
+    <tr><td>NoSQL database</td><td>Deviates from relational rules: distributed, mostly open source, horizontally scalable, schema free, simple interface (often with SQL on top); usually no ACID guarantees</td></tr>
+    <tr><td>Transaction</td><td>A set of reads or changes that must run with all or nothing logic</td></tr>
+    <tr><td>ACID</td><td>Atomicity (all or nothing), consistency (valid state to valid state), isolation (no half-done work visible), durability (confirmed changes survive failures)</td></tr>
+    <tr><td>BASE</td><td>Basically available (always answers), soft state (not consistent at every moment), eventual consistency (consistent once modifications stop)</td></tr>
+  </tbody></table></div>
+  <h3>The four NoSQL families</h3>
+  <div class="scroll"><table><thead><tr><th>Type</th><th>How it stores data</th></tr></thead><tbody>
+    <tr><td>Key-value store</td><td>Sets of key-value pairs; operations add, remove, modify, find</td></tr>
+    <tr><td>Document database</td><td>Each record is a JSON or XML document carrying both metadata (keys) and data (values), with no schema constraints</td></tr>
+    <tr><td>Column-oriented database</td><td>Derived from Google's Bigtable: data organized by column, each row with a variable number of columns; example HBase, on HDFS, queried in SQL through Phoenix, Hive or Splice Machine</td></tr>
+    <tr><td>Graph database</td><td>Nodes and the relationships between them, with a flexible schema; example Neo4j (ACID, fast node traversal, Cypher language)</td></tr>
+  </tbody></table></div>
+  <h3>Columnar storage, graphs and vectors</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Why store by column</td><td>No wasted space for missing values and high compression, since a column holds repeated values of one type; also used by Exadata, SQL Server column store, SAP HANA, Power Pivot</td></tr>
+    <tr><td>Dictionary encoding</td><td>Distinct values listed once in a dictionary, each value replaced by its position: \(\lceil \log_2 \kk \rceil\) bits per code for \(\kk\) distinct values</td></tr>
+    <tr><td>Run-length encoding</td><td>Each run of identical consecutive values becomes one triple (value, initial position, count); compresses most with many repeated values in a sorted column</td></tr>
+    <tr><td>Property graph</td><td>Nodes are containers of properties (key/value pairs); relationships connect nodes, have a direction and may carry properties; nodes are nouns, relationships verbs</td></tr>
+    <tr><td>Embedding</td><td>A numerical vector produced by a machine learning model from a content (text, image, sound, product), placed so that similar meanings land close together</td></tr>
+    <tr><td>Vector database</td><td>Stores vectors with id and metadata, optimized to find those closest to a query by Euclidean distance, dot product or cosine similarity \(\cos(\qv,\vb) = \frac{\qv \cdot \vb}{\lVert \qv \rVert \, \lVert \vb \rVert}\)</td></tr>
+    <tr><td>Uses of vector databases</td><td>Semantic search, recommendations, RAG (retrieving relevant documents for a generative model)</td></tr>
+    <tr><td>ANN indexes</td><td>Approximate nearest neighbor: explore only a promising part of the space, trading a little accuracy for speed; HNSW builds a layered graph of neighbors, IVF searches only the closest clusters</td></tr>
+  </tbody></table></div>
 </div></section>
 
 <section><div class="col">
@@ -636,6 +777,42 @@ RETURN m.title, a.name</pre>
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 5 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>HDFS</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Hadoop</td><td>A distributed calculation system based on HDFS (storage) and MapReduce (computation); open source, scalable to thousands of nodes, for structured and unstructured data, fault tolerant on commodity hardware</td></tr>
+    <tr><td>Block</td><td>The parts a file is cut into, generally 64 or 128 MB each</td></tr>
+    <tr><td>Replication</td><td>Each block is copied on different nodes; default replication factor 3, so a file takes 3 times its size</td></tr>
+    <tr><td>Name node</td><td>The master: holds all the metadata (files, their blocks, block locations), creates, renames and deletes files, manages replication</td></tr>
+    <tr><td>Data nodes</td><td>The slaves, which carry out the actual reads and writes</td></tr>
+    <tr><td>Rack awareness</td><td>Copies placed so that even if an entire rack fails all the data remain available</td></tr>
+    <tr><td>Erasure coding (Hadoop 3)</td><td>Extra encoded data that can rebuild lost blocks; storage overhead 50% instead of 200%; an option enabled folder by folder, replication stays the default</td></tr>
+  </tbody></table></div>
+  <h3>MapReduce</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>MapReduce</td><td>The distributed computation engine on HDFS data, with a Java API only; all later Hadoop engines derive from it</td></tr>
+    <tr><td>Map phase</td><td>Prepares the data and maps them to key/value pairs</td></tr>
+    <tr><td>Sort, shuffle, aggregate</td><td>Done by the system: values of the same key are put together, moving across the network</td></tr>
+    <tr><td>Reduce phase</td><td>Performs the calculation on each key; the output is saved to an HDFS file</td></tr>
+    <tr><td>Data locality</td><td>The mapper runs on the nodes that hold the input: the computation travels to the data</td></tr>
+    <tr><td>Limits</td><td>Built for batch jobs of minutes or hours, not interactive queries of seconds; most problems are hard to express as map and reduce</td></tr>
+    <tr><td>Pig and Hive</td><td>High level languages translated into MapReduce jobs: Pig Latin (procedural), HiveQL (SQL dialect); ODBC drivers let BI tools reach Hive as an RDBMS</td></tr>
+  </tbody></table></div>
+  <h3>The ecosystem and today</h3>
+  <div class="scroll"><table><thead><tr><th>Layer or term</th><th>Tools and meaning</th></tr></thead><tbody>
+    <tr><td>Core services</td><td>HDFS; engines MapReduce, Tez (a job as a graph of steps) and Spark; YARN, which allocates cluster resources to tasks and applications</td></tr>
+    <tr><td>Data services</td><td>Hive (SQL), Pig, HBase (columnar NoSQL), Storm and Flume (stream ingestion), Sqoop (import and export between an RDBMS and Hadoop), HCatalog</td></tr>
+    <tr><td>Operational services</td><td>Ambari (cluster management), Oozie (job workflows), Zookeeper (synchronized configuration)</td></tr>
+    <tr><td>Analytic tools</td><td>Inside Hadoop: Giraph, Mahout, Kylin; distributed of their own: Elastic Search, Spark; from outside: SAS, KNIME, R</td></tr>
+    <tr><td>Distributions</td><td>Semi-automatic installers; the best known is Cloudera, merged with Hortonworks in 2018</td></tr>
+    <tr><td>Hadoop today</td><td>Installed enterprise infrastructure, common on-premise or hybrid; MapReduce no longer central; the usual alternative is a data lake or lakehouse with Spark on cloud storage</td></tr>
+    <tr><td>Modern names</td><td>Trino (SQL across sources without moving data), Flink (stream processing), Iceberg and Delta Lake (open table formats on Parquet files), object storage (S3, Azure Blob or ADLS Gen2, Google Cloud Storage), Kafka (event streams)</td></tr>
+    <tr><td>What to learn</td><td>The concepts (HDFS, name and data nodes, partitioning, data locality, YARN), not MapReduce mastery</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="5"></div>
 </div></section>
@@ -740,6 +917,37 @@ spark.sql("select product, sum(value) as qt_tot from sales group by product")</p
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 6 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Spark and its cluster</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Spark</td><td>A fast, in-memory data processing engine with APIs in Scala, Java, Python and R; runs on YARN and integrates with Hadoop; its stack adds Spark SQL, MLlib, GraphX and Spark Streaming</td></tr>
+    <tr><td>Why it is fast</td><td>MapReduce writes to HDFS after every step; Spark reads once, keeps intermediate results in memory and writes only at the end; it is fast on disk too</td></tr>
+    <tr><td>Driver program</td><td>Contains the instructions to execute; it creates the SparkSession, which connects to the cluster through a cluster manager (YARN, Mesos or standalone)</td></tr>
+    <tr><td>Worker nodes and executors</td><td>Workers, generally one per machine, allocate executors: JVM services that create the tasks executing the instructions and give them memory</td></tr>
+    <tr><td>Shuffle</td><td>A data exchange between executors, needed when the program aggregates or sorts</td></tr>
+    <tr><td>master parameter</td><td>Chooses the cluster: local, local[K], local[*], spark://HOST:PORT (7077), mesos://HOST:PORT (5050), yarn</td></tr>
+  </tbody></table></div>
+  <h3>RDDs and lazy execution</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>RDD</td><td>Resilient distributed dataset: Spark's primary abstraction, an immutable, fault-tolerant collection cut into partitions processed in parallel; built from a file system or by parallelizing a collection</td></tr>
+    <tr><td>Partition</td><td>A piece of an RDD, managed by an executor; an executor can manage several partitions</td></tr>
+    <tr><td>Transformation</td><td>Creates a new RDD and adds a step to the DAG, computing nothing (textFile, flatMap, map, reduceByKey)</td></tr>
+    <tr><td>Action</td><td>Executes the DAG and returns a value (collect)</td></tr>
+    <tr><td>DAG and stages</td><td>The directed acyclic graph of the program's steps, cut into stages at every shuffle; stages run in order</td></tr>
+  </tbody></table></div>
+  <h3>DataFrames and Spark SQL</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>DataFrame</td><td>A distributed collection organized into named columns, like a relational table; with a known schema Spark can select, filter, aggregate and join by column, while RDD elements are opaque</td></tr>
+    <tr><td>From RDD to DataFrame</td><td>Declare a schema (StructType) or turn elements into Rows and let Spark infer it</td></tr>
+    <tr><td>Data sources</td><td>JSON, CSV, JDBC connections to relational databases, Parquet (columnar format with metadata)</td></tr>
+    <tr><td>DataFrame API</td><td>select, filter, groupBy with sum, show</td></tr>
+    <tr><td>Temporary view</td><td>createOrReplaceTempView makes a table for SQL that lives as long as the session; dropTempView removes it</td></tr>
+    <tr><td>Persistent table</td><td>saveAsTable stores the DataFrame in the Hive metastore, so it survives restarts</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="6"></div>
 </div></section>
@@ -830,6 +1038,39 @@ query = (streamingCountsDF.writeStream.format("memory")
   </figure>
   <p><strong>A pipeline packs the preparation and the model together, so the test data go through exactly the steps the training data went through.</strong> The second example of the course is a linear regression that predicts the 2015 median house price of US cities from their 2014 population: a VectorAssembler (a transformer) packs the population into a features column, LinearRegression fits the model, and a RegressionEvaluator measures its error. The course materials also include a decision tree for fraud detection and notebooks on MLflow and generative AI, which the slides do not cover.</p>
   <div class="quiz inq" data-quiz="7d"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Lesson 7 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Structured Streaming</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Streaming data</td><td>Data continuously generated by a source (clicks, sensors, transactions), to be processed incrementally</td></tr>
+    <tr><td>Structured Streaming</td><td>Spark's scalable, fault-tolerant engine for live streams, built on Spark SQL: a streaming query is written like a batch one and runs incrementally</td></tr>
+    <tr><td>Unbounded input table</td><td>The stream seen as a table where every new datum is an appended row; the query produces a result table</td></tr>
+    <tr><td>Trigger</td><td>A moment when Spark checks for new data, updates the result table and writes it out</td></tr>
+    <tr><td>In code</td><td>readStream instead of read; window(time, "1 hour") groups events by hour; writeStream with a sink and an output mode such as complete</td></tr>
+  </tbody></table></div>
+  <h3>Graphs</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Property graph</td><td>Nodes with properties and labels; relationships directed, named and with a start and an end node</td></tr>
+    <tr><td>GraphX</td><td>Spark's graph component: extends the RDD with a directed multigraph with properties on vertices and edges, plus algorithms</td></tr>
+    <tr><td>GraphFrames</td><td>A simpler library on DataFrames: a vertex DataFrame (column id) and an edge DataFrame (columns src, dst)</td></tr>
+    <tr><td>Degree</td><td>The number of edges of a vertex: in-degree (arriving) and out-degree (leaving)</td></tr>
+    <tr><td>Subgraph</td><td>A graph that keeps only some edges and vertices</td></tr>
+    <tr><td>Built-in algorithms</td><td>PageRank (important vertices), connected components (groups linked to each other), triangle count (triangles through each vertex)</td></tr>
+  </tbody></table></div>
+  <h3>MLlib and pipelines</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>MLlib</td><td>Spark's machine learning library: algorithms, featurization, pipelines, utilities</td></tr>
+    <tr><td>Machine learning process</td><td>Understand the data, split into training and test set, prepare (cleanse, normalize, encode categories), train, test on unseen data</td></tr>
+    <tr><td>Algorithm families</td><td>Regression, classification, clustering and other unsupervised methods, recommendation (ALS) and frequent patterns</td></tr>
+    <tr><td>Transformer</td><td>Turns a DataFrame into another, usually adding a column (Tokenizer, HashingTF, OneHotEncoder)</td></tr>
+    <tr><td>Estimator</td><td>A learning algorithm: fits a model on a DataFrame and produces a transformer that computes predictions</td></tr>
+    <tr><td>Evaluator</td><td>Computes metrics of the predictions (accuracy, F1, AUC, regression error)</td></tr>
+    <tr><td>Pipeline</td><td>Chains the stages so the test data go through exactly the same steps as the training data</td></tr>
+    <tr><td>Logistic regression</td><td>Adds word weights to an intercept to get a score \(z\), turned into a probability \(p = 1/(1+e^{-z})\); above 0.5 predicts label 1</td></tr>
+  </tbody></table></div>
 </div></section>
 
 <section><div class="col">
@@ -934,6 +1175,39 @@ query = (streamingCountsDF.writeStream.format("memory")
     <figcaption>Two ways to give users one view of three source systems. In the first panel ETL copies the data into a central store, and queries run there. In the second a virtualization layer stores nothing: each query is translated and sent to the sources, which do the work, and the answers travel over the network.</figcaption>
   </figure>
   <p>The pros, according to the lecture: cost savings, since storing and maintaining data is cheaper than replicating them and transforming them into other formats and places; logical abstraction, since heterogeneous sources can interact more easily; easier governance, since rules are applied centrally to all the data; a bridge between structured and unstructured data; and higher productivity, since less time goes into integrating sources. The cons follow from the second panel: it relies on the storage, memory and CPUs of the sources, can require big memory and computation resources, increases network traffic, needs a high initial investment and can be slow for complex tasks.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Lesson 8 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>The data lake</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Data lake (Gartner)</td><td>Storage instances holding data assets in addition to the sources, in a near-exact or exact copy of their format, giving skilled analysts an unrefined view free of the compromises of a warehouse</td></tr>
+    <tr><td>Data lake (lecturer)</td><td>A repository of vast raw data in native format, structured, semi-structured and unstructured, plus processed data; schema on read; feeds reporting, analytics and machine learning; mostly based on Hadoop and Spark</td></tr>
+    <tr><td>Users</td><td>Data scientists, analysts, applications, business users</td></tr>
+    <tr><td>Schema on write vs on read</td><td>Warehouse: tables defined before inserting, every row must fit; lake: the schema, if needed, is defined when reading, so readers can read the same file differently</td></tr>
+    <tr><td>Hot and cold data</td><td>Hot: recent or often accessed; cold: older or rarely accessed</td></tr>
+    <tr><td>Adoption in four steps</td><td>Cheap landing area for operational data, laboratory for data scientists, store of the warehouses' cold data, main component through which most data flows pass</td></tr>
+  </tbody></table></div>
+  <h3>Data warehouse versus data lake</h3>
+  <div class="scroll"><table><thead><tr><th></th><th>Data warehouse</th><th>Data lake</th></tr></thead><tbody>
+    <tr><td>Data</td><td>Structured</td><td>Structured and unstructured</td></tr>
+    <tr><td>State</td><td>Processed</td><td>Raw and processed</td></tr>
+    <tr><td>Schema</td><td>On write</td><td>On read</td></tr>
+    <tr><td>Storage</td><td>Expensive for large volumes</td><td>Designed for low cost</td></tr>
+    <tr><td>Temperature</td><td>Hot data</td><td>Hot and cold data</td></tr>
+    <tr><td>Role in BI 2.0</td><td>Hot and distilled data, low-latency interactive queries, existing reports</td><td>All raw data and final processed data, ETL and transformations, machine learning, cold data at longer latency</td></tr>
+  </tbody></table></div>
+  <h3>Making it work</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>BI 2.0</td><td>New sources go straight into the lake (data ingestion), which sits next to the warehouse and exchanges data with it; the semantic layer also serves advanced analytics</td></tr>
+    <tr><td>Data distillation</td><td>Detailed, complex analyses on much data in the lake give small results that move to the warehouse and into the BI workflow</td></tr>
+    <tr><td>Critical success factors</td><td>Data governance, data quality process, metadata management, training of data scientists and end users</td></tr>
+    <tr><td>Data governance policy</td><td>Maps sources, data flows and output services, and manages the metadata that make the lake searchable</td></tr>
+    <tr><td>Data quality rule</td><td>Apply quality rules to the output, not the input: label the quality and let each user decide</td></tr>
+    <tr><td>Data virtualization</td><td>A logical layer that integrates siloed data without copying them, governs them centrally and delivers them in real time</td></tr>
+    <tr><td>Virtualization pros and cons</td><td>Pros: lower cost, logical abstraction, easier governance, bridge between structured and unstructured data, productivity; cons: relies on the sources' resources, more network traffic, high initial investment, slow for complex tasks</td></tr>
+  </tbody></table></div>
 </div></section>
 
 <section><div class="col">
@@ -1082,6 +1356,51 @@ query = (streamingCountsDF.writeStream.format("memory")
     <tr><td>Will this component fail soon?</td><td>Trenitalia, Rolls-Royce, Enel</td><td>classification, survival analysis</td><td>random forest, gradient boosted trees on sensor features</td></tr>
     <tr><td>Who will respond to this offer?</td><td>Kroger, Target</td><td>propensity scoring</td><td>logistic regression, lift and gain charts</td></tr></tbody></table></div>
   <p>SMOTE, in the fraud row, creates synthetic examples of the rare class so that the model sees enough frauds to learn from; lift and gain charts measure how much better than random a score ranks the customers who respond. ARIMA is a classic time-series model, XGBoost a widely used implementation of gradient boosted trees, and Regression Learner the KNIME node that fits a linear regression.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Lesson 9 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Predictive and generative AI</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Predictive AI</td><td>Uses historical data and traditional machine learning to find patterns and predict future events, always with some uncertainty; can include descriptive, diagnostic and prescriptive analysis</td></tr>
+    <tr><td>Generative AI</td><td>Creates new content: text, images, code, audio</td></tr>
+    <tr><td>Predictive (discriminative) model</td><td>Learns a function that predicts a target variable from the input variables (predictors, features)</td></tr>
+    <tr><td>Generative model</td><td>Captures the main characteristics of the data and their links, to generate entirely new data</td></tr>
+    <tr><td>Where the value is</td><td>Predictive AI is still the primary source of value; adoption is wide (89%) but few companies are high performers (6%): a data and modelling problem, not a tool problem</td></tr>
+    <tr><td>How they combine</td><td>Predictive AI analyses and directs, generative AI acts on the insights: predictive to run today's business, generative to design tomorrow's</td></tr>
+  </tbody></table></div>
+  <h3>Data warehouse and BI</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>BI process</td><td>Collect the company's data, cleanse them, transform data into information, present it in reports and dashboards; in the cloud often ELT, load first and transform inside the warehouse</td></tr>
+    <tr><td>Governance layer</td><td>Master data management, data quality, metadata and lineage, security and privacy under the GDPR</td></tr>
+    <tr><td>Garbage in, garbage out</td><td>No model overcomes inaccurate or distorted input: models, and today language models and agents, need a reliable data environment upstream</td></tr>
+    <tr><td>Data warehousing</td><td>Collecting and managing data from different corporate sources to serve business applications</td></tr>
+    <tr><td>Inmon's four properties</td><td>Integrated (different sources, one homogeneous container), subject-oriented (by subject, not by application), non-volatile (grows with regular loads, users cannot change it), time-variant (periodic snapshots over several years)</td></tr>
+    <tr><td>Data marts and data mesh</td><td>Data marts: smaller environments fed by the warehouse for one business function; data mesh: each domain owns and publishes its own data products on a shared platform</td></tr>
+    <tr><td>Operational database vs warehouse</td><td>Processes and daily operations, current data, normalized, OLTP; against subjects and decisions, aggregated history, denormalized, OLAP</td></tr>
+    <tr><td>Lakehouse</td><td>Warehouse reliability on lake storage; today's AI-ready platforms add feature stores, vector databases and semantic layers</td></tr>
+  </tbody></table></div>
+  <h3>Big Data</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Three pillars since 2016</td><td>Big Data, predictive analytics, prescriptive analytics (rules directly applicable to the business)</td></tr>
+    <tr><td>Sources</td><td>Traditional: operational systems, cloud ERP and CRM, structured and reliable; emergent: IoT, edge, social media, wearables, satellites, logs and more</td></tr>
+    <tr><td>Structured, semi-structured, unstructured</td><td>Fit a table; tags or keys without a rigid schema (JSON, XML, logs); no predefined structure (documents, images, audio, video); 80 to 90% of new enterprise data is unstructured</td></tr>
+    <tr><td>The five Vs</td><td>Volume, variety, velocity, plus value (measured on business KPIs) and veracity (not all data are trustworthy)</td></tr>
+    <tr><td>Three misreadings</td><td>Big Data are not only volume, not only the web, and not all the data: what matters are the relevant ones</td></tr>
+    <tr><td>Pasini's definition</td><td>Potential business knowledge that leverages today's variety, velocity and growing volume to generate new insights and value through proper enablers</td></tr>
+    <tr><td>Enablers</td><td>Data quality, security and privacy; BI, analytics and database platforms; cloud services; management culture and skills</td></tr>
+    <tr><td>Four triggers</td><td>Data from many sources, open-source tools, cheap elastic computing power, falling storage costs</td></tr>
+    <tr><td>Internet of Things</td><td>Networks of connected objects with sensors that exchange data; uses: predictive maintenance, energy optimisation, usage-based pricing</td></tr>
+  </tbody></table></div>
+  <h3>From business question to model</h3>
+  <div class="scroll"><table><thead><tr><th>Idea</th><th>In short</th></tr></thead><tbody>
+    <tr><td>The analysis loop</td><td>Data, analysis, insights, decisions, and decisions generate new data: models must be monitored and retrained</td></tr>
+    <tr><td>Common thread of the eleven cases</td><td>A target variable, historical data from the warehouse, a validated model and a business KPI to improve</td></tr>
+    <tr><td>Always compare against a baseline</td><td>A simple model is a strong benchmark even for a deep learning one, as in Zalando's forecasts</td></tr>
+    <tr><td>Ethics and law</td><td>Inferred sensitive data need consent under the GDPR; the EU AI Act treats HR and recruitment AI as high-risk; a human must evaluate tax-risk cases</td></tr>
+    <tr><td>Typical tasks</td><td>Who will leave: binary classification; fraud: classification on imbalanced data, anomaly detection; next week's sales: regression and time series; customer value: regression and clustering; failures: classification and survival analysis; offer response: propensity scoring</td></tr>
+  </tbody></table></div>
 </div></section>
 
 <section><div class="col">

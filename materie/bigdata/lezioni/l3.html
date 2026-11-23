@@ -95,6 +95,40 @@ WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders o2
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 3 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>Combining tables</h3>
+  <div class="scroll"><table><thead><tr><th>Operator</th><th>What it returns</th></tr></thead><tbody>
+    <tr><td>Cartesian product</td><td>All the combinations of rows of two tables, the intermediate result of FROM; the starting point of every join</td></tr>
+    <tr><td>CROSS JOIN</td><td>The whole cartesian product</td></tr>
+    <tr><td>INNER JOIN</td><td>Only the pairs of rows where the ON predicate is true</td></tr>
+    <tr><td>LEFT, RIGHT, FULL OUTER JOIN</td><td>The inner join plus the rows without a partner, padded with NULL: every row of the first table (LEFT), of the second (RIGHT), of both (FULL)</td></tr>
+    <tr><td>UNION</td><td>The rows of two SELECTs with the same columns, one under the other, without duplicates; joins add columns, UNION adds rows</td></tr>
+    <tr><td>UNION ALL</td><td>The same, keeping duplicates; faster when the results cannot overlap</td></tr>
+  </tbody></table></div>
+  <h3>Missing values, groups and subqueries</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Three-valued logic</td><td>Any comparison with NULL, another NULL included, is UNKNOWN; ON, WHERE and HAVING keep only TRUE, so UNKNOWN rows are dropped</td></tr>
+    <tr><td>IS NULL, COALESCE</td><td>Test missing values with IS NULL or IS NOT NULL, never = NULL; COALESCE(x, value) replaces a NULL</td></tr>
+    <tr><td>Aggregate functions</td><td>SUM, MIN, MAX, AVG, COUNT, STDEV, STDEVP, VAR, VARP: many rows into one value; they ignore NULLs, except COUNT(*), which counts rows; COUNT(DISTINCT x) counts different values</td></tr>
+    <tr><td>GROUP BY</td><td>One output row per unique combination of the grouping columns; after grouping the detail rows are lost</td></tr>
+    <tr><td>WHERE vs HAVING</td><td>WHERE filters rows before aggregation; HAVING filters groups after GROUP BY and can test an aggregate</td></tr>
+    <tr><td>Subquery</td><td>A query nested in another, used like an expression; it returns a value (scalar), a list or a table</td></tr>
+    <tr><td>Self-contained vs correlated</td><td>Self-contained: independent of the outer query, runs once; correlated: uses values of the outer query's current row, runs once per row</td></tr>
+    <tr><td>EXISTS, NOT EXISTS</td><td>TRUE if the subquery returns at least one row (or none, for NOT EXISTS)</td></tr>
+  </tbody></table></div>
+  <h3>Analytical (window) functions</h3>
+  <div class="scroll"><table><thead><tr><th>Element</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Idea</td><td>Compute over groups of rows but keep every row, adding the result as a new column</td></tr>
+    <tr><td>OVER (PARTITION BY … ORDER BY …)</td><td>PARTITION BY splits the rows into partitions; ORDER BY orders the rows inside each; OVER () uses all the rows</td></tr>
+    <tr><td>Window</td><td>The rows around the current one that enter the calculation: UNBOUNDED PRECEDING, n PRECEDING, CURRENT ROW, n FOLLOWING, UNBOUNDED FOLLOWING</td></tr>
+    <tr><td>ROW_NUMBER</td><td>Numbers the rows of each partition; keeping number 1 finds, say, each customer's largest order</td></tr>
+    <tr><td>LAG, LEAD</td><td>The value n rows before or after the current one, with a default when there is none</td></tr>
+    <tr><td>Moving average, running total</td><td>AVG over ROWS BETWEEN 2 PRECEDING AND CURRENT ROW; SUM from UNBOUNDED PRECEDING</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="3"></div>
 </div></section>

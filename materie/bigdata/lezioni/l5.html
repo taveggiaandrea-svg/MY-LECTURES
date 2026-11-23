@@ -94,6 +94,42 @@
 </div></section>
 
 <section><div class="col">
+  <h2>Lesson 5 at a glance</h2>
+  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h3>HDFS</h3>
+  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
+    <tr><td>Hadoop</td><td>A distributed calculation system based on HDFS (storage) and MapReduce (computation); open source, scalable to thousands of nodes, for structured and unstructured data, fault tolerant on commodity hardware</td></tr>
+    <tr><td>Block</td><td>The parts a file is cut into, generally 64 or 128 MB each</td></tr>
+    <tr><td>Replication</td><td>Each block is copied on different nodes; default replication factor 3, so a file takes 3 times its size</td></tr>
+    <tr><td>Name node</td><td>The master: holds all the metadata (files, their blocks, block locations), creates, renames and deletes files, manages replication</td></tr>
+    <tr><td>Data nodes</td><td>The slaves, which carry out the actual reads and writes</td></tr>
+    <tr><td>Rack awareness</td><td>Copies placed so that even if an entire rack fails all the data remain available</td></tr>
+    <tr><td>Erasure coding (Hadoop 3)</td><td>Extra encoded data that can rebuild lost blocks; storage overhead 50% instead of 200%; an option enabled folder by folder, replication stays the default</td></tr>
+  </tbody></table></div>
+  <h3>MapReduce</h3>
+  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
+    <tr><td>MapReduce</td><td>The distributed computation engine on HDFS data, with a Java API only; all later Hadoop engines derive from it</td></tr>
+    <tr><td>Map phase</td><td>Prepares the data and maps them to key/value pairs</td></tr>
+    <tr><td>Sort, shuffle, aggregate</td><td>Done by the system: values of the same key are put together, moving across the network</td></tr>
+    <tr><td>Reduce phase</td><td>Performs the calculation on each key; the output is saved to an HDFS file</td></tr>
+    <tr><td>Data locality</td><td>The mapper runs on the nodes that hold the input: the computation travels to the data</td></tr>
+    <tr><td>Limits</td><td>Built for batch jobs of minutes or hours, not interactive queries of seconds; most problems are hard to express as map and reduce</td></tr>
+    <tr><td>Pig and Hive</td><td>High level languages translated into MapReduce jobs: Pig Latin (procedural), HiveQL (SQL dialect); ODBC drivers let BI tools reach Hive as an RDBMS</td></tr>
+  </tbody></table></div>
+  <h3>The ecosystem and today</h3>
+  <div class="scroll"><table><thead><tr><th>Layer or term</th><th>Tools and meaning</th></tr></thead><tbody>
+    <tr><td>Core services</td><td>HDFS; engines MapReduce, Tez (a job as a graph of steps) and Spark; YARN, which allocates cluster resources to tasks and applications</td></tr>
+    <tr><td>Data services</td><td>Hive (SQL), Pig, HBase (columnar NoSQL), Storm and Flume (stream ingestion), Sqoop (import and export between an RDBMS and Hadoop), HCatalog</td></tr>
+    <tr><td>Operational services</td><td>Ambari (cluster management), Oozie (job workflows), Zookeeper (synchronized configuration)</td></tr>
+    <tr><td>Analytic tools</td><td>Inside Hadoop: Giraph, Mahout, Kylin; distributed of their own: Elastic Search, Spark; from outside: SAS, KNIME, R</td></tr>
+    <tr><td>Distributions</td><td>Semi-automatic installers; the best known is Cloudera, merged with Hortonworks in 2018</td></tr>
+    <tr><td>Hadoop today</td><td>Installed enterprise infrastructure, common on-premise or hybrid; MapReduce no longer central; the usual alternative is a data lake or lakehouse with Spark on cloud storage</td></tr>
+    <tr><td>Modern names</td><td>Trino (SQL across sources without moving data), Flink (stream processing), Iceberg and Delta Lake (open table formats on Parquet files), object storage (S3, Azure Blob or ADLS Gen2, Google Cloud Storage), Kafka (event streams)</td></tr>
+    <tr><td>What to learn</td><td>The concepts (HDFS, name and data nodes, partitioning, data locality, YARN), not MapReduce mastery</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
   <h2>Test yourself</h2>
   <div class="quiz" data-quiz="5"></div>
 </div></section>
