@@ -50,6 +50,7 @@ const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.
   prev:'Lezione precedente',next:'Lezione successiva',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
   askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
+  askSlow:'nessuna risposta in tempo, provo il modello successivo.',
   askFmt:'Scrivi le formule in LaTeX fra \\( \\) o \\[ \\], mai con il simbolo del dollaro.'};
 const $=s=>document.querySelector(s);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!==undefined)e.innerHTML=h;return e};
@@ -192,6 +193,7 @@ function gameMatrix(rows,cols,cells,o){
 Object.assign(UI,{check:'Check',pickFirst:'Pick an answer first.',right:'Correct.',wrong:'Not quite.',play:'Play',pause:'Pause',seek:'Position in the animation',
   prev:'Previous lesson',next:'Next lesson',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
   askSys:'You are a tutor. Answer in English, briefly and clearly, based on the lessons provided: first the open lesson, then the course map and the excerpts from other lessons. When you use another lesson, say which one. If the question goes beyond the course, say so.',
+  askSlow:'no reply in time, trying the next model.',
   askFmt:'Write formulas in LaTeX between \\( \\) or \\[ \\], never with dollar signs.'});
 /* colour roles of this subject: ndarray and its data BLUE, Python list PUR, header and metadata ORG, pointers and results PINK,
    bits set to 1 and the estimate of pi YEL, views TEAL, correct GRN, overflow and errors RED, virtual copies dashed grey */
@@ -1365,8 +1367,11 @@ renderMath(document.querySelector('footer'));
       .replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/^[ \t]*[*-] /gm,'• ').replace(/^#{1,4} +(.*)$/gm,'<b>$1</b>');
     renderMath(o)}
 
-  /* modelli in ordine di preferenza; quelli che rispondono «non esiste» vengono ricordati e saltati */
-  const MODELS=[['gemini-4-hydrogen',{thinkingLevel:'low'}],['gemini-3.5-flash',{thinkingLevel:'low'}],['gemini-2.5-flash',{thinkingBudget:0}]];
+  /* modelli in ordine di preferenza, scelti misurando i tempi con la chiave vera (23 novembre 2026, contesto di una lezione, circa 8.000 token):
+     gemini-3.5-flash-lite prima parola in 0,7-1 s; gemini-3.1-flash-lite circa 1 s; gemini-3.5-flash 6-13 s;
+     gemini-4-hydrogen nessuna risposta dopo oltre 40 s anche per una domanda di una riga; gemini-3.8-flash e 3.6-flash spesso 503 (troppa richiesta).
+     Se un modello non manda la prima parola entro WAIT ms si passa al successivo; quelli che rispondono «non esiste» vengono ricordati e saltati. */
+  const MODELS=[['gemini-3.5-flash-lite',{thinkingLevel:'low'}],['gemini-3.1-flash-lite',{thinkingLevel:'low'}],['gemini-3.5-flash',{thinkingLevel:'low'}]],WAIT=8000;
   let hist=[],histN=null,ctrl=null;
   go.onclick=async()=>{const q=ta.value.trim(),k=q&&key();if(!k)return;
     const cur=(lessons.find(l=>!l.hidden)||lessons[0]).dataset.n|0;
@@ -1375,8 +1380,12 @@ renderMath(document.querySelector('footer'));
     o.textContent='…';go.disabled=true;ta.value='';
     const contents=[{role:'user',parts:[{text:context(q,cur)}]},{role:'model',parts:[{text:'OK.'}]},...hist,{role:'user',parts:[{text:q}]}];
     const skip=ls('gemini-skip').split(',');let txt='',err='';
-    try{for(const [m,th] of MODELS){if(skip.includes(m))continue;
-        const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':streamGenerateContent?alt=sse',{method:'POST',signal:sig,
+    try{for(const [m,th] of MODELS){if(skip.includes(m))continue;if(sig.aborted)break;
+        /* ogni modello ha il suo interruttore: si spegne se la prima parola non arriva entro WAIT ms */
+        const one=new AbortController(),stop=()=>one.abort();sig.addEventListener('abort',stop);
+        let slow=false,timer=setTimeout(()=>{slow=true;one.abort()},WAIT);
+        try{
+        const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+m+':streamGenerateContent?alt=sse',{method:'POST',signal:one.signal,
           headers:{'Content-Type':'application/json','x-goog-api-key':k},
           body:JSON.stringify({systemInstruction:{parts:[{text:UI.askSys+' '+UI.askFmt}]},contents,generationConfig:{thinkingConfig:th,maxOutputTokens:2048}})});
         if(!r.ok){let j={};try{j=await r.json()}catch(e){}err=(j.error&&j.error.message)||('HTTP '+r.status);
@@ -1390,8 +1399,11 @@ renderMath(document.querySelector('footer'));
             try{const j=JSON.parse(line.slice(5)),c=j.candidates&&j.candidates[0];
               if(c&&c.content&&c.content.parts)txt+=c.content.parts.filter(x=>!x.thought).map(x=>x.text||'').join('');
               if(j.error)err=j.error.message}catch(e){}}
+          if(txt&&timer){clearTimeout(timer);timer=0}
           show(txt,false)}
         break}
+        catch(e){if(sig.aborted)throw e;if(txt)break;err=slow?m+': '+UI.askSlow:String(e)}
+        finally{clearTimeout(timer);sig.removeEventListener('abort',stop)}}
       if(txt){show(txt,true);hist.push({role:'user',parts:[{text:q}]},{role:'model',parts:[{text:txt}]});hist=hist.slice(-6)}
       else o.textContent=err||'Error'}
     catch(e){if(e.name!=='AbortError')o.textContent=txt||String(e)}

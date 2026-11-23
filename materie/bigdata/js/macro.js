@@ -2,6 +2,7 @@
 Object.assign(UI,{check:'Check',pickFirst:'Pick an answer first.',right:'Correct.',wrong:'Not quite.',play:'Play',pause:'Pause',seek:'Position in the animation',
   prev:'Previous lesson',next:'Next lesson',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
   askSys:'You are a tutor. Answer in English, briefly and clearly, based on the lessons provided: first the open lesson, then the course map and the excerpts from other lessons. When you use another lesson, say which one. If the question goes beyond the course, say so.',
+  askSlow:'no reply in time, trying the next model.',
   askFmt:'Write formulas in LaTeX between \\( \\) or \\[ \\], never with dollar signs.'});
 /* colour roles of this subject: primary key YEL, foreign key PINK, conditions ORG, NULL PUR, measures BLUE, windows TEAL, accepted GRN, rejected RED */
 const PKC=YEL,FKC=PINK,PRC=ORG,NLC=PUR,MSC=BLUE,WNC=TEAL;
