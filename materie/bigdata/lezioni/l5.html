@@ -1,142 +1,142 @@
-<article class="lesson" data-n="5" id="lezione-5" data-title="How do you store a file bigger than any disk?" hidden>
+<article class="lesson" data-n="5" id="lezione-5" data-title="Come si memorizza un file più grande di qualunque disco?" hidden>
 <section class="hero"><div class="col">
-  <p class="chap">Lesson 5 · A. Rezzani, slides</p>
-  <h1>How do you store a file bigger than any disk?</h1>
-  <p class="desc">Hadoop, the Big Data "ecosystem": the HDFS distributed file system, the MapReduce computation engine, and the tools built on top of them.</p>
+  <p class="chap">Lezione 5 · A. Rezzani, slide</p>
+  <h1>Come si memorizza un file più grande di qualunque disco?</h1>
+  <p class="desc">Hadoop, l'«ecosistema» dei Big Data: il file system distribuito HDFS, il motore di calcolo MapReduce e gli strumenti costruiti sopra di essi.</p>
 </div></section>
 
 <section><div class="col">
-  <p>Lesson 4 named the two main Big Data tools, Hadoop and Spark, and recalled the vocabulary of distributed systems: a <strong>node</strong> is a single server, a <strong>rack</strong> a case with a bunch of servers, a <strong>cluster</strong> a collection of servers, in one or more racks, that behaves as a single machine. This lesson opens Hadoop.</p>
-  <p class="stmt"><strong>Hadoop.</strong> A distributed calculation system based on two components: <strong>HDFS</strong> (Hadoop Distributed File System), which stores the data, and <strong>MapReduce</strong>, a distributed calculation framework, which computes on them.</p>
-  <p>Hadoop is open source, distributed and scalable up to thousands of nodes, and handles both structured and unstructured data. It is also <strong>fault tolerant</strong>: it is built to run on <strong>commodity hardware</strong>, cheap ordinary servers that do break, and it survives their failures by keeping copies of the data. How?</p>
-  <h2>Cut the file into blocks, then copy each block</h2>
-  <p>Each file in HDFS is made of parts called <strong>blocks</strong>, generally 64 or 128 MB each. Each block is <strong>replicated</strong>: the default <strong>replication factor</strong> is 3, and it can be changed. The copies live on different nodes, so no single disk holds the whole file and no single failure destroys it.</p>
+  <p>La lezione 4 ha nominato i due principali strumenti dei Big Data, Hadoop e Spark, e ha ricordato il vocabolario dei sistemi distribuiti: un <strong>nodo</strong> è un singolo server, un <strong>rack</strong> un armadio con un gruppo di server, un <strong>cluster</strong> un insieme di server, in uno o più rack, che si comporta come una macchina sola. Questa lezione apre Hadoop.</p>
+  <p class="stmt"><strong>Hadoop.</strong> Un sistema di calcolo distribuito basato su due componenti: <strong>HDFS</strong> (Hadoop Distributed File System), che memorizza i dati, e <strong>MapReduce</strong>, un framework di calcolo distribuito, che calcola su di essi.</p>
+  <p>Hadoop è open source, distribuito e scalabile fino a migliaia di nodi, e gestisce sia dati strutturati sia non strutturati. È anche <strong>tollerante ai guasti</strong> (fault tolerant): è costruito per girare su <strong>hardware comune</strong> (commodity hardware), server ordinari ed economici che si rompono davvero, e sopravvive ai loro guasti tenendo copie dei dati. Come?</p>
+  <h2>Taglia il file in blocchi, poi copia ogni blocco</h2>
+  <p>Ogni file in HDFS è fatto di parti chiamate <strong>blocchi</strong>, in genere da 64 o 128 MB ciascuno. Ogni blocco è <strong>replicato</strong>: il <strong>fattore di replica</strong> predefinito è 3, e si può cambiare. Le copie stanno su nodi diversi, così nessun disco da solo contiene l'intero file e nessun singolo guasto lo distrugge.</p>
   <figure>
     <div class="w" id="b5hdfs"></div>
-    <figcaption>A 512 MB file cut into four blocks of 128 MB (B1 to B4), each stored three times on a cluster of three racks with three data nodes each, after the lecture's HDFS diagram. The name node, on top, keeps only the metadata: which blocks make the file and where each copy is.</figcaption>
+    <figcaption>Un file da 512 MB tagliato in quattro blocchi da 128 MB (da B1 a B4), ciascuno memorizzato tre volte su un cluster di tre rack con tre data node ciascuno, secondo lo schema di HDFS della lezione. Il name node, in alto, tiene solo i metadati: quali blocchi formano il file e dove si trova ogni copia.</figcaption>
   </figure>
-  <p>A server called the <strong>name node</strong> holds all the file system <strong>metadata</strong>: the list of files, the list of blocks of each file, and their locations. It is the master node of the cluster: it handles operations such as creating, renaming and deleting files, and it takes care of replication. The other nodes are the <strong>data nodes</strong>, the slaves, which carry out the actual reads and writes.</p>
+  <p>Un server chiamato <strong>name node</strong> contiene tutti i <strong>metadati</strong> del file system: l'elenco dei file, l'elenco dei blocchi di ogni file e la loro posizione. È il nodo master del cluster: gestisce operazioni come creare, rinominare e cancellare file, e si occupa della replica. Gli altri nodi sono i <strong>data node</strong>, gli slave, che eseguono le letture e le scritture vere e proprie.</p>
   <div class="quiz inq" data-quiz="5a"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>What if a whole rack goes dark?</h2>
-  <p>Replication protects the data until all the nodes holding copies of the same block fail. A rack shares power and network, so it can fail all at once: three copies on three nodes of the same rack would vanish together. That is why HDFS is <strong>rack aware</strong>: it places the copies so that even if an entire rack fails, all the data is still available.</p>
+  <h2>E se si spegne un rack intero?</h2>
+  <p>La replica protegge i dati finché non si guastano tutti i nodi che contengono copie dello stesso blocco. Un rack condivide alimentazione e rete, quindi può guastarsi tutto insieme: tre copie su tre nodi dello stesso rack sparirebbero insieme. Per questo HDFS è <strong>consapevole dei rack</strong> (rack aware): dispone le copie in modo che, anche se si guasta un intero rack, tutti i dati restino disponibili.</p>
   <figure>
     <div class="w" id="b5fail"></div>
-    <figcaption>The same cluster in two moments. In the first panel all nine data nodes work. In the second rack 2 has failed (red): every block still has at least one copy on a working node (green tick), because no block keeps all its copies on one rack.</figcaption>
+    <figcaption>Lo stesso cluster in due momenti. Nel primo riquadro funzionano tutti e nove i data node. Nel secondo il rack 2 si è guastato (in rosso): ogni blocco ha ancora almeno una copia su un nodo funzionante (spunta verde), perché nessun blocco tiene tutte le sue copie su un solo rack.</figcaption>
   </figure>
-  <p><strong>Copies on different racks turn a hardware failure into a non-event.</strong> The price is disk space: with replication factor n, a file takes n times its size.</p>
-  <p>Hadoop 3 replaces replication with a more space efficient algorithm called <strong>erasure coding</strong> (EC). EC adds some extra data to the blocks, encoded so that the system can use it to rebuild other blocks if they become unavailable. According to the lecture it cuts the storage overhead, the extra space beyond the file itself, to 50%. A note on the slide: in Hadoop 3 erasure coding is an option enabled folder by folder, while replication with factor 3 remains the default.</p>
+  <p><strong>Le copie su rack diversi trasformano un guasto dell'hardware in un non evento.</strong> Il prezzo è lo spazio su disco: con fattore di replica n, un file occupa n volte la sua dimensione.</p>
+  <p>Hadoop 3 sostituisce la replica con un algoritmo più efficiente nello spazio chiamato <strong>erasure coding</strong> (EC, codifica a cancellazione). L'EC aggiunge ai blocchi alcuni dati in più, codificati in modo che il sistema possa usarli per ricostruire altri blocchi se diventano indisponibili. Secondo la lezione riduce il sovraccarico di memorizzazione (storage overhead), lo spazio in più oltre al file stesso, al 50%. Una nota sulla slide: in Hadoop 3 l'erasure coding è un'opzione da attivare cartella per cartella, mentre la replica con fattore 3 resta l'impostazione predefinita.</p>
   <figure>
     <div class="w" id="b5ec"></div>
-    <figcaption>Disk space taken by a 1 GB file. White is the file itself, grey the extra space that buys fault tolerance: two more full copies with replication factor 3 (overhead 200%), half a file of encoded data with erasure coding (overhead 50%).</figcaption>
+    <figcaption>Spazio su disco occupato da un file da 1 GB. Il bianco è il file stesso, il grigio lo spazio in più che compra la tolleranza ai guasti: due copie complete in più con fattore di replica 3 (sovraccarico del 200%), mezzo file di dati codificati con l'erasure coding (sovraccarico del 50%).</figcaption>
   </figure>
   <div class="quiz inq" data-quiz="5b"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Moving the computation to the data</h2>
-  <p>Storing is half the job. <strong>MapReduce</strong> is the distributed computation engine that works on the data stored in HDFS. Today Hadoop has other, more efficient engines, but they all derive from MapReduce, which only has a Java API. The programmer must split the problem into two phases.</p>
-  <p class="stmt"><strong>Map and reduce.</strong> In the <strong>map</strong> phase the data are prepared and mapped to a <span class="k-yellow">key</span>/<span class="k-blue">value</span> structure: the output of the mapper program is a set of key/value pairs. In the <strong>reduce</strong> phase the actual calculation is performed: the output of the reducer is the final result, saved to an HDFS file.</p>
-  <p>The system does the rest. It runs the mapper on each node where parts of the input file are stored, so the computation travels to the data instead of the data to the computation. Then it sorts, <span class="k-orange">shuffles</span> and aggregates the mapper outputs, putting the values of the same key together, and runs the reducer on each node. The lecture's simplest example counts the letters of the input "A C B C A".</p>
+  <h2>Portare il calcolo ai dati</h2>
+  <p>Memorizzare è metà del lavoro. <strong>MapReduce</strong> è il motore di calcolo distribuito che lavora sui dati memorizzati in HDFS. Oggi Hadoop ha altri motori, più efficienti, ma derivano tutti da MapReduce, che ha solo un'API Java. Il programmatore deve dividere il problema in due fasi.</p>
+  <p class="stmt"><strong>Map e reduce.</strong> Nella fase di <strong>map</strong> i dati vengono preparati e trasformati in una struttura <span class="k-yellow">chiave</span>/<span class="k-blue">valore</span>: l'output del programma mapper è un insieme di coppie chiave/valore. Nella fase di <strong>reduce</strong> si esegue il calcolo vero e proprio: l'output del reducer è il risultato finale, salvato in un file HDFS.</p>
+  <p>Il resto lo fa il sistema. Esegue il mapper su ogni nodo dove sono memorizzate parti del file di input, così è il calcolo a spostarsi verso i dati e non i dati verso il calcolo. Poi ordina, <span class="k-orange">rimescola</span> (shuffle) e aggrega gli output dei mapper, mettendo insieme i valori della stessa chiave, ed esegue il reducer su ogni nodo. L'esempio più semplice della lezione conta le lettere dell'input «A C B C A».</p>
   <figure>
     <div class="w" id="b5mr"></div>
-    <figcaption>The lecture's MapReduce example, animated. Press play: five map tasks each emit a key/value pair (key in yellow, value in blue), the system sorts and groups the pairs by key, moving them across the network (orange), and three reduce tasks add up the values of their key.</figcaption>
+    <figcaption>L'esempio di MapReduce della lezione, animato. Premi play: cinque task di map emettono ciascuno una coppia chiave/valore (chiave in giallo, valore in blu), il sistema ordina e raggruppa le coppie per chiave, spostandole attraverso la rete (in arancione), e tre task di reduce sommano i valori della loro chiave.</figcaption>
   </figure>
-  <p>Word count is the first task of any text analysis, and the lecture runs it on a sentence from the Hadoop website. The mapper emits (word, 1) for every word; sort and aggregate collect the ones of each word; the reducer adds them up. Words are compared without capitals, so "The" and "the" are one key.</p>
+  <p>Il conteggio delle parole (word count) è il primo compito di qualunque analisi di testi, e la lezione lo esegue su una frase del sito di Hadoop. Il mapper emette (parola, 1) per ogni parola; ordinamento e aggregazione raccolgono gli uno di ogni parola; il reducer li somma. Le parole si confrontano senza maiuscole, quindi «The» e «the» sono una sola chiave.</p>
   <figure>
     <div class="w" id="b5wc"></div>
-    <figcaption>Word count on the lecture's sentence, after the slide: the three tables show part of the mapper output, of the sorted and aggregated pairs, and of the reducer output. Only "the" and "of" appear twice; the other 22 distinct words appear once.</figcaption>
+    <figcaption>Il conteggio delle parole sulla frase della lezione, secondo la slide: le tre tabelle mostrano una parte dell'output del mapper, delle coppie ordinate e aggregate, e dell'output del reducer. Solo «the» e «of» compaiono due volte; le altre 22 parole distinte compaiono una volta.</figcaption>
   </figure>
   <div class="quiz inq" data-quiz="5c"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Built for batch, not for questions</h2>
-  <p>MapReduce was designed for <strong>batch workloads</strong>: computations on a huge amount of data that complete in minutes or even hours. It is not suitable for <strong>interactive queries</strong>, the many small questions we send to an RDBMS (a relational database management system), where we expect an answer in seconds or tenths of a second. And it is hard to program: most problems are very difficult to express with a map and a reduce.</p>
+  <h2>Costruito per il batch, non per le domande</h2>
+  <p>MapReduce è stato progettato per i <strong>carichi batch</strong> (batch workloads): calcoli su un'enorme quantità di dati che finiscono in minuti o anche in ore. Non è adatto alle <strong>query interattive</strong>, le tante piccole domande che mandiamo a un RDBMS (un sistema di gestione di database relazionali), dove ci aspettiamo una risposta in secondi o decimi di secondo. Ed è difficile da programmare: la maggior parte dei problemi è molto difficile da esprimere con una map e una reduce.</p>
   <figure>
     <div class="w" id="b5lat"></div>
-    <figcaption>Response times on a logarithmic scale, where each step to the right multiplies the time by ten. The blue band is what an interactive query on an RDBMS should take; the orange band is the time of a typical MapReduce batch job, as described in the lecture.</figcaption>
+    <figcaption>Tempi di risposta su scala logaritmica, dove ogni passo verso destra moltiplica il tempo per dieci. La fascia blu è quanto dovrebbe durare una query interattiva su un RDBMS; la fascia arancione è il tempo di un tipico job batch di MapReduce, come descritto nella lezione.</figcaption>
   </figure>
-  <p><strong>Pig</strong> and <strong>Hive</strong> make MapReduce easier. They offer high level languages and translate programs written in them into MapReduce jobs: <strong>Pig Latin</strong> is a procedural language whose instructions resemble SQL keywords, <strong>HiveQL</strong> an SQL dialect that implements the ANSI SQL syntax plus some built in functions. The main Hadoop distributions also provide ODBC drivers (a standard way for programs to connect to a database) that let users connect to Hive as if it were an RDBMS: every Business Intelligence and reporting tool can then reach Hadoop.</p>
+  <p><strong>Pig</strong> e <strong>Hive</strong> rendono MapReduce più facile. Offrono linguaggi di alto livello e traducono i programmi scritti in essi in job MapReduce: <strong>Pig Latin</strong> è un linguaggio procedurale le cui istruzioni somigliano alle parole chiave di SQL, <strong>HiveQL</strong> un dialetto SQL che implementa la sintassi ANSI SQL più alcune funzioni predefinite. Le principali distribuzioni di Hadoop forniscono anche driver ODBC (un modo standard con cui i programmi si collegano a un database) che permettono agli utenti di collegarsi a Hive come se fosse un RDBMS: così qualunque strumento di Business Intelligence e di reportistica può raggiungere Hadoop.</p>
   <div class="quiz inq" data-quiz="5d"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>An ecosystem, not a program</h2>
-  <p>Around HDFS and MapReduce grew a family of tools that cover the whole data life cycle. The lecture groups them in four layers.</p>
+  <h2>Un ecosistema, non un programma</h2>
+  <p>Intorno a HDFS e MapReduce è cresciuta una famiglia di strumenti che copre l'intero ciclo di vita dei dati. La lezione li raggruppa in quattro strati.</p>
   <figure>
     <div class="w" id="b5eco"></div>
-    <figcaption>The lecture's simplified Hadoop ecosystem, redrawn. The core services sit at the bottom (storage, resource negotiation, computation engines); data services, operational services and analytic tools are built on top of them.</figcaption>
+    <figcaption>L'ecosistema Hadoop semplificato della lezione, ridisegnato. In basso stanno i servizi di base (memorizzazione, negoziazione delle risorse, motori di calcolo); sopra di essi sono costruiti i servizi per i dati, i servizi operativi e gli strumenti di analisi.</figcaption>
   </figure>
-  <p>The <strong>core services</strong> are HDFS, the engines MapReduce, Tez (which runs a job as a graph of steps rather than a fixed map and reduce) and Spark, and <strong>YARN</strong> (yet another resource negotiator), the software layer that allocates the cluster's resources to each Hadoop task and to the applications above it.</p>
-  <p>The <strong>data services</strong> include Hive, the SQL interface to Hadoop, which translates HiveQL into MapReduce, Tez or Spark programs; Pig, which does the same for Pig Latin; HBase, the NoSQL columnar database of lesson 4, which only works inside Hadoop; Storm and Flume, which ingest data produced in streams, such as server logs, tweets or IoT sensor readings; and Sqoop, a sort of ETL tool (extract, transform, load, lesson 1) between an RDBMS and Hadoop, which imports relational tables into Hadoop or exports data back. The diagram also shows HCatalog, which shares Hive's table definitions with the other tools (a gloss added here).</p>
-  <p>The <strong>operational services</strong> are Ambari, a web tool to manage the cluster; Oozie, a workflow tool to orchestrate jobs (MapReduce, Hive, Pig, Sqoop, Flume, Storm and so on); and Zookeeper, which shares and keeps synchronized the configuration files of each application.</p>
-  <p>The <strong>analytic tools</strong> are of three kinds. Some only work inside a Hadoop cluster: Giraph for graphs, Mahout for machine learning, Kylin for OLAP (the multidimensional analysis of lesson 1), which saves aggregations in HBase's columnar storage and uses them to answer Hive queries. Others are distributed tools of their own: Elastic Search, a powerful search engine, and Spark. Others connect to Hadoop from outside: SAS, KNIME (the tool of the second part of this course) and R.</p>
+  <p>I <strong>servizi di base</strong> (core services) sono HDFS, i motori MapReduce, Tez (che esegue un job come un grafo di passi invece che come una map e una reduce fisse) e Spark, e <strong>YARN</strong> (yet another resource negotiator, «ancora un altro negoziatore di risorse»), lo strato software che assegna le risorse del cluster a ogni task di Hadoop e alle applicazioni sopra di esso.</p>
+  <p>I <strong>servizi per i dati</strong> (data services) comprendono Hive, l'interfaccia SQL di Hadoop, che traduce HiveQL in programmi MapReduce, Tez o Spark; Pig, che fa lo stesso per Pig Latin; HBase, il database NoSQL a colonne della lezione 4, che funziona solo dentro Hadoop; Storm e Flume, che acquisiscono dati prodotti in flussi continui, come i log dei server, i tweet o le letture dei sensori IoT; e Sqoop, una sorta di strumento ETL (extract, transform, load, lezione 1) fra un RDBMS e Hadoop, che importa tabelle relazionali in Hadoop o riesporta i dati verso l'RDBMS. Lo schema mostra anche HCatalog, che condivide le definizioni delle tabelle di Hive con gli altri strumenti (spiegazione aggiunta qui).</p>
+  <p>I <strong>servizi operativi</strong> (operational services) sono Ambari, uno strumento web per gestire il cluster; Oozie, uno strumento di workflow per orchestrare i job (MapReduce, Hive, Pig, Sqoop, Flume, Storm e così via); e Zookeeper, che condivide e tiene sincronizzati i file di configurazione di ogni applicazione.</p>
+  <p>Gli <strong>strumenti di analisi</strong> (analytic tools) sono di tre tipi. Alcuni funzionano solo dentro un cluster Hadoop: Giraph per i grafi, Mahout per il machine learning, Kylin per l'OLAP (l'analisi multidimensionale della lezione 1), che salva le aggregazioni nella memorizzazione a colonne di HBase e le usa per rispondere alle query di Hive. Altri sono strumenti distribuiti a sé stanti: Elastic Search, un potente motore di ricerca, e Spark. Altri ancora si collegano a Hadoop dall'esterno: SAS, KNIME (lo strumento della seconda parte di questo corso) e R.</p>
   <div class="quiz inq" data-quiz="5e"></div>
-  <p>Installing a cluster from the Apache distribution can be very hard, so companies use distributions with a semi-automatic installer; the most famous is <strong>Cloudera</strong>, which merged in 2018 with Hortonworks, another Hadoop distributor. On balance, Hadoop can handle every data type and store and compute huge amounts of data, but it is complex, difficult to install and maintain, and slow for some workloads such as interactive queries.</p>
+  <p>Installare un cluster dalla distribuzione Apache può essere molto difficile, quindi le aziende usano distribuzioni con un installatore semiautomatico; la più famosa è <strong>Cloudera</strong>, che nel 2018 si è fusa con Hortonworks, un altro distributore di Hadoop. Tirando le somme, Hadoop può gestire ogni tipo di dato e memorizzare ed elaborare enormi quantità di dati, ma è complesso, difficile da installare e mantenere, e lento per alcuni carichi come le query interattive.</p>
 </div></section>
 
 <section><div class="col">
-  <h2>Is Hadoop still used?</h2>
-  <p>Yes, but its role has shifted from default Big Data platform to installed enterprise infrastructure. It remains common in large organizations with mature on-premise or hybrid platforms (part in the company's own data centre, part in the cloud), especially where moving petabytes of data is expensive. MapReduce, however, is no longer central.</p>
+  <h2>Hadoop si usa ancora?</h2>
+  <p>Sì, ma il suo ruolo è passato da piattaforma Big Data predefinita a infrastruttura aziendale già installata. Resta comune nelle grandi organizzazioni con piattaforme mature on-premise o ibride (in parte nel centro dati dell'azienda, in parte nel cloud), soprattutto dove spostare petabyte di dati costa caro. MapReduce, però, non è più centrale.</p>
   <figure>
     <div class="w" id="b5stack"></div>
-    <figcaption>The lecture's picture of a typical enterprise today. In the first panel the legacy path, still found in existing installations; in the second the modern, hybrid direction, where object storage replaces HDFS and newer engines and table formats replace MapReduce.</figcaption>
+    <figcaption>Lo schema della lezione di una tipica azienda di oggi. Nel primo riquadro il percorso legacy, che si trova ancora nelle installazioni esistenti; nel secondo la direzione moderna e ibrida, dove l'object storage sostituisce HDFS e motori e formati di tabella più recenti sostituiscono MapReduce.</figcaption>
   </figure>
-  <p>The new names, as the lecture defines them. <strong>Trino</strong> is a distributed SQL query engine that queries large data sets across different sources (S3, Hive, Iceberg, PostgreSQL and others) without moving them into one database. <strong>Flink</strong> is a distributed stream-processing engine that processes data continuously as events arrive, often in real time. <strong>Iceberg</strong>, created at Netflix, and <strong>Delta Lake</strong>, created by Databricks, the company of Spark's creators, are open table formats: they keep the data in files, usually Parquet, a columnar file format met again in lesson 6, plus metadata and transaction logs, so that several engines can treat the files as tables. <strong>Object storage</strong> means cloud services such as Amazon S3, Azure Blob Storage or ADLS Gen2, and Google Cloud Storage.</p>
-  <p>The usual Hadoop alternative is a data lake, or <strong>lakehouse</strong>, built with Spark on cloud storage: lesson 8 is about it. The lecture's advice to a data engineer in 2026 sums up the shift.</p>
-  <div class="scroll"><table><thead><tr><th>Technology</th><th>2026 relevance, according to the lecture</th></tr></thead><tbody>
-    <tr><td>Hadoop MapReduce</td><td>low, legacy</td></tr><tr><td>HDFS and YARN</td><td>useful in existing installations</td></tr><tr><td>Hive</td><td>still present</td></tr>
-    <tr><td>Spark, Kafka</td><td>very important</td></tr><tr><td>Iceberg, Delta Lake</td><td>high growth</td></tr><tr><td>Trino</td><td>highly relevant</td></tr><tr><td>S3, ADLS, GCS (object storage)</td><td>fundamental</td></tr></tbody></table></div>
-  <p>Kafka, which the lecture names here without detail, is a platform that moves streams of events between systems. The key idea: learn the Hadoop concepts (HDFS, name node and data nodes, partitioning, data locality, that is running the computation where the data are, YARN), because they explain why every modern distributed system looks the way it does, not MapReduce mastery.</p>
+  <p>I nomi nuovi, come li definisce la lezione. <strong>Trino</strong> è un motore di query SQL distribuito che interroga grandi insiemi di dati su fonti diverse (S3, Hive, Iceberg, PostgreSQL e altre) senza spostarli in un unico database. <strong>Flink</strong> è un motore distribuito di elaborazione dei flussi (stream processing) che elabora i dati di continuo man mano che arrivano gli eventi, spesso in tempo reale. <strong>Iceberg</strong>, creato da Netflix, e <strong>Delta Lake</strong>, creato da Databricks, l'azienda dei creatori di Spark, sono formati di tabella aperti: tengono i dati in file, di solito Parquet, un formato di file a colonne che ritorna nella lezione 6, più metadati e log delle transazioni, così che più motori possano trattare i file come tabelle. Per <strong>object storage</strong> si intendono servizi cloud come Amazon S3, Azure Blob Storage o ADLS Gen2, e Google Cloud Storage.</p>
+  <p>L'alternativa abituale a Hadoop è un data lake, o <strong>lakehouse</strong>, costruito con Spark su storage nel cloud: ne parla la lezione 8. Il consiglio della lezione a un data engineer nel 2026 riassume il cambiamento.</p>
+  <div class="scroll"><table><thead><tr><th>Tecnologia</th><th>Rilevanza nel 2026, secondo la lezione</th></tr></thead><tbody>
+    <tr><td>Hadoop MapReduce</td><td>bassa, legacy</td></tr><tr><td>HDFS e YARN</td><td>utili nelle installazioni esistenti</td></tr><tr><td>Hive</td><td>ancora presente</td></tr>
+    <tr><td>Spark, Kafka</td><td>molto importanti</td></tr><tr><td>Iceberg, Delta Lake</td><td>in forte crescita</td></tr><tr><td>Trino</td><td>molto rilevante</td></tr><tr><td>S3, ADLS, GCS (object storage)</td><td>fondamentali</td></tr></tbody></table></div>
+  <p>Kafka, che la lezione nomina qui senza dettagli, è una piattaforma che sposta flussi di eventi fra sistemi. L'idea chiave: imparare i concetti di Hadoop (HDFS, name node e data node, partizionamento, località dei dati, cioè eseguire il calcolo dove stanno i dati, YARN), perché spiegano come mai ogni sistema distribuito moderno è fatto così, non diventare esperti di MapReduce.</p>
 </div></section>
 
 <section class="recap"><div class="col">
-  <h2>Lesson 5 at a glance</h2>
-  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
+  <h2>La lezione 5 in sintesi</h2>
+  <p>Le definizioni e le idee di questa lezione in un solo posto, da ripassare prima del quiz.</p>
   <h3>HDFS</h3>
-  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
-    <tr><td>Hadoop</td><td>A distributed calculation system based on HDFS (storage) and MapReduce (computation); open source, scalable to thousands of nodes, for structured and unstructured data, fault tolerant on commodity hardware</td></tr>
-    <tr><td>Block</td><td>The parts a file is cut into, generally 64 or 128 MB each</td></tr>
-    <tr><td>Replication</td><td>Each block is copied on different nodes; default replication factor 3, so a file takes 3 times its size</td></tr>
-    <tr><td>Name node</td><td>The master: holds all the metadata (files, their blocks, block locations), creates, renames and deletes files, manages replication</td></tr>
-    <tr><td>Data nodes</td><td>The slaves, which carry out the actual reads and writes</td></tr>
-    <tr><td>Rack awareness</td><td>Copies placed so that even if an entire rack fails all the data remain available</td></tr>
-    <tr><td>Erasure coding (Hadoop 3)</td><td>Extra encoded data that can rebuild lost blocks; storage overhead 50% instead of 200%; an option enabled folder by folder, replication stays the default</td></tr>
+  <div class="scroll"><table><thead><tr><th>Termine</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>Hadoop</td><td>Un sistema di calcolo distribuito basato su HDFS (memorizzazione) e MapReduce (calcolo); open source, scalabile fino a migliaia di nodi, per dati strutturati e non strutturati, tollerante ai guasti su hardware comune</td></tr>
+    <tr><td>Blocco</td><td>Le parti in cui viene tagliato un file, in genere da 64 o 128 MB ciascuna</td></tr>
+    <tr><td>Replica</td><td>Ogni blocco è copiato su nodi diversi; fattore di replica predefinito 3, quindi un file occupa 3 volte la sua dimensione</td></tr>
+    <tr><td>Name node</td><td>Il master: contiene tutti i metadati (file, loro blocchi, posizione dei blocchi), crea, rinomina e cancella file, gestisce la replica</td></tr>
+    <tr><td>Data node</td><td>Gli slave, che eseguono le letture e le scritture vere e proprie</td></tr>
+    <tr><td>Consapevolezza dei rack</td><td>Copie disposte in modo che, anche se si guasta un intero rack, tutti i dati restino disponibili</td></tr>
+    <tr><td>Erasure coding (Hadoop 3)</td><td>Dati codificati in più che possono ricostruire i blocchi persi; sovraccarico di memorizzazione del 50% invece del 200%; un'opzione da attivare cartella per cartella, la replica resta l'impostazione predefinita</td></tr>
   </tbody></table></div>
   <h3>MapReduce</h3>
-  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
-    <tr><td>MapReduce</td><td>The distributed computation engine on HDFS data, with a Java API only; all later Hadoop engines derive from it</td></tr>
-    <tr><td>Map phase</td><td>Prepares the data and maps them to key/value pairs</td></tr>
-    <tr><td>Sort, shuffle, aggregate</td><td>Done by the system: values of the same key are put together, moving across the network</td></tr>
-    <tr><td>Reduce phase</td><td>Performs the calculation on each key; the output is saved to an HDFS file</td></tr>
-    <tr><td>Data locality</td><td>The mapper runs on the nodes that hold the input: the computation travels to the data</td></tr>
-    <tr><td>Limits</td><td>Built for batch jobs of minutes or hours, not interactive queries of seconds; most problems are hard to express as map and reduce</td></tr>
-    <tr><td>Pig and Hive</td><td>High level languages translated into MapReduce jobs: Pig Latin (procedural), HiveQL (SQL dialect); ODBC drivers let BI tools reach Hive as an RDBMS</td></tr>
+  <div class="scroll"><table><thead><tr><th>Concetto</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>MapReduce</td><td>Il motore di calcolo distribuito sui dati di HDFS, con la sola API Java; tutti i motori successivi di Hadoop derivano da esso</td></tr>
+    <tr><td>Fase di map</td><td>Prepara i dati e li trasforma in coppie chiave/valore</td></tr>
+    <tr><td>Ordinamento, shuffle, aggregazione</td><td>Li fa il sistema: i valori della stessa chiave vengono messi insieme, spostandosi attraverso la rete</td></tr>
+    <tr><td>Fase di reduce</td><td>Esegue il calcolo su ogni chiave; l'output è salvato in un file HDFS</td></tr>
+    <tr><td>Località dei dati</td><td>Il mapper gira sui nodi che contengono l'input: è il calcolo a spostarsi verso i dati</td></tr>
+    <tr><td>Limiti</td><td>Costruito per job batch di minuti od ore, non per query interattive di secondi; la maggior parte dei problemi è difficile da esprimere come map e reduce</td></tr>
+    <tr><td>Pig e Hive</td><td>Linguaggi di alto livello tradotti in job MapReduce: Pig Latin (procedurale), HiveQL (dialetto SQL); i driver ODBC permettono agli strumenti di BI di raggiungere Hive come un RDBMS</td></tr>
   </tbody></table></div>
-  <h3>The ecosystem and today</h3>
-  <div class="scroll"><table><thead><tr><th>Layer or term</th><th>Tools and meaning</th></tr></thead><tbody>
-    <tr><td>Core services</td><td>HDFS; engines MapReduce, Tez (a job as a graph of steps) and Spark; YARN, which allocates cluster resources to tasks and applications</td></tr>
-    <tr><td>Data services</td><td>Hive (SQL), Pig, HBase (columnar NoSQL), Storm and Flume (stream ingestion), Sqoop (import and export between an RDBMS and Hadoop), HCatalog</td></tr>
-    <tr><td>Operational services</td><td>Ambari (cluster management), Oozie (job workflows), Zookeeper (synchronized configuration)</td></tr>
-    <tr><td>Analytic tools</td><td>Inside Hadoop: Giraph, Mahout, Kylin; distributed of their own: Elastic Search, Spark; from outside: SAS, KNIME, R</td></tr>
-    <tr><td>Distributions</td><td>Semi-automatic installers; the best known is Cloudera, merged with Hortonworks in 2018</td></tr>
-    <tr><td>Hadoop today</td><td>Installed enterprise infrastructure, common on-premise or hybrid; MapReduce no longer central; the usual alternative is a data lake or lakehouse with Spark on cloud storage</td></tr>
-    <tr><td>Modern names</td><td>Trino (SQL across sources without moving data), Flink (stream processing), Iceberg and Delta Lake (open table formats on Parquet files), object storage (S3, Azure Blob or ADLS Gen2, Google Cloud Storage), Kafka (event streams)</td></tr>
-    <tr><td>What to learn</td><td>The concepts (HDFS, name and data nodes, partitioning, data locality, YARN), not MapReduce mastery</td></tr>
+  <h3>L'ecosistema e oggi</h3>
+  <div class="scroll"><table><thead><tr><th>Strato o termine</th><th>Strumenti e significato</th></tr></thead><tbody>
+    <tr><td>Servizi di base</td><td>HDFS; i motori MapReduce, Tez (un job come grafo di passi) e Spark; YARN, che assegna le risorse del cluster a task e applicazioni</td></tr>
+    <tr><td>Servizi per i dati</td><td>Hive (SQL), Pig, HBase (NoSQL a colonne), Storm e Flume (acquisizione di flussi), Sqoop (importazione ed esportazione fra un RDBMS e Hadoop), HCatalog</td></tr>
+    <tr><td>Servizi operativi</td><td>Ambari (gestione del cluster), Oozie (workflow dei job), Zookeeper (configurazione sincronizzata)</td></tr>
+    <tr><td>Strumenti di analisi</td><td>Dentro Hadoop: Giraph, Mahout, Kylin; distribuiti a sé stanti: Elastic Search, Spark; dall'esterno: SAS, KNIME, R</td></tr>
+    <tr><td>Distribuzioni</td><td>Installatori semiautomatici; la più nota è Cloudera, fusa con Hortonworks nel 2018</td></tr>
+    <tr><td>Hadoop oggi</td><td>Infrastruttura aziendale già installata, comune on-premise o ibrida; MapReduce non è più centrale; l'alternativa abituale è un data lake o un lakehouse con Spark su storage nel cloud</td></tr>
+    <tr><td>Nomi moderni</td><td>Trino (SQL su più fonti senza spostare i dati), Flink (elaborazione di flussi), Iceberg e Delta Lake (formati di tabella aperti su file Parquet), object storage (S3, Azure Blob o ADLS Gen2, Google Cloud Storage), Kafka (flussi di eventi)</td></tr>
+    <tr><td>Che cosa imparare</td><td>I concetti (HDFS, name node e data node, partizionamento, località dei dati, YARN), non diventare esperti di MapReduce</td></tr>
   </tbody></table></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Test yourself</h2>
+  <h2>Mettiti alla prova</h2>
   <div class="quiz" data-quiz="5"></div>
 </div></section>
 
 <section><div class="col">
-  <p>If only one thing from this lesson stays with you: <strong>Hadoop splits files into replicated blocks spread across racks, and moves the computation to the nodes that hold them</strong>, map close to the data, then a shuffle, then reduce.</p>
-  <p>Lesson 6 shows why Spark, doing the same job in memory, replaced MapReduce as the engine of choice.</p>
-  <nav class="navend" aria-label="Other lessons"></nav>
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>Hadoop divide i file in blocchi replicati sparsi su più rack, e porta il calcolo ai nodi che li contengono</strong>: map vicino ai dati, poi uno shuffle, poi reduce.</p>
+  <p>La lezione 6 mostra perché Spark, facendo lo stesso lavoro in memoria, ha sostituito MapReduce come motore preferito.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
 </div></section>
 </article>

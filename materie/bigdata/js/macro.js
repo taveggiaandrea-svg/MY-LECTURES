@@ -1,14 +1,13 @@
-/* Big Data and Databases: interface in English and small drawing helpers shared by the four lessons */
-Object.assign(UI,{check:'Check',pickFirst:'Pick an answer first.',right:'Correct.',wrong:'Not quite.',play:'Play',pause:'Pause',seek:'Position in the animation',
-  prev:'Previous lesson',next:'Next lesson',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
-  askSys:'You are a tutor. Answer in English, briefly and clearly, based on the lessons provided: first the open lesson, then the course map and the excerpts from other lessons. When you use another lesson, say which one. If the question goes beyond the course, say so.',
-  askSlow:'no reply in time, trying the next model.',
-  askFmt:'Write formulas in LaTeX between \\( \\) or \\[ \\], never with dollar signs.'});
+/* Big Data and Databases, versione italiana: l'interfaccia usa i testi italiani di core.js; piccoli strumenti di disegno comuni alle lezioni.
+   La versione inglese sta in en/js/macro.js: le due copie vanno tenute allineate. */
 /* colour roles of this subject: primary key YEL, foreign key PINK, conditions ORG, NULL PUR, measures BLUE, windows TEAL, accepted GRN, rejected RED */
 const PKC=YEL,FKC=PINK,PRC=ORG,NLC=PUR,MSC=BLUE,WNC=TEAL;
 Object.assign(MAC,{'\\kk':col(BLUE,'k'),'\\qv':col(ORG,'q'),'\\vb':col(BLUE,'v')});
-/* numbers in English: point as decimal separator, trailing zeros removed */
+/* numeri: fe con il punto decimale, come li scrivono SQL e Spark (codice, contenuto delle tabelle, risultati delle query);
+   fi con la virgola decimale e il punto delle migliaia dalle cinque cifre in su, per testo, report, assi e note in italiano */
 const fe=(v,d)=>{if(v===null||v===undefined)return 'NULL';const p=Math.pow(10,d===undefined?2:d);return String(Math.round(v*p)/p)};
+const fi=(v,d)=>{if(v===null||v===undefined)return 'NULL';const p=Math.pow(10,d===undefined?2:d),r=Math.round(v*p)/p,[i,f]=String(Math.abs(r)).split('.');
+  return (r<0?'−':'')+(i.length>4?i.replace(/\B(?=(\d{3})+(?!\d))/g,'.'):i)+(f?','+f:'')};
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 /* a table drawn in SVG. cols: [{t:header, w:width, a:'s'|'e', c:header colour}]; rows: arrays of cells, a cell is a string or
    {v:text, f:colour, b:bold, st:struck}; o.bg(i) row background, o.op(i) row opacity. Returns {s,w,h}. */
@@ -30,7 +29,7 @@ function sTab(x,y,cols,rows,o){
 const lbl=(x,y,t,c,o)=>{o=o||{};return '<text x="'+x+'" y="'+y+'" font-size="'+(o.s||13.5)+'" text-anchor="'+(o.a||'middle')+'"'+(o.w?' font-weight="'+o.w+'"':'')+' style="paint-order:stroke;stroke:#000;stroke-width:4px;fill:'+(c||'#fff')+'">'+t+'</text>'};
 const rect=(x,y,w,h,f,st,o)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+(f||'none')+'"'+(st?' stroke="'+st+'"':'')+(o||'')+'/>';
 const line=(x1,y1,x2,y2,c,w,o)=>'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+(w||1.5)+'"'+(o||'')+'/>';
-const verdict=(ok,t)=>'<span class="'+(ok?'ok':'bad')+'">'+(ok?'Accepted.':'Rejected.')+'</span> '+t;
+const verdict=(ok,t)=>'<span class="'+(ok?'ok':'bad')+'">'+(ok?'Accettato.':'Rifiutato.')+'</span> '+t;
 const OKBG='rgba(131,193,103,.22)',BADBG='rgba(252,98,85,.24)',HLBG='rgba(255,255,255,.1)',WINBG='rgba(92,208,179,.22)';
 /* datasets from the course scripts and slides */
 const CUST=[[1,'marco','rossi','milan'],[2,'john','doe','london'],[3,'mark','smith','liverpool'],[4,'mary','jane','london'],[5,'mario','bianchi','rome']];

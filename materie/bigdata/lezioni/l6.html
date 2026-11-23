@@ -1,81 +1,81 @@
-<article class="lesson" data-n="6" id="lezione-6" data-title="What makes Spark so fast?" hidden>
+<article class="lesson" data-n="6" id="lezione-6" data-title="Che cosa rende Spark così veloce?" hidden>
 <section class="hero"><div class="col">
-  <p class="chap">Lesson 6 · A. Rezzani, slides and Spark scripts</p>
-  <h1>What makes Spark so fast?</h1>
-  <p class="desc">Lightning fast computing with Spark: in-memory processing, the cluster architecture, RDDs, transformations and actions, DataFrames and Spark SQL.</p>
+  <p class="chap">Lezione 6 · A. Rezzani, slide e script Spark</p>
+  <h1>Che cosa rende Spark così veloce?</h1>
+  <p class="desc">Calcolo velocissimo con Spark: elaborazione in memoria, architettura del cluster, RDD, trasformazioni e azioni, DataFrame e Spark SQL.</p>
 </div></section>
 
 <section><div class="col">
-  <p>Lesson 5 ended with MapReduce: map close to the data, shuffle, reduce, and a result written to HDFS. It works, but it is slow and hard to program. Spark does the same kind of job, and the first slide of the lecture says how it differs.</p>
-  <p class="stmt"><strong>Spark.</strong> A fast, in-memory data processing engine, with APIs in Scala, Java, Python and R. Running on Hadoop's YARN, it integrates deeply with Hadoop; on top of its core it powers a stack of high level tools: Spark SQL, MLlib for machine learning, GraphX for graphs and Spark Streaming.</p>
-  <p>Spark started in 2009 as a Hadoop subproject at AMPLab, became open source in 2010 and an Apache project in 2013; versions 1.6.2 and 2.0.0 came in 2016, 2.3 and 2.4 in 2018, 3.x in 2020. The slide places AMPLab at UCLA: it is the laboratory of the University of California at Berkeley.</p>
-  <h2>Keep the data in memory between steps</h2>
-  <p>Most real jobs have several steps: clean, then join, then aggregate, then iterate. MapReduce reads its input from HDFS and writes its output to HDFS at every step, and disks are slow. Spark reads once, keeps the intermediate results in memory and writes only at the end.</p>
+  <p>La lezione 5 si è chiusa con MapReduce: map vicino ai dati, shuffle, reduce, e un risultato scritto in HDFS. Funziona, ma è lento e difficile da programmare. Spark fa lo stesso tipo di lavoro, e la prima slide della lezione dice in che cosa è diverso.</p>
+  <p class="stmt"><strong>Spark.</strong> Un motore di elaborazione dei dati veloce e in memoria, con API in Scala, Java, Python e R. Girando su YARN di Hadoop, si integra profondamente con Hadoop; sopra il suo nucleo alimenta una serie di strumenti di alto livello: Spark SQL, MLlib per il machine learning, GraphX per i grafi e Spark Streaming.</p>
+  <p>Spark è nato nel 2009 come sottoprogetto di Hadoop all'AMPLab, è diventato open source nel 2010 e progetto Apache nel 2013; le versioni 1.6.2 e 2.0.0 sono arrivate nel 2016, la 2.3 e la 2.4 nel 2018, la 3.x nel 2020. La slide colloca l'AMPLab alla UCLA: è invece il laboratorio dell'Università della California a Berkeley.</p>
+  <h2>Tenere i dati in memoria fra un passo e l'altro</h2>
+  <p>La maggior parte dei lavori reali ha più passi: pulire, poi unire, poi aggregare, poi iterare. MapReduce legge il suo input da HDFS e scrive il suo output in HDFS a ogni passo, e i dischi sono lenti. Spark legge una volta, tiene i risultati intermedi in memoria e scrive solo alla fine.</p>
   <figure>
     <div class="w" id="b6io"></div>
-    <figcaption>The lecture's comparison for a two-step job, redrawn. In the first panel MapReduce goes through HDFS (the cylinders) before and after each step: four disk operations. In the second Spark reads from HDFS once and passes the result of step 1 to step 2 in memory (the chips).</figcaption>
+    <figcaption>Il confronto della lezione per un lavoro in due passi, ridisegnato. Nel primo riquadro MapReduce passa per HDFS (i cilindri) prima e dopo ogni passo: quattro operazioni su disco. Nel secondo Spark legge da HDFS una volta e passa il risultato del passo 1 al passo 2 in memoria (i chip).</figcaption>
   </figure>
-  <p><strong>Spark is fast because it stops writing to disk between one step and the next.</strong> Not only: the lecture stresses that it is fast for on-disk computation too, as two benchmarks show.</p>
+  <p><strong>Spark è veloce perché smette di scrivere su disco fra un passo e il successivo.</strong> Non solo: la lezione sottolinea che è veloce anche nel calcolo su disco, come mostrano due benchmark.</p>
   <figure>
     <div class="w" id="b6perf"></div>
-    <figcaption>The two benchmarks of the lecture. In the first panel, the running time of a logistic regression on a 100-node cluster with 100 GB of data (the Hadoop bar, about 110 seconds, is read from the slide's chart). In the second, the sort benchmark: the 2013 record set with Hadoop and Spark's 2014 winning run.</figcaption>
+    <figcaption>I due benchmark della lezione. Nel primo riquadro, il tempo di esecuzione di una regressione logistica su un cluster di 100 nodi con 100 GB di dati (la barra di Hadoop, circa 110 secondi, è letta dal grafico della slide). Nel secondo, il benchmark di ordinamento: il record del 2013 stabilito con Hadoop e l'esecuzione vincente di Spark nel 2014.</figcaption>
   </figure>
   <div class="quiz inq" data-quiz="6a"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Who does what in a Spark cluster</h2>
-  <p>The <strong>driver program</strong> contains all the instructions Spark must execute, for example read a file, aggregate the data, save the result to another file. In it the programmer creates the <strong>SparkSession</strong> object, which connects to the cluster through a <strong>cluster manager</strong> and sends the program to be executed. Spark can use YARN as cluster manager if it lives on the same cluster as Hadoop, Apache Mesos, or its own standalone manager.</p>
-  <p>Once connected, the driver sends the lines of code with the Spark commands. The <strong>worker nodes</strong>, generally one per physical machine, receive them and allocate one or more <strong>executors</strong>: services running on the Java virtual machine (JVM) that create the <strong>tasks</strong> which physically execute the instructions, and allocate enough memory to each task. Executors on different workers exchange data when needed: these exchanges are the <span class="k-orange">shuffles</span>, and they happen when the program aggregates data (rows with the same key may sit on different workers) or sorts them.</p>
+  <h2>Chi fa che cosa in un cluster Spark</h2>
+  <p>Il <strong>driver program</strong> (programma driver) contiene tutte le istruzioni che Spark deve eseguire, per esempio leggere un file, aggregare i dati, salvare il risultato in un altro file. Al suo interno il programmatore crea l'oggetto <strong>SparkSession</strong>, che si collega al cluster attraverso un <strong>cluster manager</strong> (gestore del cluster) e invia il programma da eseguire. Spark può usare come cluster manager YARN, se sta sullo stesso cluster di Hadoop, Apache Mesos, oppure il proprio gestore standalone.</p>
+  <p>Una volta collegato, il driver invia le righe di codice con i comandi Spark. I <strong>worker node</strong> (nodi di lavoro), in genere uno per macchina fisica, le ricevono e allocano uno o più <strong>executor</strong> (esecutori): servizi che girano sulla macchina virtuale Java (JVM), creano i <strong>task</strong> che eseguono fisicamente le istruzioni e assegnano a ogni task memoria sufficiente. Gli executor su worker diversi si scambiano dati quando serve: questi scambi sono gli <span class="k-orange">shuffle</span>, e avvengono quando il programma aggrega i dati (righe con la stessa chiave possono stare su worker diversi) o li ordina.</p>
   <figure>
     <div class="w" id="b6arch"></div>
-    <figcaption>The lecture's Spark architecture, redrawn. The driver, with its SparkContext, talks to the cluster manager, which hands out resources on the worker nodes; each worker runs an executor with a cache and tasks. The orange arrow is a shuffle between executors.</figcaption>
+    <figcaption>L'architettura di Spark della lezione, ridisegnata. Il driver, con il suo SparkContext, parla con il cluster manager, che distribuisce le risorse sui worker node; ogni worker esegue un executor con una cache e dei task. La freccia arancione è uno shuffle fra executor.</figcaption>
   </figure>
-  <p>The <code>master</code> parameter of the session decides which cluster to use, as in <code>SparkSession.builder.master("spark://myserver:7077").appName("myApp").getOrCreate()</code>.</p>
-  <div class="scroll"><table><thead><tr><th>master</th><th>meaning</th></tr></thead><tbody>
-    <tr><td><code>local</code></td><td>local execution with one thread</td></tr><tr><td><code>local[K]</code></td><td>local execution with K workers</td></tr><tr><td><code>local[*]</code></td><td>local execution with as many workers as the machine has cores</td></tr>
-    <tr><td><code>spark://HOST:PORT</code></td><td>a standalone cluster; default port 7077</td></tr><tr><td><code>mesos://HOST:PORT</code></td><td>a Mesos cluster; default port 5050</td></tr>
-    <tr><td><code>yarn</code></td><td>a YARN cluster, whose address is in the configuration folders named by HADOOP_CONF_DIR and YARN_CONF_DIR</td></tr></tbody></table></div>
-  <p>The Apache distribution is relatively easy to install on every operating system. Databricks offers another distribution, also in the cloud, and Spark is available as a cloud service on Microsoft HDInsight, Google Cloud and IBM Bluemix.</p>
+  <p>Il parametro <code>master</code> della sessione decide quale cluster usare, come in <code>SparkSession.builder.master("spark://myserver:7077").appName("myApp").getOrCreate()</code>.</p>
+  <div class="scroll"><table><thead><tr><th>master</th><th>significato</th></tr></thead><tbody>
+    <tr><td><code>local</code></td><td>esecuzione locale con un solo thread</td></tr><tr><td><code>local[K]</code></td><td>esecuzione locale con K worker</td></tr><tr><td><code>local[*]</code></td><td>esecuzione locale con tanti worker quanti sono i core della macchina</td></tr>
+    <tr><td><code>spark://HOST:PORT</code></td><td>un cluster standalone; porta predefinita 7077</td></tr><tr><td><code>mesos://HOST:PORT</code></td><td>un cluster Mesos; porta predefinita 5050</td></tr>
+    <tr><td><code>yarn</code></td><td>un cluster YARN, il cui indirizzo sta nelle cartelle di configurazione indicate da HADOOP_CONF_DIR e YARN_CONF_DIR</td></tr></tbody></table></div>
+  <p>La distribuzione Apache è relativamente facile da installare su ogni sistema operativo. Databricks offre un'altra distribuzione, anche nel cloud, e Spark è disponibile come servizio cloud su Microsoft HDInsight, Google Cloud e IBM Bluemix.</p>
   <div class="quiz inq" data-quiz="6b"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Data cut into partitions: the RDD</h2>
-  <p class="stmt"><strong>RDD.</strong> A resilient distributed dataset is the primary abstraction of Spark: an immutable, fault-tolerant collection of elements, cut into <span class="k-teal">partitions</span> that are distributed across the nodes of the cluster and processed in parallel.</p>
-  <p>Each partition is managed by an executor, generally one executor per node, and an executor can manage more than one partition of the same RDD. An RDD can hold strings, as when you read a text file, or key/value pairs, created by the program. It is created either from a file system (HDFS, HBase, or any Hadoop data source) or by parallelizing an existing Scala or Python collection.</p>
+  <h2>Dati tagliati in partizioni: l'RDD</h2>
+  <p class="stmt"><strong>RDD.</strong> Un resilient distributed dataset (insieme di dati distribuito e resiliente) è l'astrazione principale di Spark: una collezione di elementi immutabile e tollerante ai guasti, tagliata in <span class="k-teal">partizioni</span> che sono distribuite sui nodi del cluster ed elaborate in parallelo.</p>
+  <p>Ogni partizione è gestita da un executor, in genere un executor per nodo, e un executor può gestire più di una partizione dello stesso RDD. Un RDD può contenere stringhe, come quando si legge un file di testo, oppure coppie chiave/valore, create dal programma. Si crea o da un file system (HDFS, HBase, o qualunque fonte di dati di Hadoop) o parallelizzando una collezione esistente di Scala o di Python.</p>
   <figure>
     <div class="w" id="b6rdd"></div>
-    <figcaption>The lecture's example: one RDD of four partitions (teal) spread over three nodes, each with one executor. The first executor handles two partitions, the others one each; all four are processed at the same time.</figcaption>
+    <figcaption>L'esempio della lezione: un RDD di quattro partizioni (in verde acqua) sparse su tre nodi, ciascuno con un executor. Il primo executor gestisce due partizioni, gli altri una ciascuno; tutte e quattro vengono elaborate contemporaneamente.</figcaption>
   </figure>
 </div></section>
 
 <section><div class="col">
-  <h2>Nothing happens until you ask for a result</h2>
-  <p>Once an RDD exists, every operation on it is one of two kinds. A <strong>transformation</strong> creates a new RDD from an existing one and adds a step to the processing plan, the <strong>DAG</strong> (directed acyclic graph: the execution workflow of the program). An <span class="k-pink">action</span> executes the DAG and returns a value. Transformations alone compute nothing: Spark waits for an action, then runs the whole plan at once.</p>
+  <h2>Non succede nulla finché non chiedi un risultato</h2>
+  <p>Una volta che un RDD esiste, ogni operazione su di esso è di uno di due tipi. Una <strong>trasformazione</strong> crea un nuovo RDD da uno esistente e aggiunge un passo al piano di elaborazione, il <strong>DAG</strong> (directed acyclic graph, grafo aciclico orientato: il flusso di esecuzione del programma). Un'<span class="k-pink">azione</span> esegue il DAG e restituisce un valore. Le sole trasformazioni non calcolano nulla: Spark aspetta un'azione, poi esegue tutto il piano in una volta.</p>
 <pre class="code">rdd = sc.textFile("input.txt")\
     .flatMap(lambda line: line.split())\
     .map(lambda word: (word, 1))\
     .reduceByKey(lambda x, y: x + y, 3)\
     .<span class="k-pink">collect()</span></pre>
-  <p>Read line by line: <code>sc</code> is the SparkContext of the session; <code>textFile</code> reads the file into an RDD of lines, <code>flatMap</code> splits the lines into one big RDD of words, <code>map</code> turns each word into a key/value pair (word, 1), <code>reduceByKey</code> groups by key and sums the values into 3 partitions, and <code>collect</code> returns the result to the driver. A <code>lambda</code> is a small function written inline.</p>
+  <p>Leggendo riga per riga: <code>sc</code> è lo SparkContext della sessione; <code>textFile</code> legge il file in un RDD di righe, <code>flatMap</code> divide le righe in un unico grande RDD di parole, <code>map</code> trasforma ogni parola in una coppia chiave/valore (parola, 1), <code>reduceByKey</code> raggruppa per chiave e somma i valori in 3 partizioni, e <code>collect</code> restituisce il risultato al driver. Una <code>lambda</code> è una piccola funzione scritta direttamente sul posto.</p>
   <figure>
     <div class="w" id="b6lazy"></div>
-    <figcaption>The lecture's example on its sentence (punctuation removed), animated. Press play: the four transformations only add boxes to the DAG; the action collect() runs it. The DAG is cut into two stages, and between them the shuffle (orange) brings equal words together. The result goes back to the driver (pink). Simplified for illustration: the slide's diagram has four input partitions, and which output partition receives which word, decided in Spark by a hash of the key, is invented here.</figcaption>
+    <figcaption>L'esempio della lezione sulla sua frase (senza punteggiatura), animato. Premi play: le quattro trasformazioni aggiungono solo riquadri al DAG; l'azione collect() lo esegue. Il DAG è tagliato in due stage, e fra di essi lo shuffle (in arancione) riunisce le parole uguali. Il risultato torna al driver (in rosa). Semplificato a scopo illustrativo: lo schema della slide ha quattro partizioni di input, e l'assegnazione delle parole alle partizioni di output, che in Spark è decisa da un hash della chiave, qui è inventata.</figcaption>
   </figure>
-  <p><strong>A DAG is cut into stages at every shuffle, and the stages run in order.</strong> Inside a stage each partition goes through its steps on its own executor; at the boundary the data must be redistributed, so that all the pairs of one word meet in the same partition.</p>
+  <p><strong>Un DAG viene tagliato in stage a ogni shuffle, e gli stage vengono eseguiti in ordine.</strong> Dentro uno stage ogni partizione percorre i suoi passi sul proprio executor; al confine i dati vanno ridistribuiti, perché tutte le coppie di una stessa parola si ritrovino nella stessa partizione.</p>
   <div class="quiz inq" data-quiz="6c"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Tables again: DataFrames and Spark SQL</h2>
-  <p>To Spark the elements of an RDD are opaque objects: their inner structure is unknown. <strong>Spark SQL</strong> is the module for structured data, and it adds the <strong>DataFrame</strong>: a distributed collection of data organized into named columns, conceptually equivalent to a table of a relational database or to a data frame in R or Python, with richer optimizations under the hood. It can also act as a distributed SQL query engine.</p>
+  <h2>Di nuovo le tabelle: DataFrame e Spark SQL</h2>
+  <p>Per Spark gli elementi di un RDD sono oggetti opachi: la loro struttura interna è sconosciuta. <strong>Spark SQL</strong> è il modulo per i dati strutturati, e aggiunge il <strong>DataFrame</strong>: una collezione distribuita di dati organizzata in colonne con un nome, concettualmente equivalente a una tabella di un database relazionale o a un data frame in R o Python, con ottimizzazioni più ricche dietro le quinte. Può anche funzionare come motore distribuito di query SQL.</p>
   <figure>
     <div class="w" id="b6df"></div>
-    <figcaption>The lecture's comparison. In the first panel an RDD of User objects: Spark sees each one as a closed box. In the second a DataFrame of the same users: Spark knows the schema (metadata: column names and types), so it can select, filter, aggregate and join by column. The names and values in the rows are invented for illustration.</figcaption>
+    <figcaption>Il confronto della lezione. Nel primo riquadro un RDD di oggetti User: Spark vede ciascuno come una scatola chiusa. Nel secondo un DataFrame degli stessi utenti: Spark conosce lo schema (i metadati: nomi e tipi delle colonne), quindi può selezionare, filtrare, aggregare e unire per colonna. I nomi e i valori nelle righe sono inventati a scopo illustrativo.</figcaption>
   </figure>
-  <p>An RDD becomes a DataFrame in two ways, both in the course script: by declaring a schema (<code>StructType</code> with the field names and types) or by turning each element into a <code>Row</code> and letting Spark infer the schema. DataFrames are also read directly from data sources such as JSON files, JDBC connections (the Java standard for reaching a database) to relational databases, or <strong>Parquet</strong> files, an optimized format that stores data in columns together with their metadata (column names and data types).</p>
-  <p>The course script loads <code>sales.csv</code>, eleven sales with date, product, value and customer id, and works on it with the DataFrame API and with SQL:</p>
+  <p>Un RDD diventa un DataFrame in due modi, entrambi nello script del corso: dichiarando uno schema (<code>StructType</code> con i nomi e i tipi dei campi) oppure trasformando ogni elemento in un oggetto <code>Row</code> e lasciando che Spark deduca lo schema. I DataFrame si leggono anche direttamente da fonti di dati come file JSON, connessioni JDBC (lo standard Java per raggiungere un database) a database relazionali, o file <strong>Parquet</strong>, un formato ottimizzato che memorizza i dati per colonne insieme ai loro metadati (nomi delle colonne e tipi di dato).</p>
+  <p>Lo script del corso carica <code>sales.csv</code>, undici vendite con data, prodotto, valore e id del cliente, e ci lavora con l'API dei DataFrame e con SQL:</p>
 <pre class="code">sales = spark.read.option("header", True).option("inferSchema", True).csv("sales.csv")
 sales.select(sales["product"], sales["value"]).show(2)
 sales.filter(sales["value"] &gt; 200).show()
@@ -84,51 +84,51 @@ sales.createOrReplaceTempView("sales")
 spark.sql("select product, sum(value) as qt_tot from sales group by product")</pre>
   <figure>
     <div class="w" id="b6sales"></div>
-    <figcaption>The course's sales.csv and two results of the script. The filter keeps the rows where value is greater than 200 (highlighted in the table); groupBy with sum adds up the values of each product. The SQL query on the temporary view returns the same three totals as groupBy.</figcaption>
+    <figcaption>Il file sales.csv del corso e due risultati dello script. Il filtro tiene le righe in cui value è maggiore di 200 (evidenziate nella tabella); groupBy con sum somma i valori di ogni prodotto. La query SQL sulla vista temporanea restituisce gli stessi tre totali di groupBy.</figcaption>
   </figure>
-  <p>A DataFrame registered with <code>createOrReplaceTempView</code> becomes a temporary table that lives as long as the session; <code>spark.catalog.dropTempView</code> removes it. <code>saveAsTable</code> instead materializes the DataFrame as a <strong>persistent table</strong> in the Hive metastore, the catalog where Hive keeps its table definitions (Spark creates a local one, based on the Derby database, if no Hive installation exists): the table survives restarts as long as you connect to the same metastore.</p>
+  <p>Un DataFrame registrato con <code>createOrReplaceTempView</code> diventa una tabella temporanea che vive quanto la sessione; <code>spark.catalog.dropTempView</code> la elimina. <code>saveAsTable</code> invece materializza il DataFrame come <strong>tabella persistente</strong> nel metastore di Hive, il catalogo in cui Hive tiene le definizioni delle sue tabelle (Spark ne crea uno locale, basato sul database Derby, se non esiste un'installazione di Hive): la tabella sopravvive ai riavvii finché ci si collega allo stesso metastore.</p>
   <div class="quiz inq" data-quiz="6d"></div>
 </div></section>
 
 <section class="recap"><div class="col">
-  <h2>Lesson 6 at a glance</h2>
-  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
-  <h3>Spark and its cluster</h3>
-  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
-    <tr><td>Spark</td><td>A fast, in-memory data processing engine with APIs in Scala, Java, Python and R; runs on YARN and integrates with Hadoop; its stack adds Spark SQL, MLlib, GraphX and Spark Streaming</td></tr>
-    <tr><td>Why it is fast</td><td>MapReduce writes to HDFS after every step; Spark reads once, keeps intermediate results in memory and writes only at the end; it is fast on disk too</td></tr>
-    <tr><td>Driver program</td><td>Contains the instructions to execute; it creates the SparkSession, which connects to the cluster through a cluster manager (YARN, Mesos or standalone)</td></tr>
-    <tr><td>Worker nodes and executors</td><td>Workers, generally one per machine, allocate executors: JVM services that create the tasks executing the instructions and give them memory</td></tr>
-    <tr><td>Shuffle</td><td>A data exchange between executors, needed when the program aggregates or sorts</td></tr>
-    <tr><td>master parameter</td><td>Chooses the cluster: local, local[K], local[*], spark://HOST:PORT (7077), mesos://HOST:PORT (5050), yarn</td></tr>
+  <h2>La lezione 6 in sintesi</h2>
+  <p>Le definizioni e le idee di questa lezione in un solo posto, da ripassare prima del quiz.</p>
+  <h3>Spark e il suo cluster</h3>
+  <div class="scroll"><table><thead><tr><th>Termine</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>Spark</td><td>Un motore di elaborazione dei dati veloce e in memoria con API in Scala, Java, Python e R; gira su YARN e si integra con Hadoop; il suo stack aggiunge Spark SQL, MLlib, GraphX e Spark Streaming</td></tr>
+    <tr><td>Perché è veloce</td><td>MapReduce scrive in HDFS dopo ogni passo; Spark legge una volta, tiene i risultati intermedi in memoria e scrive solo alla fine; è veloce anche su disco</td></tr>
+    <tr><td>Driver program</td><td>Contiene le istruzioni da eseguire; crea la SparkSession, che si collega al cluster attraverso un cluster manager (YARN, Mesos o standalone)</td></tr>
+    <tr><td>Worker node ed executor</td><td>I worker, in genere uno per macchina, allocano gli executor: servizi della JVM che creano i task che eseguono le istruzioni e danno loro memoria</td></tr>
+    <tr><td>Shuffle</td><td>Uno scambio di dati fra executor, necessario quando il programma aggrega o ordina</td></tr>
+    <tr><td>Parametro master</td><td>Sceglie il cluster: local, local[K], local[*], spark://HOST:PORT (7077), mesos://HOST:PORT (5050), yarn</td></tr>
   </tbody></table></div>
-  <h3>RDDs and lazy execution</h3>
-  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
-    <tr><td>RDD</td><td>Resilient distributed dataset: Spark's primary abstraction, an immutable, fault-tolerant collection cut into partitions processed in parallel; built from a file system or by parallelizing a collection</td></tr>
-    <tr><td>Partition</td><td>A piece of an RDD, managed by an executor; an executor can manage several partitions</td></tr>
-    <tr><td>Transformation</td><td>Creates a new RDD and adds a step to the DAG, computing nothing (textFile, flatMap, map, reduceByKey)</td></tr>
-    <tr><td>Action</td><td>Executes the DAG and returns a value (collect)</td></tr>
-    <tr><td>DAG and stages</td><td>The directed acyclic graph of the program's steps, cut into stages at every shuffle; stages run in order</td></tr>
+  <h3>RDD ed esecuzione pigra</h3>
+  <div class="scroll"><table><thead><tr><th>Concetto</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>RDD</td><td>Resilient distributed dataset: l'astrazione principale di Spark, una collezione immutabile e tollerante ai guasti tagliata in partizioni elaborate in parallelo; costruita da un file system o parallelizzando una collezione</td></tr>
+    <tr><td>Partizione</td><td>Un pezzo di un RDD, gestito da un executor; un executor può gestire più partizioni</td></tr>
+    <tr><td>Trasformazione</td><td>Crea un nuovo RDD e aggiunge un passo al DAG, senza calcolare nulla (textFile, flatMap, map, reduceByKey)</td></tr>
+    <tr><td>Azione</td><td>Esegue il DAG e restituisce un valore (collect)</td></tr>
+    <tr><td>DAG e stage</td><td>Il grafo aciclico orientato dei passi del programma, tagliato in stage a ogni shuffle; gli stage vengono eseguiti in ordine</td></tr>
   </tbody></table></div>
-  <h3>DataFrames and Spark SQL</h3>
-  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
-    <tr><td>DataFrame</td><td>A distributed collection organized into named columns, like a relational table; with a known schema Spark can select, filter, aggregate and join by column, while RDD elements are opaque</td></tr>
-    <tr><td>From RDD to DataFrame</td><td>Declare a schema (StructType) or turn elements into Rows and let Spark infer it</td></tr>
-    <tr><td>Data sources</td><td>JSON, CSV, JDBC connections to relational databases, Parquet (columnar format with metadata)</td></tr>
-    <tr><td>DataFrame API</td><td>select, filter, groupBy with sum, show</td></tr>
-    <tr><td>Temporary view</td><td>createOrReplaceTempView makes a table for SQL that lives as long as the session; dropTempView removes it</td></tr>
-    <tr><td>Persistent table</td><td>saveAsTable stores the DataFrame in the Hive metastore, so it survives restarts</td></tr>
+  <h3>DataFrame e Spark SQL</h3>
+  <div class="scroll"><table><thead><tr><th>Concetto</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>DataFrame</td><td>Una collezione distribuita organizzata in colonne con un nome, come una tabella relazionale; con uno schema noto Spark può selezionare, filtrare, aggregare e unire per colonna, mentre gli elementi di un RDD sono opachi</td></tr>
+    <tr><td>Da RDD a DataFrame</td><td>Dichiarare uno schema (StructType) oppure trasformare gli elementi in oggetti Row e lasciare che Spark lo deduca</td></tr>
+    <tr><td>Fonti di dati</td><td>JSON, CSV, connessioni JDBC a database relazionali, Parquet (formato a colonne con metadati)</td></tr>
+    <tr><td>API dei DataFrame</td><td>select, filter, groupBy con sum, show</td></tr>
+    <tr><td>Vista temporanea</td><td>createOrReplaceTempView crea una tabella per SQL che vive quanto la sessione; dropTempView la elimina</td></tr>
+    <tr><td>Tabella persistente</td><td>saveAsTable memorizza il DataFrame nel metastore di Hive, così sopravvive ai riavvii</td></tr>
   </tbody></table></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Test yourself</h2>
+  <h2>Mettiti alla prova</h2>
   <div class="quiz" data-quiz="6"></div>
 </div></section>
 
 <section><div class="col">
-  <p>If only one thing from this lesson stays with you: <strong>Spark keeps partitioned data in memory and runs a plan only when an action asks for a result</strong>, cutting the plan into stages at every shuffle.</p>
-  <p>Lesson 7 looks at the other components of the stack: streaming, graphs and machine learning.</p>
-  <nav class="navend" aria-label="Other lessons"></nav>
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>Spark tiene in memoria i dati partizionati ed esegue un piano solo quando un'azione chiede un risultato</strong>, tagliando il piano in stage a ogni shuffle.</p>
+  <p>La lezione 7 guarda agli altri componenti dello stack: streaming, grafi e machine learning.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
 </div></section>
 </article>

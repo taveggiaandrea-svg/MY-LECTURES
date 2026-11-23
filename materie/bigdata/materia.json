@@ -1,9 +1,10 @@
 {
   "titolo": "30416 Big Data and Databases",
   "breve": "Big Data",
-  "descrizione": "Lessons 1 to 9: the data analytics timeline, relational databases and SQL, NoSQL and the Big Data toolbox, Hadoop, Spark and its stack, data lakes, and the data behind predictive and generative AI.",
-  "fonte": "A. Rezzani, slides, SQL and Spark scripts of 30416 Big Data and Databases, lessons 1 to 8, and L. Molteni, slides of lesson 9 (Bocconi)",
+  "descrizione": "Lezioni da 1 a 9: l'evoluzione dell'analisi dei dati, i database relazionali e SQL, NoSQL e gli strumenti dei Big Data, Hadoop, Spark e il suo ecosistema, i data lake e i dati dietro l'AI predittiva e generativa. In italiano e in inglese.",
+  "fonte": "A. Rezzani, slide, script SQL e Spark di 30416 Big Data and Databases, lezioni da 1 a 8, e L. Molteni, slide della lezione 9 (Bocconi)",
   "ordine": 2,
   "miniatura": 3,
-  "lingua": "en"
+  "lingua": "it",
+  "nome_lingua": "IT"
 }

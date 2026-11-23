@@ -1,145 +1,145 @@
-<article class="lesson" data-n="1" id="lezione-1" data-title="Why can't we just query the operational database?" hidden>
+<article class="lesson" data-n="1" id="lezione-1" data-title="Perché non basta interrogare il database operativo?" hidden>
 <section class="hero"><div class="col">
-  <p class="chap">Lesson 1 · A. Rezzani, slides</p>
-  <h1>Why can't we just query the operational database?</h1>
-  <p class="desc">The data analytics timeline: from printed reports on operational systems to data warehouses, OLAP, predictive analytics and Big Data platforms.</p>
+  <p class="chap">Lezione 1 · A. Rezzani, slide</p>
+  <h1>Perché non basta interrogare il database operativo?</h1>
+  <p class="desc">L'evoluzione dell'analisi dei dati: dai report stampati sui sistemi operazionali ai data warehouse, all'OLAP, all'analisi predittiva e alle piattaforme Big Data.</p>
 </div></section>
 
 <section><div class="col">
-  <p>A company sells through one system and keeps in touch with its clients through another. Both store customers. Ask both the same simple questions and look at what comes back.</p>
+  <p>Un'azienda vende attraverso un sistema e tiene i contatti con i clienti attraverso un altro. Entrambi memorizzano i clienti. Fai a tutti e due le stesse domande semplici e guarda che cosa ti restituiscono.</p>
   <figure>
     <div class="w" id="b1src"></div>
-    <figcaption>Two tables built on this page from the course customers. The first panel is the sales system (an ERP, software for sales and accounting), the second the customer management system (a CRM, software that tracks contacts with customers); both are explained below. Red cells mark two of the disagreements, a different spelling of Milan and an old address kept next to the new one; Roma and Rome, LONDON and London are of the same kind. Grey rows are the two records of Mary Jane.</figcaption>
+    <figcaption>Due tabelle costruite per questa pagina a partire dai clienti del corso. Il primo riquadro è il sistema delle vendite (un ERP, software per vendite e contabilità), il secondo il sistema di gestione dei clienti (un CRM, software che registra i contatti con i clienti); entrambi sono spiegati più sotto. Le celle rosse segnano due dei disaccordi, una grafia diversa di Milano e un vecchio indirizzo tenuto accanto a quello nuovo; Roma e Rome, LONDON e London sono dello stesso tipo. Le righe grigie sono i due record di Mary Jane.</figcaption>
   </figure>
-  <p>Nobody made a mistake. Each system was built for its own job, by its own team, with its own conventions. The trouble appears only when you use the data for something they were not designed for: analysis across the whole company.</p>
-  <p>The lecture starts from an informal vocabulary, refined in lesson 2. A <strong>database</strong> is a set of tables and other objects. A <strong>table</strong>, also called a relation, is a set of records defined by a list of <strong>fields</strong> (columns), each with a name and a data type. A <strong>record</strong> is one horizontal line of a table: the values of all the fields for one thing, such as one customer.</p>
+  <p>Nessuno ha sbagliato. Ogni sistema è stato costruito per il proprio compito, da un proprio gruppo di lavoro, con le proprie convenzioni. Il problema compare solo quando usi i dati per qualcosa per cui i sistemi non sono stati progettati: l'analisi sull'intera azienda.</p>
+  <p>La lezione parte da un vocabolario informale, che la lezione 2 rende più preciso. Un <strong>database</strong> è un insieme di tabelle e di altri oggetti. Una <strong>tabella</strong>, detta anche relazione, è un insieme di record definiti da un elenco di <strong>campi</strong> (colonne), ciascuno con un nome e un tipo di dato. Un <strong>record</strong> è una riga orizzontale della tabella: i valori di tutti i campi per una sola cosa, per esempio un cliente.</p>
 </div></section>
 
 <section><div class="col">
-  <h2>Five phases, each one fixing the last</h2>
-  <p>The lecture tells the history of data analysis as five phases. Each adds a layer on top of the previous ones.</p>
+  <h2>Cinque fasi, ognuna corregge la precedente</h2>
+  <p>La lezione racconta la storia dell'analisi dei dati in cinque fasi. Ognuna aggiunge uno strato sopra quelle precedenti.</p>
   <figure>
     <div class="w" id="b1time"></div>
-    <figcaption>The lecture's timeline, redrawn. Each phase adds one layer to the company's data stack (the colored bar) and changes the kind of report it can produce (the line under the year). The rest of the lesson walks through the phases in order.</figcaption>
+    <figcaption>La linea del tempo della lezione, ridisegnata. Ogni fase aggiunge uno strato all'architettura dei dati dell'azienda (la barra colorata) e cambia il tipo di report che si può produrre (la riga sotto l'anno). Il resto della lezione percorre le fasi in ordine.</figcaption>
   </figure>
-  <p>From the 1980s, the <strong>RDBMS</strong> (relational database management system, the software that stores and manages tables) and <strong>SQL</strong> (Structured Query Language, used to ask tables questions) made it possible to produce reports automatically. They were static, mostly printed, and every query ran on the <strong>operational databases</strong>.</p>
-  <p>An operational database stores the day-to-day activity of a company in real time: every order, invoice and payment. It sits under applications such as an <strong>ERP</strong> (enterprise resource planning: software for accounting, procurement and production, for example SAP or Oracle JD Edwards) and a <strong>CRM</strong> (customer relationship management: software that tracks every interaction with customers and prospects, for example Salesforce).</p>
+  <p>Dagli anni Ottanta, l'<strong>RDBMS</strong> (relational database management system, il software che memorizza e gestisce le tabelle) e <strong>SQL</strong> (Structured Query Language, il linguaggio per fare domande alle tabelle) hanno reso possibile produrre report in modo automatico. Erano statici, per lo più stampati, e ogni interrogazione girava sui <strong>database operativi</strong>.</p>
+  <p>Un database operativo memorizza in tempo reale l'attività quotidiana di un'azienda: ogni ordine, fattura e pagamento. Sta sotto applicazioni come un <strong>ERP</strong> (enterprise resource planning: software per contabilità, acquisti e produzione, per esempio SAP o Oracle JD Edwards) e un <strong>CRM</strong> (customer relationship management: software che registra ogni interazione con clienti e potenziali clienti, per esempio Salesforce).</p>
 </div></section>
 
 <section><div class="col">
-  <h2>What a report is, at three heights</h2>
-  <p>A <strong>report</strong> is a document that organizes information in narrative, graphic or tabular form, prepared ad hoc, periodically or as required; put simply, the formatted result of database queries that contains useful data for decision making. The lecture distinguishes three kinds by how much they aggregate and how often they are produced.</p>
+  <h2>Che cos'è un report, a tre livelli</h2>
+  <p>Un <strong>report</strong> è un documento che organizza le informazioni in forma narrativa, grafica o tabellare, preparato ad hoc, periodicamente o secondo necessità; detto in modo semplice, è il risultato formattato di interrogazioni a un database, che contiene dati utili per prendere decisioni. La lezione ne distingue tre tipi in base a quanto aggregano e a quanto spesso vengono prodotti.</p>
   <figure>
     <div class="w" id="b1rep"></div>
-    <figcaption>The six sales of the course scripts, seen as three reports. The operational one keeps every sale plus daily subtotals (grey rows); the tactical one keeps only the daily totals; the strategic one squeezes the period into a single line. Amount is quantity times price.</figcaption>
+    <figcaption>Le sei vendite degli script del corso, viste come tre report. Quello operativo tiene ogni vendita più i subtotali giornalieri (righe grigie); quello tattico tiene solo i totali giornalieri; quello strategico comprime il periodo in una sola riga. L'importo è la quantità per il prezzo.</figcaption>
   </figure>
-  <p><strong>The higher a report sits in the company, the more it aggregates and the less often it is produced.</strong> Operational reports are daily and mix detail with totals; tactical ones are daily or weekly; strategic ones summarize the company's situation weekly or monthly.</p>
+  <p><strong>Più un report sta in alto nell'azienda, più aggrega e meno spesso viene prodotto.</strong> I report operativi sono giornalieri e mescolano dettaglio e totali; quelli tattici sono giornalieri o settimanali; quelli strategici riassumono la situazione dell'azienda ogni settimana o ogni mese.</p>
   <div class="quiz inq" data-quiz="1a"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Why analysis on operational databases goes wrong</h2>
-  <p>The lecture lists three problems. The first figure showed one of them: the same data live in more than one system, so formats differ (Milano or Milan) and versions differ (an old address next to the new one).</p>
-  <p>The other two come from design. Operational databases are built for fast inserts and updates of single records, not for reading millions of rows at once. And reports compete with transactions for the same machine: a heavy report slows down the people entering orders, and vice versa.</p>
+  <h2>Perché l'analisi sui database operativi va male</h2>
+  <p>La lezione elenca tre problemi. La prima figura ne mostrava uno: gli stessi dati vivono in più di un sistema, quindi i formati sono diversi (Milano o Milan) e le versioni sono diverse (un vecchio indirizzo accanto a quello nuovo).</p>
+  <p>Gli altri due nascono dalla progettazione. I database operativi sono costruiti per inserire e aggiornare velocemente singoli record, non per leggere milioni di righe alla volta. E i report competono con le transazioni per la stessa macchina: un report pesante rallenta chi sta inserendo gli ordini, e viceversa.</p>
   <figure>
     <div class="w" id="b1load"></div>
-    <figcaption>An illustrative model, not lecture data. Each bar is the time needed to save one incoming order, in milliseconds (ms). In the first panel no report is running; in the second, eight reports run on the same server and the bars turn red above 15 ms; in the third the same eight reports run on a separate copy.</figcaption>
+    <figcaption>Un modello illustrativo, non dati della lezione. Ogni barra è il tempo necessario per salvare un ordine in arrivo, in millisecondi (ms). Nel primo riquadro non gira nessun report; nel secondo otto report girano sullo stesso server e le barre diventano rosse sopra i 15 ms; nel terzo gli stessi otto report girano su una copia separata.</figcaption>
   </figure>
   <div class="quiz inq" data-quiz="1b"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>A separate database just for analysis</h2>
-  <p>From the 1990s companies built an analytical database next to the operational ones: the <strong>data warehouse</strong> (DWH). At first it was a mere copy, which solved the performance problem. Later the data from different sources were integrated, made consistent, cleansed and reorganized into the <strong>dimensional model</strong>, which lesson 2 opens up.</p>
-  <p>Data reach the warehouse through <strong>ETL</strong>: extract the data from the operational sources, transform them by applying business rules and data quality checks, load them into the warehouse. The same acronym also names the software tools that do it.</p>
+  <h2>Un database separato solo per l'analisi</h2>
+  <p>Dagli anni Novanta le aziende hanno costruito, accanto a quelli operativi, un database analitico: il <strong>data warehouse</strong> (DWH, letteralmente «magazzino dei dati»). All'inizio era una semplice copia, e questo risolveva il problema delle prestazioni. Poi i dati delle diverse fonti sono stati integrati, resi coerenti, ripuliti e riorganizzati secondo il <strong>modello dimensionale</strong>, che la lezione 2 approfondisce.</p>
+  <p>I dati arrivano nel warehouse attraverso l'<strong>ETL</strong> (extract, transform, load): si estraggono i dati dalle fonti operative, si trasformano applicando regole di business e controlli di qualità dei dati, si caricano nel warehouse. La stessa sigla indica anche gli strumenti software che lo fanno.</p>
   <figure>
     <div class="w" id="b1etl"></div>
-    <figcaption>The two systems of the first figure after ETL. The first column is the staging area, where records are copied as they are; the second shows them transformed and sorted by person, with one record discarded by a business rule; the third is the warehouse, one record per real customer with a new key (yellow). Lines show which records merge.</figcaption>
+    <figcaption>I due sistemi della prima figura dopo l'ETL. La prima colonna è l'area di staging, dove i record vengono copiati così come sono; la seconda li mostra trasformati e ordinati per persona, con un record scartato da una regola di business; la terza è il warehouse, un record per ogni cliente reale con una nuova chiave (in giallo). Le linee mostrano quali record si fondono.</figcaption>
   </figure>
-  <p>The two business rules used here, how names are written and which source wins when ERP and CRM disagree, are examples chosen for this page. Every company writes its own.</p>
-  <p>Because its data are integrated from all sources and cleansed, the warehouse is called the <strong>single source of truth</strong>. <strong>A data warehouse is designed to support business decisions</strong>, by letting you consolidate, analyze and report data at different levels of aggregation.</p>
-  <p>It is also the starting point of <strong>Business Intelligence</strong> (BI): the technologies, applications and practices for collecting, integrating, analyzing and presenting business information, with the purpose of better decisions. The BI process runs extract, cleanse, transform and integrate, load the warehouse, then analyze and disseminate. In the lecture's diagram of a BI system, the operational sources (CRM, ERP and legacy systems, older software still in use) feed ETL and a staging area, then the relational warehouse, then a <strong>semantic layer</strong> such as OLAP (which presents data in business terms, so users need not know the tables), then the client tools people use.</p>
+  <p>Le due regole di business usate qui, come si scrivono i nomi e quale fonte prevale quando ERP e CRM non sono d'accordo, sono esempi scelti per questa pagina. Ogni azienda scrive le proprie.</p>
+  <p>Poiché i suoi dati sono integrati da tutte le fonti e ripuliti, il warehouse viene chiamato <strong>unica fonte di verità</strong> (single source of truth). <strong>Un data warehouse è progettato per supportare le decisioni aziendali</strong>, perché permette di consolidare, analizzare e presentare i dati a diversi livelli di aggregazione.</p>
+  <p>È anche il punto di partenza della <strong>Business Intelligence</strong> (BI): le tecnologie, le applicazioni e le pratiche per raccogliere, integrare, analizzare e presentare le informazioni aziendali, con lo scopo di decidere meglio. Il processo di BI procede così: estrarre, ripulire, trasformare e integrare, caricare il warehouse, poi analizzare e diffondere. Nello schema di un sistema di BI mostrato a lezione, le fonti operative (CRM, ERP e sistemi legacy, cioè software più vecchi ancora in uso) alimentano l'ETL e un'area di staging, poi il warehouse relazionale, poi uno <strong>strato semantico</strong> come l'OLAP (che presenta i dati in termini di business, così gli utenti non devono conoscere le tabelle), poi gli strumenti client usati dalle persone.</p>
 </div></section>
 
 <section><div class="col">
-  <h2>Asking questions without writing SQL</h2>
-  <p>A warehouse still has to be queried in SQL, and the user must know its tables and how they relate. From the late 1990s, <strong>OLAP</strong> (online analytical processing) engines removed that barrier. They replace tables with multidimensional structures and store data together with <strong>metadata</strong>, data about the data, such as how tables connect.</p>
-  <p>So the user no longer needs to know the relationships, and OLAP answers aggregate questions (sums, averages, counts) much faster than a relational database. It is a technology for data discovery: unlimited report viewing, complex analytical calculations, analysis along any dimension. The lecture describes the OLAP client as a huge pivot table over the whole warehouse, used by drag and drop.</p>
+  <h2>Fare domande senza scrivere SQL</h2>
+  <p>Un warehouse va comunque interrogato in SQL, e l'utente deve conoscerne le tabelle e i loro legami. Dalla fine degli anni Novanta i motori <strong>OLAP</strong> (online analytical processing, elaborazione analitica in linea) hanno tolto questo ostacolo. Sostituiscono le tabelle con strutture multidimensionali e memorizzano i dati insieme ai <strong>metadati</strong>, cioè dati sui dati, come il modo in cui le tabelle sono collegate.</p>
+  <p>Così l'utente non ha più bisogno di conoscere le relazioni, e l'OLAP risponde alle domande di aggregazione (somme, medie, conteggi) molto più velocemente di un database relazionale. È una tecnologia per l'esplorazione dei dati: consultazione illimitata dei report, calcoli analitici complessi, analisi lungo qualunque dimensione. La lezione descrive il client OLAP come un'enorme tabella pivot su tutto il warehouse, usata trascinando i campi con il mouse.</p>
   <figure>
     <div class="w" id="b1olap"></div>
-    <figcaption>The course sales as a cube with three dimensions (city, product, date), like the cube in the lecture's slide, cut into one slice per date: each filled cell holds the quantity sold for that combination. Next to the slices, one pivot of the cube: dates added up, cities on the rows, products on the columns.</figcaption>
+    <figcaption>Le vendite del corso come un cubo a tre dimensioni (città, prodotto, data), come il cubo della slide, tagliato in una fetta per ogni data: ogni cella piena contiene la quantità venduta per quella combinazione. Accanto alle fette, una pivot del cubo: date sommate, città sulle righe, prodotti sulle colonne.</figcaption>
   </figure>
-  <p>Every choice of rows and columns is one view of the same cube. This is the <strong>dynamic report</strong> of phase 3, as opposed to the static, printed report of phases 1 and 2.</p>
+  <p>Ogni scelta di righe e colonne è una vista dello stesso cubo. È questo il <strong>report dinamico</strong> della fase 3, contrapposto al report statico e stampato delle fasi 1 e 2.</p>
   <div class="quiz inq" data-quiz="1c"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>From what happened to what will happen</h2>
-  <p>Warehouse and OLAP both look backwards. From around 2000 companies increasingly wanted to predict future events, such as next month's sales or the cost of energy. A new term appeared, <strong>data mining</strong>: discovering hidden patterns in large data sets that the business can exploit, for customer segmentation, market basket analysis (which products are bought together), churn analysis (who is about to leave), campaign targeting or demand forecasting.</p>
-  <p>This splits analytics in two. <strong>Descriptive analytics</strong> summarizes raw data so humans can read it, and describes the past: static reports and BI belong here. <strong>Predictive analytics</strong> estimates how likely a future outcome is, using statistics, machine learning and data mining on current and historical facts.</p>
+  <h2>Da che cosa è successo a che cosa succederà</h2>
+  <p>Warehouse e OLAP guardano entrambi all'indietro. Dal 2000 circa le aziende hanno voluto sempre più prevedere eventi futuri, come le vendite del mese prossimo o il costo dell'energia. È comparso un termine nuovo, <strong>data mining</strong> (letteralmente «estrazione dai dati»): scoprire in grandi insiemi di dati schemi nascosti che l'azienda può sfruttare, per la segmentazione dei clienti, la market basket analysis (quali prodotti si comprano insieme), la churn analysis (chi sta per andarsene), la scelta dei destinatari delle campagne o la previsione della domanda.</p>
+  <p>Questo divide l'analisi dei dati in due. L'<strong>analisi descrittiva</strong> riassume i dati grezzi perché le persone possano leggerli, e descrive il passato: qui stanno i report statici e la BI. L'<strong>analisi predittiva</strong> stima quanto è probabile un esito futuro, usando statistica, machine learning e data mining su fatti attuali e storici.</p>
   <figure>
     <div class="w" id="b1fc"></div>
-    <figcaption>Simulated monthly sales, not lecture data. The solid line is the known past, which can only be described. After today, a simple model projects the next six months (dashed), with a shaded band for its uncertainty.</figcaption>
+    <figcaption>Vendite mensili simulate, non dati della lezione. La linea continua è il passato noto, che si può solo descrivere. Dopo oggi, un modello semplice proietta i sei mesi successivi (tratteggio), con una fascia ombreggiata per la sua incertezza.</figcaption>
   </figure>
-  <p><strong>Machine learning</strong>, in the lecture's words, is the science of getting computers to act without being explicitly programmed. Data mining borrows from it, from artificial intelligence, from statistics and from database systems; today predictive analytics is largely a modern name for data mining.</p>
+  <p>Il <strong>machine learning</strong> (apprendimento automatico), con le parole della lezione, è la scienza che fa agire i computer senza programmarli in modo esplicito. Il data mining attinge al machine learning, all'intelligenza artificiale, alla statistica e ai sistemi di database; oggi «analisi predittiva» è in buona parte un nome moderno del data mining.</p>
 </div></section>
 
 <section><div class="col">
-  <h2>Data too big for the old tools</h2>
-  <p>From around 2012 people started talking about <strong>Big Data</strong>. The usual definition lists three features, the three Vs: <strong>volume</strong> (potentially huge, such as every card transaction or every reading of an industrial sensor), <strong>velocity</strong> (fast data arriving continuously, as from Internet of Things sensors) and <strong>variety</strong>.</p>
-  <p>The lecture prefers a sharper definition: Big Data are data that we cannot analyze, or that it is not convenient to analyze, with traditional tools such as relational databases. The main tools for them are <strong>Hadoop</strong>, a distributed file system plus computation engine whose many tools cover the whole data life cycle, from ingestion to presentation, and <strong>Spark</strong>, a fast distributed computation engine more oriented to analysis; both get their own lectures later.</p>
-  <p>Variety needs a closer look. <strong>Structured</strong> data fit conveniently in a table, like ERP data. <strong>Unstructured</strong> data do not, like the text of a post or an image from medical equipment. Most data called unstructured are actually <strong>semi-structured</strong>.</p>
+  <h2>Dati troppo grandi per i vecchi strumenti</h2>
+  <p>Dal 2012 circa si è cominciato a parlare di <strong>Big Data</strong>. La definizione più comune elenca tre caratteristiche, le tre V: <strong>volume</strong> (potenzialmente enorme, come ogni transazione con carta o ogni lettura di un sensore industriale), <strong>velocità</strong> (dati rapidi che arrivano di continuo, come quelli dei sensori dell'Internet delle cose) e <strong>varietà</strong>.</p>
+  <p>La lezione preferisce una definizione più netta: i Big Data sono dati che non possiamo analizzare, o che non conviene analizzare, con gli strumenti tradizionali come i database relazionali. I principali strumenti per trattarli sono <strong>Hadoop</strong>, un file system distribuito più un motore di calcolo, i cui numerosi strumenti coprono l'intero ciclo di vita dei dati, dall'acquisizione alla presentazione, e <strong>Spark</strong>, un motore di calcolo distribuito veloce, più orientato all'analisi; entrambi hanno più avanti lezioni dedicate.</p>
+  <p>La varietà merita uno sguardo più attento. I dati <strong>strutturati</strong> stanno comodamente in una tabella, come i dati di un ERP. Quelli <strong>non strutturati</strong> no, come il testo di un post o un'immagine di un'apparecchiatura medica. La maggior parte dei dati detti non strutturati sono in realtà <strong>semi-strutturati</strong>.</p>
   <figure>
     <div class="w" id="b1post"></div>
-    <figcaption>The same social media post as you see it (first panel) and as it is stored (second panel). White parts are key/value pairs that would fit a table column; grey italic parts are free content with no fixed structure.</figcaption>
+    <figcaption>Lo stesso post di un social network come lo vedi (primo riquadro) e come viene memorizzato (secondo riquadro). Le parti bianche sono coppie chiave/valore che starebbero in una colonna di una tabella; le parti in corsivo grigio sono contenuto libero senza una struttura fissa.</figcaption>
   </figure>
   <div class="quiz inq" data-quiz="1d"></div>
-  <p>A note on the slides: one slide defines unstructured data as data that "can be conveniently put into a table". It is a typo for "cannot", as lesson 4 states correctly.</p>
-  <p>In the 2020s the trend topics are Big Data again (new versions of Hadoop and Spark), predictive analytics and <strong>cloud computing</strong>: renting platforms (PaaS, platform as a service) or raw infrastructure (IaaS, infrastructure as a service) instead of buying servers, with resources that scale at low prices. Traditional sources such as ERPs and CRMs now keep a deeper level of detail, and new sources keep arriving: scientific and medical equipment, distributed control systems in plants, high frequency trading, social media, Internet of Things devices.</p>
+  <p>Una nota sulle slide: una slide definisce i dati non strutturati come dati che «can be conveniently put into a table» (si possono mettere comodamente in una tabella). È un refuso per «cannot» (non si possono), come la lezione 4 dice correttamente.</p>
+  <p>Negli anni Venti i temi di tendenza sono di nuovo i Big Data (nuove versioni di Hadoop e Spark), l'analisi predittiva e il <strong>cloud computing</strong>: noleggiare piattaforme (PaaS, platform as a service) o infrastruttura di base (IaaS, infrastructure as a service) invece di comprare server, con risorse che si adattano alla domanda a prezzi bassi. Le fonti tradizionali come ERP e CRM conservano ora un livello di dettaglio più profondo, e continuano ad arrivare fonti nuove: apparecchiature scientifiche e mediche, sistemi di controllo distribuito negli impianti, trading ad alta frequenza, social network, dispositivi dell'Internet delle cose.</p>
 </div></section>
 
 <section class="recap"><div class="col">
-  <h2>Lesson 1 at a glance</h2>
-  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
-  <h3>Basic vocabulary</h3>
-  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
-    <tr><td>Database, table, record</td><td>A database is a set of tables and other objects; a table (relation) is a set of records defined by fields with a name and a data type; a record is one line of values for one thing</td></tr>
-    <tr><td>Operational database</td><td>Stores the day-to-day activity of a company in real time, under applications such as an ERP (accounting, procurement, production) and a CRM (interactions with customers)</td></tr>
-    <tr><td>Report</td><td>The formatted result of database queries, useful for decisions: operational (daily, detail plus totals), tactical (daily or weekly totals), strategic (weekly or monthly summary); the higher in the company, the more aggregated and the less frequent</td></tr>
+  <h2>La lezione 1 in sintesi</h2>
+  <p>Le definizioni e le idee di questa lezione in un solo posto, da ripassare prima del quiz.</p>
+  <h3>Vocabolario di base</h3>
+  <div class="scroll"><table><thead><tr><th>Termine</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>Database, tabella, record</td><td>Un database è un insieme di tabelle e di altri oggetti; una tabella (relazione) è un insieme di record definiti da campi con un nome e un tipo di dato; un record è una riga di valori per una sola cosa</td></tr>
+    <tr><td>Database operativo</td><td>Memorizza in tempo reale l'attività quotidiana di un'azienda, sotto applicazioni come un ERP (contabilità, acquisti, produzione) e un CRM (interazioni con i clienti)</td></tr>
+    <tr><td>Report</td><td>Il risultato formattato di interrogazioni a un database, utile per decidere: operativo (giornaliero, dettaglio più totali), tattico (totali giornalieri o settimanali), strategico (sintesi settimanale o mensile); più in alto nell'azienda, più aggregato e meno frequente</td></tr>
   </tbody></table></div>
-  <h3>The five phases of data analysis</h3>
-  <div class="scroll"><table><thead><tr><th>Phase</th><th>What it added</th><th>Kind of report</th></tr></thead><tbody>
-    <tr><td>1. RDBMS and SQL (1980s)</td><td>Automatic reports, run directly on the operational databases</td><td>Static, mostly printed</td></tr>
-    <tr><td>2. Data warehouse (1990s)</td><td>A separate analytical database, first a copy, then integrated and cleansed data fed by ETL</td><td>Static</td></tr>
-    <tr><td>3. OLAP (late 1990s)</td><td>Multidimensional cubes with metadata: aggregate questions without SQL, by drag and drop</td><td>Dynamic</td></tr>
-    <tr><td>4. Data mining (from 2000)</td><td>Hidden patterns and predictions of future events</td><td>Predictive</td></tr>
-    <tr><td>5. Big Data (from 2012)</td><td>Distributed platforms such as Hadoop and Spark for data too big or too varied for relational tools</td><td>Predictive, at scale</td></tr>
+  <h3>Le cinque fasi dell'analisi dei dati</h3>
+  <div class="scroll"><table><thead><tr><th>Fase</th><th>Che cosa ha aggiunto</th><th>Tipo di report</th></tr></thead><tbody>
+    <tr><td>1. RDBMS e SQL (anni Ottanta)</td><td>Report automatici, eseguiti direttamente sui database operativi</td><td>Statico, per lo più stampato</td></tr>
+    <tr><td>2. Data warehouse (anni Novanta)</td><td>Un database analitico separato, prima una copia, poi dati integrati e ripuliti alimentati dall'ETL</td><td>Statico</td></tr>
+    <tr><td>3. OLAP (fine anni Novanta)</td><td>Cubi multidimensionali con metadati: domande di aggregazione senza SQL, trascinando i campi</td><td>Dinamico</td></tr>
+    <tr><td>4. Data mining (dal 2000)</td><td>Schemi nascosti e previsioni di eventi futuri</td><td>Predittivo</td></tr>
+    <tr><td>5. Big Data (dal 2012)</td><td>Piattaforme distribuite come Hadoop e Spark per dati troppo grandi o troppo vari per gli strumenti relazionali</td><td>Predittivo, su larga scala</td></tr>
   </tbody></table></div>
-  <h3>Key concepts</h3>
-  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
-    <tr><td>Why not analyze the operational database</td><td>Three problems: the same data live in several systems with different formats and versions; the design favours fast single-record writes, not reading millions of rows; reports compete with transactions for the same machine</td></tr>
-    <tr><td>Data warehouse (DWH)</td><td>An analytical database designed to support business decisions, with data consolidated at different levels of aggregation; integrated and cleansed, it is the single source of truth</td></tr>
-    <tr><td>ETL</td><td>Extract from the operational sources, transform with business rules and data quality checks (through a staging area), load into the warehouse; also the name of the tools that do it</td></tr>
-    <tr><td>Business Intelligence (BI)</td><td>Technologies, applications and practices to collect, integrate, analyze and present business information for better decisions: sources, ETL and staging, warehouse, semantic layer (such as OLAP), client tools</td></tr>
-    <tr><td>OLAP</td><td>Online analytical processing: multidimensional structures plus metadata, fast sums, averages and counts along any dimension; the client works like a huge pivot table over the warehouse</td></tr>
-    <tr><td>Data mining</td><td>Discovering hidden, exploitable patterns in large data sets: segmentation, market basket, churn, targeting, demand forecasting; today largely called predictive analytics</td></tr>
-    <tr><td>Descriptive vs predictive analytics</td><td>Descriptive summarizes and describes the past (reports, BI); predictive estimates how likely a future outcome is, with statistics, machine learning and data mining</td></tr>
-    <tr><td>Machine learning</td><td>The science of getting computers to act without being explicitly programmed</td></tr>
-    <tr><td>Big Data</td><td>The three Vs: volume, velocity, variety; the lecture's sharper definition is data that we cannot analyze, or that it is not convenient to analyze, with traditional tools such as relational databases</td></tr>
-    <tr><td>Hadoop and Spark</td><td>Hadoop: distributed file system plus computation engine, with tools for the whole data life cycle; Spark: fast distributed computation engine oriented to analysis</td></tr>
-    <tr><td>Structured, semi-structured, unstructured</td><td>Structured data fit conveniently in a table (ERP data); unstructured do not (post text, medical images); most data called unstructured are in fact semi-structured</td></tr>
-    <tr><td>Cloud computing</td><td>Renting platforms (PaaS) or raw infrastructure (IaaS) instead of buying servers, with resources that scale at low prices</td></tr>
+  <h3>Concetti chiave</h3>
+  <div class="scroll"><table><thead><tr><th>Concetto</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>Perché non analizzare il database operativo</td><td>Tre problemi: gli stessi dati vivono in più sistemi con formati e versioni diversi; la progettazione privilegia scritture veloci di singoli record, non la lettura di milioni di righe; i report competono con le transazioni per la stessa macchina</td></tr>
+    <tr><td>Data warehouse (DWH)</td><td>Un database analitico progettato per supportare le decisioni aziendali, con dati consolidati a diversi livelli di aggregazione; integrato e ripulito, è l'unica fonte di verità</td></tr>
+    <tr><td>ETL</td><td>Estrarre dalle fonti operative, trasformare con regole di business e controlli di qualità dei dati (passando per un'area di staging), caricare nel warehouse; è anche il nome degli strumenti che lo fanno</td></tr>
+    <tr><td>Business Intelligence (BI)</td><td>Tecnologie, applicazioni e pratiche per raccogliere, integrare, analizzare e presentare le informazioni aziendali e decidere meglio: fonti, ETL e staging, warehouse, strato semantico (come l'OLAP), strumenti client</td></tr>
+    <tr><td>OLAP</td><td>Online analytical processing: strutture multidimensionali più metadati, somme, medie e conteggi veloci lungo qualunque dimensione; il client funziona come un'enorme tabella pivot sul warehouse</td></tr>
+    <tr><td>Data mining</td><td>Scoprire in grandi insiemi di dati schemi nascosti e sfruttabili: segmentazione, market basket, churn, scelta dei destinatari, previsione della domanda; oggi chiamato in buona parte analisi predittiva</td></tr>
+    <tr><td>Analisi descrittiva e predittiva</td><td>La descrittiva riassume e descrive il passato (report, BI); la predittiva stima quanto è probabile un esito futuro, con statistica, machine learning e data mining</td></tr>
+    <tr><td>Machine learning</td><td>La scienza che fa agire i computer senza programmarli in modo esplicito</td></tr>
+    <tr><td>Big Data</td><td>Le tre V: volume, velocità, varietà; la definizione più netta della lezione: dati che non possiamo analizzare, o che non conviene analizzare, con gli strumenti tradizionali come i database relazionali</td></tr>
+    <tr><td>Hadoop e Spark</td><td>Hadoop: file system distribuito più motore di calcolo, con strumenti per l'intero ciclo di vita dei dati; Spark: motore di calcolo distribuito veloce, orientato all'analisi</td></tr>
+    <tr><td>Strutturati, semi-strutturati, non strutturati</td><td>I dati strutturati stanno comodamente in una tabella (dati di un ERP); quelli non strutturati no (testo di un post, immagini mediche); la maggior parte dei dati detti non strutturati è in realtà semi-strutturata</td></tr>
+    <tr><td>Cloud computing</td><td>Noleggiare piattaforme (PaaS) o infrastruttura di base (IaaS) invece di comprare server, con risorse che si adattano alla domanda a prezzi bassi</td></tr>
   </tbody></table></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Test yourself</h2>
+  <h2>Mettiti alla prova</h2>
   <div class="quiz" data-quiz="1"></div>
 </div></section>
 
 <section><div class="col">
-  <p>If only one thing from this lesson stays with you: <strong>each phase moved analysis one step further away from the operational databases</strong>, first onto a copy, then onto integrated data, then into cubes, predictive models and distributed platforms.</p>
-  <p>Lesson 2 opens the box: what a relational database really is, and why the operational database and the warehouse are designed in opposite ways.</p>
-  <nav class="navend" aria-label="Other lessons"></nav>
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>ogni fase ha spostato l'analisi un passo più lontano dai database operativi</strong>, prima su una copia, poi su dati integrati, poi nei cubi, nei modelli predittivi e nelle piattaforme distribuite.</p>
+  <p>La lezione 2 apre la scatola: che cos'è davvero un database relazionale, e perché il database operativo e il warehouse sono progettati in modi opposti.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
 </div></section>
 </article>

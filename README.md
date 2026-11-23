@@ -10,12 +10,12 @@ Leggere prima `METODO.md`: contiene tutte le regole di scrittura, di stile, di d
 
 ```
 shared/style.css     foglio di stile comune (non duplicarlo nelle materie)
-shared/core.js       colori, macro KaTeX, funzioni di base, quiz (le risposte verificate restano salvate nel browser), player, componenti (piani, alberi, matrici)
-shared/boot.js       riquadri neri, tema, navigazione fra le lezioni, montaggio pigro, assistente «Chiedi all'AI» (Gemini in streaming, lezione aperta + mappa del corso + estratti delle altre lezioni), barra di scorrimento come mappa della lezione (quiz in azzurro velato, sezioni `recap` in ambra velato), percentuale di avanzamento a decine accanto al cursore
+shared/core.js       colori, macro KaTeX, funzioni di base, quiz, player, componenti (piani, alberi, matrici)
+shared/boot.js       riquadri neri, tema, navigazione fra le lezioni, montaggio pigro, assistente «Chiedi all'AI» (Gemini in streaming, lezione aperta + mappa del corso + estratti delle altre lezioni), barra di scorrimento come mappa della lezione (quiz in azzurro velato, sezioni `recap` in grigio più chiaro)
 shared/home.js       tema della pagina iniziale
 shared/topgrid.js    griglia animata nella barra superiore (una griglia che subisce lente trasformazioni lineari), in tutte le pagine
 materie/<id>/
-  materia.json       titolo, breve, descrizione, fonte, ordine nella pagina iniziale, numero della miniatura, lingua (facoltativa, "it" se manca)
+  materia.json       titolo, breve, descrizione, fonte, ordine nella pagina iniziale, numero della miniatura, lingua (facoltativa, "it" se manca), nome_lingua per il selettore (facoltativo, per esempio "IT")
   top.html           barra superiore della materia (il nome porta alla pagina iniziale) e apertura di <main>
   lezioni/lN.html    una lezione per file (si può partire da l0, per esempio una mappa del corso): <article class="lesson" data-n="N" id="lezione-N" data-title="...">
   foot.html          chiusura di <main> e piè di pagina con le fonti
@@ -24,6 +24,7 @@ materie/<id>/
   js/lN.js           INIT[N]=function(){...} per le figure; QZ['Na']=()=>[...] per i quiz
   js/shared.js       (facoltativo) componenti della materia usati da più lezioni, caricati dopo thumbs.js
   style.css          (facoltativo) stile proprio della materia, caricato dopo shared/style.css: solo ciò che manca, mai una copia
+  <xx>/              (facoltativa) un'altra lingua della materia, con codice di due lettere (per esempio en/): lezioni/, js/lN.js, js/macro.js, top.html, foot.html e un materia.json con i soli campi che cambiano (titolo, lingua, nome_lingua); i file che mancano (miniature, shared.js, style.css) si prendono dalla cartella principale
 shared/domande.js    pagina «Domande all'AI» (site/domande/): legge l'archivio delle domande all'assistente
 build.py             costruisce site/ (pagina iniziale, una pagina per materia, pagina delle domande)
 worker/index.js      password del sito e archivio /api/domande (Durable Object con SQLite)
@@ -42,6 +43,14 @@ site/                il sito pubblicato: si genera con build.py, non si modifica
 ### Aggiungere una lezione a una materia esistente
 
 Aggiungere `lezioni/lN.html` e `js/lN.js`, un link in `top.html`, una miniatura in `js/thumbs.js`, poi ricostruire e testare.
+
+### Materie in più lingue
+
+Una materia può avere una seconda lingua in una sottocartella di due lettere (oggi solo `materie/bigdata/en/`). `build.py` costruisce una pagina per lingua (`site/bigdata/` e `site/bigdata/en/`), aggiunge nella barra superiore il selettore delle lingue e uno script che ricorda la scelta (`localStorage`, chiave `lingua-<id>`) e riapre la stessa lezione nell'altra lingua. `test.py` prova anche le pagine delle lingue.
+
+Le due versioni sono copie separate: testo, figure (le etichette stanno dentro `js/lN.js`) e quiz. Una correzione a una figura o a un dato va fatta in entrambe le cartelle. Nella versione italiana i numeri seguono le convenzioni italiane (virgola decimale; punto delle migliaia dalle cinque cifre in su; in `js/macro.js` la funzione `fi`), mentre codice SQL e Spark, contenuto delle tabelle e risultati delle query restano con il punto decimale (funzione `fe`).
+
+**Big Data: le lezioni nuove si scrivono prima in italiano** (in `materie/bigdata/`). La versione inglese in `materie/bigdata/en/` si aggiunge solo su richiesta; finché manca, la pagina inglese semplicemente non ha quella lezione e il selettore apre la prima lezione disponibile.
 
 ## Pubblicazione
 

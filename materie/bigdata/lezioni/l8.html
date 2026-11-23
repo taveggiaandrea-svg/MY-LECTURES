@@ -1,136 +1,136 @@
-<article class="lesson" data-n="8" id="lezione-8" data-title="Where do the raw data go?" hidden>
+<article class="lesson" data-n="8" id="lezione-8" data-title="Dove vanno i dati grezzi?" hidden>
 <section class="hero"><div class="col">
-  <p class="chap">Lesson 8 · A. Rezzani, slides</p>
-  <h1>Where do the raw data go?</h1>
-  <p class="desc">Big Data architectures: the data lake, how it differs from the data warehouse, how the two work together in the company's information system, and the newer idea of data virtualization.</p>
+  <p class="chap">Lezione 8 · A. Rezzani, slide</p>
+  <h1>Dove vanno i dati grezzi?</h1>
+  <p class="desc">Architetture Big Data: il data lake, come si differenzia dal data warehouse, come i due lavorano insieme nel sistema informativo dell'azienda, e l'idea più recente della virtualizzazione dei dati.</p>
 </div></section>
 
 <section><div class="col">
-  <p>Lessons 5 to 7 built the toolbox: HDFS to store huge files cheaply, Spark to process them, streaming, graphs and machine learning on top. Lesson 1 described the classic home of company data, the <strong>data warehouse</strong> (DWH): structured, cleaned data loaded by ETL processes (extract, transform, load) and ready for fast queries. Where do the new tools fit next to it? The lecture's answer is the <strong>data lake</strong>.</p>
-  <p>Gartner, a research and advisory firm, defines it as a collection of storage instances holding data assets in addition to the original sources, kept in a near-exact or exact copy of the source format. Its purpose is to give the most skilled analysts an unrefined view of the data, so they can explore refinement and analysis techniques free of the compromises built into a data warehouse or a data mart.</p>
-  <p class="stmt"><strong>Data lake.</strong> In the lecturer's own definition, a repository that holds a vast amount of raw data in its native format, structured, semi-structured and unstructured, together with a vast amount of processed or semi-processed data. The structure is not defined until the data are needed (<strong>schema on read</strong>). It provides data for reporting, analytics and machine learning, and it is mostly based on Hadoop and Spark.</p>
-  <p>The raw data come from everywhere: web and clickstream, machine logs, devices and sensors, images, audio and video, social networks, relational databases, healthcare and financial data. Cleansing, aggregation and governance turn part of them into processed data, stored in the lake too. The technologies follow the life of the data.</p>
+  <p>Le lezioni da 5 a 7 hanno costruito la cassetta degli attrezzi: HDFS per memorizzare file enormi a basso costo, Spark per elaborarli, e sopra streaming, grafi e machine learning. La lezione 1 descriveva la sede classica dei dati aziendali, il <strong>data warehouse</strong> (DWH): dati strutturati e ripuliti, caricati da processi ETL (extract, transform, load) e pronti per query veloci. Dove si collocano accanto a esso i nuovi strumenti? La risposta della lezione è il <strong>data lake</strong> (letteralmente «lago di dati»).</p>
+  <p>Gartner, una società di ricerca e consulenza, lo definisce come un insieme di istanze di memorizzazione che contengono patrimoni di dati in aggiunta alle fonti originali, tenuti in una copia quasi esatta o esatta del formato di origine. Il suo scopo è dare agli analisti più esperti una visione non raffinata dei dati, perché possano esplorare tecniche di raffinamento e di analisi libere dai compromessi incorporati in un data warehouse o in un data mart.</p>
+  <p class="stmt"><strong>Data lake.</strong> Nella definizione del docente, un archivio che contiene una vasta quantità di dati grezzi nel loro formato nativo, strutturati, semistrutturati e non strutturati, insieme a una vasta quantità di dati elaborati o semielaborati. La struttura non viene definita finché i dati non servono (<strong>schema on read</strong>, schema alla lettura). Fornisce dati per reportistica, analisi e machine learning, ed è basato soprattutto su Hadoop e Spark.</p>
+  <p>I dati grezzi arrivano da ogni parte: web e clickstream (la sequenza dei clic), log delle macchine, dispositivi e sensori, immagini, audio e video, social network, database relazionali, dati sanitari e finanziari. Pulizia, aggregazione e governance ne trasformano una parte in dati elaborati, memorizzati anch'essi nel lago. Le tecnologie seguono la vita dei dati.</p>
   <figure>
     <div class="w" id="b8tech"></div>
-    <figcaption>The lecture's map of data lake technologies, redrawn: the four phases of the data's life in the lake, with the Spark and Hadoop tools of lessons 5 to 7 that serve each one.</figcaption>
+    <figcaption>La mappa delle tecnologie del data lake mostrata nella lezione, ridisegnata: le quattro fasi della vita dei dati nel lago, con gli strumenti di Spark e di Hadoop delle lezioni da 5 a 7 che servono ciascuna.</figcaption>
   </figure>
-  <p>The lecture names four kinds of users of the lake: data scientists, analysts, applications and business users.</p>
+  <p>La lezione indica quattro tipi di utenti del lago: data scientist, analisti, applicazioni e utenti di business.</p>
 </div></section>
 
 <section><div class="col">
-  <h2>Decide the schema before or after?</h2>
-  <p>The deepest difference from a warehouse is when the structure is decided. A DWH uses <strong>schema on write</strong>: before inserting data we must define the tables, and every row must fit them. A data lake writes to a file system, so the schema, if needed, is defined when the data are read.</p>
+  <h2>Decidere lo schema prima o dopo?</h2>
+  <p>La differenza più profonda rispetto a un warehouse è quando si decide la struttura. Un DWH usa lo <strong>schema on write</strong> (schema alla scrittura): prima di inserire i dati bisogna definire le tabelle, e ogni riga deve adattarsi a esse. Un data lake scrive su un file system, quindi lo schema, se serve, viene definito quando i dati vengono letti.</p>
   <figure>
     <div class="w" id="b8schema"></div>
-    <figcaption>The same three incoming sales records in the two worlds (an example added here, in the format of the course's sales.csv). In the first panel the warehouse table exists first, and the record whose value is "n/a" cannot be loaded. In the second the lake stores all three lines as they are; each reader applies a schema when it reads, and two readers can read the same file differently.</figcaption>
+    <figcaption>Gli stessi tre record di vendita in arrivo nei due mondi (un esempio aggiunto qui, nel formato del file sales.csv del corso). Nel primo riquadro la tabella del warehouse esiste prima, e il record il cui valore è «n/a» non può essere caricato. Nel secondo il lago memorizza tutte e tre le righe così come sono; ogni lettore applica uno schema quando legge, e due lettori possono leggere lo stesso file in modo diverso.</figcaption>
   </figure>
-  <p><strong>Schema on write protects the warehouse; schema on read keeps everything for later.</strong> The lecture sums up the comparison in five points.</p>
+  <p><strong>Lo schema on write protegge il warehouse; lo schema on read tiene tutto per dopo.</strong> La lezione riassume il confronto in cinque punti.</p>
   <div class="scroll"><table><thead><tr><th></th><th>Data warehouse</th><th>Data lake</th></tr></thead><tbody>
-    <tr><td>Data</td><td>structured</td><td>structured and unstructured</td></tr>
-    <tr><td>State</td><td>processed</td><td>raw and processed</td></tr>
-    <tr><td>Schema</td><td>on write: tables defined before inserting</td><td>on read: defined, if needed, when reading</td></tr>
-    <tr><td>Storage</td><td>expensive for large volumes</td><td>designed for low cost</td></tr>
-    <tr><td>Data temperature</td><td>suitable for hot data</td><td>suitable for hot and cold data</td></tr></tbody></table></div>
-  <p><span class="k-orange">Hot data</span> are the more recent or more accessed data; <span class="k-blue">cold data</span> the older or less accessed ones. Cost is where the lake wins most clearly, as a chart from Hortonworks, the Hadoop distributor of lesson 5, shows.</p>
+    <tr><td>Dati</td><td>strutturati</td><td>strutturati e non strutturati</td></tr>
+    <tr><td>Stato</td><td>elaborati</td><td>grezzi ed elaborati</td></tr>
+    <tr><td>Schema</td><td>on write: tabelle definite prima di inserire</td><td>on read: definito, se serve, al momento della lettura</td></tr>
+    <tr><td>Memorizzazione</td><td>costosa per grandi volumi</td><td>progettata per costare poco</td></tr>
+    <tr><td>Temperatura dei dati</td><td>adatto ai dati caldi</td><td>adatto ai dati caldi e freddi</td></tr></tbody></table></div>
+  <p>I <span class="k-orange">dati caldi</span> (hot data) sono quelli più recenti o più consultati; i <span class="k-blue">dati freddi</span> (cold data) quelli più vecchi o meno consultati. È sul costo che il lago vince più nettamente, come mostra un grafico di Hortonworks, il distributore di Hadoop della lezione 5.</p>
   <figure>
     <div class="w" id="b8cost"></div>
-    <figcaption>Fully loaded cost per raw terabyte of data, from minimum to maximum, after the Hortonworks chart in the lecture. The values are read approximately from the chart, which has no numbers on its bars: cloud storage and Hadoop cost a small fraction of a NAS (network-attached storage), of an engineered system (an appliance that bundles hardware and database software), of a SAN (storage area network) or of an MPP database (massively parallel processing). The slide's last axis label reads $180,000, although the even grid spacing gives $100,000; the redraw follows the spacing.</figcaption>
+    <figcaption>Costo complessivo per terabyte di dati grezzi, dal minimo al massimo, secondo il grafico di Hortonworks mostrato nella lezione. I valori sono letti in modo approssimato dal grafico, che non ha numeri sulle barre: lo storage nel cloud e Hadoop costano una piccola frazione di un NAS (network-attached storage, memoria collegata in rete), di un engineered system (un'appliance, cioè un sistema preconfigurato che riunisce hardware e software del database), di una SAN (storage area network, rete di memorizzazione) o di un database MPP (massively parallel processing, elaborazione massicciamente parallela). L'ultima etichetta dell'asse nella slide dice 180.000 dollari, anche se la spaziatura regolare della griglia dà 100.000; il disegno segue la spaziatura.</figcaption>
   </figure>
   <div class="quiz inq" data-quiz="8a"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>A lake is adopted one step at a time</h2>
-  <p>Companies rarely start with a lake at the centre of everything. The lecture describes four steps, each building on the one below.</p>
+  <h2>Un lago si adotta un passo alla volta</h2>
+  <p>Raramente le aziende cominciano con un lago al centro di tutto. La lezione descrive quattro passi, ciascuno costruito su quello sotto.</p>
   <figure>
     <div class="w" id="b8steps"></div>
-    <figcaption>The four steps of data lake adoption, after the lecture's pyramid: from a cheap staging area at the base to the main component of the information system at the top.</figcaption>
+    <figcaption>I quattro passi dell'adozione di un data lake, secondo la piramide della lezione: da un'area di staging economica alla base al componente principale del sistema informativo in cima.</figcaption>
   </figure>
-  <p>Read from the base, the lake starts as a cheap place where data from the operational systems land, separate from everything else; it then becomes a laboratory for data scientists; then the warehouses lean on it to keep their cold data, thanks to its low storage costs; and finally most of the company's data flows pass through it.</p>
+  <p>Letto dalla base, il lago comincia come un posto economico dove atterrano i dati dei sistemi operazionali, separato da tutto il resto; diventa poi un laboratorio per i data scientist; poi i warehouse si appoggiano a esso per tenere i loro dati freddi, grazie ai bassi costi di memorizzazione; e infine la maggior parte dei flussi di dati dell'azienda passa attraverso di esso.</p>
   <div class="quiz inq" data-quiz="8b"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>The warehouse stays: who does what</h2>
-  <p>The lake does not replace the warehouse; the architecture changes around it. In traditional Business Intelligence (BI), data from the sources go through ETL into the DWH, and a semantic layer (the business view of the data: measures, dimensions, names users understand) feeds the reports. In what the lecture calls BI 2.0, emerging sources join the traditional ones and the lake sits next to the warehouse.</p>
+  <h2>Il warehouse resta: chi fa che cosa</h2>
+  <p>Il lago non sostituisce il warehouse; l'architettura cambia intorno a esso. Nella Business Intelligence (BI) tradizionale, i dati delle fonti passano per l'ETL fino al DWH, e uno strato semantico (la visione di business dei dati: misure, dimensioni, nomi comprensibili agli utenti) alimenta i report. In quella che la lezione chiama BI 2.0, alle fonti tradizionali si aggiungono fonti emergenti e il lago si affianca al warehouse.</p>
   <figure>
     <div class="w" id="b8arch"></div>
-    <figcaption>Traditional BI and BI 2.0, after the lecture's diagram. In the second panel the new sources go straight into the data lake (data ingestion), which exchanges data with the warehouse; data quality and data governance belong to the lake, and the semantic layer now serves advanced analytics too.</figcaption>
+    <figcaption>BI tradizionale e BI 2.0, secondo lo schema della lezione. Nel secondo riquadro le nuove fonti entrano direttamente nel data lake (data ingestion, acquisizione dei dati), che scambia dati con il warehouse; la qualità dei dati e la data governance appartengono al lago, e lo strato semantico ora serve anche le analisi avanzate.</figcaption>
   </figure>
-  <p>The data flows change accordingly. Data from the traditional sources can still go through ETL, but some or all of the ETL procedures can move into the lake, which becomes the repository of raw data and the place where transformations happen. Data from the new sources go directly to the lake, where they can be processed or used in complex analytical tasks such as machine learning; the results can then be moved to the warehouse.</p>
-  <p>The <strong>warehouse</strong> still holds the <span class="k-orange">hot</span> data coming from the ETL processes, whether they read the sources directly or the lake, and the distilled data coming from the analyses run on the lake. It allows low-latency, interactive queries and keeps the reporting systems built on it working. The <strong>lake</strong> holds all the raw data and the final processed data; the hot part is pushed to the warehouse, while the <span class="k-blue">cold</span> part stays in the lake, available with a longer latency. With more detail and a longer history, it supplies the warehouse, data scientists (for both descriptive reports and predictive models) and corporate applications.</p>
-  <p>The lecture calls the movement from lake to warehouse <strong>data distillation</strong>: the lake allows more detailed and complex analyses on much more data, and the results are often small enough to be transferred to the warehouse and injected into the BI workflow.</p>
+  <p>I flussi di dati cambiano di conseguenza. I dati delle fonti tradizionali possono ancora passare per l'ETL, ma alcune o tutte le procedure ETL possono spostarsi nel lago, che diventa l'archivio dei dati grezzi e il luogo dove avvengono le trasformazioni. I dati delle nuove fonti vanno direttamente nel lago, dove possono essere elaborati o usati in compiti analitici complessi come il machine learning; i risultati possono poi essere spostati nel warehouse.</p>
+  <p>Il <strong>warehouse</strong> contiene ancora i dati <span class="k-orange">caldi</span> che arrivano dai processi ETL, sia che leggano direttamente le fonti sia che leggano il lago, e i dati distillati che arrivano dalle analisi eseguite sul lago. Permette query interattive a bassa latenza e tiene in funzione i sistemi di reportistica costruiti su di esso. Il <strong>lago</strong> contiene tutti i dati grezzi e i dati elaborati finali; la parte calda viene spinta nel warehouse, mentre la parte <span class="k-blue">fredda</span> resta nel lago, disponibile con una latenza maggiore. Con più dettaglio e una storia più lunga, rifornisce il warehouse, i data scientist (sia per i report descrittivi sia per i modelli predittivi) e le applicazioni aziendali.</p>
+  <p>La lezione chiama lo spostamento dal lago al warehouse <strong>distillazione dei dati</strong> (data distillation): il lago permette analisi più dettagliate e complesse su molti più dati, e i risultati sono spesso abbastanza piccoli da essere trasferiti nel warehouse e inseriti nel flusso di lavoro della BI.</p>
   <figure>
     <div class="w" id="b8distill"></div>
-    <figcaption>Data distillation, animated. Press play: a Spark job reads a large amount of raw data in the lake (the dots, which stay where they are), computes a small result, and the result enters the warehouse, where the usual BI reports can use it. The sizes are illustrative.</figcaption>
+    <figcaption>La distillazione dei dati, animata. Premi play: un job Spark legge una grande quantità di dati grezzi nel lago (i puntini, che restano dove sono), calcola un risultato piccolo, e il risultato entra nel warehouse, dove i soliti report di BI possono usarlo. Le dimensioni sono illustrative.</figcaption>
   </figure>
   <div class="quiz inq" data-quiz="8c"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>A lake takes whatever you give it</h2>
-  <p>That is its strength and its problem. Without rules a lake fills with data nobody can find or trust, and many users with different profiles must be able to use it. The lecture names four <strong>critical success factors</strong>: data governance and a data quality process against the first problem, metadata management (part of governance) and training of data scientists and end users against the second.</p>
-  <p>A <strong>data governance policy</strong> maps the data sources (applications, input services), the data flows (how data are loaded into the lake) and the output services (the warehouse, applications, output data services), and manages the <strong>metadata</strong>, the data about the data, which make it easy to search the lake and interpret its content.</p>
-  <p>The <strong>data quality process</strong> has a less obvious rule: quality rules should be applied to the output data, not to the input. A filter at the entrance would keep out data of medium quality that could still be useful for certain applications.</p>
+  <h2>Un lago prende tutto quello che gli dai</h2>
+  <p>È la sua forza e il suo problema. Senza regole un lago si riempie di dati che nessuno riesce a trovare o di cui nessuno si fida, e molti utenti con profili diversi devono poterlo usare. La lezione indica quattro <strong>fattori critici di successo</strong>: la data governance e un processo di qualità dei dati contro il primo problema, la gestione dei metadati (parte della governance) e la formazione di data scientist e utenti finali contro il secondo.</p>
+  <p>Una <strong>politica di data governance</strong> mappa le fonti di dati (applicazioni, servizi di input), i flussi di dati (come i dati vengono caricati nel lago) e i servizi di output (il warehouse, le applicazioni, i servizi di dati in uscita), e gestisce i <strong>metadati</strong>, i dati sui dati, che rendono facile cercare nel lago e interpretarne il contenuto.</p>
+  <p>Il <strong>processo di qualità dei dati</strong> ha una regola meno ovvia: le regole di qualità vanno applicate ai dati in uscita, non a quelli in entrata. Un filtro all'ingresso terrebbe fuori dati di qualità media che potrebbero comunque essere utili per certe applicazioni.</p>
   <figure>
     <div class="w" id="b8qual"></div>
-    <figcaption>Two ways to handle quality, with records of high, medium and low quality. In the first panel a filter at the entrance lets only high-quality records into the lake, and the medium ones are lost. In the second every record enters with a quality label, and each user decides: the reporting system takes only high quality, a data scientist also accepts medium.</figcaption>
+    <figcaption>Due modi di gestire la qualità, con record di qualità alta, media e bassa. Nel primo riquadro un filtro all'ingresso lascia entrare nel lago solo i record di qualità alta, e quelli medi vanno persi. Nel secondo ogni record entra con un'etichetta di qualità, e ogni utente decide: il sistema di reportistica prende solo la qualità alta, un data scientist accetta anche quella media.</figcaption>
   </figure>
-  <p><strong>Label the quality and let the final user decide.</strong> That is the lecture's recommendation: put a quality label on the data rather than filtering them out.</p>
+  <p><strong>Etichetta la qualità e lascia decidere l'utente finale.</strong> È la raccomandazione della lezione: mettere un'etichetta di qualità sui dati invece di filtrarli via.</p>
   <div class="quiz inq" data-quiz="8d"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Or leave the data where they are</h2>
-  <p>A newer trend avoids copying altogether. <strong>Data virtualization</strong> is a logical data layer that integrates the enterprise data siloed in different systems, manages them in one place for security and governance, and delivers them to business users in real time.</p>
+  <h2>Oppure lascia i dati dove sono</h2>
+  <p>Una tendenza più recente evita del tutto di copiare. La <strong>virtualizzazione dei dati</strong> (data virtualization) è uno strato logico che integra i dati aziendali chiusi in sistemi diversi, li gestisce in un solo posto per sicurezza e governance, e li consegna agli utenti di business in tempo reale.</p>
   <figure>
     <div class="w" id="b8virt"></div>
-    <figcaption>Two ways to give users one view of three source systems. In the first panel ETL copies the data into a central store, and queries run there. In the second a virtualization layer stores nothing: each query is translated and sent to the sources, which do the work, and the answers travel over the network.</figcaption>
+    <figcaption>Due modi di dare agli utenti una sola vista di tre sistemi di origine. Nel primo riquadro l'ETL copia i dati in un archivio centrale, e le query girano lì. Nel secondo uno strato di virtualizzazione non memorizza nulla: ogni query viene tradotta e mandata alle fonti, che fanno il lavoro, e le risposte viaggiano sulla rete.</figcaption>
   </figure>
-  <p>The pros, according to the lecture: cost savings, since storing and maintaining data is cheaper than replicating them and transforming them into other formats and places; logical abstraction, since heterogeneous sources can interact more easily; easier governance, since rules are applied centrally to all the data; a bridge between structured and unstructured data; and higher productivity, since less time goes into integrating sources. The cons follow from the second panel: it relies on the storage, memory and CPUs of the sources, can require big memory and computation resources, increases network traffic, needs a high initial investment and can be slow for complex tasks.</p>
+  <p>I vantaggi, secondo la lezione: risparmio sui costi, perché memorizzare e mantenere i dati costa meno che replicarli e trasformarli in altri formati e luoghi; astrazione logica, perché fonti eterogenee possono interagire più facilmente; governance più facile, perché le regole si applicano in modo centrale a tutti i dati; un ponte fra dati strutturati e non strutturati; e maggiore produttività, perché si spende meno tempo a integrare le fonti. Gli svantaggi discendono dal secondo riquadro: si affida allo spazio di archiviazione, alla memoria e alle CPU delle fonti, può richiedere grandi risorse di memoria e di calcolo, aumenta il traffico di rete, richiede un alto investimento iniziale e può essere lenta per i compiti complessi.</p>
 </div></section>
 
 <section class="recap"><div class="col">
-  <h2>Lesson 8 at a glance</h2>
-  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
-  <h3>The data lake</h3>
-  <div class="scroll"><table><thead><tr><th>Term</th><th>In short</th></tr></thead><tbody>
-    <tr><td>Data lake (Gartner)</td><td>Storage instances holding data assets in addition to the sources, in a near-exact or exact copy of their format, giving skilled analysts an unrefined view free of the compromises of a warehouse</td></tr>
-    <tr><td>Data lake (lecturer)</td><td>A repository of vast raw data in native format, structured, semi-structured and unstructured, plus processed data; schema on read; feeds reporting, analytics and machine learning; mostly based on Hadoop and Spark</td></tr>
-    <tr><td>Users</td><td>Data scientists, analysts, applications, business users</td></tr>
-    <tr><td>Schema on write vs on read</td><td>Warehouse: tables defined before inserting, every row must fit; lake: the schema, if needed, is defined when reading, so readers can read the same file differently</td></tr>
-    <tr><td>Hot and cold data</td><td>Hot: recent or often accessed; cold: older or rarely accessed</td></tr>
-    <tr><td>Adoption in four steps</td><td>Cheap landing area for operational data, laboratory for data scientists, store of the warehouses' cold data, main component through which most data flows pass</td></tr>
+  <h2>La lezione 8 in sintesi</h2>
+  <p>Le definizioni e le idee di questa lezione in un solo posto, da ripassare prima del quiz.</p>
+  <h3>Il data lake</h3>
+  <div class="scroll"><table><thead><tr><th>Termine</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>Data lake (Gartner)</td><td>Istanze di memorizzazione che contengono patrimoni di dati in aggiunta alle fonti, in una copia quasi esatta o esatta del loro formato, per dare agli analisti esperti una visione non raffinata libera dai compromessi di un warehouse</td></tr>
+    <tr><td>Data lake (docente)</td><td>Un archivio di grandi quantità di dati grezzi in formato nativo, strutturati, semistrutturati e non strutturati, più dati elaborati; schema on read; alimenta reportistica, analisi e machine learning; basato soprattutto su Hadoop e Spark</td></tr>
+    <tr><td>Utenti</td><td>Data scientist, analisti, applicazioni, utenti di business</td></tr>
+    <tr><td>Schema on write e on read</td><td>Warehouse: tabelle definite prima di inserire, ogni riga deve adattarsi; lago: lo schema, se serve, si definisce in lettura, quindi lettori diversi possono leggere lo stesso file in modo diverso</td></tr>
+    <tr><td>Dati caldi e freddi</td><td>Caldi: recenti o consultati spesso; freddi: più vecchi o consultati di rado</td></tr>
+    <tr><td>Adozione in quattro passi</td><td>Area di atterraggio economica per i dati operativi, laboratorio per i data scientist, deposito (offloading) dei dati freddi dei warehouse, componente principale attraverso cui passa la maggior parte dei flussi di dati</td></tr>
   </tbody></table></div>
-  <h3>Data warehouse versus data lake</h3>
+  <h3>Data warehouse contro data lake</h3>
   <div class="scroll"><table><thead><tr><th></th><th>Data warehouse</th><th>Data lake</th></tr></thead><tbody>
-    <tr><td>Data</td><td>Structured</td><td>Structured and unstructured</td></tr>
-    <tr><td>State</td><td>Processed</td><td>Raw and processed</td></tr>
+    <tr><td>Dati</td><td>Strutturati</td><td>Strutturati e non strutturati</td></tr>
+    <tr><td>Stato</td><td>Elaborati</td><td>Grezzi ed elaborati</td></tr>
     <tr><td>Schema</td><td>On write</td><td>On read</td></tr>
-    <tr><td>Storage</td><td>Expensive for large volumes</td><td>Designed for low cost</td></tr>
-    <tr><td>Temperature</td><td>Hot data</td><td>Hot and cold data</td></tr>
-    <tr><td>Role in BI 2.0</td><td>Hot and distilled data, low-latency interactive queries, existing reports</td><td>All raw data and final processed data, ETL and transformations, machine learning, cold data at longer latency</td></tr>
+    <tr><td>Memorizzazione</td><td>Costosa per grandi volumi</td><td>Progettata per costare poco</td></tr>
+    <tr><td>Temperatura</td><td>Dati caldi</td><td>Dati caldi e freddi</td></tr>
+    <tr><td>Ruolo nella BI 2.0</td><td>Dati caldi e distillati, query interattive a bassa latenza, report esistenti</td><td>Tutti i dati grezzi e i dati elaborati finali, ETL e trasformazioni, machine learning, dati freddi a latenza maggiore</td></tr>
   </tbody></table></div>
-  <h3>Making it work</h3>
-  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
-    <tr><td>BI 2.0</td><td>New sources go straight into the lake (data ingestion), which sits next to the warehouse and exchanges data with it; the semantic layer also serves advanced analytics</td></tr>
-    <tr><td>Data distillation</td><td>Detailed, complex analyses on much data in the lake give small results that move to the warehouse and into the BI workflow</td></tr>
-    <tr><td>Critical success factors</td><td>Data governance, data quality process, metadata management, training of data scientists and end users</td></tr>
-    <tr><td>Data governance policy</td><td>Maps sources, data flows and output services, and manages the metadata that make the lake searchable</td></tr>
-    <tr><td>Data quality rule</td><td>Apply quality rules to the output, not the input: label the quality and let each user decide</td></tr>
-    <tr><td>Data virtualization</td><td>A logical layer that integrates siloed data without copying them, governs them centrally and delivers them in real time</td></tr>
-    <tr><td>Virtualization pros and cons</td><td>Pros: lower cost, logical abstraction, easier governance, bridge between structured and unstructured data, productivity; cons: relies on the sources' resources, more network traffic, high initial investment, slow for complex tasks</td></tr>
+  <h3>Farlo funzionare</h3>
+  <div class="scroll"><table><thead><tr><th>Concetto</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>BI 2.0</td><td>Le nuove fonti entrano direttamente nel lago (data ingestion), che sta accanto al warehouse e scambia dati con esso; lo strato semantico serve anche le analisi avanzate</td></tr>
+    <tr><td>Distillazione dei dati</td><td>Analisi dettagliate e complesse su molti dati nel lago danno risultati piccoli che passano nel warehouse e nel flusso di lavoro della BI</td></tr>
+    <tr><td>Fattori critici di successo</td><td>Data governance, processo di qualità dei dati, gestione dei metadati, formazione di data scientist e utenti finali</td></tr>
+    <tr><td>Politica di data governance</td><td>Mappa fonti, flussi di dati e servizi di output, e gestisce i metadati che rendono il lago ricercabile</td></tr>
+    <tr><td>Regola di qualità dei dati</td><td>Applicare le regole di qualità all'output, non all'input: etichettare la qualità e lasciare decidere ogni utente</td></tr>
+    <tr><td>Virtualizzazione dei dati</td><td>Uno strato logico che integra dati chiusi in sistemi diversi senza copiarli, li governa in modo centrale e li consegna in tempo reale</td></tr>
+    <tr><td>Pro e contro della virtualizzazione</td><td>Pro: costi minori, astrazione logica, governance più facile, ponte fra dati strutturati e non strutturati, produttività; contro: si affida alle risorse delle fonti, più traffico di rete, alto investimento iniziale, lenta per i compiti complessi</td></tr>
   </tbody></table></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Test yourself</h2>
+  <h2>Mettiti alla prova</h2>
   <div class="quiz" data-quiz="8"></div>
 </div></section>
 
 <section><div class="col">
-  <p>If only one thing from this lesson stays with you: <strong>the lake keeps everything, raw and cheap, with the schema decided at reading time; the warehouse keeps the hot, distilled data for fast queries</strong>, and governance decides whether the lake stays usable.</p>
-  <p>Lesson 9 steps back to ask why all this matters for business: how data warehouses and Big Data feed predictive and generative AI.</p>
-  <nav class="navend" aria-label="Other lessons"></nav>
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>il lago tiene tutto, grezzo ed economico, con lo schema deciso al momento della lettura; il warehouse tiene i dati caldi e distillati per le query veloci</strong>, e la governance decide se il lago resta utilizzabile.</p>
+  <p>La lezione 9 fa un passo indietro per chiedersi perché tutto questo conti per il business: come i data warehouse e i Big Data alimentano l'AI predittiva e generativa.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
 </div></section>
 </article>

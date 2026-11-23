@@ -1,62 +1,62 @@
-<article class="lesson" data-n="3" id="lezione-3" data-title="How do you combine two tables?" hidden>
+<article class="lesson" data-n="3" id="lezione-3" data-title="Come si combinano due tabelle?" hidden>
 <section class="hero"><div class="col">
-  <p class="chap">Lesson 3 · A. Rezzani, slides and SQL scripts</p>
-  <h1>How do you combine two tables?</h1>
-  <p class="desc">Advanced SQL: UNION, joins, missing values, grouping and summarizing, subqueries and analytical functions.</p>
+  <p class="chap">Lezione 3 · A. Rezzani, slide e script SQL</p>
+  <h1>Come si combinano due tabelle?</h1>
+  <p class="desc">SQL avanzato: UNION, join, valori mancanti, raggruppamenti e sintesi, sottoquery e funzioni analitiche.</p>
 </div></section>
 
 <section><div class="col">
-  <p>Lesson 2 ended with normalized tables: every fact stored once, in its own table. The price is that answers are scattered. A sale knows its buyer only by number; the name sits in another table. This lesson puts the pieces back together.</p>
-  <h2>Who bought what?</h2>
-  <p>These are the lecture's two tables. Buyers has a name and a <span class="k-yellow">buyer_id</span>; sales has a <span class="k-pink">buyer_id</span>, a product id and a quantity. You want one result with the buyer's name next to each quantity. The most naive way is to pair every buyer with every sale.</p>
+  <p>La lezione 2 si è chiusa con tabelle normalizzate: ogni fatto memorizzato una volta sola, nella sua tabella. Il prezzo è che le risposte sono sparse. Una vendita conosce il suo acquirente solo per numero; il nome sta in un'altra tabella. Questa lezione rimette insieme i pezzi.</p>
+  <h2>Chi ha comprato che cosa?</h2>
+  <p>Queste sono le due tabelle della lezione. Buyers (acquirenti) ha un nome e un <span class="k-yellow">buyer_id</span>; sales (vendite) ha un <span class="k-pink">buyer_id</span>, un id di prodotto e una quantità. Vuoi un solo risultato con il nome dell'acquirente accanto a ogni quantità. Il modo più ingenuo è accoppiare ogni acquirente con ogni vendita.</p>
   <figure>
     <div class="w" id="b3cart"></div>
-    <figcaption>Every buyer (rows) crossed with every sale (columns): the cartesian product, 4 × 5 = 20 pairs. Each cell compares the two buyer ids; the orange cells are the pairs where they are equal, the condition a join writes after the keyword ON.</figcaption>
+    <figcaption>Ogni acquirente (righe) incrociato con ogni vendita (colonne): il prodotto cartesiano, 4 × 5 = 20 coppie. Ogni cella confronta i due id di acquirente; le celle arancioni sono le coppie in cui sono uguali, la condizione che un join scrive dopo la parola chiave ON.</figcaption>
   </figure>
-  <p>The <strong>cartesian product</strong> is all the possible combinations of rows of two tables, the intermediate result of the FROM clause; the slide's own example crosses 3 names (Davis, Funk, King) with 3 products into 9 rows. It is the starting point of every join, and in SQL queries it is usually not what you want: most pairs match a buyer with someone else's sale.</p>
-  <p class="stmt"><strong>Join.</strong> A join puts the columns of two tables side by side, matching rows with a predicate. A <strong>CROSS JOIN</strong> returns the whole cartesian product. An <strong>INNER JOIN</strong> keeps only the pairs where the <span class="k-orange">ON</span> predicate is true. An <strong>outer join</strong> also preserves the rows of a designated table and fills the missing side with <span class="k-purple">NULL</span>: LEFT keeps every row of the first table, RIGHT every row of the second, FULL both.</p>
+  <p>Il <strong>prodotto cartesiano</strong> è l'insieme di tutte le combinazioni possibili delle righe di due tabelle, il risultato intermedio della clausola FROM; l'esempio della slide incrocia 3 nomi (Davis, Funk, King) con 3 prodotti e ottiene 9 righe. È il punto di partenza di ogni join, e nelle query SQL di solito non è ciò che vuoi: la maggior parte delle coppie abbina un acquirente alla vendita di qualcun altro.</p>
+  <p class="stmt"><strong>Join.</strong> Un join affianca le colonne di due tabelle, abbinando le righe con un predicato. Un <strong>CROSS JOIN</strong> restituisce l'intero prodotto cartesiano. Un <strong>INNER JOIN</strong> tiene solo le coppie in cui il predicato dopo <span class="k-orange">ON</span> è vero. Un <strong>outer join</strong> (join esterno) conserva in più le righe di una tabella designata e riempie il lato mancante con <span class="k-purple">NULL</span>: LEFT tiene ogni riga della prima tabella, RIGHT ogni riga della seconda, FULL quelle di entrambe.</p>
 <pre class="code">SELECT buyer_name, sales.buyer_id, qty
 FROM buyers LEFT OUTER JOIN sales
   ON <span class="k-orange">buyers.buyer_id = sales.buyer_id</span>;</pre>
   <figure>
     <div class="w" id="b3joins"></div>
-    <figcaption>The four joins on the same data. One sale from a buyer 9, who is not in buyers, is added on this page: in the lecture's data every sale has a valid buyer, so RIGHT and FULL would equal INNER and LEFT. Purple NULLs mark the rows kept without a partner.</figcaption>
+    <figcaption>I quattro join sugli stessi dati. Una vendita di un acquirente 9, che non è in buyers, è aggiunta in questa pagina: nei dati della lezione ogni vendita ha un acquirente valido, quindi RIGHT e FULL sarebbero uguali a INNER e LEFT. I NULL viola segnano le righe tenute senza un partner.</figcaption>
   </figure>
-  <p><strong>An outer join is an inner join plus the rows that found no partner, padded with NULL.</strong> Lucy Thin bought nothing: she disappears from INNER and RIGHT, and survives with NULLs in LEFT and FULL.</p>
+  <p><strong>Un outer join è un inner join più le righe che non hanno trovato un partner, completate con NULL.</strong> Lucy Thin non ha comprato nulla: sparisce da INNER e RIGHT, e sopravvive con dei NULL in LEFT e FULL.</p>
 </div></section>
 
 <section><div class="col">
-  <h2>Stacking instead of matching: UNION</h2>
-  <p>A join adds columns. <strong>UNION</strong> adds rows: it combines the results of two or more SELECT statements with the same columns, one under the other, and removes duplicate rows. <strong>UNION ALL</strong> does the same but keeps the duplicates. The course script uses t1 = {(1, 'a'), (2, 'b')} and t2 = {(1, 'a'), (3, 'c')}.</p>
+  <h2>Impilare invece di abbinare: UNION</h2>
+  <p>Un join aggiunge colonne. <strong>UNION</strong> aggiunge righe: combina i risultati di due o più istruzioni SELECT con le stesse colonne, uno sotto l'altro, ed elimina le righe duplicate. <strong>UNION ALL</strong> fa lo stesso ma tiene i duplicati. Lo script del corso usa t1 = {(1, 'a'), (2, 'b')} e t2 = {(1, 'a'), (3, 'c')}.</p>
   <figure>
     <div class="w" id="b3union"></div>
-    <figcaption>The two operators on t1 and t2 of the course script 07.union.sql. Grey labels say which table each row comes from. The row (1, 'a') is in both tables: UNION keeps it once, UNION ALL twice.</figcaption>
+    <figcaption>I due operatori su t1 e t2 dello script del corso 07.union.sql. Le etichette grigie dicono da quale tabella viene ogni riga. La riga (1, 'a') è in entrambe le tabelle: UNION la tiene una volta, UNION ALL due.</figcaption>
   </figure>
-  <p>A practical note added on this page: removing duplicates means comparing rows, which costs work, so when the two results cannot overlap UNION ALL gives the same rows faster.</p>
+  <p>Una nota pratica aggiunta in questa pagina: eliminare i duplicati vuol dire confrontare le righe, il che costa lavoro, quindi quando i due risultati non possono sovrapporsi UNION ALL restituisce le stesse righe più velocemente.</p>
 </div></section>
 
 <section><div class="col">
-  <h2>When a value is missing</h2>
-  <p>The outer joins produced NULLs, and SQL treats them in a special way. With no missing values a predicate is TRUE or FALSE: 5 &gt; 2 is TRUE. With missing values there is a third outcome, <span class="k-purple">UNKNOWN</span>: comparing NULL to anything, another NULL included, gives UNKNOWN.</p>
+  <h2>Quando un valore manca</h2>
+  <p>Gli outer join hanno prodotto dei NULL, e SQL li tratta in modo speciale. Senza valori mancanti un predicato è TRUE o FALSE (vero o falso): 5 &gt; 2 è TRUE. Con i valori mancanti c'è un terzo esito, <span class="k-purple">UNKNOWN</span> (sconosciuto): confrontare NULL con qualunque cosa, un altro NULL compreso, dà UNKNOWN.</p>
   <figure>
     <div class="w" id="b3null"></div>
-    <figcaption>First, five comparisons and their outcome. Then the course Customers left joined with Sales (script 08.joins.sql): Bianchi has no sales, so his sale columns are NULL. The last two columns evaluate two predicates on every row; WHERE keeps only the rows where a predicate is TRUE.</figcaption>
+    <figcaption>Prima, cinque confronti e il loro esito. Poi i Customers del corso in left join con Sales (script 08.joins.sql): Bianchi non ha vendite, quindi le colonne della sua vendita sono NULL. Le ultime due colonne valutano due predicati su ogni riga; WHERE tiene solo le righe in cui un predicato è TRUE.</figcaption>
   </figure>
-  <p><strong>Query filters (ON, WHERE, HAVING) keep only TRUE, so UNKNOWN rows are silently dropped.</strong> That is why you test for missing values with <code>IS NULL</code> or <code>IS NOT NULL</code>, never with <code>= NULL</code>. The function <code>COALESCE(x, 'N/A')</code> replaces a NULL with a value of your choice: in the lecture's query on this left join, Bianchi's row shows product 'N/A' and quantity 0 instead of two NULLs.</p>
+  <p><strong>I filtri delle query (ON, WHERE, HAVING) tengono solo TRUE, quindi le righe UNKNOWN vengono scartate in silenzio.</strong> Per questo i valori mancanti si verificano con <code>IS NULL</code> o <code>IS NOT NULL</code>, mai con <code>= NULL</code>. La funzione <code>COALESCE(x, 'N/A')</code> sostituisce un NULL con un valore a tua scelta: nella query della lezione su questo left join, la riga di Bianchi mostra il prodotto 'N/A' e la quantità 0 invece di due NULL.</p>
   <div class="quiz inq" data-quiz="3a"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>From rows to groups</h2>
-  <p>An <strong>aggregate function</strong> turns many rows into one value: SUM, MIN, MAX, AVG, COUNT, and the standard deviations and variances STDEV, STDEVP, VAR, VARP. They return a single value with no column name, can be used in SELECT, HAVING and ORDER BY, and ignore NULLs, except <code>COUNT(*)</code>, which counts rows. Alone they summarize the whole table; with <strong>GROUP BY</strong> they summarize each group, one output row per unique combination of the grouping columns.</p>
+  <h2>Dalle righe ai gruppi</h2>
+  <p>Una <strong>funzione di aggregazione</strong> trasforma molte righe in un solo valore: SUM, MIN, MAX, AVG, COUNT, e le deviazioni standard e varianze STDEV, STDEVP, VAR, VARP. Restituiscono un solo valore senza nome di colonna, si possono usare in SELECT, HAVING e ORDER BY, e ignorano i NULL, tranne <code>COUNT(*)</code>, che conta le righe. Da sole riassumono l'intera tabella; con <strong>GROUP BY</strong> riassumono ogni gruppo, una riga di risultato per ogni combinazione distinta delle colonne di raggruppamento.</p>
   <figure>
     <div class="w" id="b3group"></div>
-    <figcaption>The lecture's picture of how GROUP BY works, redrawn with the rows the slide shows. The first table is the orders; WHERE keeps the rows of customers 30097 and 30098 (the others fade); GROUP BY gathers them into one group per customer; COUNT(*) turns each group into one row.</figcaption>
+    <figcaption>Lo schema della lezione su come funziona GROUP BY, ridisegnato con le righe mostrate nella slide. La prima tabella sono gli ordini; WHERE tiene le righe dei clienti 30097 e 30098 (le altre sbiadiscono); GROUP BY le raccoglie in un gruppo per cliente; COUNT(*) trasforma ogni gruppo in una riga.</figcaption>
   </figure>
-  <p>The order matters. WHERE filters <strong>rows</strong> before aggregation, and after GROUP BY the detail rows are lost: only the groups remain. To filter <strong>groups</strong> you need a clause that runs after GROUP BY and can test an aggregate: <span class="k-orange">HAVING</span>.</p>
-  <p>The next examples use the course's OrdersDB script: a Customer table (Anders, Trujillo, Moreno), an Orders table with OrderDate, CustomerId and TotalAmount, an OrderItem table with the quantity of each product in each order, and a Product table. Without GROUP BY, <code>SELECT SUM(i.quantity), COUNT(*) FROM OrderItem i</code> returns one row: 240 units over 16 items. Grouped by product, it returns one row per product: Chai 48 units in 5 items, Chang 71 in 4, Aniseed Syrup 56 in 4, Chef Anton's Cajun Seasoning 65 in 3.</p>
-  <p>Here are the 16 rows of OrderItem, one cell per item: each row of the table is an order, each column a product, and the number is the quantity of that product in that order. Cajun is Chef Anton's Cajun Seasoning, as in the figure below. An empty cell means the order does not contain the product; Chef Anton's Gumbo Mix, the fifth product, appears in no order.</p>
-  <div class="scroll"><table class="tight"><thead><tr><th class="n">Order</th><th class="n">Chai</th><th class="n">Chang</th><th class="n">Aniseed Syrup</th><th class="n">Cajun</th></tr></thead><tbody>
+  <p>L'ordine conta. WHERE filtra le <strong>righe</strong> prima dell'aggregazione, e dopo GROUP BY le righe di dettaglio sono perse: restano solo i gruppi. Per filtrare i <strong>gruppi</strong> serve una clausola che venga eseguita dopo GROUP BY e possa verificare un'aggregazione: <span class="k-orange">HAVING</span>.</p>
+  <p>Gli esempi seguenti usano lo script OrdersDB del corso: una tabella Customer (Anders, Trujillo, Moreno), una tabella Orders con OrderDate, CustomerId e TotalAmount, una tabella OrderItem con la quantità di ogni prodotto in ogni ordine, e una tabella Product. Senza GROUP BY, <code>SELECT SUM(i.quantity), COUNT(*) FROM OrderItem i</code> restituisce una sola riga: 240 unità su 16 voci. Raggruppata per prodotto, restituisce una riga per prodotto: Chai 48 unità in 5 voci, Chang 71 in 4, Aniseed Syrup 56 in 4, Chef Anton's Cajun Seasoning 65 in 3.</p>
+  <p>Ecco le 16 righe di OrderItem, una cella per voce: ogni riga della tabella è un ordine, ogni colonna un prodotto, e il numero è la quantità di quel prodotto in quell'ordine. Cajun è Chef Anton's Cajun Seasoning, come nella figura più sotto. Una cella vuota significa che l'ordine non contiene il prodotto; Chef Anton's Gumbo Mix, il quinto prodotto, non compare in nessun ordine.</p>
+  <div class="scroll"><table class="tight"><thead><tr><th class="n">Ordine</th><th class="n">Chai</th><th class="n">Chang</th><th class="n">Aniseed Syrup</th><th class="n">Cajun</th></tr></thead><tbody>
     <tr><td class="n">1</td><td class="n">12</td><td class="n">10</td><td class="n">5</td><td class="n"></td></tr>
     <tr><td class="n">2</td><td class="n">9</td><td class="n">40</td><td class="n"></td><td class="n"></td></tr>
     <tr><td class="n">3</td><td class="n"></td><td class="n"></td><td class="n">10</td><td class="n">35</td></tr>
@@ -66,7 +66,7 @@ FROM buyers LEFT OUTER JOIN sales
     <tr><td class="n">7</td><td class="n"></td><td class="n"></td><td class="n">6</td><td class="n"></td></tr>
     <tr><td class="n">8</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">15</td></tr>
     <tr><td class="n">9</td><td class="n">6</td><td class="n"></td><td class="n"></td><td class="n"></td></tr>
-    <tr><td>Total<br>(items)</td><td class="n"><strong>48</strong> (5)</td><td class="n"><strong>71</strong> (4)</td><td class="n"><strong>56</strong> (4)</td><td class="n"><strong>65</strong> (3)</td></tr>
+    <tr><td>Totale<br>(voci)</td><td class="n"><strong>48</strong> (5)</td><td class="n"><strong>71</strong> (4)</td><td class="n"><strong>56</strong> (4)</td><td class="n"><strong>65</strong> (3)</td></tr>
   </tbody></table></div>
 <pre class="code">SELECT p.productname, <span class="k-blue">SUM(i.quantity)</span> TotalQt, <span class="k-blue">COUNT(*)</span> nr_of_sales
 FROM OrderItem i JOIN Product p ON p.id = i.productid
@@ -74,122 +74,122 @@ GROUP BY p.productname
 HAVING <span class="k-orange">SUM(i.quantity) &gt; 60</span>;</pre>
   <figure>
     <div class="w" id="b3having"></div>
-    <figcaption>Total quantity per product in the OrderItem table of the course database (Cajun is Chef Anton's Cajun Seasoning; Gumbo Mix has no items, so it forms no group). The orange line is HAVING SUM &gt; 60. In the first panel all items count; in the second WHERE quantity &gt; 10 removes the small items before the sums.</figcaption>
+    <figcaption>Quantità totale per prodotto nella tabella OrderItem del database del corso (Cajun è Chef Anton's Cajun Seasoning; Gumbo Mix non ha voci, quindi non forma alcun gruppo). La linea arancione è HAVING SUM &gt; 60. Nel primo riquadro contano tutte le voci; nel secondo WHERE quantity &gt; 10 toglie le voci piccole prima delle somme.</figcaption>
   </figure>
-  <p>With no WHERE, only Chang (71) and Chef Anton's Cajun Seasoning (65) pass HAVING, the lecture's result. <code>COUNT(DISTINCT customerid)</code> on Orders counts different values instead of rows: 2, since only Anders and Trujillo placed orders.</p>
+  <p>Senza WHERE, solo Chang (71) e Chef Anton's Cajun Seasoning (65) superano HAVING, il risultato della lezione. <code>COUNT(DISTINCT customerid)</code> su Orders conta i valori diversi invece delle righe: 2, perché solo Anders e Trujillo hanno fatto ordini.</p>
   <div class="quiz inq" data-quiz="3c"></div>
 </div></section>
 
 <section><div class="col">
-  <h2>A query inside a query</h2>
-  <p>A <strong>subquery</strong> is a query nested in another. Its result is passed to the outer query, which uses it like an expression. A subquery can return one value (scalar), a list, or a whole table. It is <strong>self-contained</strong> if it does not depend on the outer query, and <strong>correlated</strong> if it uses values from the outer query's current row.</p>
+  <h2>Una query dentro una query</h2>
+  <p>Una <strong>sottoquery</strong> (subquery) è una query annidata in un'altra. Il suo risultato passa alla query esterna, che lo usa come un'espressione. Una sottoquery può restituire un valore (scalare), un elenco o un'intera tabella. È <strong>indipendente</strong> (self-contained) se non dipende dalla query esterna, e <strong>correlata</strong> (correlated) se usa valori della riga corrente della query esterna.</p>
 <pre class="code">WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders)                     -- self-contained
 WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders o2
                      WHERE o2.customerid = <span class="k-orange">o.customerid</span>)              -- correlated</pre>
   <figure>
     <div class="w" id="b3subq"></div>
-    <figcaption>The two queries of the lecture on the course orders. In the first panel the inner query runs once and returns a single date. In the second it runs once per order, for that order's customer: its result is shown as a column. Green rows are those where the order date equals the inner result.</figcaption>
+    <figcaption>Le due query della lezione sugli ordini del corso. Nel primo riquadro la query interna viene eseguita una volta e restituisce una sola data. Nel secondo viene eseguita una volta per ordine, per il cliente di quell'ordine: il suo risultato è mostrato come una colonna. Le righe verdi sono quelle in cui la data dell'ordine è uguale al risultato interno.</figcaption>
   </figure>
-  <p>The self-contained version answers "who placed the last order", one row. The correlated version answers "when did each customer place their last order", one row per customer. With <code>EXISTS</code> a subquery becomes an existence test: it is TRUE if the subquery returns at least one row, FALSE otherwise. In the course database <code>WHERE EXISTS (SELECT * FROM Orders o WHERE o.customerid = c.id)</code> returns Anders and Trujillo, and <code>NOT EXISTS</code> returns Moreno, the customer with no orders.</p>
+  <p>La versione indipendente risponde a «chi ha fatto l'ultimo ordine», una riga. La versione correlata risponde a «quando ogni cliente ha fatto il suo ultimo ordine», una riga per cliente. Con <code>EXISTS</code> una sottoquery diventa una verifica di esistenza: è TRUE se la sottoquery restituisce almeno una riga, FALSE altrimenti. Nel database del corso <code>WHERE EXISTS (SELECT * FROM Orders o WHERE o.customerid = c.id)</code> restituisce Anders e Trujillo, e <code>NOT EXISTS</code> restituisce Moreno, il cliente senza ordini.</p>
 </div></section>
 
 <section><div class="col">
-  <h2>Aggregating without losing the rows</h2>
-  <p>Start from a question GROUP BY cannot answer well: next to each order, how much has that customer spent in total, and what share of it is this order? GROUP BY gives you the totals, but only one row per customer, and the single orders are gone.</p>
+  <h2>Aggregare senza perdere le righe</h2>
+  <p>Parti da una domanda a cui GROUP BY non sa rispondere bene: accanto a ogni ordine, quanto ha speso in tutto quel cliente, e che quota ne rappresenta questo ordine? GROUP BY ti dà i totali, ma una sola riga per cliente, e i singoli ordini spariscono.</p>
 <pre class="code">SELECT customerid, SUM(TotalAmount) AS CustomerTotal
 FROM Orders
 GROUP BY customerid;</pre>
-  <div class="scroll"><table class="tight"><thead><tr><th>name</th><th class="n">CustomerTotal</th></tr></thead><tbody>
+  <div class="scroll"><table class="tight"><thead><tr><th>nome</th><th class="n">CustomerTotal</th></tr></thead><tbody>
     <tr><td>Anders</td><td class="n">4066.8</td></tr>
     <tr><td>Trujillo</td><td class="n">9528.7</td></tr>
   </tbody></table></div>
-  <p>An <strong>analytical function</strong>, also called a window function, does the same sum but does not collapse anything: every order stays, and the result is added as a new column. You recognize it by the keyword <span class="k-teal">OVER</span> after the function.</p>
+  <p>Una <strong>funzione analitica</strong>, detta anche funzione finestra (window function), fa la stessa somma ma non fa collassare nulla: ogni ordine resta, e il risultato viene aggiunto come nuova colonna. La riconosci dalla parola chiave <span class="k-teal">OVER</span> dopo la funzione.</p>
 <pre class="code">SELECT customerid, OrderDate, TotalAmount,
        SUM(TotalAmount) <span class="k-teal">OVER (PARTITION BY customerid)</span> AS CustomerTotal
 FROM Orders;</pre>
-  <div class="scroll"><table class="tight"><thead><tr><th>name</th><th>date</th><th class="n">amount</th><th class="n">CustomerTotal</th><th class="n">share</th></tr></thead><tbody>
-    <tr><td>Anders</td><td>07-04</td><td class="n">440</td><td class="n">4066.8</td><td class="n">11%</td></tr>
-    <tr><td>Anders</td><td>07-05</td><td class="n">1813</td><td class="n">4066.8</td><td class="n">45%</td></tr>
-    <tr><td>Anders</td><td>07-05</td><td class="n">670.8</td><td class="n">4066.8</td><td class="n">16%</td></tr>
-    <tr><td>Anders</td><td>07-08</td><td class="n">625.2</td><td class="n">4066.8</td><td class="n">15%</td></tr>
-    <tr><td>Anders</td><td>07-15</td><td class="n">517.8</td><td class="n">4066.8</td><td class="n">13%</td></tr>
-    <tr><td>Trujillo</td><td>07-04</td><td class="n">1863.4</td><td class="n">9528.7</td><td class="n">20%</td></tr>
-    <tr><td>Trujillo</td><td>07-06</td><td class="n">3730</td><td class="n">9528.7</td><td class="n">39%</td></tr>
-    <tr><td>Trujillo</td><td>07-07</td><td class="n">1444.8</td><td class="n">9528.7</td><td class="n">15%</td></tr>
-    <tr><td>Trujillo</td><td>07-09</td><td class="n">2490.5</td><td class="n">9528.7</td><td class="n">26%</td></tr>
+  <div class="scroll"><table class="tight"><thead><tr><th>nome</th><th>data</th><th class="n">importo</th><th class="n">CustomerTotal</th><th class="n">quota</th></tr></thead><tbody>
+    <tr><td>Anders</td><td>04/07</td><td class="n">440</td><td class="n">4066.8</td><td class="n">11%</td></tr>
+    <tr><td>Anders</td><td>05/07</td><td class="n">1813</td><td class="n">4066.8</td><td class="n">45%</td></tr>
+    <tr><td>Anders</td><td>05/07</td><td class="n">670.8</td><td class="n">4066.8</td><td class="n">16%</td></tr>
+    <tr><td>Anders</td><td>08/07</td><td class="n">625.2</td><td class="n">4066.8</td><td class="n">15%</td></tr>
+    <tr><td>Anders</td><td>15/07</td><td class="n">517.8</td><td class="n">4066.8</td><td class="n">13%</td></tr>
+    <tr><td>Trujillo</td><td>04/07</td><td class="n">1863.4</td><td class="n">9528.7</td><td class="n">20%</td></tr>
+    <tr><td>Trujillo</td><td>06/07</td><td class="n">3730</td><td class="n">9528.7</td><td class="n">39%</td></tr>
+    <tr><td>Trujillo</td><td>07/07</td><td class="n">1444.8</td><td class="n">9528.7</td><td class="n">15%</td></tr>
+    <tr><td>Trujillo</td><td>09/07</td><td class="n">2490.5</td><td class="n">9528.7</td><td class="n">26%</td></tr>
   </tbody></table></div>
-  <p>Same orders as the lecture's examples. The share column, amount divided by CustomerTotal, is added on this page to show what the extra column makes possible: a calculation that needs both the single row and its group.</p>
-  <p class="stmt"><strong>Analytical function.</strong> A function that computes over a group of rows, like an aggregate, but returns one value for every row instead of one value per group.</p>
+  <p>Sono gli stessi ordini degli esempi della lezione, e i valori della query restano con il punto decimale come li restituisce SQL. La colonna della quota, importo diviso CustomerTotal, è aggiunta in questa pagina per mostrare che cosa rende possibile la colonna in più: un calcolo che ha bisogno sia della singola riga sia del suo gruppo.</p>
+  <p class="stmt"><strong>Funzione analitica.</strong> Una funzione che calcola su un gruppo di righe, come una funzione di aggregazione, ma restituisce un valore per ogni riga invece di un valore per gruppo.</p>
 
-  <h3>The three parts of OVER</h3>
-  <p>What goes inside the brackets of OVER decides which rows each calculation looks at. There are up to three parts, and each answers one question.</p>
-  <div class="scroll"><table><thead><tr><th>Part</th><th>Question it answers</th><th>In the example</th></tr></thead><tbody>
-    <tr><td><code>PARTITION BY</code></td><td>Which rows form my group? Each partition is computed on its own, like a group in GROUP BY</td><td>one partition per customer</td></tr>
-    <tr><td><code>ORDER BY</code></td><td>In what order are the rows inside the group? Needed whenever "previous", "first" or "so far" has a meaning</td><td>orders by date, or by amount</td></tr>
-    <tr><td><code>ROWS BETWEEN … AND …</code></td><td>Of the rows in my group, which ones around the current row enter the calculation? This is the <span class="k-teal">window</span></td><td>the current order and the two before it</td></tr>
+  <h3>Le tre parti di OVER</h3>
+  <p>Ciò che sta dentro le parentesi di OVER decide quali righe guarda ogni calcolo. Le parti sono al massimo tre, e ciascuna risponde a una domanda.</p>
+  <div class="scroll"><table><thead><tr><th>Parte</th><th>Domanda a cui risponde</th><th>Nell'esempio</th></tr></thead><tbody>
+    <tr><td><code>PARTITION BY</code></td><td>Quali righe formano il mio gruppo? Ogni partizione si calcola per conto suo, come un gruppo in GROUP BY</td><td>una partizione per cliente</td></tr>
+    <tr><td><code>ORDER BY</code></td><td>In che ordine stanno le righe dentro il gruppo? Serve ogni volta che «precedente», «primo» o «fino a qui» hanno un significato</td><td>ordini per data, o per importo</td></tr>
+    <tr><td><code>ROWS BETWEEN … AND …</code></td><td>Delle righe del mio gruppo, quali intorno alla riga corrente entrano nel calcolo? È la <span class="k-teal">finestra</span> (window)</td><td>l'ordine corrente e i due prima</td></tr>
   </tbody></table></div>
-  <p>All three are optional. With nothing in the brackets, <code>SUM(TotalAmount) OVER ()</code>, the group is the whole table and every row gets the grand total, 13595.5. With PARTITION BY alone, as above, every row gets the total of its own customer.</p>
-  <p>The window is described by its two edges, counted from the current row. <code>UNBOUNDED PRECEDING</code> is the first row of the partition and <code>UNBOUNDED FOLLOWING</code> the last; <code>n PRECEDING</code> and <code>n FOLLOWING</code> are n rows before or after the current one; <code>CURRENT ROW</code> is the row itself. Two windows cover most uses. <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> is "this row and the two before", a window that slides down with the current row. <code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> is "from the first row up to this one", a window that keeps growing.</p>
+  <p>Tutte e tre sono facoltative. Con niente fra le parentesi, <code>SUM(TotalAmount) OVER ()</code>, il gruppo è l'intera tabella e ogni riga riceve il totale generale, 13.595,5. Con il solo PARTITION BY, come sopra, ogni riga riceve il totale del proprio cliente.</p>
+  <p>La finestra si descrive con i suoi due estremi, contati a partire dalla riga corrente. <code>UNBOUNDED PRECEDING</code> è la prima riga della partizione e <code>UNBOUNDED FOLLOWING</code> l'ultima; <code>n PRECEDING</code> e <code>n FOLLOWING</code> sono n righe prima o dopo quella corrente; <code>CURRENT ROW</code> è la riga stessa. Due finestre coprono la maggior parte degli usi. <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> vuol dire «questa riga e le due prima», una finestra che scorre verso il basso insieme alla riga corrente. <code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> vuol dire «dalla prima riga fino a questa», una finestra che continua a crescere.</p>
 
-  <h3>Four functions, four questions</h3>
-  <p>The figure applies four analytical functions to the same orders, always partitioned by customer. Each answers a different question.</p>
+  <h3>Quattro funzioni, quattro domande</h3>
+  <p>La figura applica quattro funzioni analitiche agli stessi ordini, sempre partizionati per cliente. Ciascuna risponde a una domanda diversa.</p>
   <figure>
     <div class="w" id="b3win"></div>
-    <figcaption>Four functions on the orders of the lecture's examples, partitioned by customer. ROW_NUMBER numbers each customer's orders from the largest; LAG(TotalAmount, 1, 0) copies the previous amount (arrows), or 0 if there is none; the last two panels mark in teal the window used for one row.</figcaption>
+    <figcaption>Quattro funzioni sugli ordini degli esempi della lezione, partizionati per cliente. ROW_NUMBER numera gli ordini di ogni cliente dal più grande; LAG(TotalAmount, 1, 0) copia l'importo precedente (frecce), oppure 0 se non c'è; gli ultimi due riquadri segnano in verde acqua la finestra usata per una riga.</figcaption>
   </figure>
-  <p><code>ROW_NUMBER()</code> answers "which is each customer's largest order?". With <code>ORDER BY TotalAmount DESC</code> it numbers the orders of each customer from the largest, starting again from 1 at every new customer; keeping the rows with rn = 1 leaves one order per customer, the largest.</p>
-  <p><code>LAG(TotalAmount, 1, 0)</code> answers "how much was the previous order?". With <code>ORDER BY OrderDate</code> it copies the amount from 1 row before, and puts the default 0 on the first order of each customer, which has no previous one. <code>LEAD</code> does the same looking ahead.</p>
-  <p><code>AVG</code> with <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> answers "what is the average of the last three orders?", a moving average. Anders has two orders on 5 July, and the slide lists 1813 before 670.8; this page keeps that order. For his third order, 670.8, the window holds his first three orders:</p>
+  <p><code>ROW_NUMBER()</code> risponde a «qual è l'ordine più grande di ogni cliente?». Con <code>ORDER BY TotalAmount DESC</code> numera gli ordini di ogni cliente dal più grande, ripartendo da 1 a ogni nuovo cliente; tenendo le righe con rn = 1 resta un ordine per cliente, il più grande.</p>
+  <p><code>LAG(TotalAmount, 1, 0)</code> risponde a «quanto valeva l'ordine precedente?». Con <code>ORDER BY OrderDate</code> copia l'importo di 1 riga prima, e mette il valore predefinito 0 sul primo ordine di ogni cliente, che non ha un precedente. <code>LEAD</code> fa lo stesso guardando in avanti.</p>
+  <p><code>AVG</code> con <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> risponde a «qual è la media degli ultimi tre ordini?», una media mobile. Anders ha due ordini il 5 luglio, e la slide elenca 1813 prima di 670,8; questa pagina mantiene quell'ordine. Per il suo terzo ordine, 670,8, la finestra contiene i suoi primi tre ordini:</p>
 <pre class="code">AVG(TotalAmount) <span class="k-teal">OVER (PARTITION BY customerid ORDER BY OrderDate
                      ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)</span></pre>
-  <div class="eq">\[ \frac{440 + 1813 + 670.8}{3} = 974.6 \]</div>
-  <p><code>SUM</code> with <code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> answers "how much has the customer spent so far?", a running total: on each order, the sum of all that customer's orders up to that date.</p>
-  <p><strong>GROUP BY answers with one row per group; an analytical function answers on every row, and OVER says which rows to look at.</strong></p>
+  <div class="eq">\[ \frac{440 + 1813 + 670{,}8}{3} = 974{,}6 \]</div>
+  <p><code>SUM</code> con <code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> risponde a «quanto ha speso il cliente finora?», un totale progressivo: su ogni ordine, la somma di tutti gli ordini di quel cliente fino a quella data.</p>
+  <p><strong>GROUP BY risponde con una riga per gruppo; una funzione analitica risponde su ogni riga, e OVER dice quali righe guardare.</strong></p>
   <div class="quiz inq" data-quiz="3b"></div>
 </div></section>
 
 <section class="recap"><div class="col">
-  <h2>Lesson 3 at a glance</h2>
-  <p>The definitions and ideas of this lesson in one place, to review before the quiz.</p>
-  <h3>Combining tables</h3>
-  <div class="scroll"><table><thead><tr><th>Operator</th><th>What it returns</th></tr></thead><tbody>
-    <tr><td>Cartesian product</td><td>All the combinations of rows of two tables, the intermediate result of FROM; the starting point of every join</td></tr>
-    <tr><td>CROSS JOIN</td><td>The whole cartesian product</td></tr>
-    <tr><td>INNER JOIN</td><td>Only the pairs of rows where the ON predicate is true</td></tr>
-    <tr><td>LEFT, RIGHT, FULL OUTER JOIN</td><td>The inner join plus the rows without a partner, padded with NULL: every row of the first table (LEFT), of the second (RIGHT), of both (FULL)</td></tr>
-    <tr><td>UNION</td><td>The rows of two SELECTs with the same columns, one under the other, without duplicates; joins add columns, UNION adds rows</td></tr>
-    <tr><td>UNION ALL</td><td>The same, keeping duplicates; faster when the results cannot overlap</td></tr>
+  <h2>La lezione 3 in sintesi</h2>
+  <p>Le definizioni e le idee di questa lezione in un solo posto, da ripassare prima del quiz.</p>
+  <h3>Combinare tabelle</h3>
+  <div class="scroll"><table><thead><tr><th>Operatore</th><th>Che cosa restituisce</th></tr></thead><tbody>
+    <tr><td>Prodotto cartesiano</td><td>Tutte le combinazioni delle righe di due tabelle, il risultato intermedio di FROM; il punto di partenza di ogni join</td></tr>
+    <tr><td>CROSS JOIN</td><td>L'intero prodotto cartesiano</td></tr>
+    <tr><td>INNER JOIN</td><td>Solo le coppie di righe in cui il predicato dopo ON è vero</td></tr>
+    <tr><td>LEFT, RIGHT, FULL OUTER JOIN</td><td>L'inner join più le righe senza partner, completate con NULL: ogni riga della prima tabella (LEFT), della seconda (RIGHT), di entrambe (FULL)</td></tr>
+    <tr><td>UNION</td><td>Le righe di due SELECT con le stesse colonne, una sotto l'altra, senza duplicati; i join aggiungono colonne, UNION aggiunge righe</td></tr>
+    <tr><td>UNION ALL</td><td>Lo stesso, tenendo i duplicati; più veloce quando i risultati non possono sovrapporsi</td></tr>
   </tbody></table></div>
-  <h3>Missing values, groups and subqueries</h3>
-  <div class="scroll"><table><thead><tr><th>Concept</th><th>In short</th></tr></thead><tbody>
-    <tr><td>Three-valued logic</td><td>Any comparison with NULL, another NULL included, is UNKNOWN; ON, WHERE and HAVING keep only TRUE, so UNKNOWN rows are dropped</td></tr>
-    <tr><td>IS NULL, COALESCE</td><td>Test missing values with IS NULL or IS NOT NULL, never = NULL; COALESCE(x, value) replaces a NULL</td></tr>
-    <tr><td>Aggregate functions</td><td>SUM, MIN, MAX, AVG, COUNT, STDEV, STDEVP, VAR, VARP: many rows into one value; they ignore NULLs, except COUNT(*), which counts rows; COUNT(DISTINCT x) counts different values</td></tr>
-    <tr><td>GROUP BY</td><td>One output row per unique combination of the grouping columns; after grouping the detail rows are lost</td></tr>
-    <tr><td>WHERE vs HAVING</td><td>WHERE filters rows before aggregation; HAVING filters groups after GROUP BY and can test an aggregate</td></tr>
-    <tr><td>Subquery</td><td>A query nested in another, used like an expression; it returns a value (scalar), a list or a table</td></tr>
-    <tr><td>Self-contained vs correlated</td><td>Self-contained: independent of the outer query, runs once; correlated: uses values of the outer query's current row, runs once per row</td></tr>
-    <tr><td>EXISTS, NOT EXISTS</td><td>TRUE if the subquery returns at least one row (or none, for NOT EXISTS)</td></tr>
+  <h3>Valori mancanti, gruppi e sottoquery</h3>
+  <div class="scroll"><table><thead><tr><th>Concetto</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>Logica a tre valori</td><td>Qualunque confronto con NULL, un altro NULL compreso, è UNKNOWN; ON, WHERE e HAVING tengono solo TRUE, quindi le righe UNKNOWN vengono scartate</td></tr>
+    <tr><td>IS NULL, COALESCE</td><td>I valori mancanti si verificano con IS NULL o IS NOT NULL, mai con = NULL; COALESCE(x, valore) sostituisce un NULL</td></tr>
+    <tr><td>Funzioni di aggregazione</td><td>SUM, MIN, MAX, AVG, COUNT, STDEV, STDEVP, VAR, VARP: molte righe in un solo valore; ignorano i NULL, tranne COUNT(*), che conta le righe; COUNT(DISTINCT x) conta i valori diversi</td></tr>
+    <tr><td>GROUP BY</td><td>Una riga di risultato per ogni combinazione distinta delle colonne di raggruppamento; dopo il raggruppamento le righe di dettaglio sono perse</td></tr>
+    <tr><td>WHERE e HAVING</td><td>WHERE filtra le righe prima dell'aggregazione; HAVING filtra i gruppi dopo GROUP BY e può verificare un'aggregazione</td></tr>
+    <tr><td>Sottoquery</td><td>Una query annidata in un'altra, usata come un'espressione; restituisce un valore (scalare), un elenco o una tabella</td></tr>
+    <tr><td>Indipendente e correlata</td><td>Indipendente: non dipende dalla query esterna, viene eseguita una volta; correlata: usa valori della riga corrente della query esterna, viene eseguita una volta per riga</td></tr>
+    <tr><td>EXISTS, NOT EXISTS</td><td>TRUE se la sottoquery restituisce almeno una riga (o nessuna, per NOT EXISTS)</td></tr>
   </tbody></table></div>
-  <h3>Analytical (window) functions</h3>
-  <div class="scroll"><table><thead><tr><th>Element</th><th>In short</th></tr></thead><tbody>
-    <tr><td>Idea</td><td>Compute over groups of rows but keep every row, adding the result as a new column</td></tr>
-    <tr><td>OVER (PARTITION BY … ORDER BY …)</td><td>PARTITION BY splits the rows into partitions; ORDER BY orders the rows inside each; OVER () uses all the rows</td></tr>
-    <tr><td>Window</td><td>The rows around the current one that enter the calculation: UNBOUNDED PRECEDING, n PRECEDING, CURRENT ROW, n FOLLOWING, UNBOUNDED FOLLOWING</td></tr>
-    <tr><td>ROW_NUMBER</td><td>Numbers the rows of each partition; keeping number 1 finds, say, each customer's largest order</td></tr>
-    <tr><td>LAG, LEAD</td><td>The value n rows before or after the current one, with a default when there is none</td></tr>
-    <tr><td>Moving average, running total</td><td>AVG over ROWS BETWEEN 2 PRECEDING AND CURRENT ROW; SUM from UNBOUNDED PRECEDING</td></tr>
+  <h3>Funzioni analitiche (funzioni finestra)</h3>
+  <div class="scroll"><table><thead><tr><th>Elemento</th><th>In breve</th></tr></thead><tbody>
+    <tr><td>Idea</td><td>Calcolare su gruppi di righe ma tenere ogni riga, aggiungendo il risultato come nuova colonna</td></tr>
+    <tr><td>OVER (PARTITION BY … ORDER BY …)</td><td>PARTITION BY divide le righe in partizioni; ORDER BY ordina le righe dentro ciascuna; OVER () usa tutte le righe</td></tr>
+    <tr><td>Finestra</td><td>Le righe intorno a quella corrente che entrano nel calcolo: UNBOUNDED PRECEDING, n PRECEDING, CURRENT ROW, n FOLLOWING, UNBOUNDED FOLLOWING</td></tr>
+    <tr><td>ROW_NUMBER</td><td>Numera le righe di ogni partizione; tenere il numero 1 trova, per esempio, l'ordine più grande di ogni cliente</td></tr>
+    <tr><td>LAG, LEAD</td><td>Il valore n righe prima o dopo quella corrente, con un valore predefinito quando non c'è</td></tr>
+    <tr><td>Media mobile, totale progressivo</td><td>AVG su ROWS BETWEEN 2 PRECEDING AND CURRENT ROW; SUM da UNBOUNDED PRECEDING</td></tr>
   </tbody></table></div>
 </div></section>
 
 <section><div class="col">
-  <h2>Test yourself</h2>
+  <h2>Mettiti alla prova</h2>
   <div class="quiz" data-quiz="3"></div>
 </div></section>
 
 <section><div class="col">
-  <p>If only one thing from this lesson stays with you: <strong>joins and unions rebuild what normalization split, GROUP BY collapses rows into groups, and window functions compute over groups while keeping every row.</strong></p>
-  <p>Lesson 4 leaves the single relational server behind: what changes when the data no longer fit in one machine or in one table.</p>
-  <nav class="navend" aria-label="Other lessons"></nav>
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>join e union ricostruiscono ciò che la normalizzazione ha diviso, GROUP BY fa collassare le righe in gruppi, e le funzioni finestra calcolano sui gruppi tenendo ogni riga.</strong></p>
+  <p>La lezione 4 lascia alle spalle il singolo server relazionale: che cosa cambia quando i dati non stanno più in una macchina sola o in una tabella sola.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
 </div></section>
 </article>

@@ -22,6 +22,7 @@ async def main():
     shots=len(sys.argv)>1 and sys.argv[1]=='shots'; os.makedirs(SHOTS,exist_ok=True)
     threading.Thread(target=serve,daemon=True).start()
     subs=sorted(d for d in os.listdir(SITE) if os.path.exists(os.path.join(SITE,d,'index.html')))
+    subs+=sorted(d+'/'+v for d in subs for v in os.listdir(os.path.join(SITE,d)) if os.path.exists(os.path.join(SITE,d,v,'index.html')))
     bad=0
     async with async_playwright() as p:
         b=await p.chromium.launch()
@@ -53,7 +54,7 @@ async def main():
                         await pg.evaluate("document.querySelectorAll('details').forEach(d=>d.open=true)")
                         figs=pg.locator(sel+' figure')
                         for i in range(await figs.count()):
-                            await figs.nth(i).scroll_into_view_if_needed();await figs.nth(i).screenshot(path=os.path.join(SHOTS,'%s_L%d_f%02d.png'%(s,k,i)))
+                            await figs.nth(i).scroll_into_view_if_needed();await figs.nth(i).screenshot(path=os.path.join(SHOTS,'%s_L%d_f%02d.png'%(s.replace('/','-'),k,i)))
                     await pg.close()
         await b.close()
     print('PROBLEMI:',bad)

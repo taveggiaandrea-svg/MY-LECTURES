@@ -44,36 +44,77 @@ def katex_assets():
     elif not os.path.isdir(dst):
         sys.exit('Manca KaTeX: passare la cartella dist di katex@0.16.9 come argomento.')
 
-def lessons_of(mid):
-    d = os.path.join(HERE, 'materie', mid, 'lezioni')
+def lessons_of(src):
+    d = os.path.join(src, 'lezioni')
     return sorted((int(re.match(r'l(\d+)\.html$', f).group(1)) for f in os.listdir(d) if re.match(r'l\d+\.html$', f)))
 
-def build_subject(mid):
-    meta = json.loads(rd('materie', mid, 'materia.json'))
-    nums = lessons_of(mid)
-    body = rd('materie', mid, 'top.html')
+def variants_of(mid):
+    """Altre lingue della materia: sottocartelle di due lettere con una propria cartella lezioni/ (per esempio materie/bigdata/en/)."""
+    base = os.path.join(HERE, 'materie', mid)
+    return sorted(d for d in os.listdir(base) if re.fullmatch(r'[a-z]{2}', d) and os.path.isdir(os.path.join(base, d, 'lezioni')))
+
+def lang_bar(mid, cur, langs):
+    """Selettore di lingua nella barra superiore. langs: [(codice, nome, percorso relativo dalla pagina corrente)]."""
+    if len(langs) < 2:
+        return ''
+    links = ''.join('<a href="%s" data-lang="%s" data-mid="%s"%s>%s</a>' % (href, code, mid, ' aria-current="true"' if code == cur else '', name)
+                    for code, name, href in langs)
+    return '<div class="lang" role="group" aria-label="Lingua / Language">' + links + '</div>\n  '
+
+def lang_redirect(mid, cur, langs):
+    """Nel <head>: se l'utente ha scelto un'altra lingua per questa materia, apre subito quella pagina, alla stessa lezione."""
+    if len(langs) < 2:
+        return ''
+    m = ','.join("%s:'%s'" % (code, href) for code, _, href in langs)
+    return ("<script>try{var p=localStorage.getItem('lingua-%s'),m={%s};"
+            "if(p&&p!=='%s'&&m[p])location.replace(m[p]+location.hash)}catch(e){}</script>\n") % (mid, m, cur)
+
+def build_page(mid, meta, src, out, up, cur, langs):
+    """Costruisce una pagina della materia dalla cartella src (la materia o una sua lingua) in site/<out>/.
+    I file che una lingua non ha (miniature, componenti, stile) vengono presi dalla cartella principale della materia."""
+    main = os.path.join(HERE, 'materie', mid)
+    pick = lambda *p: os.path.join(src, *p) if os.path.exists(os.path.join(src, *p)) else os.path.join(main, *p)
+    rf = lambda path: open(path, encoding='utf-8').read()
+    nums = lessons_of(src)
+    body = rf(pick('top.html'))
+    body = body.replace('<button class="tog"', lang_bar(mid, cur, langs) + '<button class="tog"', 1)
     for n in nums:
-        body += '<!-- ===================== LEZIONE %d ===================== -->\n' % n + rd('materie', mid, 'lezioni', 'l%d.html' % n)
-    body += rd('materie', mid, 'foot.html')
-    css = os.path.join(HERE, 'materie', mid, 'style.css')
+        body += '<!-- ===================== LEZIONE %d ===================== -->\n' % n + rf(os.path.join(src, 'lezioni', 'l%d.html' % n))
+    body += rf(pick('foot.html'))
+    css = pick('style.css')
     extra = '<link rel="stylesheet" href="style.css">\n' if os.path.exists(css) else ''
     if extra:
-        write(os.path.join(SITE, mid, 'style.css'), open(css, encoding='utf-8').read())
-    page = (head(meta['titolo'], '../', meta.get('lingua', 'it'), extra) + body +
-            '<script src="../assets/katex/katex.min.js"></script>\n'
-            '<script src="../assets/katex/contrib/auto-render.min.js"></script>\n'
+        write(os.path.join(SITE, out, 'style.css'), rf(css))
+    extra += lang_redirect(mid, cur, langs)
+    page = (head(meta['titolo'], up, meta.get('lingua', 'it'), extra) + body +
+            '<script src="' + up + 'assets/katex/katex.min.js"></script>\n'
+            '<script src="' + up + 'assets/katex/contrib/auto-render.min.js"></script>\n'
             '<script src="app.js"></script>\n</body>\n</html>\n')
     js = [rd('shared', 'core.js')]
     for f in ('macro.js', 'thumbs.js', 'shared.js'):
-        p = os.path.join(HERE, 'materie', mid, 'js', f)
+        p = pick('js', f)
         if os.path.exists(p):
-            js.append(open(p, encoding='utf-8').read())
-    js += [rd('materie', mid, 'js', 'l%d.js' % n) for n in nums if os.path.exists(os.path.join(HERE, 'materie', mid, 'js', 'l%d.js' % n))]
+            js.append(rf(p))
+    js += [rf(os.path.join(src, 'js', 'l%d.js' % n)) for n in nums if os.path.exists(os.path.join(src, 'js', 'l%d.js' % n))]
     js.append(rd('shared', 'boot.js'))
     js.append(rd('shared', 'topgrid.js'))
-    write(os.path.join(SITE, mid, 'index.html'), page)
-    write(os.path.join(SITE, mid, 'app.js'), '(function(){\n' + '\n'.join(js) + '\n})();\n')
-    titles = [re.search(r'data-title="([^"]*)"', rd('materie', mid, 'lezioni', 'l%d.html' % n)).group(1) for n in nums]
+    write(os.path.join(SITE, out, 'index.html'), page)
+    write(os.path.join(SITE, out, 'app.js'), '(function(){\n' + '\n'.join(js) + '\n})();\n')
+    titles = [re.search(r'data-title="([^"]*)"', rf(os.path.join(src, 'lezioni', 'l%d.html' % n))).group(1) for n in nums]
+    return nums, titles
+
+def build_subject(mid):
+    meta = json.loads(rd('materie', mid, 'materia.json'))
+    main = os.path.join(HERE, 'materie', mid)
+    cur = meta.get('lingua', 'it')
+    vars_ = [(v, dict(meta, **json.loads(rd('materie', mid, v, 'materia.json'))) if os.path.exists(os.path.join(main, v, 'materia.json')) else dict(meta, lingua=v))
+             for v in variants_of(mid)]
+    codes = [(cur, meta.get('nome_lingua', cur.upper()), '')] + [(v, m.get('nome_lingua', v.upper()), v + '/') for v, m in vars_]
+    # percorsi relativi: dalla pagina principale './' e 'en/'; da una lingua '../' e './'
+    rel = lambda here: [(c, n, ('./' if p == here else (p if here == '' else '../' + p))) for c, n, p in codes]
+    nums, titles = build_page(mid, meta, main, mid, '../', cur, rel(''))
+    for v, m in vars_:
+        build_page(mid, m, os.path.join(main, v), os.path.join(mid, v), '../../', v, rel(v + '/'))
     return meta, nums, titles
 
 def thumb_svg(mid, k):
