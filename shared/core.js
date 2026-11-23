@@ -93,17 +93,25 @@ function player(host,dur,onFrame){
   sc.addEventListener('input',()=>{stop();pos=+sc.value;show()});
   show();return {stop,play,seek(k){stop();pos=k;show()}};
 }
-/* quiz a scelta multipla: si sceglie, poi «Verifica» */
+/* quiz a scelta multipla: si sceglie, poi «Verifica».
+   La risposta verificata resta salvata in questo browser (localStorage) e alla visita successiva ricompare già verificata;
+   la chiave contiene materia, quiz e domanda, più un'impronta del testo, così una domanda riscritta non eredita la vecchia risposta. */
+const quizKey=(root,i,q)=>{let h=5381;for(const c of q.q+'|'+q.o.join('|'))h=(h*33^c.charCodeAt(0))>>>0;
+  return 'quiz|'+(location.pathname.split('/').filter(Boolean)[0]||'')+'|'+(root.dataset.quiz||'')+'|'+i+'|'+h.toString(36)};
 function quiz(root,qs){
-  qs.forEach(q=>{
+  qs.forEach((q,qi)=>{
     const box=el('div','q');box.append(el('p','',q.q));
     const opts=el('div','opts'),fb=el('div','fb'),chk=btn(UI.check);chk.classList.add('solid','chk');fb.setAttribute('aria-live','polite');
-    let sel=null;
+    let sel=null;const key=quizKey(root,qi,q);
     const bsq=q.o.map((t,i)=>{const b=btn(t,true);b.onclick=()=>{sel=i;bsq.forEach((x,j)=>{press(x,j===i);x.classList.remove('right','wrong')});fb.innerHTML=''};opts.append(b);return b});
-    chk.onclick=()=>{if(sel===null){fb.innerHTML=UI.pickFirst;return}
-      press(bsq[sel],false);bsq[sel].classList.add(sel===q.a?'right':'wrong');
-      fb.innerHTML=sel===q.a?'<b>'+UI.right+'</b> '+q.e:'<b>'+UI.wrong+'</b> '+q.h};
+    const verify=save=>{if(sel===null){fb.innerHTML=UI.pickFirst;return}
+      press(bsq[sel],false);bsq[sel].classList.add(sel===q.a?'right':'wrong');box.classList.add('done');
+      fb.innerHTML=sel===q.a?'<b>'+UI.right+'</b> '+q.e:'<b>'+UI.wrong+'</b> '+q.h;
+      if(save)try{localStorage.setItem(key,String(sel))}catch(e){}};
+    chk.onclick=()=>verify(true);
     box.append(opts,chk,fb);root.append(box);
+    let v=null;try{v=localStorage.getItem(key)}catch(e){}
+    if(v!==null&&+v>=0&&+v<bsq.length){sel=+v;verify(false)}
   });
 }
 const INIT={},QZ={},THUMB={};

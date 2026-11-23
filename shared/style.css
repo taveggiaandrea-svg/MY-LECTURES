@@ -273,3 +273,9 @@ html::-webkit-scrollbar-thumb:hover{background:var(--fg)}
 .dqa{white-space:pre-wrap;color:var(--gray);font-size:.92rem;margin-top:.5rem}
 .dq .btn{font-size:.85rem;min-height:2rem;padding:.35rem .7rem}
 .domlink{font-family:var(--sans);margin-top:1.4rem}
+/* avanzamento della lezione accanto al cursore della barra di scorrimento */
+.prog{position:fixed;right:6px;z-index:25;font:500 .78rem/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--fg);
+  background:color-mix(in srgb,var(--band) 82%,transparent);border:1px solid var(--frame);border-radius:999px;padding:.38rem .55rem;
+  pointer-events:none;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:top .08s linear}
+.prog.low{top:auto;right:auto;left:14px;bottom:14px}
+.prog[hidden]{display:none}
