@@ -473,15 +473,56 @@ WHERE o.orderdate = (SELECT MAX(orderdate) FROM Orders o2
 
 <section><div class="col">
   <h2>Aggregating without losing the rows</h2>
-  <p>GROUP BY collapses rows. <strong>Analytical functions</strong> compute over groups of rows but keep every row, adding the result as a new column. They use the <span class="k-teal">OVER</span> clause, made of PARTITION BY, which splits the rows into partitions (one per customer, say), and ORDER BY, which orders the rows inside each partition.</p>
-  <p>On top of that you can set a <span class="k-teal">window</span>: which rows around the current one enter the calculation. <code>UNBOUNDED PRECEDING</code> starts at the first row of the partition, <code>n PRECEDING</code> n rows before the current one, <code>CURRENT ROW</code> at the current row; <code>n FOLLOWING</code> and <code>UNBOUNDED FOLLOWING</code> look ahead.</p>
+  <p>Start from a question GROUP BY cannot answer well: next to each order, how much has that customer spent in total, and what share of it is this order? GROUP BY gives you the totals, but only one row per customer, and the single orders are gone.</p>
+<pre class="code">SELECT customerid, SUM(TotalAmount) AS CustomerTotal
+FROM Orders
+GROUP BY customerid;</pre>
+  <div class="scroll"><table class="tight"><thead><tr><th>name</th><th class="n">CustomerTotal</th></tr></thead><tbody>
+    <tr><td>Anders</td><td class="n">4066.8</td></tr>
+    <tr><td>Trujillo</td><td class="n">9528.7</td></tr>
+  </tbody></table></div>
+  <p>An <strong>analytical function</strong>, also called a window function, does the same sum but does not collapse anything: every order stays, and the result is added as a new column. You recognize it by the keyword <span class="k-teal">OVER</span> after the function.</p>
+<pre class="code">SELECT customerid, OrderDate, TotalAmount,
+       SUM(TotalAmount) <span class="k-teal">OVER (PARTITION BY customerid)</span> AS CustomerTotal
+FROM Orders;</pre>
+  <div class="scroll"><table class="tight"><thead><tr><th>name</th><th>date</th><th class="n">amount</th><th class="n">CustomerTotal</th><th class="n">share</th></tr></thead><tbody>
+    <tr><td>Anders</td><td>07-04</td><td class="n">440</td><td class="n">4066.8</td><td class="n">11%</td></tr>
+    <tr><td>Anders</td><td>07-05</td><td class="n">1813</td><td class="n">4066.8</td><td class="n">45%</td></tr>
+    <tr><td>Anders</td><td>07-05</td><td class="n">670.8</td><td class="n">4066.8</td><td class="n">16%</td></tr>
+    <tr><td>Anders</td><td>07-08</td><td class="n">625.2</td><td class="n">4066.8</td><td class="n">15%</td></tr>
+    <tr><td>Anders</td><td>07-15</td><td class="n">517.8</td><td class="n">4066.8</td><td class="n">13%</td></tr>
+    <tr><td>Trujillo</td><td>07-04</td><td class="n">1863.4</td><td class="n">9528.7</td><td class="n">20%</td></tr>
+    <tr><td>Trujillo</td><td>07-06</td><td class="n">3730</td><td class="n">9528.7</td><td class="n">39%</td></tr>
+    <tr><td>Trujillo</td><td>07-07</td><td class="n">1444.8</td><td class="n">9528.7</td><td class="n">15%</td></tr>
+    <tr><td>Trujillo</td><td>07-09</td><td class="n">2490.5</td><td class="n">9528.7</td><td class="n">26%</td></tr>
+  </tbody></table></div>
+  <p>Same orders as the lecture's examples. The share column, amount divided by CustomerTotal, is added on this page to show what the extra column makes possible: a calculation that needs both the single row and its group.</p>
+  <p class="stmt"><strong>Analytical function.</strong> A function that computes over a group of rows, like an aggregate, but returns one value for every row instead of one value per group.</p>
+
+  <h3>The three parts of OVER</h3>
+  <p>What goes inside the brackets of OVER decides which rows each calculation looks at. There are up to three parts, and each answers one question.</p>
+  <div class="scroll"><table><thead><tr><th>Part</th><th>Question it answers</th><th>In the example</th></tr></thead><tbody>
+    <tr><td><code>PARTITION BY</code></td><td>Which rows form my group? Each partition is computed on its own, like a group in GROUP BY</td><td>one partition per customer</td></tr>
+    <tr><td><code>ORDER BY</code></td><td>In what order are the rows inside the group? Needed whenever "previous", "first" or "so far" has a meaning</td><td>orders by date, or by amount</td></tr>
+    <tr><td><code>ROWS BETWEEN … AND …</code></td><td>Of the rows in my group, which ones around the current row enter the calculation? This is the <span class="k-teal">window</span></td><td>the current order and the two before it</td></tr>
+  </tbody></table></div>
+  <p>All three are optional. With nothing in the brackets, <code>SUM(TotalAmount) OVER ()</code>, the group is the whole table and every row gets the grand total, 13595.5. With PARTITION BY alone, as above, every row gets the total of its own customer.</p>
+  <p>The window is described by its two edges, counted from the current row. <code>UNBOUNDED PRECEDING</code> is the first row of the partition and <code>UNBOUNDED FOLLOWING</code> the last; <code>n PRECEDING</code> and <code>n FOLLOWING</code> are n rows before or after the current one; <code>CURRENT ROW</code> is the row itself. Two windows cover most uses. <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> is "this row and the two before", a window that slides down with the current row. <code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> is "from the first row up to this one", a window that keeps growing.</p>
+
+  <h3>Four functions, four questions</h3>
+  <p>The figure applies four analytical functions to the same orders, always partitioned by customer. Each answers a different question.</p>
   <figure>
     <div class="w" id="b3win"></div>
     <figcaption>Four functions on the orders of the lecture's examples, partitioned by customer. ROW_NUMBER numbers each customer's orders from the largest; LAG(TotalAmount, 1, 0) copies the previous amount (arrows), or 0 if there is none; the last two panels mark in teal the window used for one row.</figcaption>
   </figure>
-  <p>The moving average uses <code>AVG(TotalAmount) OVER (PARTITION BY customerid ORDER BY OrderDate ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)</code>. Anders has two orders on 5 July, and the slide lists 1813 before 670.8; this page keeps that order. For his third order, 670.8, the window holds his first three orders:</p>
+  <p><code>ROW_NUMBER()</code> answers "which is each customer's largest order?". With <code>ORDER BY TotalAmount DESC</code> it numbers the orders of each customer from the largest, starting again from 1 at every new customer; keeping the rows with rn = 1 leaves one order per customer, the largest.</p>
+  <p><code>LAG(TotalAmount, 1, 0)</code> answers "how much was the previous order?". With <code>ORDER BY OrderDate</code> it copies the amount from 1 row before, and puts the default 0 on the first order of each customer, which has no previous one. <code>LEAD</code> does the same looking ahead.</p>
+  <p><code>AVG</code> with <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> answers "what is the average of the last three orders?", a moving average. Anders has two orders on 5 July, and the slide lists 1813 before 670.8; this page keeps that order. For his third order, 670.8, the window holds his first three orders:</p>
+<pre class="code">AVG(TotalAmount) <span class="k-teal">OVER (PARTITION BY customerid ORDER BY OrderDate
+                     ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)</span></pre>
   <div class="eq">\[ \frac{440 + 1813 + 670.8}{3} = 974.6 \]</div>
-  <p>The running total uses SUM from <code>UNBOUNDED PRECEDING</code>. <code>SUM(TotalAmount) OVER ()</code>, with nothing in the brackets, puts the grand total 13595.5 on every row; <code>OVER (PARTITION BY customerid)</code> puts each customer's total instead, 4066.8 for Anders and 9528.7 for Trujillo. With ROW_NUMBER ordered by TotalAmount descending, keeping rn = 1 finds each customer's largest order. <code>LEAD</code> works like LAG but looks n rows ahead.</p>
+  <p><code>SUM</code> with <code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> answers "how much has the customer spent so far?", a running total: on each order, the sum of all that customer's orders up to that date.</p>
+  <p><strong>GROUP BY answers with one row per group; an analytical function answers on every row, and OVER says which rows to look at.</strong></p>
   <div class="quiz inq" data-quiz="3b"></div>
 </div></section>
 
