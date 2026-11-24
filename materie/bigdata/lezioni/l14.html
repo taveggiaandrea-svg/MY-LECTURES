@@ -1,0 +1,143 @@
+<article class="lesson" data-n="14" data-docente="L. Molteni" id="lezione-14" data-title="Quando ci si può fidare di un modello?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 14 · L. Molteni, slide</p>
+  <h1>Quando ci si può fidare di un modello?</h1>
+  <p class="desc">Due casi completi in KNIME: tre modelli ad albero che prevedono le cancellazioni degli hotel, e un modello di abbandono per una banca che sembrava quasi perfetto finché non si sono trovate le colonne che conoscevano già la risposta.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nelle lezioni 11, 12 e 13 hai visto i pezzi uno alla volta: preparare i dati, valutare un modello, capire come funzionano alberi e insiemi di alberi. Questa lezione li mette insieme in due casi dall'inizio alla fine. Il primo chiude il caso delle prenotazioni alberghiere. Il secondo, l'abbandono dei clienti di una banca, insegna la cosa più importante di tutte: diffidare dei risultati troppo belli.</p>
+  <h2>Le prenotazioni: tre modelli, una scelta</h2>
+  <p>Riprendi la tabella preparata nella lezione 11: 119.203 prenotazioni, 31 predittori e il target <em>canceled</em> (Yes o No), con il 37,1% di cancellazioni. La divisione è stratificata 70/30 con seme fisso 42: 83.442 righe di addestramento e 35.761 di test, entrambe con il 37,1% di cancellazioni. Il seme fisso dà la stessa divisione a ogni esecuzione, quindi i modelli si possono confrontare. Le regole di preparazione non usano il target, quindi applicarle prima della divisione non fa trapelare informazione.</p>
+  <p>I tre modelli sono quelli della lezione 13. L'<strong>albero di decisione</strong> usa il Gini, la potatura MDL e almeno 20 prenotazioni per nodo; è leggibile e rapido, ma instabile. La <strong>random forest</strong> (Tree Ensemble Learner) usa 100 alberi profondi su campioni bootstrap, con \(\sqrt{p}\) variabili per nodo: ogni albero è rumoroso, ma gli errori di alberi diversi sono poco correlati e la media taglia la varianza. Le slide notano che il nodo semplificato Random Forest Learner arrivava solo al 78% di accuratezza, mentre il Tree Ensemble Learner, che espone tutte le opzioni, arriva all'88%. Il <strong>gradient boosting</strong> usa 200 alberi di profondità 6 con tasso di apprendimento 0,1 e \(\sqrt{p}\) colonne campionate per albero.</p>
+  <figure>
+    <div class="w" id="b14cm"></div>
+    <figcaption>Le matrici di confusione dei tre modelli sulle 35.761 prenotazioni di test, con i numeri delle slide. Righe: classe vera; colonne: classe prevista; positiva è la cancellazione (Yes). Delle 13.258 cancellazioni vere, la random forest ne trova 10.293 e dà meno falsi allarmi degli altri due.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Modello</th><th>Accuratezza</th><th>κ di Cohen</th><th>Sensibilità (Yes)</th><th>Precisione (Yes)</th><th>Specificità</th><th>F1 (Yes)</th><th>AUC</th></tr></thead><tbody>
+    <tr><td>Albero di decisione</td><td>0,849</td><td>0,671</td><td>0,750</td><td>0,828</td><td>0,908</td><td>0,787</td><td>0,912</td></tr>
+    <tr><td>Random forest</td><td><strong>0,878</strong></td><td><strong>0,733</strong></td><td><strong>0,776</strong></td><td><strong>0,882</strong></td><td><strong>0,939</strong></td><td><strong>0,826</strong></td><td><strong>0,948</strong></td></tr>
+    <tr><td>Gradient boosting</td><td>0,856</td><td>0,682</td><td>0,738</td><td>0,853</td><td>0,925</td><td>0,791</td><td>0,932</td></tr>
+  </tbody></table></div>
+  <p>Qui vince la random forest su tutti gli indici. Il riferimento: prevedere sempre «No» dà un'accuratezza di 0,629, e la kappa misura proprio il guadagno sull'accordo dovuto al caso. Nella lezione 13, sui soggiorni, il gradient boosting pareggiava con la foresta: con un tasso di 0,1 e 200 alberi qui non è stato regolato abbastanza, e lo propone uno degli esercizi delle slide (tasso 0,05, 400 alberi, profondità 4 contro 8).</p>
+  <div class="quiz inq" data-quiz="14a"></div>
+  <h3>Dai punteggi alle decisioni</h3>
+  <p>I due errori non costano uguale. Una cancellazione mancata (falso negativo) lascia una camera vuota: si perde circa la tariffa per il numero di notti. Un falso allarme (falso positivo) porta a vendere una camera in più del dovuto: l'ospite va spostato in un altro albergo, con costi e recensioni negative.</p>
+  <figure>
+    <div class="w" id="b14err"></div>
+    <figcaption>I due tipi di errore dei tre modelli, dalle matrici di confusione: cancellazioni mancate (camere vuote) e falsi allarmi (camere vendute due volte). La random forest ha meno falsi allarmi; il gradient boosting manca più cancellazioni di tutti.</figcaption>
+  </figure>
+  <p>Lo Scorer usa la soglia di partenza, \(P(\text{Yes}) &gt; 0{,}5\); la curva ROC mostra tutti gli altri compromessi possibili. Se un falso allarme costa più di una cancellazione mancata, si alza la soglia; altrimenti la si abbassa.</p>
+  <p class="stmt"><strong>Prima si sceglie il modello sull'AUC, la qualità della classifica; poi la soglia sul costo degli errori.</strong> L'accuratezza da sola nasconde la struttura dei costi: guarda sempre la matrice di confusione.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>La banca: un modello che sembrava perfetto</h2>
+  <p>Una banca al dettaglio non perde i clienti da un giorno all'altro: li perde trimestre dopo trimestre. I saldi calano, le carte non si muovono più, lo stipendio viene accreditato altrove. Quando il conto viene chiuso, la decisione era stata presa mesi prima. Un modello di abbandono ha senso per tre ragioni: trattenere un cliente costa molto meno che conquistarne uno nuovo; il segnale arriva presto, perché il comportamento sui movimenti cambia prima della richiesta di chiusura; e serve un risultato su cui agire, non una percentuale, ma una <strong>lista di clienti da chiamare</strong> ordinata e grande quanto le chiamate che la filiale può fare davvero.</p>
+  <p class="stmt"><strong>La domanda non è «possiamo arrivare al 90% di accuratezza?», ma «quali clienti deve chiamare la filiale la settimana prossima, e quanto costa quella lista?».</strong></p>
+  <p>Il file ha 4.212 clienti, metà che se ne sono andati e metà no, e 198 colonne. Il cuore è il blocco del comportamento: 87 colonne di variazioni trimestrali di nove famiglie di misure (premi assicurativi, conto corrente, carte e utenze, moneta elettronica, saldi, debito residuo, titoli), ciascuna per i tre trimestri precedenti. La struttura a ritardi permette a un albero di cogliere una tendenza invece di un livello, e i valori sono variazioni, già normalizzate rispetto alla storia del cliente stesso. Poi dati anagrafici, relazione con la banca, prodotti posseduti e attività.</p>
+  <p>Il nodo Statistics, prima di qualsiasi modello, trova tre cose. Nella professione ci sono 421 celle con la scritta «#XL_EVAL_ERROR#», un errore di Excel sopravvissuto all'esportazione e trattato come una professione vera, la quarta più frequente: dovrebbe diventare un valore mancante. L'anzianità di rapporto (<em>tenure</em>) è salvata come testo: un albero la tratterebbe come categorie senza ordine e non potrebbe tagliare su «più di 8 anni». I valori mancanti sono trascurabili: 93 celle su 834.000.</p>
+  <h3>Prima trappola: 87 colonne che non dicono nulla</h3>
+  <p>Ogni colonna di comportamento compare due volte: grezza e standardizzata come z-score. Una standardizzazione è una trasformazione lineare, quindi le due colonne sono la stessa variabile, con correlazione 1,000 in tutte le 87 coppie. Un albero non si rompe: ha semplicemente due candidati identici a ogni taglio. Ma l'importanza di ogni variabile si divide a metà fra i gemelli, così tutti e due sembrano più deboli di quanto sono, e lo spazio delle variabili raddoppia, insieme al tempo di calcolo, per nessun guadagno. In una riproduzione del workflow, togliere le 87 copie ha lasciato l'accuratezza invariata (Tree Ensemble da 0,904 a 0,909).</p>
+  <h3>Seconda trappola: le colonne che conoscevano la risposta</h3>
+  <p>Il primo taglio dell'albero consegnato era il numero di <strong>conti in convenzione</strong>: conti aperti tramite un accordo con un'azienda o un'associazione, con tassi speciali e altri vantaggi. Quel taglio decide quasi tutto il problema.</p>
+  <figure>
+    <div class="w" id="b14conv"></div>
+    <figcaption>Il tasso di abbandono secondo che il cliente abbia almeno un conto in convenzione, con i numeri delle slide. Dei 1.581 clienti con una convenzione se ne sono andati 5 (0,3%); dei 2.631 senza, 2.101 (79,9%). Un solo taglio separa quasi perfettamente le due classi.</figcaption>
+  </figure>
+  <p>Predice così bene perché chi ha una convenzione, andandosene, perderebbe tassi migliori su prestiti e depositi. Ma non aiuta. Le slide lo inquadrano in due modi. Il conteggio è fra le due colonne «post-evento», conteggi di conti misurati dopo l'abbandono: il modello leggeva la risposta. E anche se non lo fosse, fallisce la <strong>prova dell'azione</strong>: l'azione ovvia sarebbe offrire convenzioni ai clienti a rischio, ma le convenzioni tagliano il margine su ogni conto, e una fidelizzazione comprata così abbassa proprio il profitto che dovrebbe proteggere. Per ogni predittore forte bisogna chiedersi: la banca può agire su questo, e a che costo? Senza quella colonna il modello deve trovare chi se ne va fra i clienti normali, dal comportamento su cui la banca può agire: è da lì che viene la lista delle chiamate.</p>
+  <div class="quiz inq" data-quiz="14b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Preparare e dividere nell'ordine giusto</h2>
+  <p>La preparazione sta in un solo metanodo, in cinque passi: ricalcolare i domini di provincia e professione, codificarle in colonne 0/1 (One to Many), raggruppare le 52 province e le professioni rare, togliere le 87 copie e le 2 colonne che trapelano, e restringere la popolazione ai soli titolari di conto corrente. L'anzianità diventa un numero. I semi del Partitioning e dell'Equal Size Sampling, che erano vuoti (la divisione cambiava a ogni esecuzione e nessun risultato era riproducibile), vengono fissati a 42. I 268 clienti senza conto corrente vengono tolti: sono tutti clienti rimasti, e chi non ha un conto corrente non è un obiettivo di fidelizzazione.</p>
+  <figure>
+    <div class="w" id="b14flow"></div>
+    <figcaption>Le righe a ogni passo, con i numeri delle slide e la quota di clienti che se ne vanno (in arancione). Prima si divide in modo stratificato, 70% e 30%, così il tasso di abbandono è uguale nelle due parti; poi si bilancia solo l'insieme di addestramento, togliendo clienti della classe più numerosa. L'insieme di test non viene mai bilanciato: è la misura che si riporta.</figcaption>
+  </figure>
+  <p>Due operazioni facili da scambiare per sbaglio, e scambiarle invalida tutti i numeri successivi. La divisione è <strong>stratificata</strong>, non casuale: un'estrazione fortunata o sfortunata sposterebbe il riferimento e il confronto fra modelli non sarebbe più equo. Il <strong>bilanciamento</strong> (Equal Size Sampling riduce la classe più numerosa, così l'algoritmo non la favorisce) si fa solo sull'insieme di addestramento: sul test fabbricherebbe una distribuzione delle classi che non esiste. L'albero e la foresta imparano dalle 2.572 righe bilanciate; il gradient boosting di H2O da tutte le 2.760, perché gestisce da solo lo sbilanciamento 53/47.</p>
+  <h3>Tre modelli, regolati sull'AUC</h3>
+  <div class="scroll"><table><thead><tr><th>Modello</th><th>Impostazioni</th><th>Parametri cercati</th><th>Ricerca</th><th>Valori migliori</th><th>AUC</th></tr></thead><tbody>
+    <tr><td>Albero di decisione</td><td>gain ratio, potatura MDL, tagli nominali binari</td><td>minimo di righe per nodo, da 10 a 50</td><td>tutti i valori, 41 prove</td><td>42</td><td>0,752</td></tr>
+    <tr><td>Tree Ensemble</td><td>Gini, 100 alberi, bootstrap, \(\sqrt{p}\) per taglio</td><td>dimensione minima del figlio 2-30, profondità 10-100</td><td>tutte le combinazioni, 80 prove</td><td>14 e 20</td><td>0,836</td></tr>
+    <tr><td>Gradient boosting (H2O)</td><td>tasso 0,1</td><td>minimo di osservazioni per foglia 10-30, profondità 6-15, alberi 100-500, quota di righe 0,8-1</td><td>bayesiana, 100 prove</td><td>30, 12, 101, 0,99</td><td>0,846</td></tr>
+  </tbody></table></div>
+  <p>Ogni modello sta dentro un ciclo di ottimizzazione dei parametri (Parameter Optimization Loop) che prova valori diversi e tiene i migliori. L'obiettivo è l'AUC letta da un nodo ROC Curve, non l'accuratezza dello Scorer: l'AUC giudica la classifica a ogni soglia, ed è ciò che serve a una lista di chiamate. Il GBM finale ha AUC 0,844, appena sotto lo 0,846 del ciclo, una differenza che le slide non spiegano. Per la foresta il guadagno della regolazione (AUC 0,836 contro 0,830 con i valori di partenza) è dentro il rumore, e il workflow tiene i valori di partenza.</p>
+  <p>Le slide stesse segnalano un difetto: i cicli valutano sulla parte di test. I valori scelti sono adattati al test, e l'AUC migliore è ottimista; lo zig-zag dell'AUC al variare del minimo di righe per nodo è soprattutto rumore. La versione pulita regola su una parte di validazione e tiene il test per il numero finale: è la regola della lezione 12.</p>
+  <div class="quiz inq" data-quiz="14c"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Prima e dopo: i numeri lusinghieri e quelli onesti</h2>
+  <p>Il workflow consegnato dava, su 1.184 righe di test mai toccate, questi risultati: albero 0,942 di accuratezza con sensibilità 0,997, random forest 0,911, gradient boosting 0,754. Sono misure vere di un'impostazione rotta. Due sintomi dovevano insospettire. Una sensibilità di 0,997: l'albero mancava 2 clienti persi su 632, e niente nel comportamento dei clienti è così prevedibile. E l'albero singolo batteva l'insieme di alberi: una colonna faceva tutto il lavoro, e la media non può migliorare una colonna che è già la risposta. Tutti e due i sintomi puntano ai dati, non all'algoritmo.</p>
+  <figure>
+    <div class="w" id="b14ba"></div>
+    <figcaption>L'accuratezza sul test dei tre modelli nel workflow consegnato (grigio) e in quello corretto (verde), stesse righe, stessa divisione, stesso seme; numeri delle slide. L'albero perde 26 punti, la foresta 16: quei punti non erano mai stati veri. Il gradient boosting era l'unico ramo che escludeva già la colonna delle convenzioni: il suo 0,754 era l'unico numero onesto.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Modello</th><th>Accuratezza consegnata</th><th>Accuratezza</th><th>AUC</th><th>κ</th><th>Sensibilità</th><th>Precisione</th></tr></thead><tbody>
+    <tr><td>Albero di decisione</td><td>0,942</td><td>0,682</td><td>0,752</td><td>0,360</td><td>0,709</td><td>0,699</td></tr>
+    <tr><td>Tree Ensemble</td><td>0,911 (RF)</td><td>0,752</td><td>0,830</td><td>0,497</td><td>0,821</td><td>0,741</td></tr>
+    <tr><td>Gradient boosting (H2O)</td><td>0,754</td><td><strong>0,762</strong></td><td><strong>0,844</strong></td><td><strong>0,521</strong></td><td>0,790</td><td><strong>0,770</strong></td></tr>
+  </tbody></table></div>
+  <p>L'ordine si capovolge: il boosting, ultimo prima, ora è primo. Gli insiemi si guadagnano il posto: 7-8 punti di accuratezza e 8-9 di AUC più dell'albero singolo, l'ordine che la teoria della lezione 13 prevede. Un'AUC di 0,84 basta per ordinare una lista di chiamate. Uno degli esercizi delle slide propone un controllo simile per gli hotel: togliere la caparra, la variabile sospetta della lezione 11, e vedere quanto scende l'AUC.</p>
+  <p class="stmt"><strong>Controlla il primo taglio prima di festeggiare:</strong> un albero singolo è il rilevatore di leakage più economico che esista. Se il primo taglio spiega quasi tutto, chiediti da dove viene quella colonna, e soprattutto quando è stata misurata.</p>
+  <h3>Che cosa fa davvero andare via i clienti</h3>
+  <p>Tolta la scorciatoia, i modelli devono usare chi è il cliente e che cosa fa.</p>
+  <figure>
+    <div class="w" id="b14imp"></div>
+    <figcaption>L'importanza relativa delle variabili nel modello migliore, il gradient boosting di H2O, in percentuale del totale (porta dell'importanza del nodo H2O GBM Learner, valori delle slide). Le variabili di profilo e di relazione sono in blu, quelle di comportamento in grigio.</figcaption>
+  </figure>
+  <p>Sei variabili di profilo e di relazione hanno il 42% dell'importanza, l'anzianità da sola il 15,8%. Le 87 variabili di variazione trimestrale insieme hanno il 47%, ma nessuna più del 2,2%: l'abbandono si costruisce con molti piccoli segnali. Le statistiche dei tagli del Tree Ensemble mettono in cima area e strategia, e contatore dei movimenti, carte, indicatore di problematicità e anzianità sono fra le prime 13 in tutti e due i modelli. Le stesse variabili spiccano nell'analisi bivariata, con V di Cramér di 0,21 per carte e utenze, 0,20 per area e problematicità, 0,19 per strategia, 0,05 (trascurabile) per il genere.</p>
+  <figure>
+    <div class="w" id="b14pat"></div>
+    <figcaption>Tre schemi su cui un direttore di filiale può agire, con i tassi di abbandono delle slide. Nel primo riquadro, per numero di prodotti oltre al conto corrente: 77,5% con nessuno, 36,5% con quattro o più. La vendita incrociata è la leva. Nel secondo, per fascia d'età: gli over 60 se ne vanno nel 62,7% dei casi, contro circa il 50% delle altre fasce, perché chiusure di filiali e passaggio al digitale colpiscono loro più di tutti. Nel terzo, per anni di rapporto: oltre i 12 anni il 62,6%, la fascia più alta, spesso rapporti dormienti. L'anzianità non è fedeltà.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Da una probabilità a una lista di chiamate</h2>
+  <p>Il modello restituisce una probabilità, e dove tagliarla è una decisione di business. I due errori non sono uguali: chiamare un cliente che sarebbe rimasto è una chiamata sprecata, pochi euro; perdere un cliente che se ne va costa il suo margine.</p>
+  <div class="scroll"><table><thead><tr><th>Soglia</th><th>Clienti segnalati</th><th>Sensibilità</th><th>Precisione</th></tr></thead><tbody>
+    <tr><td>0,3</td><td>835</td><td>0,91</td><td>0,69</td></tr>
+    <tr><td>0,5</td><td>638</td><td>0,78</td><td>0,78</td></tr>
+    <tr><td>0,7</td><td>452</td><td>0,61</td><td>0,86</td></tr>
+  </tbody></table></div>
+  <p>Un cliente perso vale molto più di una chiamata, quindi la soglia va sotto 0,5: più chiamate, meno clienti persi. In KNIME il Binary Classification Inspector sposta la soglia in modo interattivo. Ma la filiale può fare un numero limitato di chiamate, e allora la lista si costruisce in quattro passi: <strong>ordinare</strong> i clienti per probabilità di abbandono decrescente; <strong>tagliare</strong> a quanti la filiale può chiamare, una capacità e non una soglia statistica; <strong>agire</strong>, mandando alla filiale la lista con i motivi principali di ogni cliente; <strong>misurare</strong>, tenendo da parte un gruppo di controllo, senza il quale non si distingue l'effetto del modello da quello della stagione.</p>
+  <figure>
+    <div class="w" id="b14call"></div>
+    <figcaption>L'esempio svolto delle slide sul test: 300 chiamate. Scegliendo a caso, con un tasso di base del 53%, si troverebbero circa 160 clienti in procinto di andarsene. Prendendo i primi 300 della classifica del gradient boosting (precisione 0,92, soglia circa 0,86) se ne trovano 276: il modello aggiunge circa 116 clienti alla stessa campagna. Se il 30% di quelli raggiunti accetta l'offerta, sono circa 83 clienti trattenuti.</figcaption>
+  </figure>
+  <p>Il conto che ogni proposta di fidelizzazione deve superare è semplice: il costo della campagna è 300 volte il costo di una chiamata (tempo del consulente più incentivo); il valore restituito è 83 volte il margine di un cliente. È l'unica riga che paga il modello.</p>
+  <div class="quiz inq" data-quiz="14d"></div>
+</div></section>
+
+<section class="recap"><div class="col">
+  <h2>La lezione 14 in sintesi</h2>
+  <p>Le idee di questa lezione in un solo posto: prima la mappa, poi le regole da portarsi a casa.</p>
+  <figure>
+    <div class="w" data-mappa="14"></div>
+    <figcaption>La mappa della lezione: il caso degli hotel, le due trappole della banca, la divisione e il bilanciamento, i risultati onesti e la lista di chiamate.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Regola</th><th>Perché</th><th>Nel caso</th></tr></thead><tbody>
+    <tr><td>Controlla il primo taglio prima di festeggiare</td><td>un albero singolo rivela il leakage</td><td>conti in convenzione: 0,3% contro 79,9%</td></tr>
+    <tr><td>Chiediti quando è misurata ogni colonna</td><td>le colonne post-evento leggono la risposta</td><td>da 16 a 26 punti di accuratezza illusoria</td></tr>
+    <tr><td>Le colonne duplicate non sono gratis</td><td>dividono l'importanza e raddoppiano il calcolo</td><td>87 copie z-score, correlazione 1,000</td></tr>
+    <tr><td>Dividi prima, poi bilancia solo il training</td><td>il test deve avere la distribuzione vera</td><td>2.572 righe bilanciate, test 1.184 intatto</td></tr>
+    <tr><td>Fissa ogni seme, regola sulla validazione</td><td>un test usato per scegliere non è più un test</td><td>seme 42; i cicli usavano il test</td></tr>
+    <tr><td>Con dati onesti vincono gli insiemi</td><td>riducono varianza o distorsione</td><td>hotel: foresta 0,878; banca: GBM 0,762, AUC 0,844</td></tr>
+    <tr><td>Il risultato è una lista di chiamate</td><td>soglia dal costo degli errori, lunghezza dalla capacità</td><td>300 chiamate: 276 contro circa 160 a caso</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="14"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>un risultato troppo bello è un sintomo, non un trionfo</strong>; si controllano il primo taglio e il momento in cui ogni colonna è misurata, si tiene il test intatto fino alla fine, e si consegna una decisione (una soglia, una lista) pesata sui costi veri.</p>
+  <p>La lezione 15 esce dalle tabelle: come si analizzano i testi, dalle parole contate ai modelli linguistici.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

@@ -1,0 +1,177 @@
+<article class="lesson" data-n="12" data-docente="L. Molteni" id="lezione-12" data-title="Come si misura se un modello prevede bene?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 12 · L. Molteni, slide</p>
+  <h1>Come si misura se un modello prevede bene?</h1>
+  <p class="desc">Perché un modello si giudica su dati che non ha mai visto, e con quali indici: matrice di confusione, soglia, curva ROC, gain e lift per chi prevede una classe; MAE, RMSE, MAPE, R² e MASE per chi prevede un numero.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 11 hai preparato i dati delle prenotazioni alberghiere. Ora immagina di aver costruito due modelli su quei dati. Quale è migliore? E quanto ci si può fidare delle sue previsioni? Questa lezione non insegna ancora a costruire i modelli (lo farà la 13), ma a giudicarli: gli strumenti servono per qualsiasi modello.</p>
+  <p>Tutti i modelli predittivi partono da un insieme di addestramento in cui ogni riga ha degli attributi, uno dei quali è il target. L'algoritmo impara il target in funzione degli altri attributi e poi viene applicato a casi nuovi. Se il target è qualitativo il modello prevede una classe (e di solito una probabilità per ogni classe): è un problema di <strong>classificazione</strong>. Se è quantitativo prevede un numero: è un problema di <strong>regressione</strong>. Entrambi rientrano nella modellazione predittiva, ma si valutano con indici diversi.</p>
+  <h2>Perché non basta guardare i dati di addestramento</h2>
+  <p>L'obiettivo non è descrivere il passato ma prevedere i casi futuri. Sui dati di addestramento un modello flessibile può arrivare a un errore quasi nullo imparando a memoria anche il rumore: è il <strong>sovradattamento</strong> (<em>overfitting</em>). Solo l'errore su dati indipendenti stima le prestazioni che avrai in produzione.</p>
+  <figure>
+    <div class="w" id="b12over"></div>
+    <figcaption>Curve illustrative, come nelle slide. Sull'asse orizzontale la complessità del modello, per esempio la profondità di un albero; su quello verticale l'errore. L'errore sui dati di addestramento (grigio) continua a scendere; quello sui dati di test (rosa) scende, tocca un minimo e poi risale, perché il modello comincia a imparare il rumore. La complessità migliore è quella del minimo della curva di test.</figcaption>
+  </figure>
+  <p>Per questo i dati si dividono prima di costruire il modello. L'<strong>insieme di addestramento</strong> (<em>training</em>) costruisce il modello. L'<strong>insieme di validazione</strong> serve a regolarne i parametri, a scegliere fra più modelli e a fermare il sovradattamento. L'<strong>insieme di test</strong> stima l'errore su dati nuovi e si usa una volta sola, alla fine. Per confrontare due modelli bisogna usare indici adatti e lo stesso insieme di test.</p>
+  <figure>
+    <div class="w" id="b12split"></div>
+    <figcaption>Nel primo riquadro la divisione di partenza delle slide: 60% addestramento, 20% validazione, 20% test. Nel secondo la validazione incrociata con k = 5: i dati si dividono in cinque parti, ognuna fa da test una volta (in rosa) mentre le altre quattro addestrano il modello; i cinque risultati si mediano.</figcaption>
+  </figure>
+  <p>I modi di dividere sono tre. L'<strong>holdout</strong> fa una sola divisione casuale: la regola classica è due terzi per l'addestramento e un terzo per il test, oggi spesso 70/30 o 80/20; alcuni algoritmi ricavano la validazione al loro interno, per esempio con la potatura degli alberi o i campioni <em>out-of-bag</em> delle random forest (lezione 13). La <strong>validazione incrociata a k parti</strong> (<em>k-fold</em>, con k di solito 5 o 10) dà una stima più stabile al prezzo di k volte il calcolo. Il <strong>campionamento stratificato</strong> mantiene in ogni parte le proporzioni delle classi del target: indispensabile quando una classe è rara. In KNIME: Table Partitioner per la divisione (stratificata sul target), X-Partitioner e X-Aggregator per la validazione incrociata.</p>
+  <div class="quiz inq" data-quiz="12a"></div>
+  <p>Il caso che accompagna la lezione riprende le prenotazioni della lezione 11, tenendo solo i soggiorni avvenuti e pagati (non cancellati, prezzo maggiore di zero, almeno una notte): 73.387. Su questi dati i modelli prevedono due target. Uno quantitativo, il <strong>ricavo</strong> del soggiorno (tariffa media giornaliera per numero di notti, in euro; in media 350 euro nell'insieme di addestramento). Uno qualitativo, <em>high_value</em>: «High» se il ricavo è almeno 500 euro (circa il 20% più alto dei soggiorni), altrimenti «Standard». L'uso di business è dare la priorità a offerte e servizio personale per i soggiorni che valgono di più. La tariffa giornaliera è esclusa dai predittori: sarebbe leakage, perché il ricavo si calcola da lei.</p>
+  <p>I dati sono divisi 70/30 in modo stratificato: 51.370 righe di addestramento e 22.017 di test, con il 20,4% di soggiorni High nel test. Per ogni target si confrontano due modelli che conoscerai nella lezione 13: un albero di decisione e una random forest (in KNIME, Tree Ensemble).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Prevedere una classe: la matrice di confusione</h2>
+  <p>Per un classificatore il punto di partenza è la <strong>matrice di confusione</strong>: incrocia la classe vera di ogni riga del test con la classe prevista. Con N classi è una matrice N × N, e sulla diagonale stanno le previsioni giuste. Il suo pregio è che mostra quale tipo di errore fa il modello, non solo quanti. Con due classi si sceglie una classe <strong>positiva</strong>, qui High, e le quattro celle hanno un nome.</p>
+  <figure>
+    <div class="w" id="b12cm"></div>
+    <figcaption>La matrice di confusione della random forest sui 22.017 soggiorni del test, con soglia 0,5. Righe: classe vera; colonne: classe prevista, come nel nodo Scorer di KNIME. In verde le previsioni giuste: i veri positivi (TP, soggiorni High riconosciuti) e i veri negativi (TN). In rosso gli errori: i falsi negativi (FN, soggiorni High scambiati per Standard) e i falsi positivi (FP, falsi allarmi).</figcaption>
+  </figure>
+  <p>L'indice più usato, e il più facile da spiegare a un manager, è l'<strong>accuratezza</strong>: la quota di previsioni giuste. Il suo complemento è il tasso di errore.</p>
+  <div class="eq">\[ \text{accuratezza} = \frac{TP + TN}{N} = \frac{3.792 + 17.127}{22.017} = 0{,}950 \]</div>
+  <p>Il 95%: sembra ottimo. Ma da solo può ingannare. Immagina le transazioni con carta di credito, di cui solo l'1% è fraudolento, e un modello che le dichiara tutte legittime.</p>
+  <figure>
+    <div class="w" id="b12lazy"></div>
+    <figcaption>Due modelli «pigri» che prevedono sempre la classe più frequente. Nel primo riquadro, su 100 transazioni (99 legittime, 1 fraudolenta): accuratezza 99%, frodi trovate 0%. Nel secondo, sui soggiorni del test: prevedere sempre Standard dà il 79,6% di accuratezza e non trova nessun soggiorno di valore.</figcaption>
+  </figure>
+  <p class="stmt"><strong>Con classi sbilanciate l'accuratezza è dominata dalla classe più frequente:</strong> l'unico errore del modello pigro è proprio il caso che ci interessa.</p>
+  <h3>Quale tipo di errore?</h3>
+  <p>Servono indici che guardino una classe alla volta. La <strong>sensibilità</strong> (o <em>recall</em>, o tasso di veri positivi) è la quota di positivi veri che il modello trova; la <strong>specificità</strong> (tasso di veri negativi) è la quota di negativi veri riconosciuti come tali.</p>
+  <div class="eq">\[ \text{sensibilità} = \frac{TP}{TP + FN} = \frac{3.792}{4.494} = 0{,}844 \qquad \text{specificità} = \frac{TN}{TN + FP} = \frac{17.127}{17.523} = 0{,}977 \]</div>
+  <p>Nel modello pigro delle frodi la sensibilità è 0 / 1 = 0, la specificità 99 / 99 = 1. La <strong>precisione</strong> guarda dall'altra parte: delle righe previste positive, quante lo sono davvero? Misura il costo dei falsi allarmi, mentre la sensibilità misura quello dei casi mancati. L'<strong>F1</strong> le combina con una media armonica, da 0 a 1, alta solo se sono alte tutte e due.</p>
+  <div class="eq">\[ \text{precisione} = \frac{TP}{TP + FP} = \frac{3.792}{4.188} = 0{,}905 \qquad F_1 = \frac{2 \cdot \text{precisione} \cdot \text{sensibilità}}{\text{precisione} + \text{sensibilità}} = 0{,}874 \]</div>
+  <p>La precisione conta quando un falso allarme costa caro, la sensibilità quando costa caro un caso mancato.</p>
+  <div class="quiz inq" data-quiz="12b"></div>
+  <p>Tre indici reggono bene le classi sbilanciate. L'<strong>accuratezza bilanciata</strong> è la media di sensibilità e specificità, da 0 a 1; un modello che prevede sempre la classe più frequente ottiene 0,5. La <strong>kappa di Cohen</strong> misura l'accordo fra classi vere e previste oltre quello dovuto al caso: \(p_o\) è l'accuratezza, \(p_e\) l'accordo atteso se modello e realtà fossero indipendenti (lo stesso conto delle frequenze attese della lezione 10). Va da −1 a 1: sopra 0,8 molto buona, fra 0,6 e 0,8 buona. Il <strong>coefficiente di correlazione di Matthews</strong> (MCC) usa tutte e quattro le celle ed è una correlazione fra classe vera e prevista, da −1 a +1.</p>
+  <div class="eq">\[ \kappa = \frac{p_o - p_e}{1 - p_e} \qquad \text{MCC} = \frac{TP \cdot TN - FP \cdot FN}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}} \]</div>
+  <p>Per la random forest: \(p_e = (4.494 \cdot 4.188 + 17.523 \cdot 17.829) / 22.017^2 = 0{,}683\), quindi \(\kappa = (0{,}950 - 0{,}683) / (1 - 0{,}683) = 0{,}843\); accuratezza bilanciata \((0{,}844 + 0{,}977)/2 = 0{,}911\); MCC = 0,843. In KNIME il nodo Scorer riceve le previsioni sul test (mai sui dati di addestramento), con la classe vera nella prima colonna e quella prevista nella seconda; nella prima porta dà la matrice, nella seconda gli indici. Accuratezza bilanciata e MCC non ci sono: li calcola un nodo Expression sulla seconda porta.</p>
+  <figure>
+    <div class="w" id="b12cmp"></div>
+    <figcaption>Albero di decisione (grigio) e random forest (verde) sullo stesso insieme di test, valori del nodo Scorer riportati nelle slide. L'accuratezza differisce di 2 punti, kappa e MCC di 7: premiano chi riconosce bene la classe rara.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Da una probabilità a una classe: la soglia</h2>
+  <p>Un classificatore non dà direttamente una classe ma una probabilità, qui \(P(\text{High})\). La classe si assegna confrontandola con una <strong>soglia</strong> (<em>cut-off</em>), di partenza 0,5. La matrice di confusione, e ogni indice che ne deriva, dipende dalla soglia: abbassarla fa trovare più positivi, al prezzo di più falsi allarmi. Con una classe rara una soglia vicina alla sua quota nei dati, qui circa 0,2, trova più positivi.</p>
+  <figure>
+    <div class="w" id="b12cut"></div>
+    <figcaption>La stessa random forest con due soglie. Nel primo riquadro la soglia 0,5: 702 soggiorni High mancati, 396 falsi allarmi. Nel secondo la soglia 0,2: i mancati scendono a 167, i falsi allarmi salgono a 1.305. La sensibilità sale da 0,844 a 0,963, la precisione scende da 0,905 a 0,768, l'accuratezza da 0,950 a 0,933.</figcaption>
+  </figure>
+  <p class="stmt"><strong>La soglia migliore è una scelta di business:</strong> quanto costa un soggiorno di valore mancato rispetto a un'offerta sprecata.</p>
+  <p>In KNIME il Predictor deve avere attivata l'opzione che aggiunge le probabilità di ogni classe; un nodo Expression crea la nuova colonna, per esempio <code>if($["P (high_value=High) RF"] &gt;= 0.2, "High", "Standard")</code>, e uno Scorer la confronta con la classe vera.</p>
+  <h3>Tutte le soglie insieme: la curva ROC</h3>
+  <p>Se ogni soglia dà una matrice diversa, come si confrontano due modelli senza fissarne una? Si fa scorrere la soglia da 1 a 0: ogni valore dà una matrice e quindi un punto, con il tasso di falsi positivi (1 − specificità, la quota di negativi segnalati per sbaglio) in orizzontale e il tasso di veri positivi (la sensibilità) in verticale. L'insieme dei punti è la <strong>curva ROC</strong>.</p>
+  <figure>
+    <div class="w" id="b12roc"></div>
+    <figcaption>Curve illustrative, come nelle slide. La diagonale tratteggiata è un classificatore casuale; un modello utile sta sopra. Il punto (0, 0) è la soglia 1 (tutto previsto negativo), il punto (1, 1) la soglia 0 (tutto positivo), l'angolo (0, 1) il modello perfetto. Il modello 1 (verde) sta sopra il modello 2 (grigio) a ogni soglia: è più accurato.</figcaption>
+  </figure>
+  <p>Quando due curve si incrociano il disegno non basta: serve un numero. È l'<strong>AUC</strong> (<em>area under the curve</em>), l'area sotto la curva ROC: 0,5 per un modello casuale, 1 per uno perfetto. Si legge come la probabilità che un positivo scelto a caso riceva un punteggio più alto di un negativo scelto a caso. Non dipende dalla soglia né dalle proporzioni delle classi, ma non dice nulla sulla calibrazione delle probabilità, cioè se una probabilità di 0,7 corrisponda davvero al 70% di casi.</p>
+  <div class="scroll"><table><thead><tr><th>AUC</th><th>Capacità di distinguere le classi</th></tr></thead><tbody>
+    <tr><td>0,5</td><td>nessuna (casuale)</td></tr><tr><td>0,7-0,8</td><td>accettabile</td></tr><tr><td>0,8-0,9</td><td>eccellente</td></tr><tr><td>oltre 0,9</td><td>eccezionale</td></tr>
+  </tbody></table></div>
+  <p>La scala è quella del manuale di regressione logistica di Hosmer, Lemeshow e Sturdivant (2013). Sui soggiorni le due curve salgono quasi in verticale: con pochi falsi positivi i modelli trovano già la maggior parte dei soggiorni High. La foresta sta sopra l'albero a quasi ogni soglia: AUC 0,987 contro 0,968. In KNIME il nodo ROC Curve vuole la classe vera, la classe positiva (High) e una colonna di probabilità per modello; collegando i Predictor in catena, tutte le probabilità stanno in una tabella sola e le curve in un solo grafico.</p>
+  <div class="quiz inq" data-quiz="12c"></div>
+  <h3>Quanto vale la cima della classifica: gain e lift</h3>
+  <p>Spesso non si può agire su tutti: il budget permette di contattare solo il k% dei clienti. Conta allora quanti positivi il modello mette in cima. Si ordinano le righe del test per \(P(\text{High})\) dalla più alta alla più bassa, si dividono in dieci <strong>decili</strong> del 10% ciascuno, e si contano i positivi in ognuno. Il <strong>gain cumulato</strong> è la quota di tutti i positivi raccolta fino a quel decile; il <strong>lift</strong> è quante volte il modello fa meglio di una scelta a caso.</p>
+  <div class="eq">\[ \text{lift del decile} = \frac{\%\ \text{High nel decile}}{\%\ \text{High in tutto il test}} = \frac{97{,}7\%}{20{,}4\%} = 4{,}79 \]</div>
+  <figure>
+    <div class="w" id="b12gain"></div>
+    <figcaption>Il gain cumulato della random forest sul test, con i valori letti dal nodo Lift Chart e riportati nelle slide. Contattando il 10% dei soggiorni in cima alla classifica si raccoglie il 47,9% di tutti i soggiorni High (a caso, il 10%); con il 20% l'87,2%, con il 30% il 98,4%. Il modello perfetto (tratteggio verde) li raccoglierebbe tutti con il 20,4%, la quota di soggiorni High.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Decile</th><th>% High nel decile</th><th>Lift</th><th>Gain cumulato</th><th>Lift cumulato</th></tr></thead><tbody>
+    <tr><td>0-10%</td><td>97,7%</td><td>4,79</td><td>47,9%</td><td>4,79</td></tr>
+    <tr><td>10-20%</td><td>80,2%</td><td>3,93</td><td>87,2%</td><td>4,36</td></tr>
+    <tr><td>20-30%</td><td>22,8%</td><td>1,12</td><td>98,4%</td><td>3,28</td></tr>
+    <tr><td>30-40%</td><td>2,4%</td><td>0,12</td><td>99,6%</td><td>2,49</td></tr>
+    <tr><td>40-50%</td><td>0,4%</td><td>0,02</td><td>99,8%</td><td>2,00</td></tr>
+  </tbody></table></div>
+  <p>Un lift maggiore di 1 vuol dire che il modello concentra i positivi meglio di una selezione casuale. Dopo il terzo decile non resta quasi nessun soggiorno High e il lift è praticamente zero. Gain e lift servono ovunque si possa agire solo su una parte: campagne di marketing, controlli antifrode, contatti commerciali. Nelle slide una frase dice 97,9% per il primo decile, mentre la tabella dice 97,7%; il lift 4,79 torna con 97,7%.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Prevedere un numero: quanto è grande l'errore?</h2>
+  <p>Quando il target è un numero, come il ricavo di un soggiorno, ogni riga del test ha un <strong>errore</strong>: valore vero meno valore previsto, \(e_i = y_i - \hat{y}_i\). Gli indici differiscono solo per come riassumono questi errori.</p>
+  <figure>
+    <div class="w" id="b12err"></div>
+    <figcaption>Punti illustrativi, come nelle slide. Ogni punto è un soggiorno, con il ricavo previsto in orizzontale e quello vero in verticale. Sulla diagonale cadrebbero le previsioni perfette; la distanza verticale di ogni punto dalla diagonale, il segmento rosso, è il suo errore.</figcaption>
+  </figure>
+  <p>Il <strong>MAE</strong> (errore assoluto medio) è la dimensione media dell'errore, nell'unità del target (euro); è meno sensibile ai valori anomali. L'<strong>MSE</strong> (errore quadratico medio) eleva gli errori al quadrato, quindi quelli grandi pesano molto di più; è la base di molti algoritmi di apprendimento, ma si misura in euro al quadrato, difficile da leggere. L'<strong>RMSE</strong> ne prende la radice e torna in euro.</p>
+  <div class="eq">\[ \text{MAE} = \frac{1}{n}\sum_{i=1}^{n}|e_i| \qquad \text{MSE} = \frac{1}{n}\sum_{i=1}^{n}e_i^2 \qquad \text{RMSE} = \sqrt{\text{MSE}} \]</div>
+  <p>Vanno tutti da 0 all'infinito, e più bassi sono meglio è. L'RMSE è sempre almeno uguale al MAE, e uguale solo se tutti gli errori hanno la stessa dimensione: una grande distanza fra i due vuol dire che alcuni errori sono molto grandi. Per la random forest MAE = 61,8 euro e RMSE = 108,1 euro: qualche soggiorno è previsto molto male.</p>
+  <div class="quiz inq" data-quiz="12d"></div>
+  <p>Gli errori si possono anche esprimere in percentuale del valore vero. Il <strong>MPE</strong> (errore percentuale medio) lascia che errori positivi e negativi si compensino, quindi misura la distorsione: vicino a zero il modello non sbaglia sistematicamente da una parte, negativo il modello prevede troppo in media. Il <strong>MAPE</strong> (errore percentuale assoluto medio) prende i valori assoluti; non ha scala, quindi confronta modelli su dati diversi, ma non si può usare se qualche \(y_i = 0\) (divisione per zero) ed esplode se \(y_i\) è piccolo. Non c'è una soglia universale di «buon» MAPE: dipende dal business.</p>
+  <div class="eq">\[ \text{MPE} = \frac{100}{n}\sum_{i=1}^{n}\frac{e_i}{y_i} \qquad \text{MAPE} = \frac{100}{n}\sum_{i=1}^{n}\left|\frac{e_i}{y_i}\right| \]</div>
+  <p>È per questo che il caso tiene solo i soggiorni pagati: 1.622 soggiorni con ricavo zero renderebbero il MAPE infinito.</p>
+  <p>L'<strong>R²</strong> (coefficiente di determinazione) è la quota della varianza di \(y\) spiegata dal modello: 1 è un adattamento perfetto, 0 vuol dire non fare meglio che prevedere sempre la media \(\bar{y}\). Sul test può essere anche negativo: peggio della media. Sui dati di addestramento invece non scende mai quando si aggiungono predittori, anche inutili. L'<strong>R² corretto</strong> penalizza il numero di predittori \(p\) (con \(n\) osservazioni) e scende se se ne aggiunge uno irrilevante: serve a confrontare modelli con input diversi.</p>
+  <div class="eq">\[ R^2 = 1 - \frac{\sum_i e_i^2}{\sum_i (y_i - \bar{y})^2} \qquad R^2_{\text{corr}} = 1 - (1 - R^2)\,\frac{n-1}{n-p-1} \]</div>
+  <p>Il <strong>MASE</strong> (errore assoluto medio scalato) confronta il MAE del modello con quello di una previsione ingenua. Nelle serie storiche la previsione ingenua è l'ultimo valore osservato (o lo stesso periodo dell'anno prima); con dati trasversali come questi è la media dell'insieme di addestramento, 350,46 euro per ogni soggiorno, che ha MAE 214,1. Sotto 1 il modello batte la previsione ingenua, sopra 1 è inutile. Non ha scala e non divide per zero, a differenza del MAPE.</p>
+  <div class="eq">\[ \text{MASE} = \frac{\text{MAE del modello}}{\text{MAE della previsione ingenua}} \qquad \text{foresta: } \frac{61{,}8}{214{,}1} = 0{,}29 \qquad \text{albero: } \frac{191{,}0}{214{,}1} = 0{,}89 \]</div>
+  <figure>
+    <div class="w" id="b12regc"></div>
+    <figcaption>MAE e RMSE in euro dell'albero di regressione (grigio) e della random forest (verde) sul test, con il MAE della previsione ingenua come riferimento (linea tratteggiata). Valori del nodo Numeric Scorer riportati nelle slide.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Indice</th><th>Albero di regressione</th><th>Random forest</th></tr></thead><tbody>
+    <tr><td>R²</td><td>0,124</td><td>0,877</td></tr><tr><td>R² corretto (p = 29)</td><td>0,123</td><td>0,877</td></tr>
+    <tr><td>MAE (€)</td><td>191,0</td><td>61,8</td></tr><tr><td>MSE (€²)</td><td>83.294</td><td>11.677</td></tr><tr><td>RMSE (€)</td><td>288,6</td><td>108,1</td></tr>
+    <tr><td>MPE</td><td>−77,0%</td><td>−17,7%</td></tr><tr><td>MAPE</td><td>101,2%</td><td>26,6%</td></tr><tr><td>MASE</td><td>0,89</td><td>0,29</td></tr>
+  </tbody></table></div>
+  <p>La foresta spiega l'88% della varianza del ricavo e porta l'errore tipico a 62 euro. L'albero singolo fa appena meglio della media (MASE 0,89): in KNIME i suoi primi tagli usano il numero di adulti e la presenza di un'agenzia, non la durata del soggiorno. Tutti e due hanno MPE negativo: prevedono troppo per i soggiorni più economici, dove gli errori percentuali sono più grandi. In KNIME il Numeric Scorer dà R², MAE, MSE, RMSE, MAPE e R² corretto (indicando p); MPE e MASE si calcolano con un nodo Expression (un errore per riga), un GroupBy (la media) e un altro Expression (il rapporto).</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quale indice per quale domanda?</h2>
+  <p>Nessun indice racconta tutta la storia. Le slide raccolgono la domanda a cui risponde ciascuno.</p>
+  <div class="scroll"><table><thead><tr><th>Target</th><th>Indice</th><th>Domanda</th><th>Meglio quando</th></tr></thead><tbody>
+    <tr><td rowspan="5">Qualitativo</td><td>accuratezza, tasso di errore</td><td>quante previsioni sono giuste?</td><td>classi bilanciate, errori con lo stesso costo</td></tr>
+    <tr><td>sensibilità, specificità, precisione, F1</td><td>che tipo di errore fa il modello?</td><td>costi diversi di FN e FP</td></tr>
+    <tr><td>accuratezza bilanciata, κ, MCC</td><td>il modello fa meglio del caso su tutte e due le classi?</td><td>classi sbilanciate</td></tr>
+    <tr><td>ROC, AUC</td><td>quanto bene ordina i positivi sopra i negativi?</td><td>confrontare modelli, soglia non fissata</td></tr>
+    <tr><td>gain, lift</td><td>che cosa ottengo agendo sul primo k%?</td><td>campagne con budget limitato</td></tr>
+    <tr><td rowspan="5">Quantitativo</td><td>MAE, RMSE</td><td>quanto è grande l'errore tipico, nell'unità del target?</td><td>uso generale; RMSE se gli errori grandi contano</td></tr>
+    <tr><td>MPE</td><td>il modello prevede sistematicamente troppo o troppo poco?</td><td>controllare la distorsione</td></tr>
+    <tr><td>MAPE</td><td>quanto è grande l'errore in percentuale?</td><td>confrontare dati diversi, senza valori vicini a zero</td></tr>
+    <tr><td>R², R² corretto</td><td>quanta varianza è spiegata?</td><td>bontà di adattamento, confronto fra input</td></tr>
+    <tr><td>MASE</td><td>il modello batte una previsione ingenua?</td><td>confronto con un riferimento, valori vicini a zero</td></tr>
+  </tbody></table></div>
+  <p class="stmt"><strong>Riporta sempre più indici, sempre sull'insieme di test, e traducili in termini di business.</strong></p>
+  <div class="quiz inq" data-quiz="12e"></div>
+</div></section>
+
+<section class="recap"><div class="col">
+  <h2>La lezione 12 in sintesi</h2>
+  <p>Le idee di questa lezione in un solo posto: prima la mappa, poi gli indici con la loro formula.</p>
+  <figure>
+    <div class="w" data-mappa="12"></div>
+    <figcaption>La mappa della lezione: la divisione dei dati, gli indici dei classificatori, la soglia con ROC, gain e lift, gli indici della regressione.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Indice</th><th>Formula</th><th>Random forest sul test</th></tr></thead><tbody>
+    <tr><td>Accuratezza</td><td>(TP + TN) / N</td><td>0,950</td></tr>
+    <tr><td>Sensibilità (recall)</td><td>TP / (TP + FN)</td><td>0,844</td></tr>
+    <tr><td>Specificità</td><td>TN / (TN + FP)</td><td>0,977</td></tr>
+    <tr><td>Precisione</td><td>TP / (TP + FP)</td><td>0,905</td></tr>
+    <tr><td>F1</td><td>media armonica di precisione e recall</td><td>0,874</td></tr>
+    <tr><td>κ di Cohen</td><td>(p<sub>o</sub> − p<sub>e</sub>) / (1 − p<sub>e</sub>)</td><td>0,843</td></tr>
+    <tr><td>AUC</td><td>area sotto la curva ROC</td><td>0,987</td></tr>
+    <tr><td>MAE, RMSE</td><td>media di |e|, radice della media di e²</td><td>61,8 €, 108,1 €</td></tr>
+    <tr><td>R²</td><td>1 − SSE / varianza totale</td><td>0,877</td></tr>
+    <tr><td>MASE</td><td>MAE / MAE ingenuo</td><td>0,29</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="12"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>un modello si giudica solo su dati che non ha mai visto, e con più di un indice</strong>; con una classe rara l'accuratezza inganna, la soglia è una scelta di business, e un errore va letto nell'unità giusta e confrontato con una previsione ingenua.</p>
+  <p>La lezione 13 apre il motore: come funzionano gli alberi di decisione, le random forest e il gradient boosting che hanno prodotto questi numeri.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

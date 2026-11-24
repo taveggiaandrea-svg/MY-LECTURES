@@ -1,0 +1,173 @@
+<article class="lesson" data-n="16" data-docente="L. Molteni" id="lezione-16" data-title="Come si trasforma un'immagine in una tabella?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 16 · L. Molteni, slide</p>
+  <h1>Come si trasforma un'immagine in una tabella?</h1>
+  <p class="desc">Image analytics con l'approccio classico in KNIME: pixel, soglia di Otsu, componenti connesse, misure di forma, luminosità e tessitura, fino a un modello che separa i pezzi di fonderia buoni da quelli difettosi e a una soglia scelta sui costi.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 15 un testo diventava una riga di numeri. Questa lezione fa lo stesso con le immagini. I clienti cercano, confrontano e si lamentano con le fotografie; le macchine in fabbrica e nei campi producono immagini ogni secondo. Un'azienda che legge solo tabelle vede una parte sempre più piccola della realtà.</p>
+  <p>Le slide danno quattro numeri. Oltre 100 miliardi di ricerche visive con Google Lens nei primi mesi del 2025 (+65% in un anno). L'85% delle immagini sui social che mostrano il logo di un marchio non lo nomina per iscritto, quindi la text analytics non le vede. Un mercato della visione artificiale atteso a 117 miliardi di dollari nel 2030, da 56 nel 2025 (15,7% l'anno). E i costi legati alla qualità in un'azienda manifatturiera, tipicamente il 15-20% delle vendite secondo l'American Society for Quality (ASQ). Le telecamere costano poco e sono ovunque, il calcolo si è spostato accanto alla telecamera, e i modelli pronti riconoscono gli oggetti comuni: il vantaggio sta nelle immagini proprie dell'azienda, i suoi pezzi, i suoi scaffali, i suoi sinistri.</p>
+  <div class="scroll"><table><thead><tr><th>Settore</th><th>Esempio delle slide</th></tr></thead><tbody>
+    <tr><td>Qualità in produzione</td><td>BMW Group usa la piattaforma AIQX in tutti i suoi stabilimenti: telecamere sulla linea controllano pezzi ed etichette e segnalano i difetti prima che l'auto vada avanti</td></tr>
+    <tr><td>Commercio e ricerca visiva</td><td>si inquadra un prodotto e si ottengono articoli simili (Google Lens, ASOS Style Match)</td></tr>
+    <tr><td>Agricoltura</td><td>John Deere See &amp; Spray: le telecamere sulla barra spruzzano solo dove vedono un'erbaccia; 5 milioni di acri nel 2025, diserbante dimezzato circa</td></tr>
+    <tr><td>Marketing</td><td>riconoscere loghi e scene nelle immagini dei social misura l'esposizione del marchio e il ritorno delle sponsorizzazioni</td></tr>
+    <tr><td>Assicurazioni</td><td>The Hartford usa l'AI di Tractable per stimare i danni a un'auto dalle foto caricate dal cliente</td></tr>
+    <tr><td>Annunci immobiliari</td><td>nel caso RentHop di New York, il tipo di foto cambiava la quota di annunci molto richiesti dal 17% al 38%</td></tr>
+  </tbody></table></div>
+  <p>Le domande sono quattro. <strong>Quanto, quanto grande?</strong> Misurare: contare oggetti, misurarne dimensioni, area, colore. <strong>Che cos'è?</strong> Classificare l'intera immagine: pezzo buono o difettoso. <strong>Dov'è?</strong> Rilevare e segmentare: dov'è il graffio, dov'è il logo. <strong>Che cosa somiglia?</strong> Trasformare le immagini in vettori e confrontarle: ricerca visiva, annunci duplicati. Il caso di oggi è una classificazione (buono o difettoso) costruita su misure prese dall'immagine.</p>
+  <p>La catena ha cinque passi: <strong>acquisire</strong> (telecamera, luce, posizione: qui si risolvono o si creano la maggior parte dei problemi), <strong>pre-elaborare</strong> (ridimensionare, convertire in grigi, normalizzare; qui da 512 a 128 pixel per tenere il workflow leggero), <strong>estrarre le feature</strong> (trasformare la figura in una riga di numeri), <strong>modellare</strong> (un classificatore normale sulla tabella, qui una random forest) e <strong>decidere</strong> (passa o scarta; la soglia è una scelta di business).</p>
+  <p class="stmt"><strong>Una buona immagine con un modello semplice batte un'immagine scadente con un modello sofisticato:</strong> nei progetti industriali l'impianto di acquisizione e l'etichettatura richiedono più tempo del modello.</p>
+  <h2>Chi progetta le feature?</h2>
+  <p>Ci sono due modi di insegnare a una macchina a vedere, e la differenza sta in chi decide quali numeri estrarre.</p>
+  <div class="scroll"><table><thead><tr><th></th><th>Visione artificiale classica</th><th>Deep learning (reti convoluzionali, CNN)</th></tr></thead><tbody>
+    <tr><td>Feature</td><td>progettate dall'analista: soglie, forme, tessitura</td><td>imparate dalla rete a partire dai pixel</td></tr>
+    <tr><td>Dati necessari</td><td>centinaia di immagini etichettate</td><td>migliaia, o una rete pre-addestrata</td></tr>
+    <tr><td>Calcolo</td><td>un portatile, secondi</td><td>una GPU (scheda grafica per il calcolo parallelo) per l'addestramento</td></tr>
+    <tr><td>Spiegabilità</td><td>alta: ogni feature ha un significato</td><td>più bassa: servono mappe di salienza (che colorano i pixel che hanno pesato di più), SHAP</td></tr>
+    <tr><td>Robustezza</td><td>sensibile a luce, posizione, sfondo</td><td>regge molto meglio le scene variabili</td></tr>
+    <tr><td>Dove brilla</td><td>fabbriche, laboratori, documenti, pochi dati</td><td>scene aperte, molte classi, video</td></tr>
+  </tbody></table></div>
+  <p>Non è una gara: molti sistemi in produzione le combinano. I passi classici ritagliano e normalizzano l'immagine, una rete la classifica, le misure classiche spiegano il risultato all'ingegnere della qualità. L'approccio classico è la scelta giusta quando la scena è controllata (telecamera fissa, luce costante, un oggetto per immagine), le immagini etichettate sono poche, il calcolo è poco e la decisione va spiegata («scartato perché il bordo non è rotondo» si può verificare). Con scene variabili o molte classi si passa al deep learning. Il caso di oggi sta nella prima situazione: un solo pezzo, vista dall'alto, stessa luce.</p>
+  <div class="quiz inq" data-quiz="16a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Per un computer, un'immagine è una tabella di numeri</h2>
+  <p>Un'immagine <strong>raster</strong> è una griglia di pixel, e ogni pixel è un numero: il livello di grigio, da 0 (nero) a 255 (bianco). Un'immagine a colori ha tre griglie (rosso, verde, blu): 128 × 128 × 3 = 49.152 numeri. Le immagini vettoriali (loghi, disegni) memorizzano forme invece di pixel, e vanno trasformate in raster prima dell'analisi. In KNIME le immagini si leggono con List Files/Folders, Path to String e Image Reader (Table), e vivono dentro una tabella, una per riga, accanto alla loro etichetta.</p>
+  <figure>
+    <div class="w" id="b16pix"></div>
+    <figcaption>Nel primo riquadro una girante di pompa del dataset del caso (cast_ok_0_2816, 128 × 128 pixel), ridisegnata qui a 64 × 64 con 16 livelli di grigio. Nel secondo i numeri veri di un quadratino di 8 × 8 pixel del bordo, quello segnato in giallo: sono questi i dati che il computer vede.</figcaption>
+  </figure>
+  <p>Una sola immagine in grigi di 128 × 128 pixel sono 16.384 numeri. Lo scopo dei passi seguenti è passare a qualche decina di numeri con un significato. KNIME Image Processing, un'estensione gratuita con circa 150 nodi, lo fa in sei: Global Thresholder (soglia), Connected Component Analysis (segmenti), Labeling Filter (via i segmenti minuscoli), Image Segment Features (misure di ogni segmento), GroupBy (una riga per immagine) e Image Features (tessitura dell'intera immagine).</p>
+  <h3>Primo passo: separare il pezzo dallo sfondo</h3>
+  <p>Ogni pixel sopra una soglia diventa 1, ogni pixel sotto diventa 0: il risultato è una <strong>maschera</strong> binaria. Ma quale soglia? Una soglia fissa, per esempio 128, andrebbe male con una foto un po' più scura o più chiara. Il <strong>metodo di Otsu</strong> (1979) la sceglie da solo per ogni immagine: prova tutte le soglie possibili e tiene quella che rende i due gruppi di pixel il più diversi possibile, cioè che massimizza la varianza fra le classi. È la stessa idea dell'ANOVA della lezione 10.</p>
+  <div class="eq">\[ \sigma^2_{\text{fra}}(t) = w_0(t)\, w_1(t)\, \big(\mu_0(t) - \mu_1(t)\big)^2 \]</div>
+  <p>Qui \(w_0\) e \(w_1\) sono le quote di pixel sotto e sopra la soglia \(t\), \(\mu_0\) e \(\mu_1\) i loro grigi medi.</p>
+  <figure>
+    <div class="w" id="b16otsu"></div>
+    <figcaption>Il metodo di Otsu sull'immagine della figura precedente, ricalcolato. In grigio l'istogramma dei livelli di grigio dei suoi 16.384 pixel; in rosa la varianza fra le classi per ogni soglia possibile (scala a parte). Il massimo cade a 116: i pixel più chiari, cioè il fondo chiaro e gli anelli chiari del pezzo, diventano 1; quelli più scuri 0.</figcaption>
+  </figure>
+  <p>Lo stesso nodo offre altri metodi (Huang, Li, Triangle, Mean...): confrontarli è uno degli esercizi delle slide.</p>
+  <h3>Secondo e terzo passo: dalla maschera ai segmenti</h3>
+  <p>Connected Component Analysis dà lo stesso identificativo ai pixel di primo piano che si toccano (qui con 4 vicini: sopra, sotto, destra, sinistra): ogni gruppo è un <strong>segmento</strong>, l'equivalente di un sottografo connesso nella teoria dei grafi. Labeling Filter toglie i segmenti più piccoli di 10 pixel, granelli di polvere e rumore. Nelle slide un pezzo buono dà 2 segmenti puliti e uno difettoso 8, perché bave e porosità possono spezzare gli anelli chiari; la figura mostra un esempio analogo ricalcolato qui, con 2 e 6 segmenti.</p>
+  <figure>
+    <div class="w" id="b16seg"></div>
+    <figcaption>Le maschere di due pezzi del dataset dopo la soglia di Otsu (116 e 152), le componenti connesse e il filtro sotto i 10 pixel, ricalcolate qui; ogni segmento ha un colore, in nero i pixel sotto la soglia. Anche il fondo chiaro supera la soglia e conta come un segmento (in blu). Nel primo riquadro un pezzo buono: il fondo e l'anello chiaro centrale, 2 segmenti. Nel secondo un pezzo difettoso (cast_def_0_4125): l'anello è spezzato e i segmenti sono 6.</figcaption>
+  </figure>
+  <p>Il numero di segmenti è già una feature. Da solo però non basta: ricalcolandolo su tutti i 300 pezzi del dataset, la media è 3,2 segmenti per i buoni e 2,6 per i difettosi, e molti pezzi di entrambe le classi hanno 2 segmenti: l'esempio delle slide è un caso scelto, non la regola. Servono altre misure, ed è infatti ciò che dirà il modello.</p>
+  <div class="quiz inq" data-quiz="16b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Quarto passo: tre famiglie di numeri</h2>
+  <p>Dai segmenti e dall'intera immagine si estraggono feature di tre famiglie, ciascuna con una lettura di business.</p>
+  <div class="scroll"><table><thead><tr><th>Famiglia</th><th>Che cosa misura</th><th>Esempi</th><th>Lettura di business</th></tr></thead><tbody>
+    <tr><td>Statistiche del primo ordine</td><td>l'istogramma dei pixel, senza posizione</td><td>media, minimo, massimo, quantili, deviazione standard, asimmetria, curtosi</td><td>il segmento è più chiaro o più irregolare del solito?</td></tr>
+    <tr><td>Geometria (solo segmenti)</td><td>dimensione e forma di ogni segmento</td><td>numero di pixel (area), perimetro, circolarità, convessità, diametro</td><td>il bordo è ancora rotondo? Manca un pezzo?</td></tr>
+    <tr><td>Tessitura</td><td>come sono disposti i grigi nello spazio</td><td>14 statistiche di Haralick; Tamura: grana, contrasto, direzionalità</td><td>la superficie è liscia, o porosa e graffiata?</td></tr>
+  </tbody></table></div>
+  <p>Le statistiche del primo ordine non sanno dove sta un pixel: un'immagine e la stessa con i pixel rimescolati avrebbero lo stesso istogramma. La tessitura invece guarda i vicini. Haralick (1973) conta quante volte un livello di grigio sta accanto a un altro (un pixel a destra, sotto, in diagonale): il risultato è la <strong>matrice di co-occorrenza dei livelli di grigio</strong> (GLCM), e le feature di tessitura sono statistiche di quella matrice.</p>
+  <figure>
+    <div class="w" id="b16glcm"></div>
+    <figcaption>Un esempio aggiunto qui per mostrare il meccanismo. Nel primo riquadro un'immagine di 4 × 4 pixel con tre livelli di grigio (0, 1, 2). Nel secondo la sua matrice di co-occorrenza per il vicino a destra: la cella in riga \(i\) e colonna \(j\) conta le coppie di pixel affiancati con grigio \(i\) a sinistra e \(j\) a destra. Una superficie liscia concentra i conteggi sulla diagonale (vicini uguali); graffi e bordi li spostano lontano dalla diagonale, e il contrasto sale.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Feature di Haralick</th><th>Un valore alto vuol dire...</th></tr></thead><tbody>
+    <tr><td>Contrasto</td><td>i pixel vicini sono molto diversi: graffi, bordi</td></tr>
+    <tr><td>Omogeneità (IFDM)</td><td>superficie liscia e uniforme</td></tr>
+    <tr><td>Entropia</td><td>tessitura disordinata, imprevedibile</td></tr>
+    <tr><td>Correlazione</td><td>schema regolare, ripetuto</td></tr>
+    <tr><td>Cluster prominence</td><td>poche anomalie forti e isolate</td></tr>
+    <tr><td>ASM (energia)</td><td>poche coppie di grigi dominanti</td></tr>
+  </tbody></table></div>
+  <p>Fra le sigle della tabella, IFDM (inverse difference moment) è la misura di omogeneità; ICM2, che comparirà fra le variabili importanti, è una misura di correlazione dell'informazione. Nel workflow il nodo Image Features calcola le statistiche del primo ordine e Haralick con 40 livelli di grigio, distanza 1, quattro direzioni e la media fra le direzioni: 15 feature di tessitura.</p>
+  <h3>Quinto passo: una riga per pezzo</h3>
+  <p>Image Segment Features produce una riga per segmento: 863 segmenti per 300 immagini. Il modello però vuole una riga per pezzo. String Manipulation ricava l'identificativo dell'immagine da quello della riga (Row12#3 diventa Row12) e un GroupBy aggrega: il conteggio dei segmenti, e media e massimo di ogni misura (il segmento tipico e quello più estremo). Un Joiner unisce le misure dei segmenti e la tessitura dell'immagine intera. Il risultato è una tabella normale di 300 righe e 46 colonne: la classe e 45 feature (15 di tessitura, 9 del primo ordine sull'immagine intera, 21 dei segmenti).</p>
+  <p class="stmt"><strong>Dopo l'estrazione delle feature un'immagine è una riga come un'altra:</strong> da qui in poi valgono la modellazione e la valutazione delle lezioni 12-14.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il caso: ispezionare i pezzi di fonderia</h2>
+  <p>Una fonderia versa metallo liquido in uno stampo. Solidificando, alcuni pezzi escono con soffiature, porosità, bave, ritiri o un bordo deformato, e una girante difettosa in una pompa può rompersi sul campo. Oggi li controllano ispettori umani: lenti, stanchi, incoerenti fra un turno e l'altro, e un lotto sbagliato può far rifiutare un ordine intero. La proposta: una telecamera sulla linea classifica ogni pezzo come buono o difettoso e manda all'ispettore solo quelli sospetti. I due errori hanno due prezzi: un difetto mancato costa un reclamo, un richiamo, un cliente; un falso allarme costa un secondo controllo a mano.</p>
+  <p>Le immagini vengono da un dataset industriale pubblico (R. Dabhi, Kaggle; pezzi di PILOT TECHNOCAST, India): 1.300 viste dall'alto a 512 × 512, da cui il corso ne usa 300 (150 buone e 150 difettose) a 128 × 128 in grigi, più 60 immagini non etichettate di un «nuovo lotto» con il file delle risposte. Il workflow pesa circa 3,5 MB con le immagini e gira in pochi secondi. Le slide invitano a discutere tre scelte: il campione bilanciato 50/50 (in una fonderia vera i difetti sono pochi per cento, quindi l'accuratezza su un test bilanciato non è quella che si vedrà sulla linea), i 128 pixel (leggeri, ma le porosità più piccole possono sparire), e l'etichetta presa dal nome della cartella (in un progetto vero le etichette le danno gli ispettori, e sono rumorose anche loro).</p>
+  <p>Il workflow ha 21 nodi in tre sezioni: leggere ed etichettare (l'etichetta «defect» viene da un Rule Engine sul nome del file); visione classica (soglia, segmenti, misure, aggregazione, tessitura, unione); modello e decisione (Column Filter, divisione stratificata 70/30, random forest, Scorer e ROC, poi una soglia di business con un Rule Engine e un secondo Scorer). Le immagini stanno nell'area dati del workflow, così viaggiano con lui quando lo si esporta.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quanto è buono il modello, e quale soglia scegliere?</h2>
+  <figure>
+    <div class="w" id="b16cm"></div>
+    <figcaption>La matrice di confusione della random forest sui 90 pezzi di test mai visti in addestramento, con soglia 0,5 e classe positiva «difettoso»; numeri delle slide. 6 pezzi difettosi passano come buoni, l'errore costoso; 3 pezzi buoni vengono segnalati, un secondo sguardo dell'ispettore.</figcaption>
+  </figure>
+  <p>Accuratezza 90%, \(\kappa = 0{,}80\), AUC 0,97. Per i difettosi la sensibilità è 39 / 45 = 86,7% e la precisione 39 / 42 = 92,9%; per i buoni 93,3% e 87,5%. Con 90 pezzi di test un errore vale 1,1 punti di accuratezza: i numeri vanno letti come «circa il 90%», non come 90,0%. Con sole 210 immagini di addestramento e feature fatte a mano, la catena classica separa già bene i pezzi.</p>
+  <figure>
+    <div class="w" id="b16imp"></div>
+    <figcaption>Le dieci variabili più importanti della random forest, valori delle slide. In giallo la tessitura dell'immagine intera, in blu la luminosità dell'immagine o dei suoi segmenti. In cima c'è la cluster prominence: porosità e bave sono proprio «poche anomalie forti e isolate».</figcaption>
+  </figure>
+  <p>Tessitura e luminosità dei segmenti contano più della geometria pura: porosità e bave cambiano il modo in cui la luce viene riflessa. È coerente con quanto visto sul numero di segmenti, che da solo non separava le classi.</p>
+  <div class="quiz inq" data-quiz="16c"></div>
+  <h3>Spostare la soglia: una decisione di business</h3>
+  <p>La random forest dà per ogni pezzo una probabilità \(P(\text{difettoso})\); scartare sopra 0,5 è una convenzione. Nel workflow un Rule Engine scarta da 0,35 in su (<code>$P (class=defect)$ &gt;= 0.35 =&gt; "defect"</code>) e un secondo Scorer ne misura l'effetto.</p>
+  <div class="scroll"><table><thead><tr><th>Soglia</th><th>Difetti mancati</th><th>Pezzi buoni segnalati</th><th>Accuratezza</th></tr></thead><tbody>
+    <tr><td>0,50</td><td>6 / 45</td><td>3 / 45</td><td>90,0%</td></tr>
+    <tr><td>0,40</td><td>3 / 45</td><td>3 / 45</td><td>93,3%</td></tr>
+    <tr><td><strong>0,35</strong></td><td><strong>2 / 45</strong></td><td><strong>4 / 45</strong></td><td><strong>93,3%</strong></td></tr>
+    <tr><td>0,30</td><td>2 / 45</td><td>5 / 45</td><td>92,2%</td></tr>
+    <tr><td>0,25</td><td>1 / 45</td><td>11 / 45</td><td>86,7%</td></tr>
+    <tr><td>0,20</td><td>1 / 45</td><td>16 / 45</td><td>81,1%</td></tr>
+  </tbody></table></div>
+  <p>Per tradurre la tabella in euro le slide fanno tre ipotesi illustrative: sulla linea i difettosi sono il 5%; ogni pezzo segnalato viene ricontrollato a mano (5 euro); ogni difetto mancato costa 150 euro (reclamo, richiamo, cliente). Su 1.000 pezzi, con la soglia 0,5, i difettosi sono 50: se ne mancano \(50 \times 6/45 \approx 6{,}7\), che costano circa 1.000 euro; i pezzi segnalati sono i difettosi trovati (\(\approx 43{,}3\)) più i buoni segnalati (\(950 \times 3/45 \approx 63{,}3\)), circa 107 controlli da 5 euro, 533 euro. Totale circa 1.533 euro.</p>
+  <figure>
+    <div class="w" id="b16cost"></div>
+    <figcaption>Il costo atteso per 1.000 pezzi a ogni soglia, con le ipotesi delle slide, ricalcolato qui: rosso per i difetti mancati, arancione per i controlli a mano. Il minimo cade a 0,35, circa 994 euro: il 35% in meno della soglia di partenza. Scendendo ancora i difetti mancati calano poco e i controlli esplodono. Ispezionare a mano tutti i 1.000 pezzi costerebbe circa 5.000 euro.</figcaption>
+  </figure>
+  <p class="stmt"><strong>La soglia trasforma le probabilità in una decisione: si sceglie con i costi, non con l'accuratezza.</strong></p>
+  <p>Per portare il modello sulla linea, ogni immagine nuova passa per gli stessi nodi delle sezioni 1 e 2 e per il modello salvato, in batch o come servizio (KNIME Business Hub, o il workflow chiamato dal software della linea). L'ispettore resta nel giro: vede solo i pezzi segnalati e corregge le etichette. E si monitora: una lampada nuova o una lente sporca spostano i grigi e la soglia, quindi si segue ogni giorno la quota di scarti. I limiti onesti del caso: è fragile all'impianto (cambiano luce, sfondo o angolo e le feature fatte a mano cambiano); a 128 pixel le porosità più piccole possono sparire, e i sistemi veri usano la risoluzione piena; il campione è piccolo e bilanciato, con intervalli di confidenza larghi, e i costi vanno calcolati con il tasso di difetti vero.</p>
+  <p>Le slide chiudono con un'anticipazione della lezione successiva, di un altro docente: le stesse immagini con una rete convoluzionale che impara da sola i suoi filtri, e il <em>transfer learning</em> che riusa una rete pre-addestrata su milioni di foto. Notebook pubblici sul dataset completo riportano circa il 98% di accuratezza di validazione con una MobileNetV2 regolata (una rete convoluzionale leggera, pre-addestrata), al prezzo di meno trasparenza.</p>
+  <div class="quiz inq" data-quiz="16d"></div>
+</div></section>
+
+<section class="recap"><div class="col">
+  <h2>La lezione 16 in sintesi</h2>
+  <p>Le idee di questa lezione in un solo posto: prima la mappa, poi la catena classica passo per passo.</p>
+  <figure>
+    <div class="w" data-mappa="16"></div>
+    <figcaption>La mappa della lezione: perché le immagini contano, classico contro deep learning, la catena in KNIME, le feature, il caso della fonderia e la soglia sui costi.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Passo</th><th>Nodo di KNIME</th><th>Che cosa produce</th></tr></thead><tbody>
+    <tr><td>Leggere ed etichettare</td><td>List Files/Folders, Image Reader, Rule Engine</td><td>una tabella con un'immagine e una classe per riga</td></tr>
+    <tr><td>Soglia</td><td>Global Thresholder (Otsu)</td><td>una maschera binaria, soglia scelta per ogni immagine</td></tr>
+    <tr><td>Segmenti</td><td>Connected Component Analysis, Labeling Filter</td><td>gruppi di pixel che si toccano, senza quelli sotto i 10 pixel</td></tr>
+    <tr><td>Misure dei segmenti</td><td>Image Segment Features, GroupBy</td><td>conteggio, media e massimo di luminosità e forma, una riga per pezzo</td></tr>
+    <tr><td>Tessitura</td><td>Image Features (primo ordine, Haralick)</td><td>statistiche della matrice di co-occorrenza</td></tr>
+    <tr><td>Modello e soglia</td><td>Random Forest, Scorer, Rule Engine</td><td>accuratezza circa 90%, AUC 0,97; soglia 0,35: costo −35%</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="16"></div>
+</div></section>
+
+<section class="recap"><div class="col">
+  <h2>Le lezioni di L. Molteni in sintesi</h2>
+  <p>Le lezioni da 9 a 16 formano la seconda parte del corso: dai dati che alimentano l'AI ai modelli predittivi costruiti in KNIME, fino ai testi e alle immagini.</p>
+  <div class="scroll"><table><thead><tr><th>Lezione</th><th>Concetto</th><th>Idea da tenere</th><th>In una riga</th></tr></thead><tbody>
+    <tr><td>9</td><td>AI predittiva e generativa</td><td>un modello vale quanto i suoi dati</td><td>warehouse affidabile, target, KPI</td></tr>
+    <tr><td>10</td><td>Analisi di base, KNIME</td><td>lo strumento dipende dai tipi delle due variabili</td><td>χ² e V di Cramér, r, ANOVA</td></tr>
+    <tr><td>11</td><td>Preparazione dei dati</td><td>perché manca, è un errore, lo conoscerei prima?</td><td>mancanti, anomali, leakage, feature</td></tr>
+    <tr><td>12</td><td>Valutazione</td><td>solo su dati mai visti, con più indici</td><td>matrice di confusione, AUC, lift, MAE, MASE</td></tr>
+    <tr><td>13</td><td>Alberi e insiemi</td><td>foresta contro varianza, boosting contro distorsione</td><td>Gini, bootstrap, residui, SHAP</td></tr>
+    <tr><td>14</td><td>Casi applicati</td><td>un risultato troppo bello è un sintomo</td><td>primo taglio, test intatto, lista di chiamate</td></tr>
+    <tr><td>15</td><td>Testi</td><td>le parole diventano colonne</td><td>dizionario, bag of words, LDA</td></tr>
+    <tr><td>16</td><td>Immagini</td><td>i pixel diventano feature</td><td>Otsu, segmenti, Haralick, soglia sui costi</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>con l'approccio classico sei tu a decidere quali numeri estrarre da un'immagine (soglia, segmenti, luminosità, tessitura)</strong>; dopo, l'immagine è una riga come un'altra, e la soglia del modello si sceglie sul prezzo dei due errori.</p>
+  <p>Qui finisce la parte di L. Molteni. La lezione successiva, con le reti neurali, apre la parte di Tonini.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

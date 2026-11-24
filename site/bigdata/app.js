@@ -47,7 +47,7 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
   askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
   askSlow:'nessuna risposta in tempo, provo il modello successivo.',
@@ -311,6 +311,13 @@ const wideFigs=n=>$('#lezione-'+n).querySelectorAll('figure .w > div').forEach(d
   THUMB[8]=sv('<rect x="8" y="12" width="52" height="48" fill="none" stroke="#666"/>'+Array.from({length:30},(_,i)=>'<circle cx="'+(14+(i*37)%42)+'" cy="'+(18+(i*23)%38)+'" r="1.6" fill="#8a8a8a"/>').join('')+
     '<line x1="62" y1="36" x2="72" y2="36" stroke="#777"/><rect x="74" y="20" width="28" height="32" fill="none" stroke="#bbb"/><rect x="79" y="27" width="18" height="4" fill="'+BLUE+'"/><rect x="79" y="35" width="12" height="4" fill="'+BLUE+'"/><rect x="79" y="43" width="15" height="4" fill="'+BLUE+'"/>');
   THUMB[9]=sv('<line x1="10" y1="62" x2="100" y2="62" stroke="#555"/>'+[2,7,13,18,33,64,97,149,181].map((v,i)=>'<rect x="'+(12+i*9.5)+'" y="'+(62-v*0.26)+'" width="7" height="'+(v*0.26)+'" fill="'+(i>6?'#9a9a9a':'#ddd')+'"/>').join(''));
+  THUMB[10]=sv('<line x1="10" y1="62" x2="100" y2="62" stroke="#555"/>'+[1371,698,568,479,453,423,364,384,416,404,450,1033].map((v,i)=>'<rect x="'+(12+i*7.4)+'" y="'+(62-v*0.036)+'" width="6" height="'+(v*0.036)+'" fill="#bbb"/>').join('')+'<line x1="52" y1="8" x2="52" y2="62" stroke="'+YEL+'" stroke-width="1.6"/>');
+  THUMB[11]=sv('<rect x="14" y="10" width="80" height="52" fill="none" stroke="#555"/>'+[0,1,2,3].map(i=>'<line x1="14" y1="'+(23+i*13)+'" x2="94" y2="'+(23+i*13)+'" stroke="#333"/>').join('')+[[30,16],[62,29],[46,42],[78,55]].map(([x,y])=>'<circle cx="'+x+'" cy="'+y+'" r="3.2" fill="'+PUR+'"/>').join('')+'<circle cx="86" cy="18" r="3.6" fill="'+RED+'"/>');
+  THUMB[12]=sv('<line x1="14" y1="62" x2="94" y2="62" stroke="#666"/><line x1="14" y1="62" x2="14" y2="8" stroke="#666"/><line x1="14" y1="62" x2="94" y2="8" stroke="#555" stroke-dasharray="3 3"/><path d="M14 62 C 18 22, 34 12, 94 8" fill="none" stroke="'+GRN+'" stroke-width="2.4"/>');
+  THUMB[13]=sv('<line x1="54" y1="16" x2="28" y2="40" stroke="#888"/><line x1="54" y1="16" x2="80" y2="40" stroke="#888"/><line x1="28" y1="40" x2="16" y2="62" stroke="#888"/><line x1="28" y1="40" x2="40" y2="62" stroke="#888"/><line x1="80" y1="40" x2="68" y2="62" stroke="#888"/><line x1="80" y1="40" x2="92" y2="62" stroke="#888"/>'+[[54,16,'#ddd'],[28,40,'#ddd'],[80,40,'#ddd'],[16,62,GRN],[40,62,'#666'],[68,62,GRN],[92,62,GRN]].map(([x,y,c])=>'<circle cx="'+x+'" cy="'+y+'" r="5" fill="'+c+'"/>').join(''));
+  THUMB[14]=sv('<line x1="10" y1="62" x2="100" y2="62" stroke="#555"/>'+[[.942,'#8a8a8a'],[.682,GRN],[.911,'#8a8a8a'],[.752,GRN],[.754,'#8a8a8a'],[.762,GRN]].map(([v,c],i)=>'<rect x="'+(14+i*14+(i>>1)*4)+'" y="'+(62-(v-.4)*90)+'" width="11" height="'+((v-.4)*90)+'" fill="'+c+'"/>').join(''));
+  THUMB[15]=sv('<rect x="10" y="12" width="56" height="8" fill="#666"/><rect x="10" y="26" width="76" height="8" fill="#666"/><rect x="10" y="40" width="44" height="8" fill="#666"/>'+'<rect x="72" y="12" width="26" height="8" fill="'+RED+'"/><rect x="60" y="40" width="20" height="8" fill="'+GRN+'"/><rect x="10" y="54" width="64" height="8" fill="'+BLUE+'"/>');
+  THUMB[16]=sv('<circle cx="54" cy="36" r="26" fill="none" stroke="#bbb" stroke-width="5"/><circle cx="54" cy="36" r="11" fill="none" stroke="#bbb" stroke-width="4"/><circle cx="74" cy="24" r="3" fill="'+RED+'"/><circle cx="40" cy="54" r="2.4" fill="'+RED+'"/>');
 })();
 
 /* Lezione 1: l'evoluzione dell'analisi dei dati */
@@ -1650,6 +1657,961 @@ MAPPA[9]={c:'Perché un modello predittivo ha bisogno di un data warehouse?',r:[
   {t:'Insegnamenti dei casi',c:ORG,v:['Confrontarsi sempre con una baseline','Etica e diritto: GDPR, AI Act','Riaddestrare i modelli nel tempo']},
   {t:'Compiti tipici',c:TEAL,v:['Abbandono: classificazione binaria','Frodi: dati sbilanciati, anomalie','Vendite: regressione e serie storiche','Guasti: classificazione e sopravvivenza']}]};
 
+/* Lezione 10: KNIME e analisi di base dei dati (dataset IBM Telco Customer Churn) */
+const TELSC=[[31,639],[72,1849],[14,773],[21,416],[72,6130],[15,1071],[1,60],[66,1374],[5,426],[53,4872],[7,665],[57,1088],[4,191],[31,2484],[47,943],[9,191],[45,892],[43,3539],[45,929],[65,1293],[3,79],[62,4820],[56,3808],[6,487],[7,151],[17,1454],[29,602],[21,2158],[13,966],[37,3341],[1,45],[47,3650],[26,1407],[21,1559],[28,2290],[1,25],[47,949],[1,20],[56,5841],[63,6479],[17,1207],[3,246],[71,7532],[1,95],[63,4449],[17,1111],[1,19],[57,5012],[2,187],[63,5040],[29,2263],[4,365],[72,8436],[36,2498],[68,4911],[1,51],[8,412],[18,411],[1,20],[5,353],[35,1655],[71,7283],[19,1495],[57,2258],[56,4093],[20,434],[28,543],[44,2265],[72,8306],[1,93],[2,104],[2,109],[4,285],[23,454],[11,484],[35,2442],[55,1140],[62,7159],[47,4536],[26,1908],[8,438],[41,3089],[11,202],[10,857],[10,492],[71,1672],[63,6536],[8,446],[4,184],[46,4630],[15,1346],[25,2029],[7,344],[72,7898],[53,3046],[5,392],[1,49],[21,2254],[29,535],[12,224],[19,1376],[12,594],[68,1378],[30,2680],[50,4304],[43,2342],[72,7346],[17,1071],[2,97],[45,4192],[72,4575],[8,564],[27,805],[16,1391],[56,4261],[51,4473],[51,1529],[26,2089],[3,197],[71,5140],[1,90],[1,21],[72,8033],[40,1716],[28,1655],[47,4065],[62,2346],[28,2626],[25,1952],[68,5763],[36,1267],[1,69],[1,45],[22,472],[32,2954],[27,1894],[51,3121],[49,3472],[23,1677],[2,35],[6,124],[2,39],[71,1813],[42,3944],[4,215],[2,44],[18,358],[6,171],[2,185],[1,96],[14,1044],[30,1562],[27,2210],[9,714],[17,1166],[29,2830],[33,2990],[66,7384],[2,165],[45,2320],[15,309],[8,607],[10,914],[6,129],[53,4921],[1,45],[72,6735],[65,7246],[72,7790],[5,478],[67,5798],[71,5154],[52,2276],[70,5222],[35,3528],[31,1520],[1,94],[47,4042],[71,7904],[72,6369],[28,2434],[16,1449],[72,1751],[70,5264],[30,2624],[23,1222],[63,6110],[2,139],[1,54],[3,293],[1,87],[68,1396],[43,2907],[1,51],[1,19],[3,274],[23,1868],[7,481],[67,5884],[9,530],[13,357],[8,366],[52,4327],[48,4445],[33,641],[72,1779],[17,1323],[70,8152],[48,3545],[72,7286],[5,375],[20,1641],[1,50],[6,218],[72,8405],[35,739],[24,453],[34,2004],[24,2283],[27,1499],[3,189],[12,1000],[61,1552],[6,434],[47,3826],[19,1932],[4,221],[1,20],[22,2157],[2,132],[24,2231],[6,355],[26,1190],[10,1038],[60,1205],[24,1559],[39,1971],[71,6224],[19,1687],[22,413],[16,1483],[40,855],[1,20],[8,760],[55,3132],[55,3617],[1,43],[61,3779],[46,1489],[61,5527],[29,655],[10,187],[3,271],[12,1133],[68,5647],[9,296],[26,2515],[4,208],[69,4578],[12,356],[15,1400],[1,85],[62,1297],[60,3582],[47,3866],[5,114],[1,85],[29,2516],[45,4634],[31,3144],[51,4019],[66,4859],[2,116],[63,1209],[72,6689],[50,5348],[22,1049],[1,45],[17,1607],[6,495],[26,684],[45,4369],[60,3603],[71,7383],[46,3255],[40,3707],[2,179],[25,547],[32,2619],[63,3708],[1,44],[3,92],[32,2202],[18,392],[70,7842],[1,70],[5,420],[12,246],[2,194],[65,7082],[50,5190],[24,2542],[42,4323],[12,224],[7,673],[9,770],[31,2641],[29,1696],[37,695],[2,33],[72,6786],[13,1029],[1,44],[61,5321],[23,1284],[70,3370],[16,1213],[5,250],[2,38],[1,44]];
+const CHY=ORG,CHN=BLUE,MEANC=YEL,MEDC=PINK;
+/* simple statistics on arrays */
+const st10={mean:a=>a.reduce((x,y)=>x+y,0)/a.length,
+  median:a=>{const b=[...a].sort((x,y)=>x-y),m=b.length>>1;return b.length%2?b[m]:(b[m-1]+b[m])/2},
+  r:(xs,ys)=>{const mx=st10.mean(xs),my=st10.mean(ys);let sxy=0,sx=0,sy=0;xs.forEach((x,i)=>{sxy+=(x-mx)*(ys[i]-my);sx+=(x-mx)**2;sy+=(ys[i]-my)**2});return sxy/Math.sqrt(sx*sy)}};
+const gauss10=r=>{const u=Math.max(r(),1e-9),v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+INIT[10]=function(){
+  /* node in its four states */
+  (function(){
+    const g=el('div','multi');$('#b10node').append(g);
+    const st=[['Non configurato','red','In attesa di configurazione o di dati.'],['Configurato','yel','Pronto per l\'esecuzione.'],['Eseguito','grn','Risultati disponibili a valle.'],['Errore','err','L\'esecuzione è fallita.']];
+    st.forEach(([t,k,n])=>{
+      let s=tx(90,20,'Row Filter',{s:13,f:'#ddd'});
+      s+='<path d="M28 52l10 6l-10 6z" fill="#000" stroke="#bbb" stroke-width="1.5"/><path d="M142 52l10 6l-10 6z" fill="#000" stroke="#bbb" stroke-width="1.5"/>';
+      s+=line(10,58,28,58,'#777',1.5)+line(152,58,170,58,'#777',1.5);
+      s+=rect(60,30,60,56,'#FFD94A','#000',' rx="8"')+line(72,46,108,46,'#000',3)+line(72,58,100,58,'#000',3)+line(72,70,92,70,'#000',3);
+      s+=rect(56,96,68,22,'#1b1b1b','#555',' rx="11"');
+      const on={red:RED,yel:YEL,grn:GRN};
+      if(k==='err'){s+='<circle cx="90" cy="107" r="8" fill="'+RED+'"/>'+line(86,103,94,111,'#000',2)+line(94,103,86,111,'#000',2)}
+      else ['red','yel','grn'].forEach((c,i)=>{s+='<circle cx="'+(70+i*20)+'" cy="107" r="6.5" fill="'+(c===k?on[c]:'#333')+'"/>'});
+      s+=tx(16,46,'in',{s:12,f:GRAY,a:'start'})+tx(164,46,'out',{s:12,f:GRAY,a:'end'});
+      cell(g,t,s,180,126,'Nodo: '+t,n);
+    });
+  })();
+  /* workflow of the lesson */
+  (function(){
+    let s='<defs>'+arrowDef('b10ar','#888')+'</defs>';
+    const src=[70,190];
+    const nd=[['Statistics','posizione, variabilità, forma',BLUE],['Histogram','distribuzione della permanenza',BLUE],['Crosstab','tabella di contingenza, χ², V di Cramér',YEL],['Scatter Plot','permanenza e spesa totale',YEL],['Linear Correlation','matrice di r e test t',YEL],['Box Plot','permanenza per abbandono',YEL],['One-way ANOVA','permanenza per contratto, test F',YEL]];
+    nd.forEach(([n,q,c],i)=>{const y=34+i*52,x=330;
+      s+='<path d="M'+(src[0]+30)+' '+src[1]+' C 200 '+src[1]+', 230 '+y+', '+(x-34)+' '+y+'" fill="none" stroke="#888" stroke-width="1.4" marker-end="url(#b10ar)"/>';
+      s+=rect(x-26,y-18,36,36,c,'#000',' rx="6"')+tx(x+24,y-3,n,{s:14,f:'#fff',a:'start'})+tx(x+24,y+14,q,{s:12.5,f:GRAY,a:'start'})});
+    s+=rect(src[0]-30,src[1]-24,60,48,'#ccc','#000',' rx="7"')+tx(src[0],src[1]+44,'CSV Reader',{s:14,f:'#fff'})+tx(src[0],src[1]+61,'telco_customer_churn.csv',{s:11.5,f:GRAY});
+    s+=line(src[0]-14,src[1]-8,src[0]+14,src[1]-8,'#000',2.5)+line(src[0]-14,src[1],src[0]+14,src[1],'#000',2.5)+line(src[0]-14,src[1]+8,src[0]+6,src[1]+8,'#000',2.5);
+    svgBox($('#b10wf'),640,390,s,'Workflow della lezione 10','40rem');
+  })();
+  /* data types tree */
+  (function(){
+    let s='';const b=(x,y,w,t,c,o)=>rect(x-w/2,y-16,w,32,'#111',c,' rx="6"')+tx(x,y+5,t,{s:o||14,f:c});
+    s+=b(360,24,120,'Dati','#fff');
+    s+=line(360,40,180,72,'#666')+line(360,40,540,72,'#666');
+    s+=b(180,88,190,'Quantitativi (numerici)',BLUE,13.5)+b(540,88,190,'Qualitativi (categorici)',PINK,13.5);
+    [[90,180,BLUE,'Discreti'],[270,180,BLUE,'Continui'],[450,540,PINK,'Nominali'],[630,540,PINK,'Ordinali']].forEach(([x,px,c,t])=>{s+=line(px,104,x,136,'#666')+b(x,152,140,t,c)});
+    const ex=[[90,['n. di stanze,','prodotti acquistati'],'tenure (mesi, 0-72)'],[270,['vendite, reddito,','spesa mensile'],'MonthlyCharges ($)'],[450,['genere, metodo di','pagamento, regione'],'gender, PaymentMethod'],[630,['durata del contratto,','istruzione, voto 1-5'],'Contract']];
+    ex.forEach(([x,l,t])=>{s+=tx(x,192,l[0],{s:12.5,f:'#ccc'})+tx(x,208,l[1],{s:12.5,f:'#ccc'})+tx(x,236,t,{s:12.5,f:'#fff',w:600})});
+    svgBox($('#b10types'),720,250,s,'Tipi di dati','44rem');
+  })();
+  /* measurement levels staircase */
+  (function(){
+    let s='';const L=[['NOMINALE','categorie senza ordine','=, ≠','moda, frequenze, χ²','#3d6f99'],['ORDINALE','categorie ordinate','+ <, >','+ mediana, percentili','#2c5a85'],['A INTERVALLI','differenze, nessuno zero vero','+ +, −','+ media, dev. standard, correlazione','#22476e'],['DI RAPPORTI','differenze, zero vero','+ ×, ÷','+ CV, rapporti, tassi di crescita','#173658']];
+    s+=tx(468,18,'operazioni',{s:12.5,f:GRAY})+tx(540,18,'statistiche ammesse',{s:12.5,f:GRAY,a:'start'});
+    L.forEach(([n,d,o,st_,c],i)=>{const x=10+i*40,y=30+i*58;s+=rect(x,y,300,46,c)+tx(x+12,y+20,n,{s:13.5,f:'#fff',w:600,a:'start'})+tx(x+12,y+37,d,{s:12.5,f:'#dfe9f2',a:'start'});
+      s+=tx(468,y+28,o,{s:14,f:'#fff'})+tx(540,y+28,st_,{s:13,f:'#ddd',a:'start'})});
+    svgBox($('#b10levels'),760,262,s,'Livelli di misura','46rem');
+  })();
+  /* tenure histogram */
+  (function(){
+    const H=[1371,698,568,479,453,423,364,384,416,404,450,1033];let s='';const L=60,R=700,T=20,B=250,X=v=>L+v/72*(R-L),Y=v=>B-v/1500*(B-T);
+    [0,500,1000,1500].forEach(v=>{s+=line(L,Y(v),R,Y(v),'#262626',1)+tx(L-8,Y(v)+4,fi(v,0),{s:12.5,f:GRAY,a:'end'})});
+    H.forEach((v,i)=>{s+=rect(X(i*6)+1.5,Y(v),X(6)-X(0)-3,B-Y(v),'#9a9a9a')+tx(X(i*6+3),Y(v)-6,fi(v,0),{s:11.5,f:'#ddd'})});
+    for(let v=0;v<=72;v+=12)s+=tx(X(v),B+18,String(v),{s:12.5,f:GRAY});
+    s+=line(L,B,R,B,'#777',1.2);
+    s+=line(X(32.4),T,X(32.4),B,MEANC,2)+lbl(X(32.4)+6,T+60,'media 32,4',MEANC,{a:'start',s:13})+line(X(29),T,X(29),B,MEDC,2,' stroke-dasharray="6 4"')+lbl(X(29)-6,T+60,'mediana 29',MEDC,{a:'end',s:13});
+    s+=tx((L+R)/2,B+38,'mesi di permanenza (tenure)',{s:13,f:GRAY})+tx(16,(T+B)/2,'clienti',{s:13,f:GRAY,x:' transform="rotate(-90 16 '+(T+B)/2+')"'});
+    svgBox($('#b10hist'),720,300,s,'Istogramma dei mesi di permanenza','44rem');
+  })();
+  /* mean vs median on three scales */
+  (function(){
+    let s='';const rows=[['tenure (mesi)',0,72,32.4,29,0],['MonthlyCharges ($)',18.25,118.75,64.8,70.4,1],['TotalCharges ($)',18.8,8684.8,2283,1397,0]];const L=40,R=680;
+    rows.forEach(([n,lo,hi,mn,md,d],k)=>{const y=58+k*86,X=v=>L+(v-lo)/(hi-lo)*(R-L);
+      s+=tx(L,y-36,n,{s:13.5,f:'#ddd',a:'start'})+line(L,y,R,y,'#666',1.5)+tx(L,y+20,fi(lo,d===1?2:1),{s:12,f:GRAY})+tx(R,y+20,fi(hi,d===1?2:1),{s:12,f:GRAY});
+      const dx=X(mn)-X(md),near=Math.abs(dx)<70;
+      s+='<circle cx="'+X(md)+'" cy="'+y+'" r="7" fill="'+MEDC+'"/><circle cx="'+X(mn)+'" cy="'+y+'" r="7" fill="none" stroke="'+MEANC+'" stroke-width="3"/>';
+      const am=mn>md?'start':'end',ad=mn>md?'end':'start',om=mn>md?10:-10;
+      s+=lbl(X(mn)+om,y-13,'media '+fi(mn,1),MEANC,{a:am,s:13})+lbl(X(md)-om,y-13,'mediana '+fi(md,1),MEDC,{a:ad,s:13});
+    });
+    svgBox($('#b10mm'),720,284,s,'Media e mediana di tre variabili','44rem');
+  })();
+  /* skewness: three simulated densities */
+  (function(){
+    const t=el('div','trio');$('#b10shape').append(t);
+    const mk=(f,title,label,note)=>{const N=240,xs=[],ys=[];for(let i=0;i<=N;i++){const x=i/N;xs.push(x);ys.push(f(x))}
+      const tot=ys.reduce((a,b)=>a+b,0),mean=xs.reduce((a,x,i)=>a+x*ys[i],0)/tot;let acc=0,med=0;for(let i=0;i<=N;i++){acc+=ys[i];if(acc>=tot/2){med=xs[i];break}}
+      const mx=Math.max(...ys),X=x=>16+x*228,Y=y=>140-y/mx*118;let d='M'+X(0)+' 140';xs.forEach((x,i)=>d+=' L'+X(x).toFixed(1)+' '+Y(ys[i]).toFixed(1));d+=' L'+X(1)+' 140Z';
+      let s='<path d="'+d+'" fill="rgba(255,255,255,.12)" stroke="#ddd" stroke-width="2"/>'+line(16,140,244,140,'#666',1.2);
+      s+=line(X(mean),20,X(mean),140,MEANC,2.2)+line(X(med),20,X(med),140,MEDC,2.2,' stroke-dasharray="5 4"');
+      cell(t,title,s,260,150,label,note)};
+    const gam=(x,a,b)=>x<=0?0:Math.pow(x,a-1)*Math.exp(-x/b);
+    mk(x=>gam(1-x,2.2,.12),'Asimmetria negativa','Coda a sinistra','<span style="color:var(--yellow)">media</span> &lt; <span style="color:var(--pink)">mediana</span>');
+    mk(x=>Math.exp(-((x-.5)**2)/(2*.12*.12)),'Simmetrica','Simmetrica','<span style="color:var(--yellow)">media</span> = <span style="color:var(--pink)">mediana</span>');
+    mk(x=>gam(x,2.2,.12),'Asimmetria positiva','Coda a destra','<span style="color:var(--yellow)">media</span> &gt; <span style="color:var(--pink)">mediana</span>');
+  })();
+  /* row vs column percentages */
+  (function(){
+    const duo=el('div','duo');$('#b10pct').append(duo);
+    const C=[['Mensile',2220,1655],['Un anno',1307,166],['Due anni',1647,48]];
+    let a='';C.forEach(([n,no,yes],i)=>{const y=26+i*58,tot=no+yes,w=220,wy=yes/tot*w;
+      a+=tx(10,y+18,n,{s:13,f:'#ddd',a:'start'})+rect(90,y,w-wy,28,CHN)+rect(90+w-wy,y,wy,28,CHY)+tx(90+w+8,y+19,fi(yes/tot*100,1)+'%',{s:13.5,f:CHY,a:'start',w:600})});
+    a+=rect(90,200,12,12,CHN)+tx(108,211,'resta',{s:12.5,f:'#ddd',a:'start'})+rect(160,200,12,12,CHY)+tx(178,211,'se ne va',{s:12.5,f:'#ddd',a:'start'});
+    cell(duo,'Per riga: il tasso di abbandono',a,360,220,'Percentuali per riga','Dentro ogni contratto, quanti <b>se ne vanno</b>.');
+    let b='';const cs=['#e6e6e6','#9a9a9a','#555'];const grp=[['se ne va',[1655,166,48]],['resta',[2220,1307,1647]]];
+    grp.forEach(([n,v],k)=>{const x=70+k*150,tot=v[0]+v[1]+v[2],H=170;let y=24;
+      b+=tx(x+35,16,n,{s:13,f:k?CHN:CHY});
+      v.forEach((c,j)=>{const h=c/tot*H;b+=rect(x,y,70,h,cs[j],'#000');if(h>16)b+=tx(x+35,y+h/2+5,fi(c/tot*100,1)+'%',{s:12.5,f:j<2?'#000':'#fff'});y+=h})});
+    [['mensile',cs[0]],['un anno',cs[1]],['due anni',cs[2]]].forEach(([n,c],j)=>{b+=rect(14+j*104,204,12,12,c)+tx(32+j*104,215,n,{s:12.5,f:'#ddd',a:'start'})});
+    cell(duo,'Per colonna: chi sono i clienti persi',b,360,220,'Percentuali per colonna','Fra chi se ne va, l\'88,6% era <b>mensile</b>.');
+  })();
+  /* observed vs expected */
+  (function(){
+    const duo=el('div','duo');$('#b10chi').append(duo);
+    const draw=(rows,title,note,lab)=>{let s='';const H=170,M=1700,Y=v=>190-v/M*H,w=40,gap=rows.length===2?120:90,x0=rows.length===2?90:50;
+      [0,500,1000,1500].forEach(v=>{s+=line(30,Y(v),330,Y(v),'#222',1)+tx(26,Y(v)+4,fi(v,0),{s:11.5,f:GRAY,a:'end'})});
+      rows.forEach(([n,o,e],i)=>{const x=x0+i*gap;s+=rect(x,Y(o),w,190-Y(o),CHY)+rect(x+w+6,Y(e),w,190-Y(e),'none',TEAL,' stroke-dasharray="5 3" stroke-width="2"');
+        s+=tx(x+w/2,Y(o)-5,fi(o,0),{s:11.5,f:CHY})+tx(x+w*1.5+6,Y(e)-5,fi(e,0),{s:11.5,f:TEAL})+tx(x+w+3,208,n,{s:12.5,f:'#ddd'})});
+      s+=line(30,190,330,190,'#777',1.2);
+      cell(duo,title,s,340,216,lab,note)};
+    draw([['Donne',939,925.6],['Uomini',930,943.4]],'Genere: se ne vanno','χ² = 0,5: <b>quasi nessuna distanza</b> dall\'indipendenza.','Osservati e attesi per genere');
+    draw([['Mensile',1655,1028.3],['Un anno',166,390.9],['Due anni',48,449.8]],'Contratto: se ne vanno','χ² = 1.184,6: <b>lontanissimi</b> dall\'indipendenza.','Osservati e attesi per contratto');
+    const lg=el('div','cellnote');lg.innerHTML='<span style="color:var(--orange)">■</span> osservati &nbsp; <span style="color:var(--teal)">⬚</span> attesi con indipendenza';$('#b10chi').append(lg);
+  })();
+  /* Cramér's V */
+  (function(){
+    const V=[['Contract',41],['TechSupport',34],['InternetService',32],['PaymentMethod',30],['PaperlessBilling',19],['Partner',15],['gender',1]];let s='';const L=150,R=640,X=v=>L+v/50*(R-L);
+    s+=rect(L,14,X(10)-L,V.length*38+4,'rgba(255,255,255,.03)')+rect(X(10),14,X(25)-X(10),V.length*38+4,'rgba(255,255,255,.06)')+rect(X(25),14,R-X(25),V.length*38+4,'rgba(255,255,255,.1)');
+    [[5,'bassa'],[17.5,'media'],[37.5,'alta']].forEach(([v,t])=>s+=tx(X(v),V.length*38+36,'forza '+t,{s:12.5,f:GRAY}));
+    V.forEach(([n,v],i)=>{const y=20+i*38;s+=tx(L-10,y+18,n,{s:13,f:'#ddd',a:'end'})+rect(L,y+4,Math.max(2,X(v)-L),22,v>25?'#fff':v>=10?'#aaa':'#666')+tx(X(v)+8,y+20,v+'%',{s:13.5,f:'#fff',a:'start',w:600})});
+    [10,25].forEach(v=>s+=line(X(v),14,X(v),V.length*38+18,'#555',1,' stroke-dasharray="4 4"')+tx(X(v),V.length*38+52,v+'%',{s:12,f:GRAY}));
+    svgBox($('#b10cram'),680,V.length*38+62,s,'V di Cramér con l\'abbandono','42rem');
+  })();
+  /* scatter tenure vs total charges */
+  (function(){
+    let s='';const L=70,R=690,T=16,B=300,X=v=>L+v/72*(R-L),Y=v=>B-v/9000*(B-T);
+    const mx=st10.mean(TELSC.map(p=>p[0])),my=st10.mean(TELSC.map(p=>p[1]));
+    s+=rect(X(mx),T,R-X(mx),Y(my)-T,'rgba(131,193,103,.10)')+rect(L,Y(my),X(mx)-L,B-Y(my),'rgba(131,193,103,.10)');
+    [0,3000,6000,9000].forEach(v=>{s+=line(L,Y(v),R,Y(v),'#222',1)+tx(L-8,Y(v)+4,fi(v,0),{s:12.5,f:GRAY,a:'end'})});
+    for(let v=0;v<=72;v+=12)s+=tx(X(v),B+18,String(v),{s:12.5,f:GRAY});
+    TELSC.forEach(([a,b])=>s+='<circle cx="'+X(a).toFixed(1)+'" cy="'+Y(b).toFixed(1)+'" r="3.2" fill="'+BLUE+'" fill-opacity=".75"/>');
+    s+=line(X(mx),T,X(mx),B,'#ddd',1.3,' stroke-dasharray="6 4"')+line(L,Y(my),R,Y(my),'#ddd',1.3,' stroke-dasharray="6 4"');
+    s+=lbl(X(mx)+6,T+14,'media permanenza',null,{a:'start',s:12.5})+lbl(R-4,Y(my)-8,'media spesa totale',null,{a:'end',s:12.5});
+    s+=line(L,B,R,B,'#777',1.2)+line(L,T,L,B,'#777',1.2)+tx((L+R)/2,B+38,'mesi di permanenza (tenure)',{s:13,f:GRAY})+tx(16,(T+B)/2,'spesa totale ($)',{s:13,f:GRAY,x:' transform="rotate(-90 16 '+(T+B)/2+')"'});
+    s+=lbl(L+12,T+20,'r del campione = '+fi(st10.r(TELSC.map(p=>p[0]),TELSC.map(p=>p[1])),2),'#fff',{a:'start',s:13.5});
+    svgBox($('#b10scat'),720,350,s,'Permanenza e spesa totale','44rem');
+  })();
+  /* simulated correlations */
+  (function(){
+    const t=el('div','trio');$('#b10corr').append(t);const r=lcg(1010);
+    const mk=(gen,title,label)=>{const P=[];for(let i=0;i<60;i++)P.push(gen());const xs=P.map(p=>p[0]),ys=P.map(p=>p[1]);
+      const mnx=Math.min(...xs),mxx=Math.max(...xs),mny=Math.min(...ys),mxy=Math.max(...ys),X=v=>20+(v-mnx)/(mxx-mnx)*210,Y=v=>136-(v-mny)/(mxy-mny)*116;
+      let s=line(14,142,240,142,'#666',1.2)+line(14,142,14,12,'#666',1.2)+tx(236,156,'X',{s:12,f:GRAY,a:'end'})+tx(8,20,'Y',{s:12,f:GRAY});
+      P.forEach(([a,b])=>s+='<circle cx="'+X(a).toFixed(1)+'" cy="'+Y(b).toFixed(1)+'" r="3.4" fill="'+BLUE+'"/>');
+      cell(t,title,s,250,160,label,'r = '+fi(st10.r(xs,ys),2))};
+    mk(()=>{const x=r()*10;return [x,x+gauss10(r)*1.3]},'Positiva forte','Correlazione positiva');
+    mk(()=>{const x=r()*10;return [x,-x+gauss10(r)*3.2]},'Negativa','Correlazione negativa');
+    mk(()=>{const x=r()*10-5;return [x,x*x+gauss10(r)*1.4]},'Forte ma non lineare','Relazione a parabola');
+  })();
+  /* box plot tenure by churn */
+  (function(){
+    let s='';const L=110,R=690,X=v=>L+v/72*(R-L);
+    const G=[['Churn = No',[0,15,38,61,72],37.6,CHN,50],['Churn = Yes',[1,2,10,29,72],18.0,CHY,140]];
+    for(let v=0;v<=72;v+=12){s+=line(X(v),20,X(v),180,'#222',1)+tx(X(v),198,String(v),{s:12.5,f:GRAY})}
+    G.forEach(([n,q,m,c,y])=>{s+=tx(L-12,y+5,n,{s:13,f:c,a:'end'})+line(X(q[0]),y,X(q[1]),y,'#bbb',1.5)+line(X(q[3]),y,X(q[4]),y,'#bbb',1.5)+line(X(q[0]),y-10,X(q[0]),y+10,'#bbb',1.5)+line(X(q[4]),y-10,X(q[4]),y+10,'#bbb',1.5);
+      s+=rect(X(q[1]),y-20,X(q[3])-X(q[1]),40,'rgba(255,255,255,.06)',c,' stroke-width="2"')+line(X(q[2]),y-20,X(q[2]),y+20,'#fff',3)+'<circle cx="'+X(m)+'" cy="'+y+'" r="5.5" fill="'+MEANC+'"/>';
+      s+=tx(X(q[2]),y-27,'mediana '+q[2],{s:12.5,f:'#fff'})});
+    s+=tx((L+R)/2,222,'mesi di permanenza (tenure)',{s:13,f:GRAY});
+    svgBox($('#b10box'),720,232,s,'Box plot della permanenza per abbandono','44rem');
+  })();
+  /* ANOVA: between vs within */
+  (function(){
+    const duo=el('div','duo');$('#b10anova').append(duo);const mus=[30,55,80];
+    const mk=(sd,seed,title,label)=>{const r=lcg(seed),P=mus.map(m=>{const a=[];for(let i=0;i<12;i++)a.push(m+gauss10(r)*sd);return a});
+      const all=P.flat(),gm=st10.mean(all),n=all.length,c=3;let ssb=0,ssw=0;P.forEach(a=>{const m=st10.mean(a);ssb+=a.length*(m-gm)**2;a.forEach(v=>ssw+=(v-m)**2)});
+      const F=(ssb/(c-1))/(ssw/(n-c)),Y=v=>176-v/110*160;let s=line(20,Y(0),330,Y(0),'#555',1);
+      P.forEach((a,g)=>{const x=70+g*100,m=st10.mean(a);a.forEach((v,i)=>s+='<circle cx="'+(x-22+(i%6)*9)+'" cy="'+Y(Math.max(2,Math.min(108,v))).toFixed(1)+'" r="3.6" fill="#ddd"/>');s+=line(x-32,Y(m),x+32,Y(m),MEANC,3)+tx(x,194,'gruppo '+(g+1),{s:12.5,f:GRAY})});
+      cell(duo,title,s,340,202,label,'F = '+fi(F,1))};
+    mk(5,77,'Poca variabilità dentro i gruppi','Gruppi compatti');
+    mk(26,77,'Molta variabilità dentro i gruppi','Gruppi dispersi');
+  })();
+};
+QZ['10a']=()=>[{q:'Hai collegato un nodo Statistics all\'uscita di un CSV Reader, ma non l\'hai ancora configurato né eseguito. Che luce mostra il semaforo del nodo Statistics?',o:['Verde: il nodo è collegato','Gialla: pronto per l\'esecuzione','Rossa: in attesa di configurazione o di dati','Croce rossa: errore'],a:2,
+  e:'Un nodo appena aggiunto aspetta la configurazione o i dati in ingresso: luce rossa. Diventa giallo dopo la configurazione (F6) e verde dopo l\'esecuzione (F7).',h:'Il collegamento non basta: che cosa manca ancora?'}];
+QZ['10b']=()=>[{q:'Il livello di soddisfazione di un cliente, espresso con un voto da 1 a 5, è una variabile...',o:['nominale: le categorie non hanno ordine','ordinale: c\'è un ordine, ma la distanza fra 4 e 5 non è definita','di rapporti: 4 è il doppio di 2','continua: può assumere qualsiasi valore'],a:1,
+  e:'I voti sono ordinati, ma dicono solo quale categoria viene prima, non di quanto: è una variabile ordinale. Le slide la citano proprio come esempio di ordinale.',h:'Si può dire che un voto è migliore di un altro? E di quanto?'}];
+QZ['10c']=()=>[{q:'Due variabili hanno media 64,8 e 2.283 e deviazione standard 30,1 e 2.267. Quale è relativamente più variabile?',o:['La prima, perché il suo CV è più alto','La seconda, con CV di circa 99% contro 46%','Sono ugualmente variabili','Non si può dire senza conoscere le unità di misura'],a:1,
+  e:'CV = s / media × 100: 30,1 / 64,8 = 46% e 2.267 / 2.283 = 99%. Il CV è un numero puro, quindi il confronto ha senso anche fra grandezze diverse.',h:'Dividi ogni deviazione standard per la sua media.'}];
+QZ['10d']=()=>[{q:'Con α = 5% un test dà p-value = 0,08. Che cosa concludi?',o:['Si rifiuta H₀','Non si rifiuta H₀','H₀ è dimostrata vera','Si commette sicuramente un errore di primo tipo'],a:1,
+  e:'0,08 non è minore di 0,05, quindi non si rifiuta H₀. Non rifiutare non vuol dire dimostrare che H₀ è vera: i dati non bastano a escluderla.',h:'Confronta il p-value con α.'}];
+QZ['10e']=()=>[{q:'Un manager legge che «l\'88,6% dei clienti persi aveva un contratto mensile» e conclude che chi ha un contratto mensile se ne va quasi sempre. Che cosa non va?',o:['Niente, le due frasi dicono la stessa cosa','L\'88,6% è una percentuale per colonna (la composizione dei clienti persi); il tasso di abbandono dei mensili è la percentuale per riga, 42,7%','Il dato giusto sarebbe il 55%','Bisognerebbe usare la V di Cramér'],a:1,
+  e:'La percentuale per colonna dice chi sono i clienti persi; quella per riga dice quanti se ne vanno dentro ogni contratto. Fra i mensili se ne va il 42,7%, non quasi tutti.',h:'Su quale totale è calcolato l\'88,6%?'}];
+QZ['10f']=()=>[{q:'Misuri la spesa in centesimi invece che in dollari. Che cosa succede a covarianza e correlazione con la permanenza?',o:['Cambiano tutte e due','La covarianza diventa 100 volte più grande, la correlazione resta uguale','Restano uguali tutte e due','La correlazione diventa 100 volte più grande'],a:1,
+  e:'La covarianza dipende dalle unità di misura; r la divide per il prodotto delle deviazioni standard, che cambiano dello stesso fattore, quindi resta uguale.',h:'Quale dei due indici è standardizzato?'}];
+QZ['10g']=()=>[{q:'Tre gruppi hanno medie molto diverse, ma dentro ogni gruppo i valori sono dispersissimi. Che cosa ti aspetti dall\'ANOVA?',o:['F grande, perché le medie sono diverse','F piccolo, perché la variabilità dentro i gruppi è grande rispetto a quella fra i gruppi','F = 0','Non si può fare l\'ANOVA con tre gruppi'],a:1,
+  e:'F = MSB / MSW: una variabilità dentro i gruppi (MSW) grande abbassa F, come nel secondo riquadro della figura.',h:'Che cosa c\'è al denominatore di F?'}];
+QZ['10']=()=>[
+  {q:'Per i 7.043 clienti la tabella genere per abbandono ha totali di riga 3.488 (donne) e 3.555 (uomini), e 1.869 clienti persi in tutto. Quante donne perse ti aspetteresti se genere e abbandono fossero indipendenti?',o:['939','circa 926','circa 943','934,5'],a:1,
+   e:'E = totale di riga × totale di colonna / N = 3.488 × 1.869 / 7.043 ≈ 925,6. Le osservate sono 939: molto vicine, da cui il χ² piccolo.',h:'Usa la formula della frequenza attesa.'},
+  {q:'Con χ² = 1.184,6, N = 7.043 e una tabella 3 × 2, quanto vale la V di Cramér e come si legge?',o:['0,17: forza media','0,41: forza alta','0,84: quasi perfetta','1.184,6: non si può normalizzare'],a:1,
+   e:'k è il minore fra righe e colonne, 2, quindi k − 1 = 1: V = √(1.184,6 / 7.043) = √0,168 ≈ 0,41, sopra la soglia del 25%: forza alta.',h:'k − 1 vale 1 in una tabella con due colonne.'},
+  {q:'Qual è l\'IQR della permanenza dei clienti persi, se il loro 25° percentile è 2 mesi e il 75° è 29?',o:['10 mesi','27 mesi','71 mesi','29 mesi'],a:1,
+   e:'IQR = 75° percentile − 25° percentile = 29 − 2 = 27 mesi. 10 è la mediana, 71 il campo di variazione (72 − 1).',h:'IQR non usa né il minimo né il massimo.'},
+  {q:'Vuoi sapere se la spesa mensile media è diversa fra i quattro metodi di pagamento. Quale strumento scegli?',o:['Tabella di contingenza e χ²','Correlazione lineare e test t','ANOVA a un fattore e test F','V di Cramér'],a:2,
+   e:'Una variabile quantitativa (spesa mensile) e una qualitativa (metodo di pagamento): si confrontano le medie con l\'ANOVA.',h:'Di che tipo sono le due variabili?'},
+  {q:'Un analista trova r = 0,02 fra la temperatura esterna e il consumo di energia di un edificio e conclude che non c\'è alcun legame. Che cosa gli diresti?',o:['Ha ragione: r vicino a zero vuol dire nessuna relazione','r misura solo il legame lineare: il consumo potrebbe salire sia col freddo sia col caldo, una relazione a U; va guardato il diagramma','Dovrebbe calcolare la covarianza, che è più affidabile','Deve usare il test χ²'],a:1,
+   e:'Un legame forte ma non lineare, come una parabola, può dare r ≈ 0. Per questo le slide insistono: guarda sempre il diagramma di dispersione.',h:'Ricorda il terzo riquadro della figura sulle correlazioni.'},
+  {q:'Su 7.043 clienti un test trova una differenza significativa (p &lt; 0,001) fra due gruppi, ma la differenza fra le medie è di pochi giorni di permanenza. Come la leggi?',o:['È una scoperta importante, perché il p-value è piccolissimo','Con campioni molto grandi quasi ogni differenza è significativa: conta anche quanto è grande, e qui è trascurabile','Il test è sbagliato','Bisogna aumentare α'],a:1,
+   e:'Le slide lo dicono nelle ipotesi dell\'ANOVA: con campioni molto grandi quasi ogni differenza diventa significativa, quindi si guarda sempre anche l\'ampiezza della differenza.',h:'Il p-value dice se un effetto esiste, non quanto è grande.'}
+];
+MAPPA[10]={c:'Che cosa dicono i dati prima di qualsiasi modello?',r:[
+  {t:'KNIME',c:BLUE,v:['Nodi collegati in un workflow','Quattro stati: rosso, giallo, verde, errore','Configura con F6, esegui con F7','Metanodi e componenti; file .knwf e .knar']},
+  {t:'Tipi di variabile',c:PINK,v:['Qualitative: nominali, ordinali','Quantitative: discrete, continue','Scale a intervalli e di rapporti','Ogni livello eredita le statistiche di sopra']},
+  {t:'Una variabile',c:YEL,v:['Frequenze e istogramma','Media, mediana, moda','Range, IQR, deviazione standard, CV','Asimmetria e curtosi']},
+  {t:'Test d\'ipotesi',c:ORG,v:['H₀ contro H₁','Errori di primo e secondo tipo','p-value minore di α: si rifiuta H₀','Grandi campioni: guarda anche l\'ampiezza']},
+  {t:'Due qualitative',c:GRN,v:['Tabella di contingenza','Percentuali nella direzione dell\'indipendente','χ²: osservati contro attesi','V di Cramér: contratto 41%']},
+  {t:'Quantitative',c:TEAL,v:['Scatter plot, covarianza, r','r = 0 non vuol dire nessun legame','Confronto fra medie: box plot','ANOVA: F = MSB / MSW']}]};
+
+/* Lezione 11: preparazione dei dati (Telco Customer Churn) e caso delle prenotazioni alberghiere (Hotel Booking Demand) */
+const MISSC=PUR,OUTC=RED,CANC=ORG,p1=v=>v.toFixed(1).replace('.',',');
+/* vertical bar chart helper: bars [[label,value,colour]], returns svg string */
+function vbars11(bars,o){o=o||{};const W=o.W||340,H=o.H||200,top=o.top||24,bot=o.bot||34,L=o.L||16,R=W-(o.R||16),max=o.max||Math.max(...bars.map(b=>b[1])),bw=o.bw||Math.min(70,(R-L)/bars.length*.62);
+  let s='';const Y=v=>H-bot-v/max*(H-bot-top),step=(R-L)/bars.length;
+  bars.forEach(([l,v,c],i)=>{const x=L+step*i+(step-bw)/2;s+=rect(x,Y(v),bw,H-bot-Y(v),c||'#9a9a9a')+tx(x+bw/2,Y(v)-6,o.fmt?o.fmt(v):p1(v)+'%',{s:13,f:'#fff',w:600});
+    String(l).split('|').forEach((t,k)=>s+=tx(x+bw/2,H-bot+17+k*15,t,{s:12.5,f:'#ccc'}))});
+  return s+line(L,H-bot,R,H-bot,'#777',1.2)}
+INIT[11]=function(){
+  /* time spent */
+  (function(){
+    const T=[['Caricare i dati',19,1],['Ripulire i dati',26,1],['Scegliere il modello',11,0],['Addestrare e valutare il modello',12,0],['Mettere in produzione',11,0],['Altro',21,0]];let s='';const L=270,R=640,X=v=>L+v/30*(R-L);
+    T.forEach(([n,v,h],i)=>{const y=14+i*36;s+=tx(L-12,y+19,n,{s:13.5,f:h?'#fff':'#bbb',a:'end'})+rect(L,y+4,X(v)-L,22,h?ORG:'#777')+tx(X(v)+8,y+21,v+'%',{s:13.5,f:'#fff',a:'start',w:600})});
+    s+=lbl(R-4,250,'caricare + ripulire ≈ 45%',ORG,{a:'end',s:14,w:600});
+    svgBox($('#b11time'),660,262,s,'Tempo dei data scientist per attività','42rem');
+  })();
+  /* cricket example */
+  (function(){
+    const duo=el('div','duo');$('#b11cricket').append(duo);
+    cell(duo,'Genere mancante non trattato',vbars11([['Femmine|(2)',50,PINK],['Maschi|(4)',50,BLUE],['Mancante|(2)',100,MISSC]],{max:110,H:210}),340,210,'Prima del trattamento','Sembra: <b>nessuna differenza</b>.');
+    cell(duo,'Genere recuperato',vbars11([['Femmine|(4)',75,PINK],['Maschi|(4)',50,BLUE]],{max:110,H:210}),340,210,'Dopo il trattamento','Le femmine giocano <b>di più</b>.');
+  })();
+  /* listwise vs pairwise deletion */
+  (function(){
+    const duo=el('div','duo');$('#b11del').append(duo);
+    const R=[['M',25,343],['F',null,280],['M',33,332],['M',null,272],['F',25,null],['M',29,326],[null,26,259],['M',32,297]];
+    const cols=[{t:'Gender',w:80,a:'m'},{t:'Manpower',w:100,a:'m'},{t:'Sales',w:90,a:'m'}];
+    const cellv=v=>v===null?{v:'·',f:MISSC,b:true}:String(v);
+    const inc=r=>r.some(v=>v===null);
+    const t1=sTab(0,0,cols,R.map(r=>r.map(cellv)),{op:i=>inc(R[i])?.28:1,bg:i=>inc(R[i])?'rgba(252,98,85,.10)':null});
+    tabCell(duo,'Listwise',t1,'<b>n = 4</b> per ogni analisi: metà delle righe perse.',300,[40,130,225].map(x=>tx(x,t1.h+22,'n = 4',{s:13,f:RED})).join(''),t1.h+32);
+    const t2=sTab(0,0,cols,R.map(r=>r.map(cellv)));
+    let ns='';[['n = 7',40],['n = 6',130],['n = 7',225]].forEach(([t,x])=>ns+=tx(x,t2.h+22,t,{s:13,f:GRN}));
+    tabCell(duo,'Pairwise',t2,'Ogni variabile usa <b>tutte le righe</b> in cui è presente.',300,ns,t2.h+32);
+  })();
+  /* multivariate outliers */
+  (function(){
+    let s='';const r=lcg(1111),L=70,R=640,T=16,B=290,X=v=>L+(v-150)/45*(R-L),Y=v=>B-(v-45)/45*(B-T);const P=[];
+    for(let i=0;i<70;i++){const h=158+r()*30,w=-45+0.65*h+gauss10(r)*3.2;P.push([h,w])}
+    const O=[[183,56],[186,59],[160,79]];
+    [150,160,170,180,190].forEach(v=>s+=line(X(v),T,X(v),B,'#1d1d1d',1)+tx(X(v),B+18,String(v),{s:12.5,f:GRAY}));[50,60,70,80,90].forEach(v=>s+=line(L,Y(v),R,Y(v),'#1d1d1d',1)+tx(L-8,Y(v)+4,String(v),{s:12.5,f:GRAY,a:'end'}));
+    const hs=P.map(p=>p[0]).concat(O.map(o=>o[0])),ws=P.map(p=>p[1]).concat(O.map(o=>o[1]));
+    s+=rect(X(Math.min(...hs)),B-10,X(Math.max(...hs))-X(Math.min(...hs)),6,'rgba(255,255,255,.25)')+rect(L+4,Y(Math.max(...ws)),6,Y(Math.min(...ws))-Y(Math.max(...ws)),'rgba(255,255,255,.25)');
+    P.forEach(([h,w])=>s+='<circle cx="'+X(h).toFixed(1)+'" cy="'+Y(w).toFixed(1)+'" r="4" fill="#ddd"/>');
+    O.forEach(([h,w])=>s+='<circle cx="'+X(h)+'" cy="'+Y(w)+'" r="6.5" fill="'+OUTC+'"/>');
+    s+=lbl(X(160)+12,Y(79)+5,'troppo pesante',OUTC,{a:'start',s:13})+lbl(X(184.5),Y(56)+26,'troppo leggeri',OUTC,{s:13});
+    s+=line(L,B,R,B,'#777',1.2)+line(L,T,L,B,'#777',1.2)+tx((L+R)/2,B+38,'altezza (cm)',{s:13,f:GRAY})+tx(18,(T+B)/2,'peso (kg)',{s:13,f:GRAY,x:' transform="rotate(-90 18 '+(T+B)/2+')"'});
+    s+=tx(R,T+12,'fasce chiare sugli assi: intervallo dei valori',{s:12,f:GRAY,a:'end'});
+    svgBox($('#b11multi'),680,340,s,'Anomali multivariati in altezza e peso','42rem');
+  })();
+  /* box plot rule on churners' TotalCharges */
+  (function(){
+    const OUTS=[5638,5639,5643,5686,5688,5743,5743,5746,5763,5770,5770,5786,5795,5813,5885,5893,5916,5919,5921,5941,5961,6010,6015,6018,6040,6056,6110,6125,6128,6137,6143,6145,6146,6206,6215,6220,6253,6254,6281,6283,6287,6341,6383,6396,6405,6414,6419,6428,6440,6441,6448,6465,6529,6548,6579,6582,6585,6603,6615,6710,6786,6822,6852,6860,6872,6874,6876,6886,6890,6903,6938,6941,6975,6980,6981,6986,7008,7041,7102,7133,7156,7177,7220,7250,7262,7300,7318,7349,7373,7432,7447,7482,7492,7532,7535,7548,7612,7675,7690,7691,7724,7724,7752,7804,7856,7969,8110,8128,8685];
+    const q1=134.5,md=703.6,q3=2331.3,fen=q3+1.5*(q3-q1),mn=18.85;let s='';const L=30,R=690,X=v=>L+v/9000*(R-L),y=110;
+    [0,3000,6000,9000].forEach(v=>s+=line(X(v),30,X(v),180,'#1d1d1d',1)+tx(X(v),198,fi(v,0),{s:12.5,f:GRAY}));
+    s+=line(X(mn),y,X(q1),y,'#bbb',1.5)+line(X(q3),y,X(5626),y,'#bbb',1.5)+line(X(5626),y-10,X(5626),y+10,'#bbb',1.5);
+    s+=rect(X(q1),y-22,X(q3)-X(q1),44,'rgba(255,134,47,.12)',CANC,' stroke-width="2"')+line(X(md),y-22,X(md),y+22,'#fff',3);
+    s+=line(X(fen),34,X(fen),170,YEL,2,' stroke-dasharray="6 4"')+lbl(X(fen)+6,48,'staccionata ≈ 5.630 $',YEL,{a:'start',s:13});
+    const r=lcg(77);OUTS.forEach(v=>s+='<circle cx="'+X(v).toFixed(1)+'" cy="'+(y+(r()-.5)*34).toFixed(1)+'" r="3" fill="'+OUTC+'" fill-opacity=".85"/>');
+    s+=tx(X(q1),y+40,'Q₁',{s:13,f:'#ddd'})+tx(X(q3),y+40,'Q₃',{s:13,f:'#ddd'})+tx(X(md),y-30,'mediana 704',{s:12.5,f:'#fff'});
+    s+=tx((X(q3)+X(fen))/2,y-30,'1,5 × IQR',{s:12.5,f:GRAY})+line(X(q3),y-26,X(fen),y-26,'#666',1)+lbl(X(7200),y+48,'109 anomali',OUTC,{s:13});
+    s+=tx((L+R)/2,222,'spesa totale dei clienti persi ($)',{s:13,f:GRAY});
+    svgBox($('#b11fence'),720,232,s,'Regola del box plot','44rem');
+  })();
+  /* impact on statistics */
+  (function(){
+    const S=[['Media',5.45,30],['Mediana',5,5.5],['Moda',5,5],['Dev. standard',1.04,85.03]];let s='';const B=200,T=26,Y=v=>B-v/90*(B-T);
+    [0,30,60,90].forEach(v=>s+=line(40,Y(v),680,Y(v),'#1d1d1d',1)+tx(34,Y(v)+4,String(v),{s:12,f:GRAY,a:'end'}));
+    S.forEach(([n,a,b],i)=>{const x=80+i*155;s+=rect(x,Y(a),46,B-Y(a),'#9a9a9a')+rect(x+54,Y(b),46,B-Y(b),OUTC)+tx(x+23,Y(a)-6,fi(a,2),{s:12.5,f:'#ddd'})+tx(x+77,Y(b)-6,fi(b,2),{s:12.5,f:OUTC,w:600})+tx(x+50,B+20,n,{s:13,f:'#ddd'})});
+    s+=line(40,B,680,B,'#777',1.2)+rect(470,6,12,12,'#9a9a9a')+tx(488,17,'senza 300',{s:12.5,f:'#ddd',a:'start'})+rect(570,6,12,12,OUTC)+tx(588,17,'con 300',{s:12.5,f:'#ddd',a:'start'});
+    svgBox($('#b11stat'),700,232,s,'Effetto di un valore anomalo sulle statistiche','42rem');
+  })();
+  /* impact on regression */
+  (function(){
+    const r=lcg(2011),P=[];for(let i=0;i<12;i++){const x=.5+i*.8;P.push([x,2*x+2+gauss10(r)*1.1])}const O=[11.5,4];
+    const fit=pts=>{const mx=st10.mean(pts.map(p=>p[0])),my=st10.mean(pts.map(p=>p[1]));let a=0,b=0;pts.forEach(([x,y])=>{a+=(x-mx)*(y-my);b+=(x-mx)**2});const sl=a/b;return [sl,my-sl*mx]};
+    const [s1,i1]=fit(P),[s2,i2]=fit(P.concat([O]));let s='';const L=50,R=650,T=14,B=270,X=v=>L+v/12*(R-L),Y=v=>B-v/28*(B-T);
+    [0,7,14,21,28].forEach(v=>s+=line(L,Y(v),R,Y(v),'#1d1d1d',1)+tx(L-8,Y(v)+4,String(v),{s:12,f:GRAY,a:'end'}));[0,2,4,6,8,10,12].forEach(v=>s+=tx(X(v),B+18,String(v),{s:12,f:GRAY}));
+    s+='<clipPath id="b11rc"><rect x="'+L+'" y="'+T+'" width="'+(R-L)+'" height="'+(B-T)+'"/></clipPath><g clip-path="url(#b11rc)">'+line(X(0),Y(i1),X(12),Y(i1+12*s1),'#9a9a9a',2.5)+line(X(0),Y(i2),X(12),Y(i2+12*s2),OUTC,2.5,' stroke-dasharray="7 4"')+'</g>';
+    P.forEach(([x,y])=>s+='<circle cx="'+X(x)+'" cy="'+Y(y)+'" r="5" fill="#fff"/>');s+='<circle cx="'+X(O[0])+'" cy="'+Y(O[1])+'" r="7" fill="'+OUTC+'"/>';
+    s+=line(L,B,R,B,'#777',1.2)+line(L,T,L,B,'#777',1.2);
+    s+=lbl(L+14,T+18,'pendenza senza l\'anomalo: '+fi(s1,2),'#ddd',{a:'start',s:13.5})+lbl(L+14,T+40,'pendenza con l\'anomalo: '+fi(s2,2),OUTC,{a:'start',s:13.5});
+    svgBox($('#b11reg'),680,296,s,'Effetto di un valore anomalo sulla regressione','42rem');
+  })();
+  /* transformations */
+  (function(){
+    const t=el('div','trio');$('#b11tr').append(t);
+    const H=[['Spesa totale ($)',[2439,1175,692,476,413,381,366,314,295,229,174,89],'0','8.685','+0,96'],['√ spesa totale',[458,873,772,753,831,619,506,505,525,521,435,245],'0','93,2','+0,31'],['ln(spesa totale + 1)',[11,0,0,42,213,510,406,646,913,1382,1318,1602],'0','9,07','−0,82']];
+    H.forEach(([n,c,lo,hi,sk])=>{const mx=Math.max(...c);let s='';c.forEach((v,i)=>s+=rect(12+i*19.5,130-v/mx*112,17,v/mx*112,'#aaa'));s+=line(10,130,246,130,'#777',1.2)+tx(12,146,lo,{s:12,f:GRAY,a:'start'})+tx(246,146,hi,{s:12,f:GRAY,a:'end'});
+      cell(t,n,s,256,152,n,'asimmetria <b>'+sk+'</b>')});
+  })();
+  /* one-hot */
+  (function(){
+    const rows=[['Month-to-month',1,0,0],['One year',0,1,0],['Month-to-month',1,0,0],['Two year',0,0,1],['One year',0,1,0]];
+    const c1=[{t:'Contract',w:150}],c2=[{t:'Contract_M2M',w:120,a:'m',c:BLUE},{t:'Contract_1Y',w:110,a:'m',c:BLUE},{t:'Contract_2Y',w:110,a:'m',c:BLUE}];
+    const a=sTab(10,10,c1,rows.map(r=>[r[0]])),b=sTab(250,10,c2,rows.map(r=>r.slice(1).map(v=>({v:String(v),f:v?'#fff':'#666',b:!!v,bg:v?'rgba(88,196,221,.22)':null}))));
+    const s=a.s+b.s+'<defs>'+arrowDef('b11oh','#aaa')+'</defs>'+line(172,90,236,90,'#aaa',2,' marker-end="url(#b11oh)"')+tx(204,80,'One to Many',{s:12,f:GRAY});
+    svgBox($('#b11onehot'),600,a.h+24,s,'Codifica one-hot del contratto','38rem');
+  })();
+  /* churn by tenure group */
+  (function(){
+    svgBox($('#b11tg'),420,220,vbars11([['0-12',47.4,CANC],['13-24',28.7,CANC],['25-48',20.4,CANC],['49-72',9.5,CANC]],{W:420,H:220,max:55,bot:40})+tx(210,214,'classe di permanenza (mesi)',{s:12.5,f:GRAY}),'Tasso di abbandono per classe di permanenza','28rem');
+  })();
+  /* leakage crosstab */
+  (function(){
+    const cols=[{t:'reservation_status',w:180},{t:'is_canceled = 0',w:140,a:'e'},{t:'is_canceled = 1',w:140,a:'e'}];
+    const z={v:'0',f:'#555'},rows=[['Check-Out',{v:'75.166',f:'#fff',b:true,bg:'rgba(88,196,221,.22)'},z],['Canceled',z,{v:'43.017',f:'#fff',b:true,bg:'rgba(255,134,47,.25)'}],['No-Show',z,{v:'1.207',f:'#fff',b:true,bg:'rgba(255,134,47,.25)'}]];
+    const t=sTab(10,8,cols,rows,{rh:30,fs:14});
+    svgBox($('#b11leak'),490,t.h+20,t.s,'Stato della prenotazione e target','32rem');
+  })();
+  /* missing as predictor */
+  (function(){
+    let s='';const G=[['Agenzia',39.0,24.7],['Società',38.2,17.5],['Paese',37.1,13.7]];const B=190,Y=v=>B-v/45*(B-24);
+    G.forEach(([n,p,m],i)=>{const x=60+i*200;s+=rect(x,Y(p),56,B-Y(p),'#9a9a9a')+rect(x+64,Y(m),56,B-Y(m),CANC)+tx(x+28,Y(p)-6,p1(p)+'%',{s:13,f:'#ddd'})+tx(x+92,Y(m)-6,p1(m)+'%',{s:13,f:CANC,w:600})+tx(x+60,B+20,n,{s:13.5,f:'#ddd'})});
+    s+=line(30,B,650,B,'#777',1.2)+rect(390,4,12,12,'#9a9a9a')+tx(408,15,'valore presente',{s:12.5,f:'#ddd',a:'start'})+rect(530,4,12,12,CANC)+tx(548,15,'valore mancante',{s:12.5,f:'#ddd',a:'start'});
+    svgBox($('#b11flag'),680,220,s,'Cancellazioni per presenza del valore','42rem');
+  })();
+  /* signal of new features */
+  (function(){
+    const duo=el('div','duo');$('#b11sig').append(duo);
+    cell(duo,'Per gruppo di paese',vbars11([['Portogallo',56.7,CANC],['Europa',22.1,'#9a9a9a'],['Resto del|mondo',31.3,'#9a9a9a'],['Sconosciuto',11.9,'#9a9a9a']],{max:65,H:220,bot:44}),340,220,'Cancellazioni per gruppo di paese','Portogallo: <b>più della metà</b>.');
+    cell(duo,'Per anticipo (giorni)',vbars11([['0-7',9.6,'#9a9a9a'],['8-30',27.9,'#9a9a9a'],['31-90',37.7,'#9a9a9a'],['91-180',44.7,'#9a9a9a'],['181+',57.0,CANC]],{max:65,H:220,bot:44}),340,220,'Cancellazioni per anticipo','Più lontana, <b>più a rischio</b>.');
+  })();
+};
+QZ['11a']=()=>[{q:'In una tabella di studenti ci sono Student_ID, Gender, Prev_Exam_Marks, Height, Weight e Play Cricket (0 o 1), e si vuole prevedere chi gioca a cricket. Quale affermazione è corretta?',o:['Play Cricket è un predittore numerico continuo','Student_ID è un buon predittore perché è diverso per ogni studente','Play Cricket è il target ed è categorica, anche se salvata come numero','Gender è il target'],a:2,
+  e:'Il target è ciò che si vuole prevedere, Play Cricket; i suoi valori 0 e 1 sono codici di due categorie. Student_ID è un identificativo, non un predittore.',h:'Conta il livello di misura, non il formato di memorizzazione.'}];
+QZ['11b']=()=>[{q:'Nella tabella dei venditori, con la sostituzione per genere, quale valore riceve un uomo con Manpower mancante, se gli uomini con il valore presente hanno 25, 33, 29 e 32?',o:['28,33','29,75','25','30,5'],a:1,
+  e:'(25 + 33 + 29 + 32) / 4 = 119 / 4 = 29,75. 28,33 è la media generale dei 6 valori presenti.',h:'Media solo degli uomini.'}];
+QZ['11c']=()=>[{q:'Per una variabile Q₁ = 9 e Q₃ = 55. Oltre quale valore un dato è anomalo secondo la regola del box plot?',o:['55','64','124','101,5'],a:2,
+  e:'IQR = 55 − 9 = 46; staccionata superiore = 55 + 1,5 × 46 = 55 + 69 = 124. Sono i quartili della permanenza Telco: con un massimo di 72 mesi, nessun cliente è anomalo.',h:'Prima calcola l\'IQR, poi aggiungi 1,5 volte l\'IQR a Q₃.'}];
+QZ['11d']=()=>[{q:'Il metodo di pagamento ha quattro categorie senza ordine. Come lo codifichi per una regressione logistica?',o:['Con gli interi 1, 2, 3, 4','Con quattro colonne 0/1 (one-hot)','Con la normalizzazione min-max','Lo lasci come testo'],a:1,
+  e:'Per una variabile nominale serve la codifica one-hot: con 1, 2, 3, 4 il modello leggerebbe un ordine e distanze che non esistono.',h:'La variabile è nominale o ordinale?'}];
+QZ['11e']=()=>[{q:'Perché la regola dell\'IQR non funziona sui giorni in lista d\'attesa?',o:['Perché la variabile è categorica','Perché il 97% dei valori è zero: Q₁ = Q₃ = 0, IQR = 0, e ogni attesa verrebbe considerata anomala','Perché i valori sono negativi','Perché gli alberi non accettano valori grandi'],a:1,
+  e:'Con IQR = 0 entrambe le staccionate stanno a zero: le 3.693 prenotazioni che hanno atteso verrebbero azzerate. Meglio un indicatore, che conserva il segnale (63,9% contro 36,2% di cancellazioni).',h:'Quanto valgono Q₁ e Q₃ se quasi tutti i valori sono uguali?'}];
+QZ['11']=()=>[
+  {q:'Un\'azienda ha un questionario in cui chi ha un reddito basso tende a non rispondere alla domanda sul reddito. Come si classifica il meccanismo e che cosa conviene fare?',o:['MCAR: cancellare le righe','MAR: imputare la media','MNAR: la mancanza dipende dal valore stesso; aggiungere un indicatore o una categoria «non dichiarato»','Strutturale: mettere zero'],a:2,
+   e:'La probabilità di mancare dipende dal valore mancante: è MNAR. Cancellare o imputare la media distorcerebbe il quadro; un indicatore conserva l\'informazione.',h:'Da che cosa dipende la probabilità che il reddito manchi?'},
+  {q:'Undici valori fra 4 e 7 hanno media 5,45. Si aggiunge un dodicesimo valore, 300. Quanto diventa la media?',o:['5,50','30,00','85,03','27,72'],a:1,
+   e:'La somma degli undici valori è 5,45 × 11 = 60; con 300 diventa 360, divisa per 12 dà 30. La mediana invece passa solo da 5 a 5,5.',h:'Ricava la somma dalla media, aggiungi 300, dividi per 12.'},
+  {q:'Quale di queste colonne del dataset alberghiero è leakage per prevedere la cancellazione al momento della prenotazione?',o:['lead_time, i giorni fra prenotazione e arrivo','deposit_type, il tipo di caparra','assigned_room_type, la camera assegnata all\'arrivo','total_of_special_requests'],a:2,
+   e:'La camera assegnata si decide all\'arrivo, quindi non si conosce quando si prenota; e chi cancella non arriva mai. Le altre tre sono note al momento della prenotazione.',h:'Per ogni colonna: la conoscerei quando serve la previsione?'},
+  {q:'La colonna company manca nel 94% delle prenotazioni e chi ha una società cancella nel 17,5% dei casi contro il 38,2%. Che cosa fa il workflow?',o:['Cancella le righe senza società','Imputa la società più frequente','Crea l\'indicatore has_company e toglie il codice','Toglie la colonna e non ne tiene traccia'],a:2,
+   e:'È un mancante strutturale (non è una prenotazione aziendale) e la sua presenza predice: l\'indicatore conserva il segnale, il codice con troppi valori si toglie.',h:'La mancanza qui è un\'informazione?'},
+  {q:'Un modello di k-NN e una random forest vengono addestrati su dati con alcuni valori estremi ma veri. Per quale dei due conviene di più limitare gli estremi?',o:['Per la random forest, perché crea alberi profondi','Per il k-NN, perché un valore estremo altera le distanze e il vicinato','Per nessuno dei due','Per tutti e due allo stesso modo'],a:1,
+   e:'I modelli basati sulle distanze soffrono molto gli anomali; gli alberi tagliano su soglie e guardano solo l\'ordine dei valori, quindi ne risentono poco.',h:'Ricorda la tabella dei modelli di machine learning.'},
+  {q:'Per bilanciare i clienti persi uno studente applica SMOTE a tutto il dataset e poi divide in addestramento e test. Che cosa non va?',o:['Niente, SMOTE va sempre applicato prima','I casi sintetici finiscono anche nel test: la valutazione non è più fatta su dati veri','SMOTE funziona solo con le immagini','Bisognava usare la normalizzazione'],a:1,
+   e:'La regola delle slide: si aumenta solo l\'insieme di addestramento, mai quello di test, e si valida sempre su dati veri al 100%.',h:'Su quali dati deve avvenire la valutazione?'}
+];
+MAPPA[11]={c:'Come si preparano i dati per un modello?',r:[
+  {t:'I passi',c:BLUE,v:['Ruoli, livelli, uni e bivariata (lezione 10)','Mancanti, anomali, feature','Fino all\'80% del tempo di un progetto']},
+  {t:'Valori mancanti',c:PUR,v:['Perché manca? MCAR, MAR, MNAR, strutturale','Cancellare: listwise o pairwise','Imputare: media, mediana, moda, modello','Telco: 11 clienti nuovi, spesa = 0']},
+  {t:'Valori anomali',c:RED,v:['Univariati e multivariati','Box plot: oltre 1,5 IQR dai quartili','Spostano media e dev. standard, non la mediana','Errore o valore naturale?']},
+  {t:'Trattamenti',c:ORG,v:['Cancellare, sostituire, limitare','Trasformare: radice, logaritmo','Gli alberi ne risentono poco']},
+  {t:'Feature engineering',c:GRN,v:['One-hot e codifica ordinale','Min-max e z-score','Interazioni, classi, polinomi','GenAI propone, l\'uomo verifica; SMOTE solo sul training']},
+  {t:'Caso alberghi',c:YEL,v:['119.390 prenotazioni, 37% cancellate','Leakage: reservation_status','Mancanti travestiti: NA, NULL, Undefined','Indicatori, gruppi, 187 righe errate tolte']}]};
+
+/* Lezione 12: valutazione dei modelli predittivi (soggiorni alberghieri, target ricavo e high_value) */
+const TRC='#9a9a9a',TSC=PINK,DTC='#9a9a9a',RFC=GRN;
+/* 2x2 confusion matrix: m={tp,fn,fp,tn}, labels [pos,neg] */
+function cm12(x,y,m,lab,o){o=o||{};const w=o.w||120,h=o.h||64;let s='';
+  s+=tx(x+w,y-28,'classe prevista',{s:12.5,f:GRAY})+tx(x+w/2,y-8,lab[0],{s:13,f:'#ddd'})+tx(x+w*1.5,y-8,lab[1],{s:13,f:'#ddd'});
+  s+=tx(x-12,y+h/2+5,lab[0],{s:13,f:'#ddd',a:'end'})+tx(x-12,y+h*1.5+5,lab[1],{s:13,f:'#ddd',a:'end'});
+  if(!o.noside)s+=tx(x-70-(o.sx||0),y+h,'classe vera',{s:12.5,f:GRAY,x:' transform="rotate(-90 '+(x-70-(o.sx||0))+' '+(y+h)+')"'});
+  const C=[['tp',0,0,OKBG,'TP'],['fn',1,0,BADBG,'FN'],['fp',0,1,BADBG,'FP'],['tn',1,1,OKBG,'TN']];
+  C.forEach(([k,cx,cy,bg,n])=>{const X=x+cx*w,Y=y+cy*h;s+=rect(X,Y,w,h,bg,'#000')+tx(X+w/2,Y+h/2+(o.tag===false?6:0),fi(m[k],0),{s:o.fs||18,f:'#fff',w:600});
+    if(o.tag!==false)s+=tx(X+w/2,Y+h/2+20,n,{s:12,f:GRAY})});
+  return s}
+INIT[12]=function(){
+  /* training vs test error */
+  (function(){
+    let s='';const L=60,R=660,T=16,B=250,X=c=>L+(c-1)/9*(R-L),Y=e=>B-e/35*(B-T);
+    const tr=c=>28*Math.exp(-.33*(c-1))+1.5,te=c=>tr(c)+0.55*(c-1)**1.55+2;
+    [0,10,20,30].forEach(v=>s+=line(L,Y(v),R,Y(v),'#1d1d1d',1)+tx(L-8,Y(v)+4,String(v),{s:12.5,f:GRAY,a:'end'}));
+    for(let c=1;c<=10;c++)s+=tx(X(c),B+18,String(c),{s:12.5,f:GRAY});
+    const path=f=>{let d='';for(let c=1;c<=10.001;c+=.1)d+=(d?'L':'M')+X(c).toFixed(1)+' '+Y(f(c)).toFixed(1);return d};
+    s+='<path d="'+path(tr)+'" fill="none" stroke="'+TRC+'" stroke-width="3"/><path d="'+path(te)+'" fill="none" stroke="'+TSC+'" stroke-width="3"/>';
+    let best=1,bv=1e9;for(let c=1;c<=10;c+=.01){if(te(c)<bv){bv=te(c);best=c}}
+    s+=line(X(best),T,X(best),B,'#666',1.2,' stroke-dasharray="5 4"')+lbl(X(best),T+12,'complessità migliore',null,{s:13});
+    s+=lbl(X(9.6),Y(tr(9.6))-10,'errore sul training',TRC,{a:'end',s:13})+lbl(X(9.6),Y(te(9.6))-10,'errore sul test',TSC,{a:'end',s:13});
+    s+=lbl(X(2.1),Y(te(2.1))-14,'il modello impara poco',GRAY,{a:'start',s:12.5})+lbl(X(7.2),Y(te(7.2))+28,'impara il rumore',GRAY,{s:12.5});
+    s+=line(L,B,R,B,'#777',1.2)+line(L,T,L,B,'#777',1.2)+tx((L+R)/2,B+38,'complessità del modello (per esempio profondità dell\'albero)',{s:13,f:GRAY})+tx(18,(T+B)/2,'errore',{s:13,f:GRAY,x:' transform="rotate(-90 18 '+(T+B)/2+')"'});
+    svgBox($('#b12over'),680,300,s,'Errore di training e di test','42rem');
+  })();
+  /* splits */
+  (function(){
+    const duo=el('div','duo');$('#b12split').append(duo);
+    let a='';const P=[['Training',60,'#9a9a9a','costruisce il modello'],['Validazione',20,TEAL,'regola e sceglie'],['Test',20,TSC,'stima l\'errore sui dati nuovi']];let x=10;
+    P.forEach(([n,v,c,d],k)=>{const w=v/100*320;a+=rect(x,24,w,46,c,'#000')+tx(x+w/2,52,v+'%',{s:15,f:'#000',w:600})+rect(14,92+k*22,12,12,c)+tx(34,103+k*22,n+': '+d,{s:12.5,f:'#ddd',a:'start'});x+=w});
+    cell(duo,'Holdout: 60/20/20',a,340,156,'Divisione in training, validazione e test','Il test si usa <b>una volta sola</b>, alla fine.');
+    let b='';for(let r=0;r<5;r++){for(let k=0;k<5;k++){b+=rect(30+k*56,14+r*24,54,20,k===r?TSC:'#555','#000')}b+=tx(20,29+r*24,String(r+1),{s:12,f:GRAY,a:'end'})}
+    b+=tx(170,148,'parti dei dati',{s:12,f:GRAY});
+    cell(duo,'Validazione incrociata, k = 5',b,340,154,'Validazione incrociata a 5 parti','Ogni parte fa da test <b>una volta</b>.');
+  })();
+  /* confusion matrix RF */
+  (function(){
+    svgBox($('#b12cm'),440,210,cm12(150,50,{tp:3792,fn:702,fp:396,tn:17127},['High','Standard'],{w:130,h:70}),'Matrice di confusione della random forest','30rem');
+  })();
+  /* lazy models */
+  (function(){
+    const duo=el('div','duo');$('#b12lazy').append(duo);
+    cell(duo,'Frodi: sempre «legittima»',cm12(130,46,{tp:0,fn:1,fp:0,tn:99},['Frode','Legit'],{w:95,h:56,fs:17,sx:-14}),340,170,'Modello pigro sulle frodi','Accuratezza <b>99%</b>, frodi trovate <b>0%</b>.');
+    cell(duo,'Soggiorni: sempre «Standard»',cm12(130,46,{tp:0,fn:4494,fp:0,tn:17523},['High','Std'],{w:95,h:56,fs:17,sx:-14}),340,170,'Modello pigro sui soggiorni','Accuratezza <b>79,6%</b>, soggiorni High trovati <b>0</b>.');
+  })();
+  /* DT vs RF indices */
+  (function(){
+    const I=[['Accuratezza',.928,.950],['Sensibilità',.810,.844],['Specificità',.958,.977],['Precisione',.832,.905],['F1',.821,.874],['Acc. bilanciata',.884,.911],['κ di Cohen',.776,.843],['MCC',.776,.843]];
+    let s='';const L=150,R=600,X=v=>L+(v-.7)/.3*(R-L);
+    [.7,.8,.9,1].forEach(v=>s+=line(X(v),10,X(v),I.length*40+14,'#1d1d1d',1)+tx(X(v),I.length*40+30,fi(v,1),{s:12,f:GRAY}));
+    I.forEach(([n,a,b],i)=>{const y=14+i*40;s+=tx(L-12,y+18,n,{s:13,f:'#ddd',a:'end'})+rect(L,y,X(a)-L,14,DTC)+rect(L,y+16,X(b)-L,14,RFC)+tx(X(a)+6,y+12,fi(a,3),{s:11.5,f:'#ccc',a:'start'})+tx(X(b)+6,y+28,fi(b,3),{s:11.5,f:RFC,a:'start',w:600})});
+    s+=rect(L,I.length*40+42,12,12,DTC)+tx(L+18,I.length*40+53,'albero di decisione',{s:12.5,f:'#ddd',a:'start'})+rect(L+180,I.length*40+42,12,12,RFC)+tx(L+198,I.length*40+53,'random forest',{s:12.5,f:'#ddd',a:'start'});
+    s+=tx(R,I.length*40+30,'(l\'asse parte da 0,7)',{s:11.5,f:GRAY,a:'end'});
+    svgBox($('#b12cmp'),660,I.length*40+64,s,'Albero e foresta sugli stessi indici','42rem');
+  })();
+  /* cut-off */
+  (function(){
+    const duo=el('div','duo');$('#b12cut').append(duo);
+    const note=(r,p,a)=>'sensibilità <b>'+r+'</b> · precisione <b>'+p+'</b> · accuratezza '+a;
+    cell(duo,'Soglia 0,5',cm12(130,46,{tp:3792,fn:702,fp:396,tn:17127},['High','Std'],{w:95,h:56,fs:17,sx:-14}),340,170,'Soglia 0,5',note('0,844','0,905','0,950'));
+    cell(duo,'Soglia 0,2',cm12(130,46,{tp:4327,fn:167,fp:1305,tn:16218},['High','Std'],{w:95,h:56,fs:17,sx:-14}),340,170,'Soglia 0,2',note('0,963','0,768','0,933'));
+  })();
+  /* ROC illustrative */
+  (function(){
+    let s='';const L=70,S=300,T=16,X=v=>L+v*S,Y=v=>T+S-v*S;
+    [0,.2,.4,.6,.8,1].forEach(v=>{s+=line(X(v),T,X(v),T+S,'#1d1d1d',1)+line(L,Y(v),L+S,Y(v),'#1d1d1d',1)+tx(X(v),T+S+18,fi(v,1),{s:12,f:GRAY})+tx(L-8,Y(v)+4,fi(v,1),{s:12,f:GRAY,a:'end'})});
+    const roc=a=>{let d='',pts=[];for(let i=0;i<=10;i++){const x=i/10,y=1-Math.pow(1-x,a);pts.push([x,y]);d+=(d?'L':'M')+X(x).toFixed(1)+' '+Y(y).toFixed(1)}return [d,pts]};
+    const [d1,p1]=roc(4.5),[d2,p2]=roc(2);
+    s+=line(X(0),Y(0),X(1),Y(1),'#777',1.5,' stroke-dasharray="6 5"')+'<path d="'+d2+'" fill="none" stroke="'+DTC+'" stroke-width="2.5"/><path d="'+d1+'" fill="none" stroke="'+RFC+'" stroke-width="3"/>';
+    p1.forEach(([x,y])=>s+='<circle cx="'+X(x)+'" cy="'+Y(y)+'" r="3.5" fill="'+RFC+'"/>');p2.forEach(([x,y])=>s+='<circle cx="'+X(x)+'" cy="'+Y(y)+'" r="3" fill="'+DTC+'"/>');
+    s+='<circle cx="'+X(0)+'" cy="'+Y(1)+'" r="6" fill="none" stroke="'+YEL+'" stroke-width="2"/>'+lbl(X(0)+12,Y(1)+5,'(0, 1) perfetto',YEL,{a:'start',s:13});
+    s+=lbl(X(0)+10,Y(0)-8,'(0, 0) soglia 1',null,{a:'start',s:12.5})+lbl(X(1)+8,Y(1)+5,'(1, 1) soglia 0',null,{a:'start',s:12.5});
+    s+=lbl(X(.62),Y(.5),'casuale',GRAY,{s:12.5});
+    s+=line(L,T+S,L+S,T+S,'#777',1.2)+line(L,T,L,T+S,'#777',1.2)+tx(L+S/2,T+S+40,'tasso di falsi positivi (1 − specificità)',{s:13,f:GRAY})+tx(20,T+S/2,'sensibilità',{s:13,f:GRAY,x:' transform="rotate(-90 20 '+(T+S/2)+')"'});
+    s+=rect(410,60,14,14,RFC)+tx(432,72,'modello 1',{s:13,f:'#ddd',a:'start'})+rect(410,88,14,14,DTC)+tx(432,100,'modello 2',{s:13,f:'#ddd',a:'start'})+line(410,124,424,124,'#777',1.5,' stroke-dasharray="4 3"')+tx(432,128,'casuale',{s:13,f:'#ddd',a:'start'})+tx(410,160,'ogni punto = una soglia',{s:12.5,f:GRAY,a:'start'});
+    svgBox($('#b12roc'),580,370,s,'Curva ROC illustrativa','36rem');
+  })();
+  /* cumulative gain */
+  (function(){
+    const G=[0,47.9,87.2,98.4,99.6,99.8,99.9,99.9,100,100,100];let s='';const L=60,R=640,T=34,B=300,X=v=>L+v/100*(R-L),Y=v=>B-v/100*(B-T);
+    [0,20,40,60,80,100].forEach(v=>{s+=line(L,Y(v),R,Y(v),'#1d1d1d',1)+tx(L-8,Y(v)+4,v+'%',{s:12,f:GRAY,a:'end'})});for(let v=0;v<=100;v+=10)s+=tx(X(v),B+18,v+'%',{s:12,f:GRAY});
+    s+=line(X(0),Y(0),X(100),Y(100),'#777',1.5,' stroke-dasharray="6 5"')+'<polyline points="'+X(0)+','+Y(0)+' '+X(20.4)+','+Y(100)+' '+X(100)+','+Y(100)+'" fill="none" stroke="'+RFC+'" stroke-width="1.8" stroke-dasharray="3 4"/>';
+    s+='<polyline points="'+G.map((g,i)=>X(i*10)+','+Y(g)).join(' ')+'" fill="none" stroke="#fff" stroke-width="3"/>';
+    G.forEach((g,i)=>s+='<circle cx="'+X(i*10)+'" cy="'+Y(g)+'" r="4" fill="#fff"/>');
+    s+=lbl(X(10)+8,Y(47.9)+16,'10% → 47,9%',null,{a:'start',s:13})+lbl(X(20)+8,Y(87.2)+18,'20% → 87,2%',null,{a:'start',s:13})+lbl(X(30)+6,Y(98.4)+22,'30% → 98,4%',null,{a:'start',s:13});
+    s+=lbl(X(60),Y(55),'selezione casuale',GRAY,{s:12.5})+lbl(X(20.4)+6,Y(100)-8,'modello perfetto: 20,4%',RFC,{a:'start',s:12.5});
+    s+=line(L,B,R,B,'#777',1.2)+line(L,T,L,B,'#777',1.2)+tx((L+R)/2,B+40,'quota di soggiorni contattati, in ordine di P(High)',{s:13,f:GRAY})+tx(14,(T+B)/2,'quota dei soggiorni High raccolti',{s:13,f:GRAY,x:' transform="rotate(-90 14 '+(T+B)/2+')"'});
+    svgBox($('#b12gain'),680,354,s,'Gain cumulato della random forest','42rem');
+  })();
+  /* errors in regression (illustrative) */
+  (function(){
+    const r=lcg(1212),P=[];for(let i=0;i<22;i++){const p=80+r()*780,a=Math.max(40,Math.min(960,p+gauss10(r)*(40+p*.14)));P.push([p,a])}
+    let s='';const L=70,S=300,T=16,X=v=>L+v/1000*S,Y=v=>T+S-v/1000*S;
+    [0,200,400,600,800,1000].forEach(v=>{s+=line(X(v),T,X(v),T+S,'#1d1d1d',1)+line(L,Y(v),L+S,Y(v),'#1d1d1d',1)+tx(X(v),T+S+18,String(v),{s:12,f:GRAY})+tx(L-8,Y(v)+4,String(v),{s:12,f:GRAY,a:'end'})});
+    s+=line(X(0),Y(0),X(1000),Y(1000),'#888',1.5,' stroke-dasharray="6 5"');
+    P.forEach(([p,a])=>s+=line(X(p),Y(p),X(p),Y(a),RED,1.6)+'<circle cx="'+X(p).toFixed(1)+'" cy="'+Y(a).toFixed(1)+'" r="4.5" fill="#fff"/>');
+    s+=line(L,T+S,L+S,T+S,'#777',1.2)+line(L,T,L,T+S,'#777',1.2)+tx(L+S/2,T+S+40,'ricavo previsto ŷ (€)',{s:13,f:GRAY})+tx(20,T+S/2,'ricavo vero y (€)',{s:13,f:GRAY,x:' transform="rotate(-90 20 '+(T+S/2)+')"'});
+    s+=line(410,70,424,70,RED,2)+tx(432,74,'errore e = y − ŷ',{s:13,f:'#ddd',a:'start'})+line(410,98,424,98,'#888',1.5,' stroke-dasharray="4 3"')+tx(432,102,'previsione perfetta',{s:13,f:'#ddd',a:'start'});
+    svgBox($('#b12err'),580,370,s,'Errori di previsione','36rem');
+  })();
+  /* regression comparison */
+  (function(){
+    let s='';const B=230,T=24,Y=v=>B-v/320*(B-T);
+    [0,100,200,300].forEach(v=>s+=line(50,Y(v),640,Y(v),'#1d1d1d',1)+tx(44,Y(v)+4,String(v),{s:12,f:GRAY,a:'end'}));
+    [['MAE',191.0,61.8],['RMSE',288.6,108.1]].forEach(([n,a,b],i)=>{const x=120+i*270;s+=rect(x,Y(a),70,B-Y(a),DTC)+rect(x+80,Y(b),70,B-Y(b),RFC)+tx(x+35,Y(a)+18,fi(a,1),{s:13,f:'#000',w:600})+tx(x+115,Y(b)+18,fi(b,1),{s:13,f:'#000',w:600})+tx(x+75,B+20,n,{s:13.5,f:'#ddd'})});
+    s+=line(50,Y(214.1),640,Y(214.1),YEL,1.6,' stroke-dasharray="6 4"')+lbl(636,Y(214.1)-7,'MAE ingenuo 214,1',YEL,{a:'end',s:12.5});
+    s+=line(50,B,640,B,'#777',1.2)+rect(370,2,12,12,DTC)+tx(388,13,'albero di regressione',{s:12.5,f:'#ddd',a:'start'})+rect(530,2,12,12,RFC)+tx(548,13,'random forest',{s:12.5,f:'#ddd',a:'start'});
+    svgBox($('#b12regc'),660,256,s,'Errori in euro dei due modelli','42rem');
+  })();
+};
+QZ['12a']=()=>[{q:'Un analista prova dieci profondità diverse di un albero, sceglie quella con l\'errore più basso sull\'insieme di test e riporta quell\'errore come stima delle prestazioni in produzione. Che cosa non va?',o:['Niente, il test serve proprio a questo','Ha usato il test per scegliere il modello: la stima è ottimista; la scelta andava fatta sulla validazione, e il test usato una volta sola alla fine','Doveva usare più profondità','Doveva usare l\'errore sul training'],a:1,
+  e:'La validazione serve a regolare i parametri e scegliere il modello; il test stima l\'errore su dati nuovi e si usa una volta sola. Scegliendo sul test, il test non è più indipendente.',h:'Ricorda i compiti dei tre insiemi.'}];
+QZ['12b']=()=>[{q:'Una banca usa un modello per bloccare le transazioni sospette; ogni frode non bloccata costa migliaia di euro, ogni blocco sbagliato solo una telefonata al cliente. Quale indice deve essere alto prima di tutto?',o:['La precisione','La sensibilità (recall)','La specificità','L\'accuratezza'],a:1,
+  e:'Qui costa caro il caso mancato (falso negativo): serve una sensibilità alta, anche al prezzo di qualche falso allarme in più.',h:'Quale errore costa di più: il falso allarme o il caso mancato?'}];
+QZ['12c']=()=>[{q:'Un modello ha AUC = 0,52. Come lo leggi?',o:['Eccellente','Accettabile','Praticamente casuale: non distingue le classi','Dipende dalla soglia'],a:2,
+  e:'0,5 è un modello casuale; 0,52 ci è appena sopra. L\'AUC non dipende dalla soglia.',h:'Ricorda la scala delle slide.'}];
+QZ['12d']=()=>[{q:'Due modelli hanno lo stesso MAE di 60 euro; il primo ha RMSE 62, il secondo RMSE 150. Che cosa ne deduci?',o:['Sono equivalenti','Il secondo fa alcuni errori molto grandi; il primo sbaglia di quantità simili ovunque','Il primo ha errori più grandi','L\'RMSE non si può confrontare con il MAE'],a:1,
+  e:'RMSE ≥ MAE sempre, uguali solo se gli errori hanno tutti la stessa dimensione. Un divario grande indica alcuni errori molto grandi, che il quadrato fa pesare.',h:'Che cosa fa il quadrato agli errori grandi?'}];
+QZ['12e']=()=>[{q:'Un\'azienda può chiamare solo 2.000 clienti su 20.000 e vuole sapere quanti potenziali abbandoni raggiungerà chiamando i primi in classifica. Quale strumento risponde?',o:['La matrice di confusione con soglia 0,5','Il gain cumulato al primo decile','L\'R²','Il MAPE'],a:1,
+  e:'2.000 su 20.000 è il 10%: il gain cumulato al primo decile dice quale quota di tutti i positivi si raccoglie contattando il 10% in cima.',h:'Si agisce solo su una parte della classifica.'}];
+QZ['12']=()=>[
+  {q:'Con la soglia 0,2 la random forest ha TP = 4.327 e FN = 167. Qual è la sensibilità?',o:['0,844','0,963','0,768','0,933'],a:1,
+   e:'4.327 / (4.327 + 167) = 4.327 / 4.494 ≈ 0,963. 0,768 è la precisione, 0,933 l\'accuratezza.',h:'Sensibilità = TP / (TP + FN).'},
+  {q:'Con TP = 3.792 e FP = 396, quanto vale la precisione?',o:['0,844','0,977','0,905','0,950'],a:2,
+   e:'3.792 / (3.792 + 396) = 3.792 / 4.188 ≈ 0,905.',h:'Delle righe previste High, quante lo sono davvero?'},
+  {q:'Il modello che prevede sempre «Standard» ha accuratezza 0,796. Quanto valgono la sua accuratezza bilanciata e la sua kappa?',o:['0,796 e 0,796','0,5 e 0','1 e 1','0 e −1'],a:1,
+   e:'Sensibilità 0, specificità 1: media 0,5. Kappa 0: l\'accordo è esattamente quello atteso per caso. Per questo questi indici reggono le classi sbilanciate.',h:'Calcola sensibilità e specificità del modello pigro.'},
+  {q:'Il primo decile di un modello contiene il 60% di positivi, mentre in tutto il test i positivi sono il 15%. Qual è il lift del primo decile?',o:['0,25','4','45','60'],a:1,
+   e:'Lift = 60% / 15% = 4: il modello concentra i positivi quattro volte meglio di una scelta a caso.',h:'Dividi la quota nel decile per la quota complessiva.'},
+  {q:'Un modello di regressione ha R² = −0,15 sull\'insieme di test. Che cosa significa?',o:['Un errore di calcolo: l\'R² non può essere negativo','Il modello fa peggio che prevedere sempre la media','Il modello spiega il 15% della varianza','Il modello è sovradattato ai dati di test'],a:1,
+   e:'Sul test l\'R² può essere negativo: la somma degli errori al quadrato del modello supera quella di chi prevede sempre la media.',h:'Che cosa vuol dire R² = 0?'},
+  {q:'Si vuole confrontare l\'errore di previsione delle vendite giornaliere di due negozi, ma in molti giorni le vendite di uno sono zero. Quale indice evitare?',o:['MAE','MASE','MAPE','RMSE'],a:2,
+   e:'Il MAPE divide per il valore vero: con valori a zero esplode (divisione per zero). Il MASE non ha scala e non divide per i valori veri.',h:'Quale indice ha y al denominatore?'}
+];
+MAPPA[12]={c:'Come si misura se un modello prevede bene?',r:[
+  {t:'Dati mai visti',c:BLUE,v:['Training, validazione, test','Holdout, validazione incrociata','Campionamento stratificato','Sovradattamento: il test lo rivela']},
+  {t:'Matrice di confusione',c:GRN,v:['TP, FN, FP, TN','Accuratezza: inganna con classi rare','Sensibilità, specificità','Precisione, F1']},
+  {t:'Classi sbilanciate',c:TEAL,v:['Accuratezza bilanciata','κ di Cohen','MCC']},
+  {t:'Soglia e classifica',c:PINK,v:['La soglia è una scelta di business','ROC: tutte le soglie','AUC: 0,5 casuale, 1 perfetto','Gain e lift: il primo k%']},
+  {t:'Errori in numeri',c:YEL,v:['MAE, MSE, RMSE','MPE: distorsione','MAPE: niente zeri','R², R² corretto, MASE']},
+  {t:'Caso alberghi',c:ORG,v:['Foresta: accuratezza 0,950, AUC 0,987','Primo decile: lift 4,79','Ricavo: R² 0,877, MASE 0,29']}]};
+
+/* Lezione 13: alberi di decisione, random forest, gradient boosting (soggiorni, target high_value) */
+const HIC=GRN,CHU=ORG,STY=BLUE,BOOC=PINK;
+/* a tree node box: x,y centre; title; share bar */
+function node13(x,y,w,t1,t2,share,o){o=o||{};let s=rect(x-w/2,y-28,w,56,'#111',o.leaf?'#888':'#ddd',' rx="6"'+(o.leaf?' stroke-dasharray="4 3"':''));
+  s+=tx(x,y-10,t1,{s:12.5,f:o.leaf?GRAY:'#ddd'})+tx(x,y+7,t2,{s:13,f:'#fff',w:600});
+  if(share!==undefined)s+=rect(x-w/2+10,y+14,w-20,7,'#333')+rect(x-w/2+10,y+14,(w-20)*share,7,HIC);return s}
+INIT[13]=function(){
+  /* anatomy */
+  (function(){
+    let s='';const E=(x1,y1,x2,y2,t,a)=>line(x1,y1,x2,y2,'#777',1.5)+lbl((x1+x2)/2+(a||0),(y1+y2)/2+4,t,'#ccc',{s:12.5});
+    s+=E(360,62,180,150,'notti ≤ 4,5',-40)+E(360,62,540,150,'notti &gt; 4,5',40)+E(180,206,90,292,'≤ 3,5',-24)+E(180,206,270,292,'&gt; 3,5',24);
+    for(let k=0;k<6;k++)s+=line(540,206,430+k*44,292,'#555',1);
+    s+=node13(360,34,170,'RADICE · 51.370','High 20,4%',.204)+node13(180,178,170,'NODO · 39.844','High 7,5%',.075)+node13(540,178,170,'NODO · 11.526','High 65,0%',.65);
+    s+=node13(90,320,150,'FOGLIA','High 3,0%',.03,{leaf:1})+node13(270,320,150,'FOGLIA','High 26,3%',.263,{leaf:1});
+    s+=rect(410,292,260,56,'none','#555',' rx="6" stroke-dasharray="4 3"')+tx(540,316,'12 figli, uno per mese',{s:13,f:'#ccc'})+tx(540,334,'(arrival_date_month)',{s:12,f:GRAY});
+    s+=rect(458,140,276,224,'none',YEL,' rx="10" stroke-dasharray="6 5"')+tx(724,382,'un sottoalbero',{s:12.5,f:YEL,a:'end'});
+    svgBox($('#b13anat'),740,392,s,'Anatomia di un albero','46rem');
+  })();
+  /* churn example tree */
+  (function(){
+    let s='';const N=(x,y,c,st,leaf,lab)=>{const w=120;let r=rect(x-w/2,y-24,w,48,'#111',leaf?'#888':'#ddd',' rx="6"'+(leaf?' stroke-dasharray="4 3"':''));
+      r+=tx(x,y-6,'<tspan style="fill:'+CHU+'">'+c+' se ne vanno</tspan>',{s:12.5})+tx(x,y+12,'<tspan style="fill:'+STY+'">'+st+' restano</tspan>',{s:12.5});
+      const tot=c+st;r+=rect(x-w/2+8,y+16,(w-16)*c/tot,5,CHU)+rect(x-w/2+8+(w-16)*c/tot,y+16,(w-16)*st/tot,5,STY);if(lab)r+=tx(x,y+40,lab,{s:12,f:lab==='se ne va'?CHU:STY,w:600});return r};
+    const E=(x1,y1,x2,y2,t,dx)=>line(x1,y1,x2,y2,'#777',1.4)+lbl((x1+x2)/2+(dx||0),(y1+y2)/2+4,t,'#ccc',{s:12.5});
+    s+=E(360,52,220,124,'tecnologia vecchia',-50)+E(360,52,560,124,'nuova',30)+E(220,148,120,224,'≤ 2,3 anni',-40)+E(220,148,330,224,'&gt; 2,3 anni',40)+E(120,248,60,324,'età ≤ 35',-30)+E(120,248,200,324,'&gt; 35',22);
+    s+=N(360,30,50,50)+N(220,126,30,50)+N(560,126,20,0,1,'se ne va')+N(120,226,25,10)+N(330,226,5,40,1,'resta')+N(60,326,20,0,1,'se ne va')+N(200,326,5,10,1,'resta');
+    svgBox($('#b13churn'),640,380,s,'Albero dei clienti che se ne vanno','40rem');
+  })();
+  /* Gini / entropy and split quality */
+  (function(){
+    const duo=el('div','duo');$('#b13gini').append(duo);
+    let a='';const L=40,R=320,T=14,B=170,X=p=>L+p*(R-L),Y=v=>B-v*(B-T);
+    [0,.5,1].forEach(v=>a+=line(L,Y(v),R,Y(v),'#1d1d1d',1)+tx(L-6,Y(v)+4,fi(v,1),{s:12,f:GRAY,a:'end'}));[0,.5,1].forEach(p=>a+=tx(X(p),B+16,fi(p,1),{s:12,f:GRAY}));
+    const path=f=>{let d='';for(let i=0;i<=100;i++){const p=i/100;d+=(d?'L':'M')+X(p).toFixed(1)+' '+Y(f(p)).toFixed(1)}return d};
+    const H=p=>p<=0||p>=1?0:-(p*Math.log2(p)+(1-p)*Math.log2(1-p)),G=p=>1-p*p-(1-p)*(1-p);
+    a+='<path d="'+path(H)+'" fill="none" stroke="#fff" stroke-width="2.5"/><path d="'+path(p=>H(p)/2)+'" fill="none" stroke="#999" stroke-width="1.8" stroke-dasharray="5 4"/><path d="'+path(G)+'" fill="none" stroke="'+HIC+'" stroke-width="2.8"/>';
+    a+=lbl(X(.5),Y(1)-4,'entropia',null,{s:12.5})+lbl(X(.5),Y(.5)+18,'Gini',HIC,{s:12.5})+line(L,B,R,B,'#777',1.2)+tx((L+R)/2,B+34,'quota p della prima classe',{s:12.5,f:GRAY});
+    cell(duo,'Impurità di un nodo',a,340,210,'Gini ed entropia','Zero se il nodo è <b>puro</b>, massimo a p = 0,5.');
+    const b=vbars11([['Radice|50 / 50',.5,'#9a9a9a'],['Tecnologia|30/50 · 20/0',.375,HIC],['Anni &gt; 2,3|35/20 · 15/30',.455,'#9a9a9a']],{max:.6,H:210,bot:44,fmt:v=>fi(v,3)});
+    cell(duo,'Gini medio dopo il taglio',b,340,210,'Gini dei tagli possibili','Vince la tecnologia: <b>0,375</b>.');
+  })();
+  /* bias-variance targets */
+  (function(){
+    const g=el('div','multi');$('#b13bv').append(g);const r=lcg(1313);
+    [['Bassa distorsione, bassa varianza',0,0,7,'l\'obiettivo'],['Bassa distorsione, alta varianza',0,0,26,'albero profondo'],['Alta distorsione, bassa varianza',24,-18,7,'troppo semplice'],['Alta distorsione, alta varianza',22,-16,26,'il caso peggiore']].forEach(([t,dx,dy,sd,n])=>{
+      let s='';[64,46,28,12].forEach((rr,k)=>s+='<circle cx="80" cy="80" r="'+rr+'" fill="'+(k%2?'#1b1b1b':'#2a2a2a')+'" stroke="#444"/>');s+='<circle cx="80" cy="80" r="4" fill="'+YEL+'"/>';
+      for(let i=0;i<12;i++){const x=80+dx+gauss10(r)*sd*.6,y=80+dy+gauss10(r)*sd*.6;s+='<circle cx="'+Math.max(10,Math.min(150,x)).toFixed(1)+'" cy="'+Math.max(10,Math.min(150,y)).toFixed(1)+'" r="3.6" fill="'+BOOC+'"/>'}
+      cell(g,t,s,160,160,t,n)});
+  })();
+  /* bagging vs boosting */
+  (function(){
+    const duo=el('div','duo');$('#b13bag').append(duo);
+    let a='<defs>'+arrowDef('b13a','#888')+'</defs>';[['campione 1',1190],['campione 2',1140],['campione 3',1170]].forEach(([n,v],i)=>{const x=60+i*110;
+      a+=tx(x,20,n,{s:12,f:GRAY})+'<path d="M'+x+' 34l-26 40h52z" fill="none" stroke="#bbb" stroke-width="1.5"/>'+tx(x,66,'T'+(i+1),{s:13,f:'#fff'})+tx(x,96,fi(v,0)+' €',{s:13.5,f:'#fff',w:600})+line(x,104,170,150,'#666',1.2,' marker-end="url(#b13a)"')});
+    a+=rect(90,154,160,34,'#111',HIC,' rx="6"')+tx(170,176,'media = 1.167 €',{s:14,f:HIC,w:600})+tx(170,210,'in parallelo, indipendenti',{s:12.5,f:GRAY});
+    cell(duo,'Bagging: alberi in parallelo',a,340,220,'Bagging','Ogni albero prevede <b>l\'affitto</b>.');
+    let b='<defs>'+arrowDef('b13b','#888')+'</defs>';const S=[['media',1418,''],['albero 1',1272.5,'−145,5'],['albero 2',1180,'−92,5'],['albero 3',1195.4,'+15,4']];
+    S.forEach(([n,v,c],i)=>{const y=22+i*46;b+=tx(14,y+16,n,{s:12.5,f:'#ccc',a:'start'})+(c?tx(96,y+16,c,{s:13,f:BOOC,a:'start',w:600}):'')+tx(168,y+16,'→ '+fi(v,1).replace(/,0$/,'')+' €',{s:13.5,f:'#fff',a:'start',w:600})+tx(336,y+16,'errore '+fi(1160-v,1).replace(/,0$/,''),{s:11.5,f:GRAY,a:'end'});
+      if(i<3)b+=line(60,y+22,60,y+42,'#666',1.2,' marker-end="url(#b13b)"')});
+    b+=tx(170,212,'in sequenza: ogni albero impara l\'errore',{s:12.5,f:GRAY});
+    cell(duo,'Boosting: alberi in sequenza',b,340,220,'Boosting','Ogni albero prevede <b>l\'errore che resta</b>.');
+  })();
+  /* boosting worked example, four panels */
+  (function(){
+    const g=el('div','multi');$('#b13boost').append(g);
+    const xs=[750,800,850,900,950],ys=[1160,1200,1280,1450,2000];let F=xs.map(()=>1418);
+    const steps=[null,925,825,925];const mse=a=>a.reduce((s,v,i)=>s+(ys[i]-v)**2,0)/5;
+    steps.forEach((cut,k)=>{
+      if(cut){const res=ys.map((y,i)=>y-F[i]);const L=xs.map((x,i)=>x<cut?i:-1).filter(i=>i>=0),R=xs.map((x,i)=>x>=cut?i:-1).filter(i=>i>=0);
+        const ml=L.reduce((s,i)=>s+res[i],0)/L.length,mr=R.reduce((s,i)=>s+res[i],0)/R.length;F=F.map((f,i)=>f+(xs[i]<cut?ml:mr))}
+      const X=x=>20+(x-725)/250*170,Y=v=>140-(v-1000)/1100*124;let s=line(14,140,196,140,'#666',1)+line(14,140,14,10,'#666',1);
+      let d='';xs.forEach((x,i)=>{const x0=i?X((x+xs[i-1])/2):X(725),x1=i<4?X((x+xs[i+1])/2):X(975);d+=(d?'L':'M')+x0.toFixed(1)+' '+Y(F[i]).toFixed(1)+'L'+x1.toFixed(1)+' '+Y(F[i]).toFixed(1)});
+      s+='<path d="'+d+'" fill="none" stroke="'+BOOC+'" stroke-width="2.6"/>';
+      xs.forEach((x,i)=>s+=line(X(x),Y(ys[i]),X(x),Y(F[i]),'#666',1,' stroke-dasharray="2 2"')+'<circle cx="'+X(x)+'" cy="'+Y(ys[i])+'" r="4.5" fill="#fff"/>');
+      if(cut)s+=line(X(cut),12,X(cut),140,YEL,1.2,' stroke-dasharray="4 3"')+tx(X(cut),10,'taglio '+cut,{s:11,f:YEL});
+      cell(g,k?'Passo '+k:'Passo 0: la media',s,210,150,'Passo '+k,'MSE '+fi(Math.round(mse(F)),0));
+    });
+  })();
+  /* sigmoid */
+  (function(){
+    let s='';const L=60,R=660,T=14,B=200,X=f=>L+(f+5)/10*(R-L),Y=p=>B-p*(B-T);
+    [0,.5,1].forEach(v=>s+=line(L,Y(v),R,Y(v),'#1d1d1d',1)+tx(L-8,Y(v)+4,fi(v,1),{s:12,f:GRAY,a:'end'}));for(let f=-5;f<=5;f++)s+=tx(X(f),B+18,f<0?'−'+(-f):String(f),{s:12,f:GRAY});
+    let d='';for(let i=0;i<=200;i++){const f=-5+i/20;d+=(d?'L':'M')+X(f).toFixed(1)+' '+Y(1/(1+Math.exp(-f))).toFixed(1)}s+='<path d="'+d+'" fill="none" stroke="'+BOOC+'" stroke-width="3"/>';
+    [[-2,.12],[0,.5],[1.5,.82],[3,.95]].forEach(([f,p])=>s+=line(X(f),B,X(f),Y(p),'#555',1,' stroke-dasharray="3 3"')+'<circle cx="'+X(f)+'" cy="'+Y(p)+'" r="5.5" fill="#fff"/>'+lbl(X(f)+(f<0?-10:10),Y(p)+(f<0?-8:18),fi(p,2),'#fff',{a:f<0?'end':'start',s:13.5}));
+    s+=line(L,B,R,B,'#777',1.2)+tx((L+R)/2,B+38,'punteggio F (somma degli alberi)',{s:13,f:GRAY})+tx(18,(T+B)/2,'P(High)',{s:13,f:GRAY,x:' transform="rotate(-90 18 '+(T+B)/2+')"'});
+    svgBox($('#b13sig'),680,250,s,'Funzione logistica','42rem');
+  })();
+  /* results */
+  (function(){
+    const M=[['Albero',.810,.832,'#9a9a9a'],['Random forest',.844,.905,GRN],['Gradient boosting',.862,.894,PINK],['XGBoost',.850,.891,ORG]];let s='';const B=200,T=20,Y=v=>B-(v-.75)/.2*(B-T);
+    [.75,.8,.85,.9,.95].forEach(v=>s+=line(50,Y(v),660,Y(v),'#1d1d1d',1)+tx(44,Y(v)+4,fi(v,2),{s:12,f:GRAY,a:'end'}));
+    M.forEach(([n,r,p,c],i)=>{const x=80+i*148;s+=rect(x,Y(r),48,B-Y(r),c)+rect(x+56,Y(p),48,B-Y(p),c,null,' fill-opacity=".55"')+tx(x+24,Y(r)-6,fi(r,3),{s:12,f:'#fff'})+tx(x+80,Y(p)-6,fi(p,3),{s:12,f:'#fff'})+tx(x+52,B+18,n,{s:12.5,f:'#ddd'})+tx(x+24,B+34,'sens.',{s:11,f:GRAY})+tx(x+80,B+34,'prec.',{s:11,f:GRAY})});
+    s+=line(50,B,660,B,'#777',1.2)+tx(660,12,'(l\'asse parte da 0,75)',{s:11.5,f:GRAY,a:'end'});
+    svgBox($('#b13res'),680,246,s,'Sensibilità e precisione dei quattro modelli','42rem');
+  })();
+  /* importance */
+  (function(){
+    const duo=el('div','duo');$('#b13imp').append(duo);
+    const hb=(rows,max,fmt,c)=>{let s='';rows.forEach(([n,v],i)=>{const y=8+i*25;s+=tx(152,y+15,n,{s:12,f:'#ddd',a:'end'})+rect(158,y+4,v/max*130,15,c)+tx(162+v/max*130,y+16,fmt(v),{s:11.5,f:'#fff',a:'start'})});return s};
+    cell(duo,'Random forest: statistiche dei tagli',hb([['total_nights',2.88],['stays_in_week_nights',2.32],['stays_in_weekend_nights',1.84],['reserved_room_type',1.50],['arrival_date_month',1.48],['total_guests',1.45],['lead_time',.93],['adults',.72]],3,v=>fi(v,2),GRN),340,212,'Statistiche dei tagli','Massimo possibile: 3.');
+    cell(duo,'XGBoost: media di |SHAP|',hb([['total_nights',.188],['arrival_date_month',.073],['hotel',.038],['market_segment',.031],['reserved_room_type',.030],['meal',.030],['lead_time',.019],['total_guests',.015]],.2,v=>fi(v,3),ORG),340,212,'Importanza SHAP','Su P(High), 300 prenotazioni.');
+  })();
+  /* SHAP by month */
+  (function(){
+    const V=[-.080,-.085,-.080,-.002,.033,.073,.135,.131,.046,-.036,-.096,-.054],Mn=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];let s='';const Z=130,Y=v=>Z-v/.16*110;
+    [-.1,0,.1].forEach(v=>s+=line(40,Y(v),680,Y(v),v?'#1d1d1d':'#777',v?1:1.2)+tx(34,Y(v)+4,(v>0?'+':'')+fi(v,1),{s:12,f:GRAY,a:'end'}));
+    V.forEach((v,i)=>{const x=56+i*52;s+=rect(x,Math.min(Y(v),Z),38,Math.abs(Y(v)-Z),v>0?HIC:RED)+tx(x+19,v>0?Y(v)-6:Y(v)+16,(v>0?'+':'')+fi(v,3),{s:11.5,f:'#fff'})+tx(x+19,262,Mn[i],{s:12.5,f:'#ddd'})});
+    svgBox($('#b13month'),700,274,s,'SHAP medio per mese di arrivo','44rem');
+  })();
+  /* waterfall single booking */
+  (function(){
+    const C=[['total_nights',.391],['arrival_date_month',.138],['total_guests',.117],['reserved_room_type',-.032],['market_segment',.025],['lead_time',.024],['altre variabili',.015]];
+    let s='';const L=40,R=680,X=v=>L+v*(R-L);let cur=.17;
+    [0,.25,.5,.75,1].forEach(v=>s+=line(X(v),10,X(v),C.length*30+66,'#1d1d1d',1)+tx(X(v),C.length*30+82,fi(v,2),{s:12,f:GRAY}));
+    s+=rect(X(0),12,X(.17)-X(0),20,'#777')+tx(X(.17)+8,27,'previsione media 0,17',{s:12.5,f:'#ddd',a:'start'});
+    C.forEach(([n,v],i)=>{const y=42+i*30,a=Math.min(cur,cur+v),b=Math.max(cur,cur+v);s+=rect(X(a),y,Math.max(2,X(b)-X(a)),20,v>0?HIC:RED)+tx(v>0?X(b)+8:X(a)-8,y+15,n+' '+(v>0?'+':'−')+fi(Math.abs(v),3),{s:12.5,f:'#ddd',a:v>0?'start':'end'});cur+=v});
+    const y=42+C.length*30;s+=rect(X(0),y,X(.84)-X(0),20,'#fff')+tx(X(.84)-8,y+15,'previsione del modello ≈ 0,84',{s:12.5,f:'#000',a:'end',w:600});
+    svgBox($('#b13water'),720,C.length*30+92,s,'Spiegazione SHAP di una prenotazione','44rem');
+  })();
+  /* partial dependence */
+  (function(){
+    const P=[[1,0],[2,0],[3,.1],[4,.25],[5,.40],[6,.58],[7,.70],[8,.77],[9,.81],[10,.83],[11,.84],[13,.88],[14,.88]];let s='';const L=60,R=660,T=14,B=230,X=v=>L+v/14*(R-L),Y=v=>B-v*(B-T);
+    [0,.25,.5,.75,1].forEach(v=>s+=line(L,Y(v),R,Y(v),'#1d1d1d',1)+tx(L-8,Y(v)+4,fi(v,2),{s:12,f:GRAY,a:'end'}));for(let v=0;v<=14;v+=2)s+=tx(X(v),B+18,String(v),{s:12,f:GRAY});
+    s+='<polyline points="'+P.map(([v,p])=>X(v)+','+Y(p)).join(' ')+'" fill="none" stroke="'+TEAL+'" stroke-width="3"/>';P.forEach(([v,p])=>s+='<circle cx="'+X(v)+'" cy="'+Y(p)+'" r="4.5" fill="'+TEAL+'"/>');
+    s+=line(X(5),B,X(5),Y(.4),YEL,1.3,' stroke-dasharray="4 3"')+line(L,Y(.4),X(5),Y(.4),YEL,1.3,' stroke-dasharray="4 3"')+lbl(X(5)+8,Y(.4)+16,'PD(5) = 0,40',YEL,{a:'start',s:13.5});
+    s+=line(L,B,R,B,'#777',1.2)+line(L,T,L,B,'#777',1.2)+tx((L+R)/2,B+38,'notti totali imposte a ogni prenotazione',{s:13,f:GRAY})+tx(18,(T+B)/2,'P(High) media',{s:13,f:GRAY,x:' transform="rotate(-90 18 '+(T+B)/2+')"'});
+    svgBox($('#b13pdp'),680,280,s,'Dipendenza parziale delle notti','42rem');
+  })();
+};
+QZ['13a']=()=>[{q:'Nell\'albero dei 100 clienti, un cliente ha la tecnologia vecchia, è cliente da 1 anno e ha 50 anni. In quale foglia finisce e come viene classificato?',o:['Nella foglia 20 / 0: se ne va','Nella foglia 5 / 10: resta','Nella foglia 5 / 40: resta','Nella foglia 20 / 0 della tecnologia nuova: se ne va'],a:1,
+  e:'Vecchia, al massimo 2,3 anni, età oltre 35: foglia con 5 che se ne vanno e 10 che restano. La classe prevista è quella maggioritaria, resta.',h:'Segui i rami dall\'alto: tecnologia, poi anni, poi età.'}];
+QZ['13b']=()=>[{q:'Un nodo contiene 20 clienti che se ne vanno e 20 che restano. Quanto vale il suo indice di Gini?',o:['0','0,25','0,5','1'],a:2,
+  e:'p = 0,5 per entrambe le classi: 1 − (0,25 + 0,25) = 0,5, il massimo con due classi.',h:'Gini = 1 − somma dei quadrati delle quote.'}];
+QZ['13c']=()=>[{q:'In una random forest, perché a ogni taglio si considera solo un sottoinsieme casuale di variabili?',o:['Per rendere ogni albero più accurato da solo','Per rendere gli alberi diversi fra loro, così la media riduce davvero la varianza','Per risparmiare memoria','Per ridurre la distorsione di ogni albero'],a:1,
+  e:'Se una variabile fortissima fosse sempre disponibile, tutti gli alberi la userebbero in cima e si somiglierebbero. La media di alberi simili non riduce la varianza.',h:'Che cosa succede alla media di cento copie dello stesso albero?'}];
+QZ['13d']=()=>[{q:'Aggiungi sempre più alberi a un gradient boosting con tasso di apprendimento fisso. Che cosa succede all\'errore sul test?',o:['Scende sempre, come in una random forest','Scende e poi può risalire: il numero di alberi va scelto sulla validazione','Resta costante','Sale fin dal primo albero'],a:1,
+  e:'Ogni albero riduce l\'errore sul training; oltre un certo punto il modello comincia a imparare il rumore. Nella random forest invece più alberi non fanno male.',h:'Ricorda la tabella del confronto fra le due famiglie.'}];
+QZ['13e']=()=>[{q:'Il manager chiede: «perché il modello dà 0,84 a questa specifica prenotazione?». Quale lente usi?',o:['Le statistiche dei tagli della foresta','I valori SHAP di quella prenotazione','La dipendenza parziale delle notti','L\'AUC'],a:1,
+  e:'Solo SHAP spiega una singola previsione (portata locale), dividendola fra le variabili a partire dalla previsione media.',h:'Quale lente ha portata locale?'}];
+QZ['13']=()=>[
+  {q:'Un taglio divide un nodo di 100 unità in due figli: 60 unità con Gini 0,3 e 40 unità con Gini 0,1. Quanto vale il Gini del taglio?',o:['0,20','0,22','0,40','0,18'],a:1,
+   e:'Media pesata: 0,6 × 0,3 + 0,4 × 0,1 = 0,18 + 0,04 = 0,22.',h:'Pesa ogni figlio con la sua quota di unità.'},
+  {q:'Un taglio ha guadagno di informazione 0,40 e SplitINFO 2,0. Qual è il gain ratio, e a che cosa serve?',o:['0,80: premia i tagli con molti gruppi','0,20: penalizza i tagli in molti gruppi piccoli','2,40: somma le due misure','0,40: lo SplitINFO non conta'],a:1,
+   e:'Gain ratio = IG / SplitINFO = 0,40 / 2,0 = 0,20. Lo SplitINFO cresce con il numero di gruppi, quindi il rapporto protegge da variabili come il mese o il paese.',h:'Si divide il guadagno per lo SplitINFO.'},
+  {q:'Nell\'esempio degli affitti, dopo il passo 1 i residui sono −112,5, −72,5, 7,5, 177,5 e 0. Il secondo albero taglia a 825. Che cosa prevede per gli appartamenti di 750 e 800 piedi quadrati?',o:['−112,5','−92,5','−72,5','61,7'],a:1,
+   e:'A sinistra del taglio ci sono i residui −112,5 e −72,5: la loro media è −92,5. A destra (7,5 + 177,5 + 0) / 3 ≈ 61,7.',h:'Una foglia prevede la media dei residui che contiene.'},
+  {q:'Un albero di boosting dà a una prenotazione un punteggio complessivo F = 0. Qual è la probabilità prevista di High?',o:['0','0,12','0,50','1'],a:2,
+   e:'p = 1 / (1 + e⁰) = 1 / 2 = 0,5.',h:'Usa la funzione logistica.'},
+  {q:'Quale coppia descrive correttamente gli alberi singoli dentro i due tipi di insieme?',o:['Foresta: alberi bassi; boosting: alberi profondi','Foresta: alberi profondi non potati; boosting: alberi bassi, da 2 a 6 livelli','Tutti e due: alberi potati con MDL','Foresta: un solo albero; boosting: cento alberi uguali'],a:1,
+   e:'La foresta media alberi profondi (bassa distorsione, alta varianza) per ridurre la varianza; il boosting somma alberi bassi (alta distorsione, bassa varianza) per ridurre la distorsione.',h:'Quale errore attacca ciascuna famiglia?'},
+  {q:'La dipendenza parziale dice PD(5) = 0,40. Quale lettura è corretta?',o:['Il 40% delle prenotazioni dura 5 notti','Se ogni prenotazione durasse 5 notti, lasciando il resto com\'è, la probabilità media prevista di High sarebbe 0,40','Allungare un soggiorno a 5 notti causa un aumento del ricavo del 40%','Le prenotazioni di 5 notti sono High nel 40% dei dati'],a:1,
+   e:'È la previsione media del modello con le notti forzate a 5 per tutte le prenotazioni. Non è una frequenza nei dati, e non è un effetto causale.',h:'Ricorda la formula di PD(v) e che importanza non vuol dire causalità.'}
+];
+MAPPA[13]={c:'Come decide un albero, e perché cento alberi decidono meglio?',r:[
+  {t:'Alberi',c:GRN,v:['Radice, nodi, rami, foglie','Classificazione e regressione','Supervisionato, a differenza del clustering','Ricorsivo e avido']},
+  {t:'Criteri di taglio',c:BLUE,v:['Gini: 1 − somma dei quadrati','Entropia e guadagno di informazione','Gain ratio contro i tagli in molti gruppi','Potatura MDL, minimo 20 unità']},
+  {t:'Algoritmi',c:TEAL,v:['CART, C4.5, CHAID, QUEST','KNIME: Decision Tree Learner simile a C4.5','Ensemble basati su CART']},
+  {t:'Distorsione e varianza',c:YEL,v:['Errore = distorsione² + varianza + rumore','Foresta: riduce la varianza','Boosting: riduce la distorsione']},
+  {t:'Foresta e boosting',c:PINK,v:['Bootstrap e √p variabili per taglio','Alberi sui residui, tasso 0,1','XGBoost: perdita + complessità','Accuratezza: 0,928 albero, 0,950-0,951 insiemi']},
+  {t:'Importanza',c:ORG,v:['Statistiche dei tagli','SHAP: contributi che sommano alla previsione','Dipendenza parziale: forma dell\'effetto','Importanza non è causalità']}]};
+
+/* Lezione 14: casi applicati, cancellazioni alberghiere con tre modelli ad albero e abbandono dei clienti di una banca */
+const LEFTC=ORG,KEEPC=BLUE,HONC=GRN;
+INIT[14]=function(){
+  /* three confusion matrices, hotel */
+  (function(){
+    const t=el('div','trio');$('#b14cm').append(t);
+    [['Albero di decisione',{tp:9944,fn:3314,fp:2069,tn:20434}],['Random forest',{tp:10293,fn:2965,fp:1381,tn:21122}],['Gradient boosting',{tp:9790,fn:3468,fp:1690,tn:20813}]].forEach(([n,m])=>
+      cell(t,n,cm12(70,46,m,['Yes','No'],{w:82,h:52,fs:15,noside:1}),250,160,'Matrice di confusione: '+n,'mancate <b>'+fi(m.fn,0)+'</b> · falsi allarmi <b>'+fi(m.fp,0)+'</b>'));
+  })();
+  /* errors by model */
+  (function(){
+    let s='';const M=[['Albero',3314,2069],['Random forest',2965,1381],['Gradient boosting',3468,1690]],B=200,T=24,Y=v=>B-v/4000*(B-T);
+    [0,1000,2000,3000,4000].forEach(v=>s+=line(50,Y(v),660,Y(v),'#1d1d1d',1)+tx(44,Y(v)+4,fi(v,0),{s:12,f:GRAY,a:'end'}));
+    M.forEach(([n,a,b],i)=>{const x=100+i*190;s+=rect(x,Y(a),60,B-Y(a),RED)+rect(x+68,Y(b),60,B-Y(b),ORG)+tx(x+30,Y(a)-6,fi(a,0),{s:12.5,f:'#fff'})+tx(x+98,Y(b)-6,fi(b,0),{s:12.5,f:'#fff'})+tx(x+64,B+20,n,{s:13,f:'#ddd'})});
+    s+=line(50,B,660,B,'#777',1.2)+rect(330,4,12,12,RED)+tx(348,15,'cancellazioni mancate',{s:12.5,f:'#ddd',a:'start'})+rect(510,4,12,12,ORG)+tx(528,15,'falsi allarmi',{s:12.5,f:'#ddd',a:'start'});
+    svgBox($('#b14err'),680,230,s,'Errori dei tre modelli','42rem');
+  })();
+  /* special agreements split */
+  (function(){
+    let s='';const G=[['almeno un conto in convenzione',1581,5],['nessuna convenzione',2631,2101]];
+    G.forEach(([n,tot,ch],i)=>{const y=30+i*84,w=560*tot/2631;s+=tx(20,y,n+' · '+fi(tot,0)+' clienti',{s:13.5,f:'#ddd',a:'start'});
+      s+=rect(20,y+10,w*ch/tot,34,LEFTC)+rect(20+w*ch/tot,y+10,w*(1-ch/tot),34,KEEPC)+tx(20+w+10,y+33,fi(ch/tot*100,1)+'% se ne va',{s:14,f:LEFTC,a:'start',w:600})});
+    s+=rect(20,200,12,12,LEFTC)+tx(38,211,'se ne va',{s:12.5,f:'#ddd',a:'start'})+rect(120,200,12,12,KEEPC)+tx(138,211,'resta',{s:12.5,f:'#ddd',a:'start'});
+    svgBox($('#b14conv'),720,222,s,'Abbandono per conti in convenzione','44rem');
+  })();
+  /* row flow */
+  (function(){
+    let s='<defs>'+arrowDef('b14a','#888')+'</defs>';
+    const box=(x,y,w,t1,n,p,c)=>{let r=rect(x,y,w,62,'#111',c||'#bbb',' rx="6"')+tx(x+w/2,y+20,t1,{s:12.5,f:GRAY})+tx(x+w/2,y+40,fi(n,0)+' righe',{s:14,f:'#fff',w:600});
+      r+=rect(x+10,y+48,(w-20)*p,6,LEFTC)+rect(x+10+(w-20)*p,y+48,(w-20)*(1-p),6,KEEPC)+tx(x+w/2,y+76,fi(p*100,1)+'% se ne va',{s:12,f:LEFTC});return r};
+    s+=box(10,20,150,'come consegnato',4212,.5)+box(200,20,150,'solo conto corrente',3944,.534)+box(400,0,140,'training 70%',2760,.534)+box(400,110,140,'test 30%',1184,.534,YEL)+box(580,0,130,'training bilanciato',2572,.5,HONC);
+    s+=line(160,51,196,51,'#888',1.5,' marker-end="url(#b14a)"')+line(350,45,396,31,'#888',1.5,' marker-end="url(#b14a)"')+line(350,60,396,140,'#888',1.5,' marker-end="url(#b14a)"')+line(540,31,576,31,'#888',1.5,' marker-end="url(#b14a)"');
+    s+=tx(180,42,'−268',{s:12,f:GRAY})+tx(645,104,'Equal Size Sampling',{s:12,f:HONC})+tx(645,150,'il test resta',{s:12.5,f:YEL})+tx(645,168,'com\'è',{s:12.5,f:YEL});
+    svgBox($('#b14flow'),720,196,s,'Righe a ogni passo della preparazione','46rem');
+  })();
+  /* before / after */
+  (function(){
+    let s='';const M=[['Albero di decisione',.942,.682],['Random forest / Tree Ensemble',.911,.752],['Gradient boosting (H2O)',.754,.762]],B=210,T=24,Y=v=>B-(v-.5)/.5*(B-T);
+    [.5,.6,.7,.8,.9,1].forEach(v=>s+=line(50,Y(v),660,Y(v),'#1d1d1d',1)+tx(44,Y(v)+4,fi(v,1),{s:12,f:GRAY,a:'end'}));
+    M.forEach(([n,a,b],i)=>{const x=90+i*195;s+=rect(x,Y(a),62,B-Y(a),'#8a8a8a')+rect(x+70,Y(b),62,B-Y(b),HONC)+tx(x+31,Y(a)-6,fi(a,3),{s:12.5,f:'#ddd'})+tx(x+101,Y(b)-6,fi(b,3),{s:12.5,f:HONC,w:600})+tx(x+66,B+20,n,{s:12.5,f:'#ddd'});
+      const d=Math.round((b-a)*100);s+=tx(x+66,B+38,(d>0?'+':'−')+Math.abs(d)+(Math.abs(d)===1?' punto':' punti'),{s:12,f:d<0?RED:HONC})});
+    s+=line(50,B,660,B,'#777',1.2)+rect(370,4,12,12,'#8a8a8a')+tx(388,15,'workflow consegnato',{s:12.5,f:'#ddd',a:'start'})+rect(530,4,12,12,HONC)+tx(548,15,'workflow corretto',{s:12.5,f:'#ddd',a:'start'})+tx(50,14,'(l\'asse parte da 0,5)',{s:11.5,f:GRAY,a:'start'});
+    svgBox($('#b14ba'),680,260,s,'Accuratezza prima e dopo','42rem');
+  })();
+  /* GBM importance */
+  (function(){
+    const V=[['tenure (anzianità)',15.8,1],['contatore dei movimenti',6.3,1],['age (età)',5.9,1],['area',5.5,1],['carte e utenze',4.1,1],['indicatore di problematicità',4.0,1],['strategy (strategia)',2.4,1],['saldo passivo, trimestre −1',2.2,0],['accrediti di pensione o stipendio, trimestre −3',2.1,0],['movimenti di addebito, trimestre −3',2.1,0]];
+    let s='';const L=330,X=v=>L+v/18*330;V.forEach(([n,v,p],i)=>{const y=8+i*28;s+=tx(L-10,y+16,n,{s:12.5,f:'#ddd',a:'end'})+rect(L,y+4,X(v)-L,17,p?BLUE:'#8a8a8a')+tx(X(v)+8,y+17,fi(v,1)+'%',{s:12.5,f:'#fff',a:'start'})});
+    svgBox($('#b14imp'),720,V.length*28+14,s,'Importanza delle variabili nel GBM','44rem');
+  })();
+  /* three patterns */
+  (function(){
+    const t=el('div','trio');$('#b14pat').append(t);
+    const P=[['Per prodotti posseduti',[['0',77.5],['1',56.0],['2',49.2],['3',49.0],['4+',36.5]],[0],[4]],['Per fascia d\'età',[['&lt;30',48.4],['30-40',52.2],['40-50',49.5],['50-60',53.7],['60+',62.7]],[4],[]],['Per anni di rapporto',[['0-2',48.9],['3-5',50.9],['6-8',44.9],['9-11',51.5],['12+',62.6]],[4],[2]]];
+    P.forEach(([n,b,hi,lo])=>cell(t,n,vbars11(b.map(([l,v],i)=>[l,v,hi.includes(i)?RED:lo.includes(i)?GRN:'#8a8a8a']),{W:260,H:190,max:85,bw:34,L:6,R:6}),260,190,'Abbandono '+n,''));
+  })();
+  /* call list */
+  (function(){
+    let s='';const B=190,Y=v=>B-v/300*(B-20);
+    [[ 'a caso',160,'#8a8a8a'],['primi 300 del modello',276,HONC]].forEach(([n,v,c],i)=>{const x=110+i*230;s+=rect(x,Y(300),120,B-Y(300),'none','#444',' stroke-dasharray="4 3"')+rect(x,Y(v),120,B-Y(v),c)+tx(x+60,Y(v)+24,'≈ '+v,{s:17,f:'#000',w:600})+tx(x+60,B+20,n,{s:13,f:'#ddd'})});
+    s+=line(80,B,600,B,'#777',1.2)+tx(600,14,'300 chiamate (tratteggio)',{s:12,f:GRAY,a:'end'})+lbl(285,Y(218),'+116 clienti',HONC,{s:14,w:600});
+    s+=tx(170,Y(300)-6,'clienti in uscita trovati',{s:12,f:GRAY});
+    svgBox($('#b14call'),640,220,s,'Clienti trovati con 300 chiamate','40rem');
+  })();
+};
+QZ['14a']=()=>[{q:'Sulle 35.761 prenotazioni di test, quante sono state cancellate davvero, e quale accuratezza otterrebbe un modello che prevede sempre «No»?',o:['13.258 e 0,629','22.503 e 0,371','13.258 e 0,500','10.293 e 0,878'],a:0,
+  e:'Cancellazioni vere = TP + FN = 10.293 + 2.965 = 13.258 (37,1%). Prevedendo sempre No si indovinano le 22.503 non cancellate: 22.503 / 35.761 = 0,629.',h:'Somma la riga Yes di una matrice qualsiasi.'}];
+QZ['14b']=()=>[{q:'Quale domanda permette di scartare una colonna come «conti aperti dopo l\'abbandono» anche se predice benissimo?',o:['Che cosa significa questa colonna?','Quando viene misurata, rispetto al momento della previsione?','Quanti valori mancanti ha?','È numerica o categorica?'],a:1,
+  e:'Il leakage riguarda il momento della misura: una colonna misurata dopo l\'evento contiene la risposta e non sarà disponibile quando servirà prevedere.',h:'Le slide dicono: non che cosa significa, ma quando.'}];
+QZ['14c']=()=>[{q:'Uno studente bilancia l\'intero dataset (50% e 50%) e poi lo divide in training e test. Che cosa non va?',o:['Niente, l\'ordine non conta','Il test ha una distribuzione delle classi che non esiste nella realtà: le misure non valgono per i dati veri','Il training ha troppe righe','Bisognava bilanciare solo il test'],a:1,
+  e:'Prima si divide (in modo stratificato), poi si bilancia solo il training. Il test deve conservare la distribuzione naturale, perché è la misura che si riporta.',h:'Su quali dati deve essere misurato il modello?'}];
+QZ['14d']=()=>[{q:'La filiale può fare 300 chiamate. Perché la lista si taglia a 300 invece di usare la soglia 0,5?',o:['Perché 0,5 è sempre sbagliata','Perché la lunghezza della lista la decide la capacità della filiale, non una soglia statistica','Perché il modello non dà probabilità','Perché 300 è il 25% dei clienti di test'],a:1,
+  e:'Con la soglia 0,5 i clienti segnalati sarebbero 638, più delle chiamate possibili. Si ordinano per probabilità e si prendono i primi 300.',h:'Quanti clienti segnala la soglia 0,5?'}];
+QZ['14']=()=>[
+  {q:'Nel caso degli hotel la random forest ha TP = 10.293 e FP = 1.381. Quanto vale la precisione?',o:['0,776','0,882','0,939','0,878'],a:1,
+   e:'10.293 / (10.293 + 1.381) = 10.293 / 11.674 ≈ 0,882.',h:'Delle prenotazioni previste cancellate, quante lo sono davvero?'},
+  {q:'Se per l\'albergo un falso allarme (cliente da spostare in un altro albergo) costa più di una cancellazione mancata, come si muove la soglia?',o:['Si abbassa sotto 0,5','Si alza sopra 0,5','Resta 0,5','Si sceglie il modello con l\'accuratezza più alta'],a:1,
+   e:'Alzando la soglia si segnalano meno prenotazioni: meno falsi allarmi, al prezzo di qualche cancellazione mancata in più.',h:'Quale soglia produce meno previsioni positive?'},
+  {q:'Le 87 colonne z-score della banca sono copie standardizzate delle colonne grezze. Che effetto hanno su un albero?',o:['Lo migliorano, perché i dati sono normalizzati','Nessun guadagno: dividono l\'importanza fra gemelli identici e raddoppiano lo spazio delle variabili','Causano leakage','Rendono impossibile il bilanciamento'],a:1,
+   e:'Una standardizzazione è lineare: correlazione 1,000, nessuna informazione nuova. Togliendole l\'accuratezza è rimasta uguale (0,904 → 0,909).',h:'Che correlazione hanno una colonna e il suo z-score?'},
+  {q:'Quali due sintomi dovevano far sospettare del workflow consegnato?',o:['Accuratezza bassa e AUC bassa','Sensibilità 0,997 dell\'albero e l\'albero singolo che batte l\'insieme di alberi','Troppi valori mancanti e poche righe','Il boosting più lento della foresta'],a:1,
+   e:'Niente nel comportamento dei clienti è prevedibile al 99,7%, e una media di alberi non può migliorare una colonna che è già la risposta.',h:'Rileggi il paragrafo sui numeri lusinghieri.'},
+  {q:'Le slide notano che i cicli di ottimizzazione valutano sulla parte di test. Che cosa implica per l\'AUC migliore trovata?',o:['È pessimista','È ottimista: i parametri sono stati scelti guardando il test','È esatta','Non cambia nulla perché si usa l\'AUC e non l\'accuratezza'],a:1,
+   e:'Un test usato per scegliere i parametri non è più indipendente. La versione pulita regola su una parte di validazione.',h:'Ricorda il ruolo dell\'insieme di validazione nella lezione 12.'},
+  {q:'Con 300 chiamate il modello trova 276 clienti in uscita contro circa 160 a caso. Se il 30% dei clienti raggiunti accetta l\'offerta, quanti clienti in più trattiene il modello rispetto alla scelta casuale?',o:['Circa 35','Circa 83','Circa 116','Circa 48'],a:0,
+   e:'Modello: 276 × 0,3 ≈ 83; a caso: 160 × 0,3 = 48. Differenza: circa 35 clienti trattenuti in più, cioè 116 × 0,3.',h:'Applica il 30% ai due numeri, poi sottrai.'}
+];
+MAPPA[14]={c:'Quando ci si può fidare di un modello?',r:[
+  {t:'Caso hotel',c:BLUE,v:['Training 83.442, test 35.761, seme 42','Foresta migliore: 0,878, AUC 0,948','Sempre No: 0,629']},
+  {t:'Dai punteggi alle decisioni',c:ORG,v:['Mancata: camera vuota','Falso allarme: ospite da spostare','Modello sull\'AUC, soglia sui costi']},
+  {t:'Trappole della banca',c:RED,v:['87 copie z-score, correlazione 1','Convenzioni: 0,3% contro 79,9%','Colonne post-evento: leakage','Prova dell\'azione']},
+  {t:'Dividere e bilanciare',c:YEL,v:['Prima stratificare 70/30','Poi bilanciare solo il training','Fissare i semi, regolare sulla validazione']},
+  {t:'Risultati onesti',c:GRN,v:['Albero 0,942 → 0,682','GBM 0,762, AUC 0,844','Anzianità, età, prodotti, area']},
+  {t:'Lista di chiamate',c:PINK,v:['Ordinare, tagliare, agire, misurare','300 chiamate: 276 contro 160','Costo delle chiamate contro margine']}]};
+
+/* Lezione 15: text analytics, sentiment e topic sui tweet alle compagnie aeree (Twitter US Airline Sentiment) */
+const NEGC=RED,NEUC='#9a9a9a',POSC=GRN,HUMC=BLUE,LEXC=YEL;
+/* 3x3 confusion heat matrix with row percentages */
+function cm15(rows,lab){let s='';const x0=120,y0=56,w=72,h=44;
+  s+=tx(x0+1.5*w,y0-34,'classe prevista',{s:12,f:GRAY})+tx(20,y0+1.5*h,'classe umana',{s:12,f:GRAY,x:' transform="rotate(-90 20 '+(y0+1.5*h)+')"'});
+  lab.forEach((l,j)=>{s+=tx(x0+j*w+w/2,y0-10,l,{s:12,f:'#ddd'})+tx(x0-8,y0+j*h+h/2+5,l,{s:12,f:'#ddd',a:'end'})});
+  rows.forEach((r,i)=>{const tot=r.reduce((a,b)=>a+b,0);r.forEach((v,j)=>{const p=v/tot;s+=rect(x0+j*w,y0+i*h,w,h,i===j?'rgba(131,193,103,'+(0.15+p*.7).toFixed(2)+')':'rgba(252,98,85,'+(0.08+p*.7).toFixed(2)+')','#000');
+    s+=tx(x0+j*w+w/2,y0+i*h+20,Math.round(p*100)+'%',{s:14,f:'#fff',w:600})+tx(x0+j*w+w/2,y0+i*h+36,fi(v,0),{s:11,f:'#ccc'})})});
+  return s}
+INIT[15]=function(){
+  /* bag of words vs embeddings */
+  (function(){
+    const duo=el('div','duo');$('#b15bow').append(duo);
+    const cols=[{t:'tweet',w:134},{t:'delayed',w:62,a:'m'},{t:'hours',w:54,a:'m'},{t:'bag',w:42,a:'m'},{t:'great',w:52,a:'m'}];
+    const one=v=>({v:String(v),f:v?'#fff':'#555',b:!!v,bg:v?'rgba(88,196,221,.22)':null});
+    const t=sTab(0,0,cols,[['«delayed 3 hours»',1,1,0,0],['«lost my bag»',0,0,1,0],['«great crew»',0,0,0,1]].map(r=>[r[0]].concat(r.slice(1).map(one))),{rh:30});
+    tabCell(duo,'Bag of words',t,'Trasparente ma <b>sparso</b>: i sinonimi non si toccano.',340);
+    let b=line(14,176,326,176,'#555',1)+line(14,176,14,10,'#555',1);
+    [[['delayed',70,40],['late',110,58],['hours',62,78]],[['bag',230,52],['luggage',272,76],['suitcase',226,98]],[['great',110,140],['love',160,124],['thanks',188,152]]].forEach((g,k)=>{const c=[ORG,BLUE,GRN][k];
+      g.forEach(([w,x,y])=>b+='<circle cx="'+x+'" cy="'+y+'" r="4.5" fill="'+c+'"/>'+tx(x+8,y+4,w,{s:12.5,f:c,a:'start'}))});
+    cell(duo,'Embedding (mappa illustrativa)',b,340,186,'Embedding','Significati simili stanno <b>vicini</b>.');
+  })();
+  /* LDA idea */
+  (function(){
+    let s='';const T=[['Topic A','delayed · gate · hours · plane',ORG],['Topic B','bag · lost · luggage · baggage',BLUE],['Topic C','cancelled · hold · phone · rebook',PINK]];
+    T.forEach(([n,w,c],i)=>{const y=24+i*62;s+=rect(10,y,250,46,'#111',c,' rx="6"')+tx(22,y+19,n,{s:13,f:c,a:'start',w:600})+tx(22,y+37,w,{s:12,f:'#ccc',a:'start'})});
+    const D=[['«Flight cancelled, 2 h on hold to rebook»',[[.15,0],[0,1],[.85,2]]],['«Sitting at the gate 3 hours, now my bag is lost»',[[.55,0],[.45,1]]],['«Lost luggage again, nobody answers the phone»',[[.7,1],[.3,2]]]];
+    D.forEach(([t,mix],i)=>{const y=24+i*62;s+=tx(300,y+16,t,{s:12.5,f:'#ddd',a:'start'});let x=300;mix.forEach(([p,k])=>{if(p>0){s+=rect(x,y+26,p*400,14,T[k][2]);x+=p*400}})});
+    s+=tx(135,14,'ogni topic: un miscuglio di parole',{s:12,f:GRAY})+tx(500,14,'ogni tweet: un miscuglio di topic',{s:12,f:GRAY});
+    svgBox($('#b15lda'),720,212,s,'Idea della Latent Dirichlet Allocation','46rem');
+  })();
+  /* labels */
+  (function(){
+    const duo=el('div','duo');$('#b15lab').append(duo);
+    cell(duo,'Etichette umane',vbars11([['negativo',62.7,NEGC],['neutro',21.2,NEUC],['positivo',16.1,POSC]],{max:72,H:200}),340,200,'Etichette umane','<b>9.084</b> tweet negativi su 14.485.');
+    const R=[['Customer Service Issue',2883],['Late Flight',1652],['Can\'t Tell',1183],['Cancelled Flight',831],['Lost Luggage',718],['Bad Flight',573],['Flight Booking Problems',521]];
+    let b='';R.forEach(([n,v],i)=>{const y=8+i*26;b+=tx(160,y+16,n,{s:12,f:'#ddd',a:'end'})+rect(166,y+4,v/2883*120,16,NEGC)+tx(172+v/2883*120,y+17,fi(v,0),{s:11.5,f:'#fff',a:'start'})});
+    cell(duo,'Motivi dei tweet negativi',b,340,194,'Motivi dei tweet negativi','I sette motivi più frequenti.');
+  })();
+  /* confusion matrices */
+  (function(){
+    const duo=el('div','duo');$('#b15cm').append(duo);const L=['neg','neu','pos'];
+    cell(duo,'Dizionario, 14.485 tweet',cm15([[3720,3856,1508],[346,2034,687],[119,699,1516]],L),340,196,'Dizionario','Accuratezza <b>50%</b>, κ 0,27.');
+    cell(duo,'Random forest, 4.147 tweet di test',cm15([[2305,245,117],[368,346,107],[175,77,407]],L),340,196,'Random forest','Accuratezza <b>74%</b>, κ 0,48.');
+  })();
+  /* airlines humans vs lexicon */
+  (function(){
+    let s='';const A=[['US Airways',77.7,36],['American',71.7,30],['United',68.9,33],['Southwest',49.0,21],['Delta',43.0,21],['Virgin America',35.9,18]],B=210,T=20,Y=v=>B-v/85*(B-T);
+    [0,20,40,60,80].forEach(v=>s+=line(40,Y(v),680,Y(v),'#1d1d1d',1)+tx(34,Y(v)+4,v+'%',{s:12,f:GRAY,a:'end'}));
+    A.forEach(([n,h,l],i)=>{const x=60+i*104;s+=rect(x,Y(h),40,B-Y(h),HUMC)+rect(x+44,Y(l),40,B-Y(l),LEXC)+tx(x+20,Y(h)-6,Math.round(h)+'%',{s:12.5,f:'#fff'})+tx(x+64,Y(l)-6,l+'%',{s:12.5,f:'#fff'})+tx(x+42,B+20,n,{s:12.5,f:'#ddd'})});
+    s+=line(40,B,680,B,'#777',1.2)+rect(470,2,12,12,HUMC)+tx(488,13,'persone',{s:12.5,f:'#ddd',a:'start'})+rect(570,2,12,12,LEXC)+tx(588,13,'dizionario',{s:12.5,f:'#ddd',a:'start'});
+    svgBox($('#b15air'),700,236,s,'Quota di tweet negativi per compagnia','44rem');
+  })();
+  /* topics negative share */
+  (function(){
+    const Tp=[['Ritardi e cancellazioni',72,36],['Attesa al telefono e riprenotazioni',70,24],['Assistenza e personale',67,38],['Bagagli',61,31],['Posti, miglia e upgrade',56,24],['Complimenti e promozioni',22,10]];
+    let s='';const L=250,X=v=>L+v/80*400;Tp.forEach(([n,h,l],i)=>{const y=10+i*44;s+=tx(L-10,y+22,n,{s:12.5,f:'#ddd',a:'end'})+rect(L,y+4,X(h)-L,16,HUMC)+rect(L,y+22,X(l)-L,14,LEXC)+tx(X(h)+6,y+17,h+'%',{s:12,f:'#fff',a:'start'})+tx(X(l)+6,y+34,l+'%',{s:12,f:'#fff',a:'start'})});
+    s+=rect(L,Tp.length*44+18,12,12,HUMC)+tx(L+18,Tp.length*44+29,'persone',{s:12.5,f:'#ddd',a:'start'})+rect(L+110,Tp.length*44+18,12,12,LEXC)+tx(L+128,Tp.length*44+29,'dizionario',{s:12.5,f:'#ddd',a:'start'});
+    svgBox($('#b15topic'),700,Tp.length*44+40,s,'Quota di tweet negativi per topic','44rem');
+  })();
+};
+QZ['15a']=()=>[{q:'Il tweet «still no response from AA. great job guys!» contiene la parola «great». Che cosa conclude un dizionario, e perché sbaglia?',o:['Negativo: riconosce l\'ironia','Positivo: conta «great» e non vede l\'ironia','Neutro: non conosce «AA»','Non lo classifica: è troppo corto'],a:1,
+  e:'Un dizionario conta le parole positive e negative senza contesto: «great» lo fa pendere verso il positivo, ma è ironico.',h:'Che cosa conta un dizionario?'}];
+QZ['15b']=()=>[{q:'Un tweet ha 3 parole positive e 1 negativa del lessico. Quanto vale il punteggio del dizionario, e quale classe ne esce?',o:['0,75, positive','0,5, positive','2, positive','−0,5, negative'],a:1,
+  e:'(3 − 1) / (3 + 1) = 2 / 4 = 0,5: maggiore di zero, quindi «positive».',h:'(positive − negative) / (positive + negative).'}];
+QZ['15c']=()=>[{q:'Se il dizionario sottostima la negatività di tutte le compagnie, perché può ancora servire per un indicatore mensile del marchio?',o:['Perché il livello assoluto è giusto','Perché ordina le compagnie quasi come le persone (correlazione di rango 0,94): contano tendenza e classifica','Perché è più accurato della random forest','Non serve a nulla'],a:1,
+  e:'Per confrontare concorrenti e seguire la tendenza conta l\'ordine, non il livello: e l\'ordine è quasi lo stesso degli annotatori.',h:'Guarda la figura delle compagnie.'}];
+QZ['15d']=()=>[{q:'Quale risultato della lezione permette a un manager di agire, oltre a sapere che i clienti sono scontenti?',o:['L\'accuratezza del dizionario','Topic incrociati con il sentiment: che cosa non piace, e a chi','Il numero di termini nel bag of words','Il numero di iterazioni dell\'LDA'],a:1,
+  e:'Topic per sentiment dice quali temi sono più negativi e per quale compagnia: un problema proprio o di tutto il settore.',h:'Rileggi la frase dopo la tabella dei topic per compagnia.'}];
+QZ['15']=()=>[
+  {q:'Su 14.485 tweet il dizionario ne classifica bene 3.720 negativi, 2.034 neutri e 1.516 positivi. Qual è la sua accuratezza?',o:['circa 26%','circa 50%','circa 63%','circa 74%'],a:1,
+   e:'(3.720 + 2.034 + 1.516) / 14.485 = 7.270 / 14.485 ≈ 0,50.',h:'Somma la diagonale e dividi per il totale.'},
+  {q:'Perché il workflow sostituisce «Cancelled Flightled» con «cancelled» prima di tutto il resto?',o:['Per accorciare i tweet','Perché l\'artefatto crea parole finte e fa trapelare nel testo l\'etichetta del motivo: un leakage','Perché KNIME non accetta le maiuscole','Per tradurre i tweet'],a:1,
+   e:'Le etichette «Late Flight» e «Cancelled Flight» erano state scritte dentro 1.408 tweet: un modello avrebbe imparato l\'etichetta, non il linguaggio dei clienti.',h:'Ricorda la lezione 14 sulle colonne che conoscono la risposta.'},
+  {q:'In quale ordine conviene applicare Dictionary Tagger e Stop Word Filter?',o:['Prima le parole vuote, poi il tagger','Prima il tagger, poi le parole vuote, altrimenti «not» e «no» spariscono','L\'ordine non conta','Il tagger non serve se si tolgono le parole vuote'],a:1,
+   e:'Le liste di parole vuote contengono negazioni come «not» e «no», che contano per il sentiment: vanno marcate prima.',h:'Che cosa c\'è nelle liste di parole vuote?'},
+  {q:'Quale differenza fra bag of words ed embedding è corretta?',o:['Il bag of words conserva l\'ordine delle parole','Negli embedding parole con significati simili hanno vettori vicini; nel bag of words i sinonimi sono colonne senza legame','Gli embedding sono più trasparenti','Il bag of words richiede un modello pre-addestrato'],a:1,
+   e:'Il bag of words è trasparente e sparso, con una colonna per parola; gli embedding sono vettori densi in cui la vicinanza riflette il significato.',h:'Guarda i due riquadri della figura.'},
+  {q:'Nel Topic Extractor si impostano α = 0,1 e β = 0,01. Che cosa vogliono dire valori così piccoli?',o:['Molti topic per tweet e molte parole per topic','Pochi topic per tweet e poche parole per topic','Pochi tweet per topic','Che le iterazioni sono poche'],a:1,
+   e:'α piccolo concentra ogni documento su pochi topic, β piccolo concentra ogni topic su poche parole: adatto a tweet brevi e topic leggibili.',h:'α riguarda i documenti, β i topic.'},
+  {q:'La random forest arriva al 74% di accuratezza contro il 50% del dizionario. Qual è il prezzo principale?',o:['È più lenta da eseguire su un tweet','Servono migliaia di tweet etichettati da persone, e va riaddestrata quando il linguaggio cambia','Non si può usare in KNIME','Non funziona sui tweet negativi'],a:1,
+   e:'Il machine learning supervisionato impara il dominio dalle etichette umane: senza etichette non si addestra, e invecchia con il linguaggio.',h:'Riguarda la riga «Etichette necessarie» della tabella dei tre metodi.'}
+];
+MAPPA[15]={c:'Come si trasformano le parole in numeri?',r:[
+  {t:'Perché il testo',c:BLUE,v:['I clienti spiegano a parole','Sentiment, topic, classificazione, entità','Uber COTA: 90% dei ticket']},
+  {t:'Difficoltà',c:RED,v:['Ambiguità, dominio, negazione','Ironia, rumore, contesto','Artefatti nei dati: leggere i testi grezzi']},
+  {t:'Rappresentazioni',c:TEAL,v:['Bag of words: trasparente, sparso','Embedding: significati vicini','Preprocessing: l\'ordine conta']},
+  {t:'Sentiment',c:YEL,v:['Dizionario: 50%, κ 0,27','Random forest: 74%, κ 0,48','LLM: senza etichette, da controllare']},
+  {t:'Topic',c:PINK,v:['LDA: documenti come miscugli di topic','k, α, β; i nomi li diamo noi','Sei topic come i motivi degli annotatori']},
+  {t:'Decidere',c:GRN,v:['Topic per sentiment, per compagnia','Smistare, seguire, correggere la causa','Quali 50 tweet leggere oggi']}]};
+
+/* Lezione 16: image analytics classica, ispezione dei pezzi di fonderia (casting) */
+const IMG16={"ok":{"f":"cast_ok_0_2816.png","t":116,"n":2,"g":[[[0,24,14],[24,33,13],[57,7,14]],[[0,24,14],[24,33,13],[57,7,14]],[[0,22,14],[22,37,13],[59,5,14]],[[0,20,14],[20,39,13],[59,5,14]],[[0,17,14],[17,43,13],[60,4,14]],[[0,17,14],[17,43,13],[60,4,14]],[[0,16,14],[16,6,13],[22,1,12],[23,1,11],[24,4,10],[28,8,11],[36,2,12],[38,23,13],[61,3,14]],[[0,12,14],[12,1,13],[13,1,14],[14,5,13],[19,1,12],[20,1,10],[21,3,9],[24,2,8],[26,2,9],[28,7,10],[35,4,9],[39,1,10],[40,1,11],[41,1,12],[42,21,13],[63,1,14]],[[0,8,14],[8,2,13],[10,1,14],[11,5,13],[16,1,12],[17,1,11],[18,1,10],[19,1,9],[20,7,8],[27,1,9],[28,7,10],[35,4,9],[39,2,8],[41,1,9],[42,1,10],[43,1,11],[44,1,12],[45,19,13]],[[0,7,14],[7,2,13],[9,1,14],[10,4,13],[14,1,12],[15,1,11],[16,2,9],[18,9,8],[27,1,9],[28,7,10],[35,3,9],[38,6,8],[44,1,9],[45,1,11],[46,1,12],[47,17,13]],[[0,7,14],[7,6,13],[13,1,11],[14,2,9],[16,11,8],[27,1,9],[28,7,10],[35,3,9],[38,8,8],[46,1,9],[47,1,11],[48,16,13]],[[0,6,14],[6,5,13],[11,1,12],[12,1,10],[13,1,9],[14,13,8],[27,1,9],[28,7,10],[35,2,9],[37,10,8],[47,1,9],[48,1,10],[49,1,12],[50,14,13]],[[0,6,14],[6,4,13],[10,1,12],[11,1,10],[12,2,9],[14,14,8],[28,7,10],[35,3,9],[38,9,8],[47,2,9],[49,1,10],[50,1,12],[51,13,13]],[[0,6,14],[6,3,13],[9,1,12],[10,1,10],[11,4,9],[15,13,8],[28,2,10],[30,1,11],[31,4,10],[35,2,9],[37,9,8],[46,4,9],[50,1,10],[51,1,12],[52,12,13]],[[0,4,14],[4,4,13],[8,1,12],[9,1,10],[10,5,9],[15,13,8],[28,1,9],[29,1,10],[30,2,11],[32,3,10],[35,2,9],[37,9,8],[46,4,9],[50,2,10],[52,1,12],[53,11,13]],[[0,4,14],[4,3,13],[7,1,12],[8,1,10],[9,7,9],[16,8,8],[24,4,7],[28,1,9],[29,3,11],[32,2,10],[34,2,9],[36,9,8],[45,4,9],[49,4,10],[53,1,12],[54,10,13]],[[0,4,14],[4,2,13],[6,1,12],[7,2,10],[9,7,9],[16,6,8],[22,1,7],[23,2,8],[25,2,9],[27,1,11],[28,5,13],[33,1,12],[34,1,11],[35,1,9],[36,1,8],[37,4,7],[41,4,8],[45,4,9],[49,5,10],[54,1,11],[55,3,13],[58,1,12],[59,5,13]],[[0,4,14],[4,2,13],[6,1,11],[7,3,10],[10,7,9],[17,4,8],[21,2,9],[23,1,10],[24,4,9],[28,4,10],[32,2,11],[34,2,12],[36,1,11],[37,1,9],[38,1,8],[39,1,6],[40,2,7],[42,2,8],[44,5,9],[49,4,10],[53,1,9],[54,1,10],[55,1,12],[56,2,13],[58,3,12],[61,3,13]],[[0,4,14],[4,1,13],[5,1,11],[6,5,10],[11,6,9],[17,2,8],[19,4,9],[23,5,8],[28,8,9],[36,3,10],[39,1,8],[40,2,7],[42,2,8],[44,3,9],[47,4,10],[51,2,9],[53,3,10],[56,1,12],[57,1,13],[58,4,12],[62,2,13]],[[0,4,14],[4,1,12],[5,7,10],[12,6,9],[18,1,10],[19,2,9],[21,3,8],[24,1,7],[25,1,6],[26,1,5],[27,1,4],[28,3,5],[31,2,6],[33,1,7],[34,4,8],[38,1,9],[39,2,10],[41,1,9],[42,1,8],[43,3,9],[46,3,10],[49,3,9],[52,2,10],[54,2,9],[56,1,10],[57,1,12],[58,1,13],[59,3,12],[62,2,13]],[[0,3,14],[3,1,13],[4,1,11],[5,7,10],[12,4,9],[16,2,10],[18,1,9],[19,2,8],[21,1,7],[22,1,5],[23,1,3],[24,1,2],[25,1,3],[26,8,2],[34,1,3],[35,1,5],[36,1,7],[37,3,8],[40,1,10],[41,2,11],[43,1,10],[44,1,9],[45,3,10],[48,9,9],[57,1,11],[58,5,12],[63,1,13]],[[0,3,14],[3,1,13],[4,2,11],[6,10,10],[16,2,9],[18,1,8],[19,1,7],[20,1,4],[21,11,2],[32,4,3],[36,1,4],[37,1,6],[38,2,8],[40,1,9],[41,1,10],[42,2,12],[44,1,11],[45,2,10],[47,2,9],[49,1,10],[50,7,9],[57,1,10],[58,1,12],[59,1,13],[60,4,12]],[[0,3,14],[3,1,12],[4,3,11],[7,9,10],[16,1,9],[17,1,8],[18,1,6],[19,1,3],[20,12,2],[32,2,3],[34,3,2],[37,1,3],[38,1,4],[39,1,6],[40,2,9],[42,1,10],[43,1,12],[44,1,13],[45,1,11],[46,2,9],[48,1,10],[49,8,9],[57,1,10],[58,1,11],[59,5,12]],[[0,2,14],[2,1,13],[3,6,11],[9,4,10],[13,1,11],[14,1,10],[15,1,9],[16,1,8],[17,1,5],[18,3,2],[21,1,1],[22,6,2],[28,4,1],[32,8,2],[40,1,5],[41,2,9],[43,1,10],[44,2,12],[46,1,10],[47,8,9],[55,4,10],[59,5,12]],[[0,2,14],[2,1,13],[3,7,11],[10,2,10],[12,1,11],[13,1,10],[14,2,9],[16,1,5],[17,8,2],[25,2,1],[27,1,2],[28,10,1],[38,3,2],[41,1,5],[42,2,9],[44,1,10],[45,2,12],[47,1,9],[48,1,8],[49,6,9],[55,4,10],[59,1,11],[60,4,12]],[[0,2,14],[2,1,12],[3,10,11],[13,1,10],[14,1,9],[15,1,6],[16,8,2],[24,2,1],[26,7,2],[33,7,1],[40,2,2],[42,1,5],[43,2,9],[45,1,10],[46,1,11],[47,1,10],[48,6,9],[54,6,10],[60,4,12]],[[0,2,14],[2,1,12],[3,8,11],[11,1,12],[12,1,11],[13,1,10],[14,1,7],[15,1,4],[16,9,2],[25,1,3],[26,1,5],[27,1,7],[28,3,9],[31,1,7],[32,1,4],[33,4,2],[37,3,1],[40,3,2],[43,1,6],[44,2,9],[46,2,11],[48,1,10],[49,4,9],[53,6,10],[59,1,11],[60,4,12]],[[0,1,14],[1,1,13],[2,3,12],[5,5,11],[10,2,12],[12,1,10],[13,1,9],[14,1,4],[15,6,2],[21,1,1],[22,1,2],[23,1,4],[24,1,7],[25,3,9],[28,4,10],[32,1,9],[33,1,7],[34,1,4],[35,3,2],[38,3,1],[41,3,2],[44,1,8],[45,1,9],[46,1,10],[47,2,11],[49,3,9],[52,5,10],[57,2,11],[59,5,12]],[[0,1,14],[1,1,13],[2,9,12],[11,1,11],[12,1,10],[13,1,7],[14,8,2],[22,1,5],[23,3,9],[26,2,8],[28,3,9],[31,1,8],[32,2,9],[34,1,10],[35,1,6],[36,1,3],[37,3,2],[40,1,1],[41,3,2],[44,1,5],[45,1,9],[46,1,10],[47,2,11],[49,4,10],[53,7,11],[60,4,12]],[[0,1,14],[1,1,13],[2,9,12],[11,1,11],[12,1,10],[13,1,5],[14,7,2],[21,1,5],[22,3,9],[25,3,7],[28,4,8],[32,2,9],[34,1,10],[35,1,11],[36,1,7],[37,1,3],[38,7,2],[45,1,8],[46,2,10],[48,1,11],[49,1,12],[50,11,11],[61,3,12]],[[0,1,14],[1,1,13],[2,9,12],[11,1,11],[12,1,9],[13,1,4],[14,1,2],[15,1,1],[16,4,2],[20,1,4],[21,3,9],[24,1,7],[25,1,5],[26,1,6],[27,1,7],[28,5,8],[33,2,9],[35,2,10],[37,1,5],[38,1,3],[39,6,2],[45,1,6],[46,2,10],[48,2,12],[50,4,11],[54,7,10],[61,1,11],[62,2,12]],[[0,1,14],[1,1,13],[2,7,12],[9,1,13],[10,1,12],[11,1,11],[12,1,8],[13,1,3],[14,2,1],[16,4,2],[20,1,8],[21,1,10],[22,1,9],[23,1,7],[24,2,5],[26,2,7],[28,6,8],[34,3,10],[37,1,9],[38,1,3],[39,6,2],[45,1,4],[46,2,10],[48,2,11],[50,11,10],[61,1,11],[62,1,12],[63,1,13]],[[0,1,14],[1,2,13],[3,5,12],[8,2,13],[10,1,12],[11,1,11],[12,1,7],[13,6,2],[19,1,4],[20,2,10],[22,1,9],[23,1,6],[24,1,5],[25,1,6],[26,2,7],[28,6,8],[34,1,9],[35,3,10],[38,1,5],[39,6,2],[45,1,3],[46,1,9],[47,1,10],[48,2,11],[50,1,10],[51,1,9],[52,9,10],[61,1,11],[62,2,12]],[[0,1,14],[1,9,13],[10,1,12],[11,1,11],[12,1,7],[13,6,2],[19,1,5],[20,1,11],[21,1,10],[22,1,8],[23,1,5],[24,1,4],[25,1,5],[26,2,7],[28,7,8],[35,1,10],[36,2,11],[38,1,6],[39,1,3],[40,6,2],[46,1,8],[47,2,10],[49,1,11],[50,11,10],[61,1,11],[62,2,12]],[[0,1,14],[1,8,13],[9,1,14],[10,1,12],[11,1,11],[12,1,7],[13,5,2],[18,1,3],[19,1,6],[20,1,11],[21,1,10],[22,1,7],[23,3,5],[26,1,6],[27,8,7],[35,1,9],[36,2,11],[38,1,7],[39,1,3],[40,6,2],[46,1,8],[47,1,10],[48,3,11],[51,10,10],[61,1,11],[62,2,12]],[[0,1,14],[1,9,13],[10,1,12],[11,1,11],[12,1,7],[13,1,3],[14,5,2],[19,1,5],[20,1,11],[21,1,10],[22,1,8],[23,1,6],[24,1,5],[25,1,4],[26,1,5],[27,2,6],[29,5,7],[34,1,6],[35,1,9],[36,2,10],[38,1,7],[39,1,3],[40,6,2],[46,1,7],[47,1,10],[48,3,11],[51,10,10],[61,1,11],[62,2,12]],[[0,2,14],[2,9,13],[11,1,11],[12,1,8],[13,1,3],[14,5,2],[19,1,4],[20,2,10],[22,1,9],[23,1,6],[24,1,5],[25,2,4],[27,2,5],[29,6,6],[35,1,9],[36,2,10],[38,1,6],[39,7,2],[46,1,8],[47,1,10],[48,3,11],[51,10,10],[61,1,11],[62,2,12]],[[0,2,14],[2,9,13],[11,1,11],[12,1,9],[13,1,4],[14,1,2],[15,1,1],[16,4,2],[20,1,9],[21,2,10],[23,1,8],[24,1,6],[25,1,5],[26,3,4],[29,6,5],[35,3,10],[38,1,4],[39,7,2],[46,1,8],[47,1,10],[48,2,11],[50,11,10],[61,1,11],[62,2,12]],[[0,2,14],[2,9,13],[11,1,11],[12,1,10],[13,1,6],[14,1,3],[15,1,2],[16,1,1],[17,3,2],[20,1,5],[21,2,10],[23,1,9],[24,1,7],[25,1,6],[26,1,4],[27,3,3],[30,4,4],[34,1,7],[35,2,10],[37,1,8],[38,1,3],[39,3,2],[42,1,3],[43,1,2],[44,1,1],[45,1,3],[46,1,9],[47,2,10],[49,1,11],[50,11,10],[61,1,11],[62,2,12]],[[0,2,15],[2,6,13],[8,2,12],[10,1,13],[11,1,12],[12,1,11],[13,1,8],[14,2,3],[16,5,2],[21,1,7],[22,2,10],[24,1,9],[25,1,7],[26,2,5],[28,2,4],[30,2,3],[32,1,4],[33,1,6],[34,1,9],[35,1,10],[36,1,9],[37,1,4],[38,4,2],[42,1,3],[43,1,2],[44,1,1],[45,1,4],[46,2,10],[48,2,11],[50,11,10],[61,1,11],[62,2,12]],[[0,2,15],[2,1,14],[3,4,13],[7,4,12],[11,1,13],[12,1,11],[13,1,9],[14,1,5],[15,2,2],[17,1,3],[18,3,2],[21,1,3],[22,1,7],[23,1,10],[24,2,9],[26,3,8],[29,1,7],[30,1,6],[31,1,7],[32,1,8],[33,1,9],[34,1,10],[35,1,9],[36,1,5],[37,4,2],[41,2,3],[43,1,2],[44,1,1],[45,1,7],[46,2,10],[48,2,11],[50,11,10],[61,3,12]],[[0,3,14],[3,1,13],[4,7,12],[11,1,13],[12,1,11],[13,1,10],[14,1,8],[15,1,3],[16,6,2],[22,1,3],[23,1,6],[24,3,9],[27,2,10],[29,5,9],[34,1,8],[35,1,5],[36,5,2],[41,2,3],[43,1,1],[44,1,3],[45,1,9],[46,2,10],[48,1,11],[49,11,10],[60,2,11],[62,2,12]],[[0,1,15],[1,2,14],[3,1,13],[4,6,12],[10,1,11],[11,2,12],[13,1,11],[14,1,10],[15,1,6],[16,1,3],[17,2,1],[19,4,2],[23,1,3],[24,1,4],[25,1,6],[26,1,8],[27,5,9],[32,1,8],[33,1,6],[34,1,3],[35,5,2],[40,2,3],[42,1,2],[43,1,1],[44,1,7],[45,2,10],[47,2,11],[49,11,10],[60,3,11],[63,1,12]],[[0,1,15],[1,3,14],[4,5,12],[9,3,11],[12,1,12],[13,1,11],[14,1,10],[15,1,9],[16,1,5],[17,1,2],[18,4,1],[22,4,2],[26,1,3],[27,1,4],[28,3,5],[31,1,4],[32,1,3],[33,7,2],[40,2,3],[42,1,2],[43,1,4],[44,3,10],[47,1,11],[48,12,10],[60,3,11],[63,1,12]],[[0,1,15],[1,3,14],[4,1,13],[5,3,12],[8,7,11],[15,1,10],[16,1,9],[17,1,5],[18,1,2],[19,5,1],[24,8,2],[32,4,3],[36,3,2],[39,3,3],[42,1,4],[43,1,9],[44,15,10],[59,4,11],[63,1,12]],[[0,1,15],[1,3,14],[4,1,13],[5,2,12],[7,8,11],[15,2,10],[17,1,9],[18,1,5],[19,1,2],[20,4,1],[24,9,2],[33,2,3],[35,4,2],[39,2,3],[41,1,5],[42,1,8],[43,16,10],[59,4,11],[63,1,12]],[[0,1,15],[1,4,14],[5,1,12],[6,6,11],[12,3,10],[15,1,11],[16,2,10],[18,1,9],[19,1,6],[20,1,3],[21,13,2],[34,2,1],[36,3,2],[39,1,3],[40,1,6],[41,2,9],[43,16,10],[59,3,11],[62,2,12]],[[0,1,15],[1,5,14],[6,1,12],[7,5,11],[12,6,10],[18,2,9],[20,1,7],[21,1,4],[22,1,3],[23,9,2],[32,5,1],[37,1,2],[38,1,4],[39,1,7],[40,2,9],[42,16,10],[58,3,11],[61,3,12]],[[0,2,15],[2,4,14],[6,1,13],[7,4,11],[11,8,10],[19,2,9],[21,1,8],[22,1,7],[23,1,5],[24,1,4],[25,2,3],[27,2,2],[29,5,1],[34,2,2],[36,1,4],[37,1,6],[38,1,8],[39,3,9],[42,2,10],[44,2,9],[46,12,10],[58,3,11],[61,3,12]],[[0,2,15],[2,5,14],[7,1,12],[8,2,11],[10,6,10],[16,9,9],[25,1,8],[26,1,6],[27,2,5],[29,1,4],[30,2,3],[32,1,4],[33,1,5],[34,1,6],[35,1,8],[36,10,9],[46,11,10],[57,3,11],[60,4,12]],[[0,3,15],[3,4,14],[7,1,13],[8,1,12],[9,1,11],[10,5,10],[15,11,9],[26,3,10],[29,1,9],[30,2,8],[32,16,9],[48,8,10],[56,3,11],[59,5,12]],[[0,3,15],[3,5,14],[8,1,13],[9,1,11],[10,5,10],[15,24,9],[39,3,8],[42,7,9],[49,6,10],[55,3,11],[58,6,12]],[[0,4,15],[4,5,14],[9,1,13],[10,1,11],[11,3,10],[14,22,9],[36,7,8],[43,7,9],[50,4,10],[54,3,11],[57,7,12]],[[0,3,15],[3,7,14],[10,1,13],[11,1,11],[12,3,10],[15,6,9],[21,1,8],[22,7,9],[29,14,8],[43,8,9],[51,2,10],[53,2,11],[55,9,12]],[[0,3,15],[3,8,14],[11,1,13],[12,1,12],[13,2,10],[15,15,9],[30,13,8],[43,8,9],[51,1,10],[52,2,11],[54,10,12]],[[0,4,15],[4,9,14],[13,1,12],[14,1,10],[15,15,9],[30,13,8],[43,7,9],[50,1,10],[51,3,11],[54,10,12]],[[0,4,15],[4,10,14],[14,1,13],[15,1,11],[16,1,10],[17,14,9],[31,13,8],[44,5,9],[49,3,11],[52,1,12],[53,1,11],[54,9,12],[63,1,13]],[[0,5,15],[5,10,14],[15,2,13],[17,1,11],[18,13,9],[31,13,8],[44,3,9],[47,1,10],[48,1,11],[49,13,12],[62,2,13]],[[0,5,15],[5,12,14],[17,1,13],[18,1,12],[19,1,11],[20,1,10],[21,10,9],[31,12,8],[43,2,9],[45,1,10],[46,1,11],[47,14,12],[61,3,13]],[[0,5,15],[5,12,14],[17,4,13],[21,1,12],[22,1,11],[23,1,10],[24,7,9],[31,8,8],[39,3,9],[42,1,10],[43,2,11],[45,15,12],[60,4,13]],[[0,5,15],[5,12,14],[17,6,13],[23,2,12],[25,1,11],[26,3,10],[29,9,9],[38,2,10],[40,2,11],[42,18,12],[60,4,13]],[[0,5,15],[5,12,14],[17,10,13],[27,30,12],[57,7,13]],[[0,5,15],[5,12,14],[17,20,13],[37,1,12],[38,2,13],[40,5,12],[45,3,13],[48,2,12],[50,14,13]],[[0,5,15],[5,12,14],[17,20,13],[37,1,12],[38,2,13],[40,2,12],[42,1,13],[43,1,12],[44,20,13]]],"m":[[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,50,1],[56,72,1]],[[0,47,1],[51,77,1]],[[0,45,1],[47,26,1],[76,1,1],[79,49,1]],[[0,42,1],[44,31,1],[80,48,1]],[[0,78,1],[81,47,1]],[[0,79,1],[83,45,1]],[[0,82,1],[83,45,1]],[[0,54,1],[60,68,1]],[[0,48,1],[67,61,1]],[[0,45,1],[70,58,1]],[[0,43,1],[73,55,1]],[[0,41,1],[75,53,1]],[[0,39,1],[76,52,1]],[[0,37,1],[78,50,1]],[[0,36,1],[80,48,1]],[[0,35,1],[81,47,1]],[[0,34,1],[82,46,1]],[[0,33,1],[83,45,1]],[[0,32,1],[84,44,1]],[[0,31,1],[85,43,1]],[[0,30,1],[86,42,1]],[[0,30,1],[57,1,2],[87,41,1]],[[0,29,1],[52,12,2],[87,41,1]],[[0,29,1],[49,17,2],[88,40,1]],[[0,28,1],[47,21,2],[89,39,1]],[[0,28,1],[46,24,2],[89,39,1]],[[0,27,1],[45,26,2],[90,38,1]],[[0,27,1],[44,9,2],[54,18,2],[90,38,1]],[[0,26,1],[43,8,2],[54,19,2],[91,37,1]],[[0,26,1],[42,7,2],[53,21,2],[91,37,1]],[[0,26,1],[41,7,2],[53,21,2],[91,37,1]],[[0,26,1],[41,7,2],[52,23,2],[92,36,1]],[[0,25,1],[40,7,2],[52,24,2],[92,36,1]],[[0,25,1],[40,6,2],[52,24,2],[92,36,1]],[[0,25,1],[40,6,2],[52,24,2],[92,36,1]],[[0,25,1],[39,6,2],[52,24,2],[93,35,1]],[[0,25,1],[39,6,2],[52,25,2],[93,35,1]],[[0,25,1],[39,6,2],[54,23,2],[93,35,1]],[[0,25,1],[39,6,2],[57,13,2],[71,6,2],[93,35,1]],[[0,25,1],[39,6,2],[58,1,2],[62,4,2],[71,6,2],[93,35,1]],[[0,25,1],[39,6,2],[71,6,2],[93,35,1]],[[0,25,1],[40,6,2],[71,6,2],[93,35,1]],[[0,26,1],[40,6,2],[71,6,2],[93,35,1]],[[0,26,1],[40,7,2],[70,7,2],[93,35,1]],[[0,26,1],[41,7,2],[70,6,2],[92,36,1]],[[0,26,1],[41,9,2],[69,7,2],[92,36,1]],[[0,27,1],[42,8,2],[69,6,2],[92,36,1]],[[0,27,1],[42,8,2],[68,7,2],[92,36,1]],[[0,27,1],[43,8,2],[66,8,2],[91,37,1]],[[0,28,1],[44,10,2],[56,1,2],[65,8,2],[91,37,1]],[[0,28,1],[45,27,2],[91,37,1]],[[0,29,1],[46,25,2],[90,38,1]],[[0,30,1],[48,22,2],[90,38,1]],[[0,30,1],[50,18,2],[89,39,1]],[[0,31,1],[52,13,2],[89,39,1]],[[0,32,1],[57,4,2],[88,40,1]],[[0,33,1],[87,41,1]],[[0,34,1],[86,42,1]],[[0,35,1],[85,43,1]],[[0,35,1],[85,43,1]],[[0,37,1],[83,45,1]],[[0,38,1],[82,46,1]],[[0,39,1],[81,47,1]],[[0,40,1],[79,49,1]],[[0,42,1],[78,50,1]],[[0,44,1],[76,52,1]],[[0,47,1],[74,54,1]],[[0,50,1],[71,57,1]],[[0,56,1],[67,61,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]]],"h":[0,8,47,521,823,347,222,147,78,79,69,56,64,78,103,124,481,1046,1144,1039,1356,988,500,578,655,867,1482,1236,1358,543,338,7],"v":[0.0,0.0,0.0,8.6,14.0,30.7,97.6,266.4,827.2,1367.0,1679.8,1874.9,2032.7,2151.9,2241.8,2303.8,2358.7,2393.0,2417.1,2443.9,2465.0,2486.4,2497.9,2510.8,2518.7,2527.8,2535.5,2540.3,2543.8,2545.4,2544.4,2539.6,2529.5,2497.6,2451.3,2385.3,2332.9,2297.1,2269.5,2237.0,2200.3,2153.7,2110.1,2069.9,2043.5,2013.1,1981.4,1937.2,1872.8,1805.6,1714.3,1615.0,1466.2,1239.3,1060.1,908.9,682.4,459.1,285.6,198.4,113.3,25.3,2.3,1.0]},"def":{"f":"cast_def_0_4125.png","t":152,"n":6,"g":[[[0,22,14],[22,5,13],[27,1,14],[28,23,13],[51,13,14]],[[0,21,14],[21,4,13],[25,1,12],[26,2,11],[28,5,10],[33,1,9],[34,2,10],[36,1,11],[37,2,12],[39,13,13],[52,12,14]],[[0,17,14],[17,3,13],[20,1,12],[21,1,11],[22,3,9],[25,3,8],[28,1,9],[29,1,8],[30,2,9],[32,1,8],[33,5,7],[38,1,8],[39,1,9],[40,1,11],[41,1,12],[42,10,13],[52,12,14]],[[0,17,14],[17,1,13],[18,1,12],[19,1,10],[20,1,8],[21,2,6],[23,1,7],[24,4,8],[28,1,9],[29,3,8],[32,1,7],[33,1,8],[34,7,7],[41,1,8],[42,1,9],[43,1,11],[44,8,13],[52,12,14]],[[0,14,14],[14,2,13],[16,1,12],[17,1,10],[18,1,7],[19,4,6],[23,2,7],[25,2,8],[27,1,9],[28,2,8],[30,2,7],[32,1,8],[33,4,7],[37,3,6],[40,4,7],[44,1,9],[45,1,12],[46,7,13],[53,11,14]],[[0,12,14],[12,3,13],[15,1,11],[16,1,8],[17,1,7],[18,5,6],[23,2,7],[25,4,8],[29,1,9],[30,3,8],[33,3,7],[36,6,6],[42,3,7],[45,1,8],[46,1,10],[47,7,13],[54,10,14]],[[0,11,14],[11,2,13],[13,1,12],[14,1,9],[15,3,7],[18,6,6],[24,1,7],[25,5,8],[30,1,9],[31,1,8],[32,3,7],[35,8,6],[43,4,7],[47,1,9],[48,1,12],[49,6,13],[55,9,14]],[[0,10,14],[10,2,13],[12,1,11],[13,1,8],[14,4,7],[18,7,6],[25,1,7],[26,3,8],[29,1,7],[30,2,8],[32,2,7],[34,9,6],[43,4,7],[47,2,8],[49,1,11],[50,7,13],[57,2,14],[59,1,13],[60,4,14]],[[0,8,14],[8,3,13],[11,1,11],[12,1,7],[13,12,6],[25,1,7],[26,4,8],[30,5,7],[35,9,6],[44,3,7],[47,3,8],[50,1,11],[51,12,13],[63,1,14]],[[0,8,14],[8,2,13],[10,1,11],[11,1,7],[12,8,6],[20,1,5],[21,5,6],[26,1,8],[27,3,9],[30,3,8],[33,3,7],[36,2,6],[38,3,5],[41,3,6],[44,3,7],[47,4,8],[51,1,11],[52,12,13]],[[0,7,14],[7,2,13],[9,1,11],[10,1,8],[11,1,7],[12,6,6],[18,3,5],[21,5,6],[26,1,8],[27,5,9],[32,1,8],[33,3,7],[36,8,6],[44,3,7],[47,4,8],[51,1,9],[52,1,11],[53,11,13]],[[0,6,14],[6,2,13],[8,1,12],[9,1,8],[10,1,7],[11,6,6],[17,4,5],[21,4,6],[25,1,7],[26,1,10],[27,6,11],[33,1,10],[34,1,9],[35,1,8],[36,1,7],[37,7,6],[44,3,7],[47,6,8],[53,1,11],[54,10,13]],[[0,6,14],[6,2,13],[8,1,9],[9,2,7],[11,7,6],[18,2,5],[20,3,6],[23,1,7],[24,2,8],[26,1,9],[27,2,8],[29,4,7],[33,1,8],[34,1,9],[35,2,10],[37,1,9],[38,1,7],[39,4,6],[43,4,7],[47,7,8],[54,1,12],[55,9,13]],[[0,6,14],[6,1,13],[7,1,10],[8,3,7],[11,10,6],[21,2,7],[23,4,6],[27,2,7],[29,2,6],[31,1,7],[32,4,6],[36,1,7],[37,1,8],[38,2,9],[40,1,8],[41,6,7],[47,7,8],[54,1,9],[55,1,12],[56,8,13]],[[0,4,14],[4,1,13],[5,1,14],[6,1,12],[7,1,8],[8,4,7],[12,7,6],[19,1,7],[20,1,8],[21,1,6],[22,4,5],[26,2,4],[28,5,3],[33,1,4],[34,1,5],[35,3,6],[38,1,7],[39,1,8],[40,2,10],[42,2,8],[44,6,7],[50,5,8],[55,1,10],[56,8,13]],[[0,5,14],[5,1,13],[6,1,9],[7,5,7],[12,6,6],[18,1,8],[19,1,7],[20,3,5],[23,1,4],[24,6,2],[30,5,1],[35,1,2],[36,1,4],[37,2,6],[39,1,7],[40,1,8],[41,2,11],[43,1,9],[44,3,8],[47,3,7],[50,2,8],[52,3,7],[55,1,8],[56,1,11],[57,7,13]],[[0,3,14],[3,2,13],[5,1,11],[6,1,8],[7,4,7],[11,6,6],[17,1,8],[18,1,6],[19,2,5],[21,1,4],[22,1,2],[23,2,1],[25,4,2],[29,4,1],[33,4,2],[37,1,3],[38,1,5],[39,3,7],[42,1,10],[43,1,12],[44,1,10],[45,1,9],[46,1,8],[47,9,7],[56,1,9],[57,1,12],[58,6,13]],[[0,2,14],[2,3,13],[5,1,9],[6,5,7],[11,5,6],[16,1,8],[17,1,6],[18,2,5],[20,1,3],[21,4,1],[25,3,2],[28,4,1],[32,7,2],[39,1,3],[40,1,6],[41,2,7],[43,1,10],[44,1,12],[45,1,9],[46,1,8],[47,9,7],[56,1,8],[57,1,11],[58,6,13]],[[0,2,14],[2,2,13],[4,1,12],[5,1,8],[6,5,7],[11,4,6],[15,1,8],[16,1,7],[17,1,6],[18,1,5],[19,1,3],[20,1,2],[21,3,1],[24,3,2],[27,7,1],[34,3,2],[37,3,1],[40,1,2],[41,1,6],[42,1,7],[43,1,8],[44,1,10],[45,1,11],[46,1,9],[47,1,8],[48,2,7],[50,1,6],[51,4,7],[55,2,8],[57,1,9],[58,1,12],[59,5,13]],[[0,1,14],[1,3,13],[4,1,10],[5,1,8],[6,5,7],[11,3,6],[14,1,8],[15,1,7],[16,2,6],[18,1,3],[19,2,2],[21,2,1],[23,2,2],[25,16,1],[41,1,2],[42,1,6],[43,1,7],[44,1,8],[45,1,11],[46,1,10],[47,1,8],[48,2,7],[50,2,6],[52,2,7],[54,4,8],[58,1,11],[59,5,13]],[[0,2,14],[2,2,13],[4,1,9],[5,1,8],[6,8,7],[14,1,8],[15,2,6],[17,1,4],[18,2,2],[20,8,1],[28,4,2],[32,10,1],[42,1,2],[43,2,7],[45,1,8],[46,1,11],[47,1,9],[48,2,7],[50,2,6],[52,2,7],[54,4,8],[58,1,10],[59,5,13]],[[0,2,14],[2,1,13],[3,1,12],[4,1,9],[5,1,8],[6,7,7],[13,1,8],[14,1,7],[15,1,6],[16,1,5],[17,3,2],[20,5,1],[25,1,2],[26,1,3],[27,1,5],[28,1,8],[29,2,9],[31,1,8],[32,1,6],[33,1,3],[34,1,2],[35,8,1],[43,1,4],[44,1,8],[45,1,7],[46,1,9],[47,1,10],[48,6,7],[54,4,8],[58,1,9],[59,1,12],[60,4,13]],[[0,3,14],[3,1,11],[4,1,9],[5,3,8],[8,4,7],[12,1,8],[13,1,9],[14,1,7],[15,1,6],[16,1,3],[17,2,2],[19,5,1],[24,1,3],[25,1,6],[26,8,8],[34,1,6],[35,1,3],[36,1,2],[37,7,1],[44,1,6],[45,2,8],[47,1,11],[48,1,9],[49,5,7],[54,4,8],[58,1,9],[59,1,12],[60,4,13]],[[0,3,14],[3,1,10],[4,1,9],[5,4,8],[9,3,7],[12,2,8],[14,1,7],[15,1,5],[16,4,2],[20,3,1],[23,1,3],[24,2,7],[26,3,6],[29,1,7],[30,3,6],[33,1,7],[34,2,8],[36,1,4],[37,1,2],[38,6,1],[44,1,3],[45,1,8],[46,1,7],[47,2,10],[49,1,8],[50,4,7],[54,3,8],[57,2,9],[59,1,11],[60,2,13],[62,2,12]],[[0,3,14],[3,1,10],[4,1,9],[5,4,8],[9,2,7],[11,1,8],[12,1,9],[13,2,7],[15,1,3],[16,1,1],[17,3,2],[20,2,1],[22,1,3],[23,2,7],[25,2,6],[27,5,5],[32,1,6],[33,2,7],[35,2,8],[37,1,3],[38,1,2],[39,6,1],[45,1,6],[46,2,8],[48,1,11],[49,2,8],[51,2,7],[53,1,8],[54,4,9],[58,1,10],[59,1,11],[60,1,12],[61,1,13],[62,2,12]],[[0,3,14],[3,1,10],[4,1,9],[5,7,8],[12,1,9],[13,1,7],[14,1,6],[15,1,2],[16,1,1],[17,3,2],[20,1,1],[21,1,2],[22,1,6],[23,1,7],[24,2,6],[26,7,5],[33,1,6],[34,2,7],[36,1,8],[37,1,7],[38,2,2],[40,5,1],[45,1,4],[46,2,8],[48,1,11],[49,1,10],[50,5,9],[55,1,10],[56,2,9],[58,2,10],[60,1,12],[61,1,13],[62,2,12]],[[0,2,14],[2,1,13],[3,1,10],[4,3,9],[7,4,8],[11,2,9],[13,1,7],[14,1,5],[15,2,1],[17,3,2],[20,1,1],[21,1,3],[22,1,8],[23,2,6],[25,1,5],[26,1,4],[27,7,5],[34,1,6],[35,2,7],[37,1,8],[38,1,4],[39,1,2],[40,5,1],[45,1,3],[46,2,8],[48,2,11],[50,1,10],[51,8,9],[59,1,10],[60,1,12],[61,1,13],[62,2,12]],[[0,2,14],[2,1,13],[3,1,10],[4,4,9],[8,3,8],[11,1,10],[12,1,9],[13,1,7],[14,1,4],[15,3,1],[18,2,2],[20,1,1],[21,1,6],[22,1,8],[23,1,7],[24,1,6],[25,1,4],[26,1,5],[27,4,6],[31,4,5],[35,1,6],[36,1,7],[37,1,8],[38,1,6],[39,2,2],[41,4,1],[45,1,2],[46,1,7],[47,1,8],[48,1,10],[49,1,11],[50,1,9],[51,4,8],[55,1,9],[56,2,8],[58,2,9],[60,4,12]],[[0,2,14],[2,1,13],[3,1,10],[4,4,9],[8,3,8],[11,1,10],[12,1,9],[13,1,7],[14,1,4],[15,3,1],[18,1,2],[19,1,1],[20,1,2],[21,1,8],[22,2,7],[24,1,5],[25,1,4],[26,1,5],[27,4,6],[31,5,5],[36,2,8],[38,1,7],[39,2,2],[41,4,1],[45,1,2],[46,1,7],[47,1,8],[48,1,9],[49,1,10],[50,6,7],[56,1,8],[57,1,9],[58,2,8],[60,1,11],[61,3,12]],[[0,2,14],[2,1,13],[3,1,10],[4,5,9],[9,1,8],[10,1,9],[11,1,11],[12,1,8],[13,1,7],[14,1,4],[15,5,1],[20,1,2],[21,1,9],[22,2,7],[24,1,5],[25,1,4],[26,1,5],[27,4,6],[31,5,5],[36,3,7],[39,1,3],[40,1,2],[41,4,1],[45,1,2],[46,1,6],[47,1,7],[48,1,8],[49,1,10],[50,4,7],[54,1,6],[55,1,7],[56,1,9],[57,1,8],[58,1,7],[59,1,8],[60,1,11],[61,3,12]],[[0,2,14],[2,1,13],[3,2,10],[5,6,9],[11,1,11],[12,1,9],[13,1,8],[14,1,4],[15,1,2],[16,4,1],[20,1,2],[21,1,9],[22,2,8],[24,1,6],[25,2,5],[27,3,6],[30,4,5],[34,2,4],[36,3,7],[39,1,3],[40,1,2],[41,4,1],[45,1,2],[46,1,6],[47,1,7],[48,1,8],[49,1,10],[50,1,7],[51,1,6],[52,2,7],[54,1,6],[55,1,7],[56,2,8],[58,1,7],[59,1,8],[60,1,11],[61,2,12],[63,1,13]],[[0,3,14],[3,1,11],[4,3,10],[7,4,9],[11,1,11],[12,1,9],[13,1,8],[14,1,4],[15,1,2],[16,4,1],[20,1,2],[21,3,8],[24,1,7],[25,8,5],[33,3,4],[36,2,7],[38,1,6],[39,2,2],[41,4,1],[45,1,2],[46,1,6],[47,1,7],[48,1,8],[49,1,10],[50,2,7],[52,1,6],[53,4,7],[57,3,8],[60,1,11],[61,2,12],[63,1,13]],[[0,3,14],[3,1,11],[4,4,10],[8,2,9],[10,1,10],[11,1,11],[12,1,10],[13,1,8],[14,1,5],[15,1,2],[16,5,1],[21,1,6],[22,1,9],[23,1,8],[24,1,7],[25,1,5],[26,1,4],[27,5,5],[32,3,4],[35,1,5],[36,2,7],[38,1,5],[39,1,2],[40,5,1],[45,1,2],[46,1,6],[47,1,7],[48,1,8],[49,1,9],[50,6,7],[56,4,8],[60,2,12],[62,2,13]],[[0,3,14],[3,1,12],[4,7,10],[11,2,11],[13,1,9],[14,1,7],[15,2,2],[17,4,1],[21,1,4],[22,1,9],[23,2,8],[25,1,7],[26,1,5],[27,8,4],[35,3,6],[38,1,3],[39,1,2],[40,5,1],[45,1,2],[46,1,7],[47,1,6],[48,1,9],[49,1,8],[50,4,6],[54,4,7],[58,1,8],[59,1,9],[60,2,12],[62,2,13]],[[0,3,14],[3,1,12],[4,4,11],[8,3,10],[11,2,11],[13,1,9],[14,1,8],[15,1,3],[16,1,2],[17,4,1],[21,1,2],[22,1,7],[23,1,9],[24,1,8],[25,1,9],[26,1,7],[27,1,4],[28,2,3],[30,2,4],[32,1,3],[33,1,4],[34,1,5],[35,2,6],[37,1,5],[38,1,2],[39,3,1],[42,1,2],[43,2,1],[45,1,3],[46,1,7],[47,1,6],[48,1,9],[49,1,8],[50,4,6],[54,5,7],[59,1,9],[60,2,12],[62,2,13]],[[0,3,14],[3,1,13],[4,4,11],[8,4,10],[12,1,12],[13,1,10],[14,1,9],[15,1,5],[16,2,2],[18,4,1],[22,1,2],[23,1,7],[24,1,8],[25,1,7],[26,1,8],[27,1,6],[28,3,5],[31,1,4],[32,1,5],[33,4,6],[37,1,3],[38,1,2],[39,2,1],[41,2,2],[43,2,1],[45,1,5],[46,1,6],[47,1,7],[48,1,9],[49,1,7],[50,4,6],[54,5,7],[59,1,10],[60,4,12]],[[0,4,14],[4,4,11],[8,4,10],[12,2,11],[14,1,9],[15,1,7],[16,1,3],[17,5,2],[22,1,1],[23,1,3],[24,2,7],[26,1,6],[27,2,7],[29,1,8],[30,1,9],[31,1,7],[32,3,6],[35,1,5],[36,1,3],[37,1,2],[38,2,1],[40,3,2],[43,1,1],[44,1,2],[45,2,6],[47,1,8],[48,1,9],[49,5,6],[54,5,7],[59,1,10],[60,4,12]],[[0,1,14],[1,2,15],[3,1,14],[4,1,12],[5,3,11],[8,5,10],[13,1,12],[14,1,9],[15,1,8],[16,1,5],[17,6,2],[23,1,1],[24,1,2],[25,1,4],[26,4,6],[30,1,7],[31,3,6],[34,1,4],[35,2,2],[37,3,1],[40,3,2],[43,1,1],[44,1,4],[45,2,6],[47,1,9],[48,1,7],[49,5,6],[54,4,7],[58,1,8],[59,1,11],[60,4,12]],[[0,1,14],[1,1,15],[2,2,14],[4,1,13],[5,4,11],[9,4,10],[13,1,11],[14,1,10],[15,2,8],[17,1,3],[18,3,1],[21,3,2],[24,2,1],[26,1,2],[27,1,3],[28,4,5],[32,1,3],[33,2,2],[35,1,1],[36,1,2],[37,3,1],[40,2,2],[42,1,1],[43,1,2],[44,2,6],[46,1,7],[47,1,8],[48,6,6],[54,4,7],[58,1,9],[59,5,12]],[[0,5,14],[5,2,11],[7,1,10],[8,1,11],[9,2,10],[11,2,9],[13,1,10],[14,1,11],[15,1,9],[16,1,8],[17,1,7],[18,1,2],[19,5,1],[24,1,2],[25,10,1],[35,1,2],[36,3,1],[39,4,2],[43,1,5],[44,2,6],[46,1,8],[47,7,6],[54,4,7],[58,1,10],[59,5,12]],[[0,5,14],[5,1,12],[6,1,11],[7,4,10],[11,3,9],[14,1,10],[15,1,11],[16,2,8],[18,1,6],[19,1,2],[20,12,1],[32,4,2],[36,3,1],[39,3,2],[42,1,5],[43,2,6],[45,1,8],[46,1,7],[47,4,5],[51,3,6],[54,3,7],[57,1,8],[58,1,11],[59,5,12]],[[0,5,14],[5,1,13],[6,1,11],[7,4,10],[11,1,9],[12,2,8],[14,1,9],[15,2,10],[17,2,8],[19,1,6],[20,1,3],[21,9,1],[30,5,2],[35,3,1],[38,2,2],[40,1,3],[41,1,5],[42,2,6],[44,1,7],[45,1,8],[46,1,6],[47,4,5],[51,3,6],[54,3,7],[57,1,9],[58,6,12]],[[0,6,14],[6,1,12],[7,4,10],[11,1,9],[12,4,8],[16,2,9],[18,2,8],[20,1,6],[21,1,3],[22,12,2],[34,4,1],[38,1,2],[39,1,3],[40,2,6],[42,1,5],[43,1,7],[44,1,8],[45,1,6],[46,5,5],[51,3,6],[54,2,7],[56,1,8],[57,1,11],[58,6,12]],[[0,6,14],[6,1,13],[7,1,11],[8,1,10],[9,4,9],[13,4,8],[17,2,9],[19,1,8],[20,2,7],[22,1,5],[23,1,3],[24,8,2],[32,5,1],[37,1,2],[38,1,5],[39,3,6],[42,2,7],[44,1,6],[45,6,5],[51,4,6],[55,1,7],[56,1,9],[57,1,11],[58,6,12]],[[0,7,14],[7,1,12],[8,1,10],[9,4,9],[13,3,8],[16,2,7],[18,1,8],[19,1,9],[20,1,8],[21,2,7],[23,1,6],[24,1,5],[25,1,4],[26,1,3],[27,3,2],[30,4,1],[34,1,2],[35,1,3],[36,1,5],[37,4,6],[41,2,7],[43,1,6],[44,6,5],[50,5,6],[55,1,8],[56,1,11],[57,7,12]],[[0,1,15],[1,7,14],[8,1,11],[9,4,9],[13,3,8],[16,4,7],[20,2,8],[22,1,7],[23,1,6],[24,3,7],[27,2,6],[29,3,5],[32,8,6],[40,1,7],[41,1,6],[42,7,5],[49,5,6],[54,1,7],[55,1,10],[56,2,11],[58,6,12]],[[0,2,15],[2,6,14],[8,1,13],[9,1,10],[10,3,9],[13,3,8],[16,4,7],[20,1,6],[21,4,7],[25,3,6],[28,5,7],[33,7,6],[40,7,5],[47,6,6],[53,1,7],[54,1,9],[55,3,11],[58,6,12]],[[0,3,15],[3,6,14],[9,1,13],[10,1,10],[11,2,9],[13,3,8],[16,4,7],[20,4,6],[24,12,7],[36,2,6],[38,8,5],[46,7,6],[53,1,9],[54,3,11],[57,7,12]],[[0,3,15],[3,7,14],[10,1,12],[11,1,9],[12,5,8],[17,3,7],[20,4,6],[24,1,5],[25,3,6],[28,4,7],[32,3,6],[35,10,5],[45,7,6],[52,1,8],[53,3,11],[56,8,12]],[[0,4,15],[4,7,14],[11,1,12],[12,1,9],[13,5,8],[18,2,7],[20,7,6],[27,1,5],[28,1,6],[29,15,5],[44,4,6],[48,1,7],[49,2,6],[51,1,8],[52,4,11],[56,8,12]],[[0,5,15],[5,7,14],[12,1,12],[13,1,9],[14,4,8],[18,3,7],[21,9,6],[30,12,5],[42,4,6],[46,4,7],[50,1,8],[51,5,11],[56,7,12],[63,1,13]],[[0,5,15],[5,7,14],[12,1,13],[13,1,12],[14,1,10],[15,3,8],[18,4,7],[22,8,6],[30,11,5],[41,7,6],[48,1,7],[49,1,9],[50,4,11],[54,8,12],[62,2,13]],[[0,4,15],[4,8,14],[12,3,13],[15,1,11],[16,2,8],[18,4,7],[22,10,6],[32,7,5],[39,7,6],[46,1,7],[47,1,8],[48,1,10],[49,3,11],[52,9,12],[61,3,13]],[[0,4,15],[4,8,14],[12,2,13],[14,1,14],[15,1,13],[16,1,12],[17,1,9],[18,1,8],[19,4,7],[23,21,6],[44,2,7],[46,1,9],[47,3,11],[50,10,12],[60,4,13]],[[0,5,15],[5,7,14],[12,1,13],[13,3,14],[16,2,13],[18,1,11],[19,1,9],[20,5,7],[25,18,6],[43,1,7],[44,1,9],[45,1,10],[46,1,11],[47,12,12],[59,5,13]],[[0,5,15],[5,11,14],[16,3,13],[19,1,12],[20,1,11],[21,1,9],[22,1,8],[23,5,7],[28,12,6],[40,1,7],[41,1,8],[42,1,9],[43,1,11],[44,14,12],[58,6,13]],[[0,6,15],[6,10,14],[16,6,13],[22,1,12],[23,1,11],[24,1,10],[25,2,8],[27,6,7],[33,1,6],[34,4,7],[38,1,8],[39,1,9],[40,1,10],[41,1,11],[42,13,12],[55,9,13]],[[0,7,15],[7,9,14],[16,10,13],[26,1,12],[27,1,11],[28,8,10],[36,2,11],[38,10,12],[48,3,13],[51,1,12],[52,12,13]],[[0,7,15],[7,9,14],[16,12,13],[28,14,12],[42,22,13]],[[0,7,15],[7,10,14],[17,12,13],[29,3,12],[32,3,13],[35,6,12],[41,23,13]],[[0,7,15],[7,10,14],[17,4,13],[21,1,14],[22,8,13],[30,2,12],[32,32,13]],[[0,6,15],[6,13,14],[19,2,13],[21,1,14],[22,7,13],[29,2,12],[31,33,13]],[[0,6,15],[6,13,14],[19,45,13]],[[0,6,15],[6,2,14],[8,1,15],[9,10,14],[19,45,13]]],"m":[[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,53,1],[59,1,1],[73,55,1]],[[0,47,1],[78,50,1]],[[0,43,1],[81,47,1]],[[0,40,1],[84,44,1]],[[0,38,1],[86,42,1]],[[0,36,1],[88,40,1]],[[0,34,1],[90,38,1]],[[0,33,1],[92,36,1]],[[0,31,1],[94,34,1]],[[0,29,1],[95,33,1]],[[0,28,1],[96,32,1]],[[0,27,1],[98,30,1]],[[0,25,1],[99,29,1]],[[0,24,1],[100,28,1]],[[0,23,1],[101,27,1]],[[0,22,1],[102,26,1]],[[0,21,1],[103,25,1]],[[0,20,1],[104,24,1]],[[0,19,1],[105,23,1]],[[0,18,1],[55,11,2],[106,22,1]],[[0,18,1],[52,19,2],[107,21,1]],[[0,17,1],[49,5,2],[67,7,2],[108,20,1]],[[0,16,1],[72,4,2],[109,19,1]],[[0,15,1],[75,3,2],[109,19,1]],[[0,15,1],[77,3,2],[110,18,1]],[[0,14,1],[79,3,2],[111,17,1]],[[0,14,1],[80,4,2],[111,17,1]],[[0,13,1],[82,4,2],[112,16,1]],[[0,12,1],[83,4,2],[113,15,1]],[[0,12,1],[84,4,2],[113,15,1]],[[0,11,1],[85,4,2],[114,14,1]],[[0,11,1],[86,4,2],[114,14,1]],[[0,11,1],[87,4,2],[115,13,1]],[[0,10,1],[88,4,2],[115,13,1]],[[0,10,1],[89,4,2],[115,13,1]],[[0,9,1],[90,3,2],[116,12,1]],[[0,9,1],[91,3,2],[116,12,1]],[[0,9,1],[91,3,2],[116,12,1]],[[0,8,1],[92,3,2],[117,11,1]],[[0,8,1],[93,2,2],[117,11,1]],[[0,8,1],[55,10,3],[93,3,2],[118,10,1]],[[0,8,1],[26,1,1],[64,3,3],[94,2,2],[118,10,1]],[[0,7,1],[26,1,1],[94,3,2],[118,10,1]],[[0,7,1],[25,2,1],[69,2,4],[95,2,2],[118,10,1]],[[0,7,1],[25,1,1],[70,2,4],[95,3,2],[115,13,1]],[[0,7,1],[25,1,1],[71,2,4],[95,3,2],[113,15,1]],[[0,7,1],[24,2,1],[72,2,4],[96,2,2],[108,20,1]],[[0,7,1],[24,1,1],[73,2,4],[96,3,2],[108,5,1],[114,14,1]],[[0,7,1],[24,1,1],[74,1,4],[96,8,2],[108,9,1],[118,10,1]],[[0,9,1],[23,2,1],[96,6,2],[109,5,1],[116,12,1]],[[0,9,1],[23,2,1],[97,7,2],[107,4,1],[113,4,1],[119,9,1]],[[0,11,1],[23,2,1],[43,1,5],[93,1,6],[97,5,2],[111,3,1],[118,10,1]],[[0,9,1],[12,1,1],[23,2,1],[43,1,5],[93,1,6],[97,3,2],[120,8,1]],[[0,9,1],[11,2,1],[23,1,1],[43,1,5],[93,1,6],[97,2,2],[120,8,1]],[[0,10,1],[11,2,1],[23,1,1],[43,1,5],[93,1,6],[97,3,2],[120,8,1]],[[0,13,1],[23,1,1],[42,2,5],[93,1,6],[97,3,2],[120,8,1]],[[0,14,1],[22,2,1],[42,2,5],[93,1,6],[98,2,2],[120,8,1]],[[0,14,1],[22,2,1],[42,2,5],[93,1,6],[98,2,2],[120,8,1]],[[0,16,1],[22,3,1],[42,2,5],[93,1,6],[98,2,2],[120,8,1]],[[0,16,1],[20,5,1],[43,1,5],[93,1,6],[98,1,2],[120,8,1]],[[0,16,1],[17,2,1],[20,5,1],[43,1,5],[93,1,6],[98,1,2],[120,8,1]],[[0,25,1],[43,1,5],[97,2,2],[120,8,1]],[[0,25,1],[43,2,5],[97,2,2],[120,8,1]],[[0,25,1],[44,1,5],[97,2,2],[119,9,1]],[[0,26,1],[44,2,5],[97,2,2],[119,9,1]],[[0,26,1],[45,1,5],[97,1,2],[119,9,1]],[[0,26,1],[45,2,5],[96,2,2],[119,9,1]],[[0,26,1],[46,2,5],[96,2,2],[119,9,1]],[[0,27,1],[47,1,5],[96,2,2],[119,9,1]],[[0,27,1],[96,1,2],[119,9,1]],[[0,28,1],[95,2,2],[118,10,1]],[[0,28,1],[95,1,2],[118,10,1]],[[0,28,1],[94,2,2],[118,10,1]],[[0,29,1],[94,1,2],[117,11,1]],[[0,29,1],[93,2,2],[117,11,1]],[[0,30,1],[93,1,2],[117,11,1]],[[0,31,1],[116,12,1]],[[0,23,1],[24,4,1],[29,2,1],[116,12,1]],[[0,23,1],[30,2,1],[115,13,1]],[[0,23,1],[31,2,1],[115,13,1]],[[0,23,1],[32,2,1],[115,13,1]],[[0,24,1],[33,2,1],[114,14,1]],[[0,24,1],[34,2,1],[114,14,1]],[[0,23,1],[35,2,1],[113,15,1]],[[0,24,1],[36,2,1],[112,16,1]],[[0,24,1],[37,2,1],[112,16,1]],[[0,16,1],[17,4,1],[22,1,1],[111,17,1]],[[0,17,1],[18,3,1],[111,17,1]],[[0,21,1],[110,18,1]],[[0,18,1],[19,1,1],[109,19,1]],[[0,19,1],[108,20,1]],[[0,20,1],[108,20,1]],[[0,21,1],[107,21,1]],[[0,22,1],[106,22,1]],[[0,23,1],[105,23,1]],[[0,24,1],[104,24,1]],[[0,25,1],[103,25,1]],[[0,26,1],[102,26,1]],[[0,27,1],[101,27,1]],[[0,28,1],[99,29,1]],[[0,29,1],[98,30,1]],[[0,31,1],[97,31,1]],[[0,32,1],[95,33,1]],[[0,34,1],[94,34,1]],[[0,35,1],[92,36,1]],[[0,37,1],[90,38,1]],[[0,39,1],[89,39,1]],[[0,41,1],[86,42,1]],[[0,44,1],[84,44,1]],[[0,47,1],[81,47,1]],[[0,51,1],[77,51,1]],[[0,57,1],[71,57,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]],[[0,128,1]]],"h":[2,26,164,1201,502,166,64,60,65,79,249,740,1063,1143,990,886,677,556,376,299,274,216,218,206,481,599,1414,1040,1466,723,436,3],"v":[0.0,0.0,4.8,12.6,38.2,86.1,238.7,906.1,1443.8,1696.3,1846.4,1920.6,1973.4,1994.8,2010.7,2027.1,2047.4,2063.6,2080.4,2094.5,2110.5,2133.3,2189.1,2268.1,2367.7,2484.2,2615.0,2752.6,2875.8,2996.3,3095.4,3191.4,3272.0,3333.4,3378.6,3412.5,3437.8,3449.9,3454.2,3451.9,3443.4,3430.7,3409.8,3388.9,3362.9,3331.9,3300.1,3269.6,3202.3,3085.1,2973.0,2852.8,2597.8,2222.1,1895.5,1656.9,1302.8,878.4,572.0,379.8,205.7,31.1,0.7,0.0]},"patch":[[39,181,166,163,175,169,195,201],[34,135,189,161,179,175,182,207],[38,93,203,161,177,181,174,206],[33,60,194,172,166,177,172,195],[36,35,173,185,160,170,168,186],[43,22,142,198,159,169,167,178],[46,29,106,203,158,171,170,174],[45,36,84,207,159,171,173,174]]};
+const SEGC=[BLUE,ORG,GRN,PINK,YEL,TEAL,PUR,RED];
+INIT[16]=function(){
+  /* grey image and a pixel patch */
+  (function(){
+    const duo=el('div','duo');$('#b16pix').append(duo);const G=IMG16.ok.g;let a='';
+    G.forEach((row,y)=>row.forEach(([x,l,v])=>{const c=Math.round(v*17);a+='<rect x="'+(x*4)+'" y="'+(y*4)+'" width="'+(l*4)+'" height="4.4" fill="rgb('+c+','+c+','+c+')"/>'}));
+    a+=rect(180,120,16,16,'none',YEL,' stroke-width="2"');
+    cell(duo,'L\'immagine (64 × 64)','<g transform="translate(23,4)">'+a+'</g>',302,264,'Girante di pompa in grigi','Una griglia di pixel, ciascuno un grigio.');
+    let b='';IMG16.patch.forEach((r,y)=>r.forEach((v,x)=>{b+=rect(10+x*35,6+y*31,35,31,'rgb('+v+','+v+','+v+')','#000')+tx(10+x*35+17.5,6+y*31+20,String(v),{s:11.5,f:v>140?'#000':'#fff'})}));
+    cell(duo,'8 × 8 pixel, i numeri veri',b,300,264,'Valori dei pixel','0 = nero, 255 = bianco.');
+  })();
+  /* Otsu */
+  (function(){
+    const H=IMG16.ok.h,V=IMG16.ok.v,t=IMG16.ok.t;let s='';const L=50,R=670,T=16,B=220,X=g=>L+g/256*(R-L),mh=Math.max(...H),mv=Math.max(...V);
+    H.forEach((h,i)=>s+=rect(X(i*8)+1,B-h/mh*(B-T),X(8)-X(0)-2,h/mh*(B-T),i*8+8<=t?'#555':'#bbb'));
+    s+='<polyline points="'+V.map((v,i)=>X(i*4).toFixed(1)+','+(B-v/mv*(B-T)).toFixed(1)).join(' ')+'" fill="none" stroke="'+PINK+'" stroke-width="2.5"/>';
+    s+=line(X(t),T,X(t),B,YEL,2,' stroke-dasharray="6 4"')+lbl(X(t)-8,T+14,'soglia di Otsu = '+t,YEL,{a:'end',s:13.5});
+    s+=lbl(X(60),T+80,'sotto la soglia → 0',null,{s:12.5})+lbl(X(200),T+12,'sopra la soglia → 1',null,{s:12.5})+lbl(X(70),T+50,'varianza fra le classi',PINK,{s:12.5});
+    [0,64,128,192,255].forEach(g=>s+=tx(X(g),B+18,String(g),{s:12,f:GRAY}));
+    s+=line(L,B,R,B,'#777',1.2)+tx((L+R)/2,B+38,'livello di grigio',{s:13,f:GRAY});
+    svgBox($('#b16otsu'),700,268,s,'Soglia di Otsu','44rem');
+  })();
+  /* segments */
+  (function(){
+    const duo=el('div','duo');$('#b16seg').append(duo);
+    [['ok','Pezzo buono'],['def','Pezzo difettoso']].forEach(([k,n])=>{const D=IMG16[k];let s=rect(0,0,256,256,'#000');
+      D.m.forEach((row,y)=>row.forEach(([x,l,v])=>s+='<rect x="'+(x*2)+'" y="'+(y*2)+'" width="'+(l*2)+'" height="2.2" fill="'+SEGC[(v-1)%SEGC.length]+'"/>'));
+      cell(duo,n,'<g transform="translate(22,2)">'+s+'</g>',300,260,n+': segmenti',(D.n)+' segmenti · soglia '+D.t)});
+  })();
+  /* GLCM example */
+  (function(){
+    const duo=el('div','duo');$('#b16glcm').append(duo);
+    const I=[[0,0,1,1],[0,0,1,1],[0,2,2,2],[2,2,1,0]],gc=['#222','#888','#eee'];let a='';
+    I.forEach((r,y)=>r.forEach((v,x)=>a+=rect(60+x*45,10+y*45,45,45,gc[v],'#555')+tx(60+x*45+22.5,10+y*45+28,String(v),{s:15,f:v===2?'#000':'#fff',w:600})));
+    a+=line(150,32,190,32,YEL,2)+tx(170,26,'vicino a destra',{s:11.5,f:YEL});
+    cell(duo,'Immagine 4 × 4, tre grigi',a,320,196,'Immagine di esempio','');
+    const M=[[0,0,0],[0,0,0],[0,0,0]];I.forEach(r=>{for(let x=0;x<3;x++)M[r[x]][r[x+1]]++});
+    let b=tx(160,14,'pixel a destra (j)',{s:12,f:GRAY})+tx(24,110,'pixel a sinistra (i)',{s:12,f:GRAY,x:' transform="rotate(-90 24 110)"'});
+    [0,1,2].forEach(j=>b+=tx(100+j*55+27,34,String(j),{s:13,f:'#ddd'})+tx(88,52+j*50+26,String(j),{s:13,f:'#ddd',a:'end'}));
+    M.forEach((r,i)=>r.forEach((v,j)=>b+=rect(100+j*55,42+i*50,55,50,i===j?'rgba(131,193,103,'+(.15+v*.15)+')':'rgba(252,98,85,'+(.08+v*.18)+')','#000')+tx(100+j*55+27,42+i*50+31,String(v),{s:16,f:'#fff',w:600})));
+    cell(duo,'Matrice di co-occorrenza',b,320,196,'GLCM','Diagonale: vicini uguali. Fuori: <b>contrasto</b>.');
+  })();
+  /* confusion matrix */
+  (function(){svgBox($('#b16cm'),440,210,cm12(150,50,{tp:39,fn:6,fp:3,tn:42},['difettoso','buono'],{w:130,h:70}),'Matrice di confusione dei pezzi','30rem')})();
+  /* importance */
+  (function(){
+    const V=[['cluster prominence (tessitura)',1.18,1],['media del grigio minimo dei segmenti',1.14,0],['75° percentile del grigio',1.05,0],['media del grigio medio dei segmenti',1.02,0],['massimo del grigio medio dei segmenti',1.02,0],['massimo del grigio minimo dei segmenti',.84,0],['ICM2 (tessitura)',.83,1],['deviazione standard del grigio',.81,0],['sum variance (tessitura)',.78,1],['cluster shade (tessitura)',.75,1]];
+    let s='';const L=330,X=v=>L+v/1.3*320;V.forEach(([n,v,t],i)=>{const y=6+i*28;s+=tx(L-10,y+16,n,{s:12.5,f:'#ddd',a:'end'})+rect(L,y+4,X(v)-L,17,t?YEL:BLUE)+tx(X(v)+8,y+17,fi(v,2),{s:12.5,f:'#fff',a:'start'})});
+    svgBox($('#b16imp'),720,V.length*28+12,s,'Importanza delle variabili','44rem');
+  })();
+  /* expected cost */
+  (function(){
+    const C=[[.50,6,3],[.40,3,3],[.35,2,4],[.30,2,5],[.25,1,11],[.20,1,16]];let s='';const B=230,T=24,Y=v=>B-v/2300*(B-T);
+    [0,500,1000,1500,2000].forEach(v=>s+=line(50,Y(v),660,Y(v),'#1d1d1d',1)+tx(44,Y(v)+4,fi(v,0),{s:12,f:GRAY,a:'end'}));
+    C.forEach(([c,miss,fa],i)=>{const m=50*miss/45*150,chk=(50*(45-miss)/45+950*fa/45)*5,x=80+i*98;
+      s+=rect(x,Y(m),60,B-Y(m),RED)+rect(x,Y(m+chk),60,Y(m)-Y(m+chk),ORG)+tx(x+30,Y(m+chk)-6,fi(Math.round(m+chk),0)+' €',{s:12.5,f:c===.35?YEL:'#fff',w:c===.35?600:400})+tx(x+30,B+20,'soglia '+fi(c,2),{s:12.5,f:c===.35?YEL:'#ddd'})});
+    s+=line(50,B,660,B,'#777',1.2)+rect(380,4,12,12,RED)+tx(398,15,'difetti mancati',{s:12.5,f:'#ddd',a:'start'})+rect(520,4,12,12,ORG)+tx(538,15,'controlli a mano',{s:12.5,f:'#ddd',a:'start'});
+    svgBox($('#b16cost'),680,256,s,'Costo atteso per 1.000 pezzi','42rem');
+  })();
+};
+QZ['16a']=()=>[{q:'Un\'azienda vuole riconoscere centinaia di prodotti diversi negli scaffali dei supermercati, fotografati con telefoni diversi e luci diverse. Quale approccio suggeriscono le slide?',o:['Visione classica: è più spiegabile','Deep learning: scene variabili e molte classi','Nessuno dei due','Un dizionario di parole'],a:1,
+  e:'Sfondi, angoli e luci diverse rompono le feature fatte a mano, e le classi sono molte: è il territorio del deep learning.',h:'Guarda le condizioni in cui l\'approccio classico è la scelta giusta.'}];
+QZ['16b']=()=>[{q:'Perché il metodo di Otsu è meglio di una soglia fissa a 128 per tutte le immagini?',o:['Perché è più veloce','Perché sceglie per ogni immagine la soglia che separa meglio i due gruppi di pixel, adattandosi a foto più scure o più chiare','Perché usa i colori','Perché toglie la polvere'],a:1,
+  e:'Otsu massimizza la varianza fra le classi per ogni immagine: se una foto è più scura, la soglia scende con lei.',h:'Che cosa succede a una soglia fissa se la luce cambia?'}];
+QZ['16c']=()=>[{q:'Con 39 difettosi riconosciuti, 6 mancati e 3 pezzi buoni segnalati, qual è la precisione per la classe «difettoso»?',o:['86,7%','92,9%','90,0%','93,3%'],a:1,
+  e:'Precisione = 39 / (39 + 3) = 39 / 42 ≈ 92,9%. 86,7% è la sensibilità (39 / 45).',h:'Dei pezzi segnalati come difettosi, quanti lo sono davvero?'}];
+QZ['16d']=()=>[{q:'Con le ipotesi delle slide, perché scendere da 0,35 a 0,20 fa salire il costo atteso, anche se si manca un difetto in meno?',o:['Perché l\'accuratezza scende','Perché i pezzi buoni segnalati passano da 4 a 16 su 45: su 950 pezzi buoni sono centinaia di controlli a mano in più','Perché il modello va riaddestrato','Perché i difetti costano meno'],a:1,
+  e:'Un difetto mancato in meno su 45 vale circa 1,1 difetti su 1.000 pezzi (167 euro risparmiati), ma 12 pezzi buoni segnalati in più su 45 sono circa 253 controlli in più (oltre 1.250 euro).',h:'Moltiplica le quote per 50 difettosi e 950 pezzi buoni.'}];
+QZ['16']=()=>[
+  {q:'Quanti numeri contiene un\'immagine a colori di 128 × 128 pixel?',o:['16.384','32.768','49.152','128'],a:2,
+   e:'128 × 128 = 16.384 pixel, ciascuno con tre valori (rosso, verde, blu): 49.152 numeri. In grigi sarebbero 16.384.',h:'Tre griglie, una per colore.'},
+  {q:'Che cosa fa Connected Component Analysis?',o:['Sceglie la soglia','Dà lo stesso identificativo ai pixel di primo piano che si toccano, formando i segmenti','Calcola la tessitura','Divide i dati in training e test'],a:1,
+   e:'Ogni gruppo di pixel connessi diventa un segmento; il Labeling Filter toglie poi quelli sotto i 10 pixel.',h:'Pensa ai sottografi connessi.'},
+  {q:'Due immagini hanno esattamente lo stesso istogramma dei grigi, ma una ha una superficie liscia e l\'altra graffiata. Quale famiglia di feature le distingue?',o:['Le statistiche del primo ordine','La tessitura, per esempio il contrasto di Haralick','Nessuna','Il numero di pixel'],a:1,
+   e:'Le statistiche del primo ordine dipendono solo dall\'istogramma; la matrice di co-occorrenza guarda i vicini, e graffi e bordi aumentano il contrasto.',h:'Quale famiglia sa dove sta un pixel?'},
+  {q:'Perché dopo Image Segment Features serve un GroupBy?',o:['Per togliere i valori mancanti','Perché ci sono più segmenti per immagine, e il modello vuole una riga per pezzo','Per bilanciare le classi','Per calcolare l\'AUC'],a:1,
+   e:'863 segmenti per 300 immagini: il GroupBy per image_id calcola conteggio, media e massimo, una riga per pezzo.',h:'Quante righe per immagine produce il nodo?'},
+  {q:'Il test ha 90 pezzi, metà difettosi. Perché le slide dicono di leggere l\'accuratezza come «circa il 90%»?',o:['Perché il modello è casuale','Perché un solo errore vale 1,1 punti: con così pochi pezzi l\'incertezza è ampia','Perché l\'AUC è 0,97','Perché la soglia è 0,5'],a:1,
+   e:'1 / 90 ≈ 1,1%: spostare una sola previsione cambia l\'accuratezza di oltre un punto. Gli intervalli di confidenza sono larghi.',h:'Quanto vale un errore su 90?'},
+  {q:'Sulla linea i difettosi sono il 5%, ma il test è bilanciato 50/50. Che cosa ne consegue?',o:['Niente','L\'accuratezza sul test non è quella che si vedrà sulla linea: i costi vanno calcolati con il tasso di difetti vero','Il modello va buttato','Bisogna bilanciare anche la linea'],a:1,
+   e:'Con il 5% di difettosi pesano molto di più i pezzi buoni: per questo il calcolo dei costi usa 50 difettosi e 950 buoni su 1.000.',h:'Ricorda le scelte da discutere sui dati.'}
+];
+MAPPA[16]={c:'Come si trasforma un\'immagine in una tabella?',r:[
+  {t:'Perché le immagini',c:BLUE,v:['Ricerca visiva, loghi, fabbrica, campi','Misurare, classificare, rilevare, cercare','Prima di tutto: buone immagini']},
+  {t:'Classico o deep learning',c:PINK,v:['Classico: feature progettate, spiegabili','Deep: feature imparate, scene variabili','Spesso si combinano']},
+  {t:'La catena in KNIME',c:TEAL,v:['Pixel: 0 nero, 255 bianco','Otsu: soglia per ogni immagine','Componenti connesse, filtro sotto 10 pixel','GroupBy: una riga per pezzo']},
+  {t:'Feature',c:YEL,v:['Primo ordine: istogramma','Geometria dei segmenti','Tessitura: matrice di co-occorrenza']},
+  {t:'Il caso fonderia',c:GRN,v:['300 immagini, 45 feature','Accuratezza circa 90%, AUC 0,97','In cima: cluster prominence']},
+  {t:'Decidere',c:ORG,v:['Soglia 0,35: costo −35%','Persona nel giro, monitoraggio','Limiti: luce, risoluzione, campione']}]};
+
 /* ---------- Riquadri: ogni figura in un fotogramma nero ---------- */
 document.querySelectorAll('figure').forEach(f=>{
   const kids=[...f.children].filter(c=>c.tagName!=='FIGCAPTION'&&!c.classList.contains('scroll'));
@@ -1672,7 +2634,7 @@ document.querySelectorAll('figure').forEach(f=>{
    Il punto si passa all'altra pagina in localStorage (lezione, sezione, frazione della sezione), senza cancelletto nell'indirizzo:
    così Chrome può usare la pagina già preparata in background (regole di speculazione scritte da build.py) e il cambio è immediato. */
 document.querySelectorAll('.lang a[data-lang]').forEach(a=>a.addEventListener('click',e=>{
-  e.preventDefault();let j=null;const art=document.querySelector('.lesson:not([hidden])');
+  e.preventDefault();if(a.classList.contains('off'))return;let j=null;const art=document.querySelector('.lesson:not([hidden])');
   if(art){const secs=[...art.querySelectorAll(':scope > section')],hd=(document.querySelector('.top')||{offsetHeight:0}).offsetHeight,y=window.scrollY+hd;
     let i=0;secs.forEach((x,k)=>{if(x.getBoundingClientRect().top+window.scrollY<=y+1)i=k});
     const x=secs[i],t=x?x.getBoundingClientRect().top+window.scrollY:0;
@@ -1711,6 +2673,9 @@ lessons.forEach((l,i)=>{
 });
 function show(n,scroll){
   lessons.forEach(l=>{l.hidden=+l.dataset.n!==n});
+  /* lingua senza questa lezione (per esempio Big Data 10-16 solo in italiano): link spento */
+  document.querySelectorAll('.lang a[data-nums]').forEach(a=>{if(a.hasAttribute('aria-current')||!a.dataset.nums)return;const off=!a.dataset.nums.split(',').includes(String(n));
+    a.classList.toggle('off',off);if(off){a.title=UI.noLang;a.setAttribute('aria-disabled','true')}else{a.removeAttribute('title');a.removeAttribute('aria-disabled')}});
   links.forEach(a=>{if(+a.dataset.go===n){a.setAttribute('aria-current','page');try{a.scrollIntoView({block:'nearest',inline:'nearest'})}catch(_){}}else a.removeAttribute('aria-current')});
   if(!done[n]){done[n]=true;const art=byN(n);
     renderMath(art);

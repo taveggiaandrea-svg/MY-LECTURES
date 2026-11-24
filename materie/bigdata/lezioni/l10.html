@@ -1,0 +1,240 @@
+<article class="lesson" data-n="10" data-docente="L. Molteni" id="lezione-10" data-title="Che cosa dicono i dati prima di qualsiasi modello?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 10 · L. Molteni, slide</p>
+  <h1>Che cosa dicono i dati prima di qualsiasi modello?</h1>
+  <p class="desc">KNIME, il programma a nodi con cui si lavora in questa parte del corso, e un ripasso dell'analisi dei dati: una variabile alla volta, poi due variabili insieme, con i test che dicono se una relazione vale anche fuori dal campione.</p>
+</div></section>
+
+<section><div class="col">
+  <p>La lezione 9 si chiudeva con una domanda di business che diventa un modello predittivo, per esempio «quali clienti se ne andranno?». Prima di costruire un modello però bisogna guardare i dati: di che tipo sono le variabili, come si distribuiscono, quali sembrano legate all'esito che si vuole prevedere. Questa lezione fa proprio questo, con lo strumento che userai fino alla lezione 16.</p>
+  <p>L'esempio che accompagna tutta la lezione è il dataset <strong>Telco Customer Churn</strong>, pubblicato da IBM: 7.043 clienti di una compagnia telefonica, 21 variabili (dati anagrafici, servizi sottoscritti, contratto e fatturazione) e un esito, <em>Churn</em> («abbandono»): il cliente se n'è andato nell'ultimo mese? Lo ha fatto il 26,5% dei clienti. Lo stesso dataset tornerà quando costruiremo i modelli di classificazione.</p>
+  <h2>Un programma fatto di nodi</h2>
+  <p><strong>KNIME Analytics Platform</strong> è un programma open source per l'analisi dei dati: leggerli, trasformarli, visualizzarli, costruire modelli e produrre report. Non si scrive codice: si programma in modo visuale. Ogni operazione è un <strong>nodo</strong>, un riquadro con porte di ingresso a sinistra e di uscita a destra; collegando i nodi con delle frecce si costruisce un <strong>workflow</strong>, il percorso che i dati seguono dall'origine al risultato.</p>
+  <figure>
+    <div class="w" id="b10node"></div>
+    <figcaption>Lo stesso nodo nei quattro stati possibili, segnalati dal semaforo sotto il riquadro. Nel primo riquadro il nodo aspetta una configurazione o dei dati in ingresso (luce rossa). Nel secondo è configurato e pronto (gialla). Nel terzo ha svolto il suo compito e i risultati sono disponibili ai nodi a valle (verde). Nel quarto l'esecuzione è fallita (croce rossa).</figcaption>
+  </figure>
+  <p>Per configurare un nodo si fa doppio clic, oppure lo si seleziona e si preme F6; per eseguirlo si preme F7. Un nodo eseguito si può ispezionare nel <strong>monitor dei nodi</strong>, in fondo alla finestra: mostra la tabella in uscita, con dimensioni, nome e tipo di ogni colonna e valori mancanti, e con un clic passa alla scheda delle statistiche (mancanti, valori distinti, minimo e massimo, quantili). Un nodo si può anche annullare mentre gira o riportare allo stato configurato (<em>reset</em>).</p>
+  <div class="quiz inq" data-quiz="10a"></div>
+  <p>La finestra di lavoro ha poche parti, ciascuna con un compito.</p>
+  <div class="scroll"><table><thead><tr><th>Parte</th><th>A che cosa serve</th></tr></thead><tbody>
+    <tr><td>Repository dei nodi</td><td>cercare un nodo fra gli oltre 4.000 disponibili e trascinarlo nel workflow; di partenza mostra solo una selezione di nodi essenziali, «All nodes» li mostra tutti</td></tr>
+    <tr><td>Editor del workflow</td><td>disporre e collegare i nodi; trascinando l'uscita di un nodo nel vuoto compaiono i nodi consigliati da aggiungere</td></tr>
+    <tr><td>Monitor dei nodi</td><td>vedere la tabella in uscita del nodo selezionato e le sue statistiche</td></tr>
+    <tr><td>Space Explorer</td><td>sfogliare i workflow e i file salvati nello spazio locale, il <strong>workspace</strong> (la cartella del computer che li contiene)</td></tr>
+    <tr><td>Scheda Description</td><td>leggere che cosa fa il nodo selezionato e come si configura</td></tr>
+  </tbody></table></div>
+  <p>I nodi coprono tutto il ciclo di vita della scienza dei dati. Leggono file (CSV, Excel, JSON, immagini, testi), database (MySQL, PostgreSQL, Oracle, qualsiasi database con un connettore JDBC, lo standard Java per collegarsi a un database) e servizi web; lavorano con gli strumenti dei Big Data visti nella prima parte del corso (Spark, Databricks, HDFS, Hive); puliscono, uniscono e aggregano tabelle; costruiscono modelli di regressione, classificazione e clustering e li validano; disegnano grafici interattivi; scrivono i risultati in file, database o report. Le <strong>estensioni</strong> aggiungono nodi per testi, immagini, deep learning e dati geografici: le userai nelle lezioni 15 e 16. K-AI, l'assistente di KNIME, risponde a domande e può proporre o costruire un workflow.</p>
+  <p>Nelle slide il ciclo ha due metà. In KNIME Analytics Platform si prepara e si costruisce: si fondono e trasformano i dati, si modella e si visualizza, si ottimizza. In KNIME Hub si collabora e si mette in produzione: si convalida, si distribuisce, si monitora e si aggiorna. Il <strong>Community Hub</strong> (hub.knime.com) è il sito pubblico dove si cercano e si condividono workflow, nodi, componenti ed estensioni; un workflow si scarica senza registrarsi, una cartella intera solo dopo l'accesso.</p>
+  <p>Un workflow si salva in un file <strong>.knwf</strong>; una cartella di workflow in un file <strong>.knar</strong> (archivio). Quando un workflow cresce diventa illeggibile, e il docente propone tre abitudini: dare un'etichetta a ogni nodo, scrivere annotazioni sul workflow, e nascondere la complessità raggruppando più nodi in un solo riquadro.</p>
+  <div class="scroll"><table><thead><tr><th></th><th>Metanodo</th><th>Componente</th></tr></thead><tbody>
+    <tr><td>Che cosa è</td><td>più nodi raccolti in un riquadro unico</td><td>più nodi raccolti in un riquadro unico</td></tr>
+    <tr><td>A che cosa serve</td><td>ordinare il workflow per compiti e renderlo leggibile</td><td>lo stesso, più un nodo nuovo a tutti gli effetti</td></tr>
+    <tr><td>Configurazione</td><td>no</td><td>sì, come un nodo qualsiasi</td></tr>
+    <tr><td>Viste</td><td>no</td><td>vista composta: più grafici insieme, con la selezione che passa da un grafico all'altro; è la base delle data app, piccole applicazioni interattive costruite con KNIME</td></tr>
+    <tr><td>Condivisione</td><td>no</td><td>sì, sul Community Hub</td></tr>
+  </tbody></table></div>
+  <p>Il primo workflow delle slide ha due nodi: un Excel Reader, che compare da solo quando trascini il file Rooms.xlsx nell'editor, e un Bar Chart collegato alla sua uscita. Eseguito il secondo, la lente sul nodo apre il grafico. Il workflow di questa lezione è poco più grande: un lettore di file e sette nodi di analisi, uno per ogni domanda che faremo ai dati.</p>
+  <figure>
+    <div class="w" id="b10wf"></div>
+    <figcaption>Il workflow Lesson10_Basic_Data_Analysis, ridisegnato. Un CSV Reader legge il file dei clienti; ogni nodo a valle risponde a una domanda della lezione. In blu i nodi che descrivono una variabile alla volta, in giallo quelli che studiano due variabili e fanno un test.</figcaption>
+  </figure>
+</div></section>
+
+<section><div class="col">
+  <h2>Che tipo di variabile hai davanti?</h2>
+  <p>Che cosa si può calcolare dipende dal tipo di variabile. La media del metodo di pagamento non ha senso; quella dei mesi di permanenza sì. La prima distinzione è fra dati <strong>qualitativi</strong> (o categorici), espressi a parole e divisi in categorie, e dati <strong>quantitativi</strong> (o numerici), espressi con numeri.</p>
+  <figure>
+    <div class="w" id="b10types"></div>
+    <figcaption>I quattro tipi di dati, con gli esempi delle slide e, sotto, la variabile del dataset Telco che ricade in ciascuno. Le qualitative si dividono in nominali (categorie senza ordine) e ordinali (categorie con un ordine); le quantitative in discrete (conteggi) e continue (qualsiasi valore in un intervallo).</figcaption>
+  </figure>
+  <p>Nelle variabili <strong>nominali</strong> l'ordine delle categorie è arbitrario: genere, nazionalità, metodo di pagamento. Nelle <strong>ordinali</strong> c'è un ordine, ma dice solo quale categoria viene prima, non di quanto: la durata del contratto (mensile, un anno, due anni) o il livello di istruzione. Le <strong>discrete</strong> assumono valori separati, di solito interi che vengono da un conteggio: stanze di un appartamento, mesi di permanenza. Le <strong>continue</strong> possono assumere qualsiasi valore in un intervallo, come la spesa mensile; per studiarne la distribuzione bisogna raggrupparle in classi.</p>
+  <p>Fra le numeriche c'è un'altra differenza. Su una scala a <strong>intervalli</strong> lo zero è arbitrario e non indica assenza: 0 gradi Celsius non vuol dire «nessuna temperatura», e 20 gradi non sono «il doppio» di 10. Su una scala di <strong>rapporti</strong> lo zero è vero: altezza, età, reddito; 2.000 euro sono davvero il doppio di 1.000.</p>
+  <figure>
+    <div class="w" id="b10levels"></div>
+    <figcaption>I quattro livelli di misura come una scala: ogni gradino eredita le operazioni e le statistiche dei gradini sopra e ne aggiunge di nuove. Il chi quadrato, la deviazione standard e il coefficiente di variazione compariranno più avanti nella lezione.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="10b"></div>
+  <p>Infine due famiglie di metodi. La <strong>statistica descrittiva</strong> riassume i dati che hai, con tabelle, grafici e indici di posizione, variabilità e forma. La <strong>statistica inferenziale</strong> generalizza dal campione alla popolazione, con stime e test d'ipotesi. Il ponte fra le due è la teoria della probabilità.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Una variabile alla volta</h2>
+  <p>Come sono distribuiti i clienti fra i tre tipi di contratto? Una <strong>distribuzione di frequenza</strong> considera una sola variabile e conta quante volte compare ciascun valore, con le percentuali e le percentuali cumulate.</p>
+  <div class="scroll"><table><thead><tr><th>Contract</th><th>Frequenza</th><th>%</th><th>% cumulata</th></tr></thead><tbody>
+    <tr><td>Month-to-month (mensile)</td><td>3.875</td><td>55,0%</td><td>55,0%</td></tr>
+    <tr><td>One year (un anno)</td><td>1.473</td><td>20,9%</td><td>75,9%</td></tr>
+    <tr><td>Two year (due anni)</td><td>1.695</td><td>24,1%</td><td>100,0%</td></tr>
+    <tr><td>Totale</td><td>7.043</td><td>100,0%</td><td></td></tr>
+  </tbody></table></div>
+  <p>Con una variabile che ha molti valori, come i mesi di permanenza (<em>tenure</em>, da 0 a 72), una riga per valore sarebbe illeggibile: si raggruppano i valori in classi e si disegna un <strong>istogramma</strong>.</p>
+  <figure>
+    <div class="w" id="b10hist"></div>
+    <figcaption>I mesi di permanenza dei 7.043 clienti in 12 classi di 6 mesi (l'ultima comprende anche i clienti a 72 mesi), come nel nodo Histogram. Le linee verticali sono la media, in giallo, e la mediana, in rosa. Si notano due picchi: i clienti appena arrivati e quelli fedelissimi.</figcaption>
+  </figure>
+  <p>Tre numeri riassumono dove sta il centro. La <strong>media</strong> è la somma dei valori divisa per il loro numero \(n\):</p>
+  <div class="eq">\[ \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i \]</div>
+  <p>La <strong>moda</strong> è il valore più frequente, il picco più alto della distribuzione; è la misura di posizione adatta alle variabili categoriche: il contratto modale è quello mensile (55%). La <strong>mediana</strong> è il valore centrale dopo aver ordinato i dati (con un numero pari di dati, la media dei due centrali), cioè il 50° percentile. A differenza della media non si lascia trascinare dai valori estremi.</p>
+  <figure>
+    <div class="w" id="b10mm"></div>
+    <figcaption>Media (giallo) e mediana (rosa) delle tre variabili numeriche del dataset, ciascuna sulla sua scala dal minimo al massimo. Nella spesa totale la media supera di molto la mediana: pochi clienti con spese altissime la tirano verso destra.</figcaption>
+  </figure>
+  <p>Il centro non basta: due distribuzioni con la stessa media possono essere strette o larghe. Il <strong>campo di variazione</strong> (<em>range</em>) è la differenza fra il valore massimo e il minimo: per la permanenza \(72 - 0 = 72\) mesi. Un solo cliente estremo però lo cambia. Più robusto è lo <strong>scarto interquartile</strong> (IQR), la distanza fra il 75° e il 25° percentile. Il p-esimo percentile è il valore che ha sotto di sé il p% dei dati: per la permanenza il 25° è 9 mesi, il 75° è 55, quindi IQR = 55 − 9 = 46 mesi.</p>
+  <p>La <strong>varianza</strong> campionaria misura la distanza media al quadrato dalla media; non è mai negativa e si misura nel quadrato dell'unità della variabile. La <strong>deviazione standard</strong> è la sua radice, quindi torna nell'unità della variabile. Il <strong>coefficiente di variazione</strong> (CV) divide la deviazione standard per la media: è un numero puro, che permette di confrontare la variabilità di grandezze diverse.</p>
+  <div class="eq">\[ s^2 = \frac{\sum_{i=1}^{n}(x_i-\bar{x})^2}{n-1} \qquad s = \sqrt{s^2} \qquad CV = \frac{s}{\bar{x}} \times 100 \]</div>
+  <p>Nel dataset la spesa mensile ha \(s = 30{,}1\) dollari su una media di 64,8: CV = 46%. La spesa totale ha \(s = 2.267\) dollari su una media di 2.283: CV = 99%, una variabilità relativa più che doppia.</p>
+  <div class="quiz inq" data-quiz="10c"></div>
+  <p>Restano gli indici di <strong>forma</strong>. L'<strong>asimmetria</strong> (<em>skewness</em>) misura quanto gli scarti dalla media sono più grandi da una parte che dall'altra: una coda più pesante dell'altra. La <strong>curtosi</strong> misura quanto la curva è appuntita o piatta rispetto a una normale: la curtosi in eccesso di una normale è zero, un valore positivo indica una curva più appuntita, uno negativo una più piatta.</p>
+  <figure>
+    <div class="w" id="b10shape"></div>
+    <figcaption>Tre distribuzioni simulate per illustrare l'asimmetria, con la media in giallo e la mediana in rosa. Nel primo riquadro una coda lunga a sinistra (asimmetria negativa): la media sta a sinistra della mediana. Nel secondo una distribuzione simmetrica: media e mediana coincidono. Nel terzo una coda lunga a destra (asimmetria positiva), come la spesa totale dei clienti Telco (+0,96): la media sta a destra.</figcaption>
+  </figure>
+  <p>La permanenza ha curtosi −1,39: è più piatta di una normale, con i due picchi agli estremi dell'istogramma. In KNIME tutto questo esce da un solo nodo, Statistics (spuntando «Calculate median values»), che segnala anche un problema di qualità: 11 clienti hanno la spesa totale mancante, e sono proprio quelli con permanenza zero. Ci torneremo nella lezione 11.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Dal campione alla popolazione</h2>
+  <p>Fra le donne del dataset se ne va il 26,9%, fra gli uomini il 26,2%. È una differenza vera o un caso del campione? Per rispondere servono i <strong>test d'ipotesi</strong>, che dicono qualcosa sulla popolazione analizzando un campione. Un test mette a confronto due ipotesi. L'<strong>ipotesi nulla</strong> \(H_0\) è l'affermazione da mettere alla prova, di solito «nessuna relazione». L'<strong>ipotesi alternativa</strong> \(H_1\) è il suo contrario, «c'è una relazione».</p>
+  <p>Decidendo si possono sbagliare due cose. Un <strong>errore di primo tipo</strong> è rifiutare un'ipotesi nulla vera: vedere una relazione che non c'è. Un <strong>errore di secondo tipo</strong> è non rifiutare un'ipotesi nulla falsa: non vedere una relazione che c'è.</p>
+  <div class="scroll"><table><thead><tr><th>Decisione</th><th>\(H_0\) vera</th><th>\(H_0\) falsa</th></tr></thead><tbody>
+    <tr><td>Non rifiutare \(H_0\)</td><td>nessun errore (probabilità \(1-\alpha\))</td><td>errore di secondo tipo (probabilità \(\beta\))</td></tr>
+    <tr><td>Rifiutare \(H_0\)</td><td>errore di primo tipo (probabilità \(\alpha\))</td><td>nessun errore (\(1-\beta\), la <strong>potenza</strong> del test)</td></tr>
+  </tbody></table></div>
+  <p>Non si possono rendere piccoli tutti e due gli errori insieme, quindi si tiene sotto controllo il primo. Si fissa in anticipo il <strong>livello di rischio</strong> \(\alpha\), la probabilità massima accettabile di rifiutare \(H_0\) quando è vera: di solito 0,01, 0,05 o 0,10; \(1-\alpha\) è il livello di confidenza. Dai dati si calcola il rischio osservato, il <strong>p-value</strong>: la probabilità di osservare un risultato almeno così lontano da \(H_0\) se \(H_0\) fosse vera.</p>
+  <p class="stmt"><strong>Regola di decisione.</strong> Se il p-value è minore di \(\alpha\) si rifiuta \(H_0\); altrimenti non la si rifiuta.</p>
+  <p>Le slide mettono in fila otto passi: formulare \(H_0\) e \(H_1\); scegliere il test adatto; fissare \(\alpha\); raccogliere i dati e calcolare la statistica del test; ricavarne il p-value; confrontarlo con \(\alpha\); rifiutare o no \(H_0\); tradurre il risultato in una conclusione di business. Il test adatto dipende dai tipi delle due variabili, ed è questo a dividere il resto della lezione in tre casi.</p>
+  <div class="scroll"><table><thead><tr><th>Due variabili</th><th>Strumento</th><th>Test e indice</th><th>Nodi di KNIME</th></tr></thead><tbody>
+    <tr><td>qualitative (o quantitative discrete)</td><td>tabella di contingenza</td><td>test \(\chi^2\), V di Cramér</td><td>Crosstab</td></tr>
+    <tr><td>quantitative</td><td>correlazione lineare</td><td>r di Pearson, test t</td><td>Linear Correlation, Scatter Plot</td></tr>
+    <tr><td>una quantitativa e una qualitativa</td><td>confronto fra medie</td><td>ANOVA a un fattore, test F</td><td>One-way ANOVA, Box Plot</td></tr>
+  </tbody></table></div>
+  <div class="quiz inq" data-quiz="10d"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Due qualitative: la tabella di contingenza</h2>
+  <p>Una distribuzione di frequenza descrive una variabile; una <strong>tabella di contingenza</strong> (o tabulazione incrociata) ne descrive due insieme. Ogni cella contiene la frequenza assoluta di una combinazione di categorie; la colonna di destra e la riga in basso sono le <strong>frequenze marginali</strong>, i totali di ciascuna variabile. Dividendo ogni cella per il totale \(N\) si ottengono le frequenze relative.</p>
+  <div class="scroll"><table><thead><tr><th>gender \ Churn</th><th>Yes</th><th>No</th><th>Totale</th></tr></thead><tbody>
+    <tr><td>Female</td><td>939</td><td>2.549</td><td><strong>3.488</strong></td></tr>
+    <tr><td>Male</td><td>930</td><td>2.625</td><td><strong>3.555</strong></td></tr>
+    <tr><td>Totale</td><td><strong>1.869</strong></td><td><strong>5.174</strong></td><td><strong>7.043</strong></td></tr>
+  </tbody></table></div>
+  <p>Con due variabili le percentuali si possono calcolare per riga o per colonna, e rispondono a domande diverse. La regola generale: si calcolano nella direzione della variabile <strong>indipendente</strong>, quella che può influire sull'altra. Il tipo di contratto può influire sulla decisione di andarsene, non il contrario: quindi si confronta il tasso di abbandono dentro ogni tipo di contratto.</p>
+  <figure>
+    <div class="w" id="b10pct"></div>
+    <figcaption>La stessa tabella contratto per abbandono letta nelle due direzioni. Nel primo riquadro le percentuali per riga: dentro ogni contratto, la quota che se ne va (in arancione) è il tasso di abbandono, dal 42,7% dei mensili al 2,8% dei biennali. Nel secondo le percentuali per colonna: fra i clienti che se ne sono andati, l'88,6% aveva un contratto mensile. È la composizione dei clienti persi, non un tasso.</figcaption>
+  </figure>
+  <p>Attenzione a una terza variabile. Introdotta in una tabella, può rivelare un legame che non si vedeva, nasconderne o spiegarne uno che sembrava esserci (la correlazione spuria e il paradosso di Simpson, in cui una tendenza presente in ogni gruppo si inverte quando i gruppi si sommano), oppure lasciare tutto com'era.</p>
+  <p>Quando due variabili non hanno nessun legame? Quando sono <strong>statisticamente indipendenti</strong>: le percentuali per riga sono uguali in ogni riga, e uguali alla distribuzione di tutto il campione. In quel caso ogni frequenza relativa congiunta è il prodotto delle due marginali, e la frequenza attesa in una cella è</p>
+  <div class="eq">\[ E = \frac{\text{totale di riga} \times \text{totale di colonna}}{N} \]</div>
+  <p>Il genere ci va vicino: 26,9% di abbandoni fra le donne, 26,2% fra gli uomini, 26,5% in tutto. Un'indipendenza perfetta nel campione però non si vede quasi mai; serve un indice che misuri quanto la tabella osservata \(O\) si allontana da quella attesa \(E\). È il <strong>chi quadrato</strong>:</p>
+  <div class="eq">\[ \chi^2 = \sum_{\text{celle}} \frac{(O - E)^2}{E} \]</div>
+  <figure>
+    <div class="w" id="b10chi"></div>
+    <figcaption>Clienti osservati (barre piene) e attesi se ci fosse indipendenza (rettangoli tratteggiati), per le celle «se ne va» delle due tabelle. Nel primo riquadro, genere: osservati e attesi quasi coincidono, \(\chi^2 = 0{,}5\). Nel secondo, contratto: i mensili che se ne vanno sono 1.655 contro 1.028 attesi, i biennali 48 contro 450, e \(\chi^2 = 1.184{,}6\). Valori calcolati sul dataset, uguali a quelli delle slide.</figcaption>
+  </figure>
+  <p>Nel campione \(\chi^2 = 0\) se le variabili sono indipendenti. Ma vale anche per la popolazione? Il <strong>test del chi quadrato</strong> pone \(H_0\): le variabili sono indipendenti nella popolazione. Più grande è \(\chi^2\), più piccolo è il p-value. Genere: \(\chi^2 = 0{,}5\) con 1 grado di libertà, p-value = 0,47, cioè 47% &gt; 5%: non si rifiuta \(H_0\), neanche con \(\alpha = 10\%\). Contratto: \(\chi^2 = 1.184{,}6\) con 2 gradi di libertà, p-value &lt; 0,001: si rifiuta \(H_0\), contratto e abbandono sono legati anche nella popolazione.</p>
+  <p>Il p-value dice se un legame esiste, non quanto è forte. Per la forza, se \(H_0\) è stata rifiutata, si usa la <strong>V di Cramér</strong>, da 0 (nessuna associazione) a 1 (associazione perfetta), dove \(k\) è il minore fra il numero di righe e di colonne:</p>
+  <div class="eq">\[ V = \sqrt{\frac{\chi^2}{N\,(k-1)}} \qquad\text{contratto: } \sqrt{\frac{1.184{,}6}{7.043 \times 1}} = 0{,}41 \]</div>
+  <figure>
+    <div class="w" id="b10cram"></div>
+    <figcaption>La V di Cramér fra ogni variabile e l'abbandono, come nel grafico delle slide, con le soglie del docente: sotto il 10% forza bassa, fra 10% e 25% media, sopra il 25% alta. Il contratto è il fattore più forte; il genere non conta. Le variabili in alto sono buone candidate a fare da predittori nel modello di abbandono.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="10e"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Due quantitative: la correlazione</h2>
+  <p>Con due variabili numeriche la tabella non serve più: ogni cliente diventa un punto in un <strong>diagramma di dispersione</strong> (<em>scatter plot</em>), con una variabile sull'asse orizzontale (\(X\)) e l'altra su quello verticale (\(Y\)). Ecco tre variabili numeriche dei primi clienti del file.</p>
+  <div class="scroll"><table><thead><tr><th>customerID</th><th>Contract</th><th>tenure</th><th>MonthlyCharges</th><th>TotalCharges</th><th>Churn</th></tr></thead><tbody>
+    <tr><td>7590-VHVEG</td><td>Month-to-month</td><td>1</td><td>29,85</td><td>29,85</td><td>No</td></tr>
+    <tr><td>5575-GNVDE</td><td>One year</td><td>34</td><td>56,95</td><td>1.889,50</td><td>No</td></tr>
+    <tr><td>3668-QPYBK</td><td>Month-to-month</td><td>2</td><td>53,85</td><td>108,15</td><td>Yes</td></tr>
+    <tr><td>7795-CFOCW</td><td>One year</td><td>45</td><td>42,30</td><td>1.840,75</td><td>No</td></tr>
+    <tr><td>9237-HQITU</td><td>Month-to-month</td><td>2</td><td>70,70</td><td>151,65</td><td>Yes</td></tr>
+  </tbody></table></div>
+  <figure>
+    <div class="w" id="b10scat"></div>
+    <figcaption>Mesi di permanenza e spesa totale per 320 clienti estratti a caso dal dataset (il nodo Scatter Plot li disegna tutti e 7.043). Le linee tratteggiate sono le due medie e dividono il piano in quattro quadranti: i punti nei quadranti in alto a destra e in basso a sinistra, dove le due variabili stanno insieme sopra o sotto la media, fanno crescere la covarianza. Su tutto il dataset r = 0,83.</figcaption>
+  </figure>
+  <p>La <strong>covarianza</strong> misura la tendenza delle due variabili a muoversi insieme. Nella forma delle slide, con le medie \(\mu_x\) e \(\mu_y\) e \(N\) osservazioni:</p>
+  <div class="eq">\[ \mathrm{Cov}(X,Y) = \frac{1}{N}\sum_{i=1}^{N}(x_i-\mu_x)(y_i-\mu_y) \]</div>
+  <p>Il segno dice la direzione: positivo se quando una variabile è sopra la media anche l'altra tende a esserlo, negativo se quando una è sopra l'altra tende a stare sotto. Il valore assoluto invece non dice nulla sulla forza, perché dipende dalle unità di misura: misura la spesa in centesimi invece che in dollari e la covarianza diventa cento volte più grande. Serve un indice standardizzato: il <strong>coefficiente di correlazione lineare</strong>, \(\rho\) nella popolazione e \(r\) nel campione, la covarianza divisa per il prodotto delle due deviazioni standard.</p>
+  <div class="eq">\[ r = \frac{\mathrm{Cov}(X,Y)}{s_X\, s_Y} \qquad -1 \le r \le 1 \]</div>
+  <p>È simmetrico (\(r_{XY} = r_{YX}\)) e non ha unità. (Le slide scrivono la covarianza con \(1/N\) e le deviazioni standard con \(n-1\): per calcolare r si usa lo stesso denominatore sopra e sotto, e si semplifica.) Vale +1 se i punti stanno su una retta crescente, −1 su una retta decrescente, 0 se non c'è nessuna tendenza lineare.</p>
+  <figure>
+    <div class="w" id="b10corr"></div>
+    <figcaption>Dati simulati, come nelle slide. Nel primo riquadro una relazione positiva forte. Nel secondo una negativa. Nel terzo un legame fortissimo ma a forma di parabola: r è quasi zero. Il valore di r scritto sotto ogni riquadro è calcolato sui punti disegnati.</figcaption>
+  </figure>
+  <p class="stmt"><strong>r misura solo l'associazione lineare.</strong> Un legame forte ma non lineare può avere \(r \approx 0\): guarda sempre il diagramma di dispersione.</p>
+  <p>Anche qui il campione dà solo \(r\), mentre per decidere interessa \(\rho\). Il test pone \(H_0: \rho = 0\) (nessuna correlazione lineare nella popolazione) contro \(H_1: \rho \ne 0\), con la statistica</p>
+  <div class="eq">\[ t = \frac{r\sqrt{n-2}}{\sqrt{1-r^2}} \]</div>
+  <p>Più grande è \(|t|\), più piccolo è il p-value. Il nodo Linear Correlation calcola tutta la matrice e, in un'altra porta, i p-value.</p>
+  <div class="scroll"><table><thead><tr><th></th><th>tenure</th><th>MonthlyCharges</th><th>TotalCharges</th></tr></thead><tbody>
+    <tr><td>tenure</td><td>1,00</td><td>0,25</td><td><strong>0,83</strong></td></tr>
+    <tr><td>MonthlyCharges</td><td>0,25</td><td>1,00</td><td>0,65</td></tr>
+    <tr><td>TotalCharges</td><td><strong>0,83</strong></td><td>0,65</td><td>1,00</td></tr>
+  </tbody></table></div>
+  <p>Tutte e tre le correlazioni sono significative all'1%. La più forte è quella fra permanenza e spesa totale, e non è un caso: la spesa totale è circa la permanenza per la spesa mensile. Predittori così legati fra loro creano <strong>multicollinearità</strong> nei modelli di regressione: il modello fatica a separare l'effetto di uno da quello dell'altro.</p>
+  <div class="quiz inq" data-quiz="10f"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Una quantitativa e una qualitativa: le medie a confronto</h2>
+  <p>I clienti che se ne vanno sono rimasti meno a lungo? Con una variabile numerica e una categorica si confrontano le medie della prima dentro le categorie della seconda.</p>
+  <div class="scroll"><table><thead><tr><th>Churn</th><th>Permanenza media (mesi)</th><th>N</th><th>Deviazione standard</th></tr></thead><tbody>
+    <tr><td>No</td><td>37,6</td><td>5.174</td><td>24,1</td></tr>
+    <tr><td>Yes</td><td>18,0</td><td>1.869</td><td>19,5</td></tr>
+    <tr><td>Totale</td><td>32,4</td><td>7.043</td><td>24,6</td></tr>
+  </tbody></table></div>
+  <figure>
+    <div class="w" id="b10box"></div>
+    <figcaption>Il box plot della permanenza nei due gruppi, ricalcolato sul dataset. La scatola va dal 25° al 75° percentile, la linea dentro è la mediana, i baffi arrivano al minimo e al massimo; il punto giallo è la media. Metà dei clienti persi se n'è andata entro i primi 10 mesi; chi resta è sparso su tutto l'intervallo, con mediana 38.</figcaption>
+  </figure>
+  <p>Il box plot mostra i due ingredienti che servono: dove sta ogni gruppo e quanto è disperso. La differenza fra le medie del campione vale anche nella popolazione? L'<strong>ANOVA a un fattore</strong> (analisi della varianza) verifica se le medie di due o più gruppi (\(c\)) sono uguali: \(H_0\) dice che le medie della popolazione sono uguali in tutte le categorie, \(H_1\) che almeno due sono diverse.</p>
+  <p>L'idea è scomporre la variabilità totale (SST, somma dei quadrati totale) in due parti: quella <strong>fra i gruppi</strong> (SSB), dovuta alla variabile che li separa, e quella <strong>dentro i gruppi</strong> (SSW), dovuta alle differenze fra individui.</p>
+  <div class="eq">\[ \text{SST} = \text{SSB} + \text{SSW} \]</div>
+  <figure>
+    <div class="w" id="b10anova"></div>
+    <figcaption>Due situazioni simulate con tre gruppi di punti e le stesse medie di gruppo (le lineette gialle). Nel primo riquadro i punti sono stretti attorno alle loro medie: la variabilità dentro i gruppi è piccola rispetto a quella fra i gruppi, F è grande. Nel secondo le stesse medie, ma punti molto dispersi: le medie diverse potrebbero essere un caso, F è piccolo. Il valore di F è calcolato sui punti disegnati.</figcaption>
+  </figure>
+  <p>Se le medie dei gruppi sono ben distinte e la dispersione dentro i gruppi è relativamente bassa, la differenza tende a essere significativa. La tabella dell'ANOVA fa questo confronto dividendo ogni somma dei quadrati per i suoi gradi di libertà, con \(n\) osservazioni:</p>
+  <div class="scroll"><table><thead><tr><th>Fonte di variazione</th><th>Gradi di libertà</th><th>Somma dei quadrati</th><th>Media dei quadrati</th><th>F</th></tr></thead><tbody>
+    <tr><td>Fra i gruppi (fattore)</td><td>\(c-1\)</td><td>SSB</td><td>MSB = SSB / (\(c-1\))</td><td>F = MSB / MSW</td></tr>
+    <tr><td>Dentro i gruppi (errore)</td><td>\(n-c\)</td><td>SSW</td><td>MSW = SSW / (\(n-c\))</td><td></td></tr>
+    <tr><td>Totale</td><td>\(n-1\)</td><td>SST = SSB + SSW</td><td></td><td></td></tr>
+  </tbody></table></div>
+  <p>Se \(H_0\) è vera, F segue una distribuzione di Fisher con \(c-1\) e \(n-c\) gradi di libertà, da cui si ricava il p-value. Il test presuppone che in ogni gruppo la popolazione sia normale e che i gruppi abbiano la stessa varianza (lo si controlla con il test di Levene, che il nodo One-way ANOVA restituisce in un'altra porta). Il test F è sensibile alle violazioni di queste ipotesi.</p>
+  <p>Nell'esempio delle slide il fattore è il contratto: permanenza media 18,0 mesi per i mensili, 42,0 per gli annuali, 56,7 per i biennali. F = 2.960,0, p-value &lt; 0,001: le medie sono diverse anche nella popolazione.</p>
+  <p class="stmt"><strong>Con campioni molto grandi quasi ogni differenza diventa significativa: guarda sempre anche quanto è grande.</strong></p>
+  <div class="quiz inq" data-quiz="10g"></div>
+</div></section>
+
+<section class="recap"><div class="col">
+  <h2>La lezione 10 in sintesi</h2>
+  <p>Le idee di questa lezione in un solo posto, da ripassare prima del quiz: prima la mappa, poi la tabella con gli strumenti e i numeri dell'esempio.</p>
+  <figure>
+    <div class="w" data-mappa="10"></div>
+    <figcaption>La mappa della lezione: KNIME, i tipi di variabile, le statistiche di una variabile e i tre casi dell'analisi bivariata con il loro test.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Domanda</th><th>Strumento</th><th>Nel dataset Telco</th></tr></thead><tbody>
+    <tr><td>Dove sta il centro?</td><td>media, mediana, moda</td><td>permanenza: media 32,4, mediana 29 mesi; contratto modale mensile</td></tr>
+    <tr><td>Quanto sono dispersi i dati?</td><td>range, IQR, deviazione standard, CV</td><td>permanenza: range 72, IQR 46 mesi; spesa totale CV 99%</td></tr>
+    <tr><td>Che forma ha la distribuzione?</td><td>asimmetria, curtosi</td><td>spesa totale +0,96; permanenza −1,39</td></tr>
+    <tr><td>Due qualitative sono legate?</td><td>tabella di contingenza, \(\chi^2\), V di Cramér</td><td>genere: p = 0,47, nessun legame; contratto: V = 41%</td></tr>
+    <tr><td>Due quantitative sono legate?</td><td>scatter plot, r, test t</td><td>permanenza e spesa totale: r = 0,83</td></tr>
+    <tr><td>Le medie dei gruppi differiscono?</td><td>box plot, ANOVA, test F</td><td>permanenza per contratto: F = 2.960</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="10"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>prima di qualsiasi modello si guarda ogni variabile da sola e poi a coppie con l'esito da prevedere, scegliendo lo strumento in base ai tipi delle due variabili</strong>; il p-value dice se un legame esiste nella popolazione, un indice come la V di Cramér dice quanto è forte.</p>
+  <p>La lezione 11 prende i dati così come arrivano, con valori mancanti, errori e anomalie, e li prepara per un modello.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

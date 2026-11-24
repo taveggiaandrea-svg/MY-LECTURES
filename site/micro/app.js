@@ -47,7 +47,7 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
   askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
   askSlow:'nessuna risposta in tempo, provo il modello successivo.',
@@ -2243,7 +2243,7 @@ document.querySelectorAll('figure').forEach(f=>{
    Il punto si passa all'altra pagina in localStorage (lezione, sezione, frazione della sezione), senza cancelletto nell'indirizzo:
    così Chrome può usare la pagina già preparata in background (regole di speculazione scritte da build.py) e il cambio è immediato. */
 document.querySelectorAll('.lang a[data-lang]').forEach(a=>a.addEventListener('click',e=>{
-  e.preventDefault();let j=null;const art=document.querySelector('.lesson:not([hidden])');
+  e.preventDefault();if(a.classList.contains('off'))return;let j=null;const art=document.querySelector('.lesson:not([hidden])');
   if(art){const secs=[...art.querySelectorAll(':scope > section')],hd=(document.querySelector('.top')||{offsetHeight:0}).offsetHeight,y=window.scrollY+hd;
     let i=0;secs.forEach((x,k)=>{if(x.getBoundingClientRect().top+window.scrollY<=y+1)i=k});
     const x=secs[i],t=x?x.getBoundingClientRect().top+window.scrollY:0;
@@ -2282,6 +2282,9 @@ lessons.forEach((l,i)=>{
 });
 function show(n,scroll){
   lessons.forEach(l=>{l.hidden=+l.dataset.n!==n});
+  /* lingua senza questa lezione (per esempio Big Data 10-16 solo in italiano): link spento */
+  document.querySelectorAll('.lang a[data-nums]').forEach(a=>{if(a.hasAttribute('aria-current')||!a.dataset.nums)return;const off=!a.dataset.nums.split(',').includes(String(n));
+    a.classList.toggle('off',off);if(off){a.title=UI.noLang;a.setAttribute('aria-disabled','true')}else{a.removeAttribute('title');a.removeAttribute('aria-disabled')}});
   links.forEach(a=>{if(+a.dataset.go===n){a.setAttribute('aria-current','page');try{a.scrollIntoView({block:'nearest',inline:'nearest'})}catch(_){}}else a.removeAttribute('aria-current')});
   if(!done[n]){done[n]=true;const art=byN(n);
     renderMath(art);

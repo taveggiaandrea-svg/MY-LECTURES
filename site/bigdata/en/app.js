@@ -47,7 +47,7 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
   askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
   askSlow:'nessuna risposta in tempo, provo il modello successivo.',
@@ -226,7 +226,7 @@ function gameMatrix(rows,cols,cells,o){
 
 /* Big Data and Databases: interface in English and small drawing helpers shared by the four lessons */
 Object.assign(UI,{check:'Check',pickFirst:'Pick an answer first.',right:'Correct.',wrong:'Not quite.',play:'Play',pause:'Pause',seek:'Position in the animation',
-  prev:'Previous lesson',next:'Next lesson',toc:'In this lesson',partTag:'Part {p} · {d}',partEnd:'End of {d}\'s part',partEndTxt:'Lessons {a} to {b} are by {d}. From lesson {n} the course moves on to {d2}.',partStart:'{d}\'s part begins',partStartTxt:'Part {p} of the course starts here, taught by {d}.',partNav:'Part {p}: {d}',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
+  prev:'Previous lesson',next:'Next lesson',toc:'In this lesson',noLang:'This lesson is not available in this language yet',partTag:'Part {p} · {d}',partEnd:'End of {d}\'s part',partEndTxt:'Lessons {a} to {b} are by {d}. From lesson {n} the course moves on to {d2}.',partStart:'{d}\'s part begins',partStartTxt:'Part {p} of the course starts here, taught by {d}.',partNav:'Part {p}: {d}',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
   askSys:'You are a tutor. Answer in English, briefly and clearly, based on the lessons provided: first the open lesson, then the course map and the excerpts from other lessons. When you use another lesson, say which one. If the question goes beyond the course, say so.',
   askSlow:'no reply in time, trying the next model.',
   askFmt:'Write formulas in LaTeX between \\( \\) or \\[ \\], never with dollar signs.'});
@@ -312,6 +312,13 @@ const wideFigs=n=>$('#lezione-'+n).querySelectorAll('figure .w > div').forEach(d
   THUMB[8]=sv('<rect x="8" y="12" width="52" height="48" fill="none" stroke="#666"/>'+Array.from({length:30},(_,i)=>'<circle cx="'+(14+(i*37)%42)+'" cy="'+(18+(i*23)%38)+'" r="1.6" fill="#8a8a8a"/>').join('')+
     '<line x1="62" y1="36" x2="72" y2="36" stroke="#777"/><rect x="74" y="20" width="28" height="32" fill="none" stroke="#bbb"/><rect x="79" y="27" width="18" height="4" fill="'+BLUE+'"/><rect x="79" y="35" width="12" height="4" fill="'+BLUE+'"/><rect x="79" y="43" width="15" height="4" fill="'+BLUE+'"/>');
   THUMB[9]=sv('<line x1="10" y1="62" x2="100" y2="62" stroke="#555"/>'+[2,7,13,18,33,64,97,149,181].map((v,i)=>'<rect x="'+(12+i*9.5)+'" y="'+(62-v*0.26)+'" width="7" height="'+(v*0.26)+'" fill="'+(i>6?'#9a9a9a':'#ddd')+'"/>').join(''));
+  THUMB[10]=sv('<line x1="10" y1="62" x2="100" y2="62" stroke="#555"/>'+[1371,698,568,479,453,423,364,384,416,404,450,1033].map((v,i)=>'<rect x="'+(12+i*7.4)+'" y="'+(62-v*0.036)+'" width="6" height="'+(v*0.036)+'" fill="#bbb"/>').join('')+'<line x1="52" y1="8" x2="52" y2="62" stroke="'+YEL+'" stroke-width="1.6"/>');
+  THUMB[11]=sv('<rect x="14" y="10" width="80" height="52" fill="none" stroke="#555"/>'+[0,1,2,3].map(i=>'<line x1="14" y1="'+(23+i*13)+'" x2="94" y2="'+(23+i*13)+'" stroke="#333"/>').join('')+[[30,16],[62,29],[46,42],[78,55]].map(([x,y])=>'<circle cx="'+x+'" cy="'+y+'" r="3.2" fill="'+PUR+'"/>').join('')+'<circle cx="86" cy="18" r="3.6" fill="'+RED+'"/>');
+  THUMB[12]=sv('<line x1="14" y1="62" x2="94" y2="62" stroke="#666"/><line x1="14" y1="62" x2="14" y2="8" stroke="#666"/><line x1="14" y1="62" x2="94" y2="8" stroke="#555" stroke-dasharray="3 3"/><path d="M14 62 C 18 22, 34 12, 94 8" fill="none" stroke="'+GRN+'" stroke-width="2.4"/>');
+  THUMB[13]=sv('<line x1="54" y1="16" x2="28" y2="40" stroke="#888"/><line x1="54" y1="16" x2="80" y2="40" stroke="#888"/><line x1="28" y1="40" x2="16" y2="62" stroke="#888"/><line x1="28" y1="40" x2="40" y2="62" stroke="#888"/><line x1="80" y1="40" x2="68" y2="62" stroke="#888"/><line x1="80" y1="40" x2="92" y2="62" stroke="#888"/>'+[[54,16,'#ddd'],[28,40,'#ddd'],[80,40,'#ddd'],[16,62,GRN],[40,62,'#666'],[68,62,GRN],[92,62,GRN]].map(([x,y,c])=>'<circle cx="'+x+'" cy="'+y+'" r="5" fill="'+c+'"/>').join(''));
+  THUMB[14]=sv('<line x1="10" y1="62" x2="100" y2="62" stroke="#555"/>'+[[.942,'#8a8a8a'],[.682,GRN],[.911,'#8a8a8a'],[.752,GRN],[.754,'#8a8a8a'],[.762,GRN]].map(([v,c],i)=>'<rect x="'+(14+i*14+(i>>1)*4)+'" y="'+(62-(v-.4)*90)+'" width="11" height="'+((v-.4)*90)+'" fill="'+c+'"/>').join(''));
+  THUMB[15]=sv('<rect x="10" y="12" width="56" height="8" fill="#666"/><rect x="10" y="26" width="76" height="8" fill="#666"/><rect x="10" y="40" width="44" height="8" fill="#666"/>'+'<rect x="72" y="12" width="26" height="8" fill="'+RED+'"/><rect x="60" y="40" width="20" height="8" fill="'+GRN+'"/><rect x="10" y="54" width="64" height="8" fill="'+BLUE+'"/>');
+  THUMB[16]=sv('<circle cx="54" cy="36" r="26" fill="none" stroke="#bbb" stroke-width="5"/><circle cx="54" cy="36" r="11" fill="none" stroke="#bbb" stroke-width="4"/><circle cx="74" cy="24" r="3" fill="'+RED+'"/><circle cx="40" cy="54" r="2.4" fill="'+RED+'"/>');
 })();
 
 /* Lesson 1: the data analytics timeline */
@@ -1603,7 +1610,7 @@ document.querySelectorAll('figure').forEach(f=>{
    Il punto si passa all'altra pagina in localStorage (lezione, sezione, frazione della sezione), senza cancelletto nell'indirizzo:
    così Chrome può usare la pagina già preparata in background (regole di speculazione scritte da build.py) e il cambio è immediato. */
 document.querySelectorAll('.lang a[data-lang]').forEach(a=>a.addEventListener('click',e=>{
-  e.preventDefault();let j=null;const art=document.querySelector('.lesson:not([hidden])');
+  e.preventDefault();if(a.classList.contains('off'))return;let j=null;const art=document.querySelector('.lesson:not([hidden])');
   if(art){const secs=[...art.querySelectorAll(':scope > section')],hd=(document.querySelector('.top')||{offsetHeight:0}).offsetHeight,y=window.scrollY+hd;
     let i=0;secs.forEach((x,k)=>{if(x.getBoundingClientRect().top+window.scrollY<=y+1)i=k});
     const x=secs[i],t=x?x.getBoundingClientRect().top+window.scrollY:0;
@@ -1642,6 +1649,9 @@ lessons.forEach((l,i)=>{
 });
 function show(n,scroll){
   lessons.forEach(l=>{l.hidden=+l.dataset.n!==n});
+  /* lingua senza questa lezione (per esempio Big Data 10-16 solo in italiano): link spento */
+  document.querySelectorAll('.lang a[data-nums]').forEach(a=>{if(a.hasAttribute('aria-current')||!a.dataset.nums)return;const off=!a.dataset.nums.split(',').includes(String(n));
+    a.classList.toggle('off',off);if(off){a.title=UI.noLang;a.setAttribute('aria-disabled','true')}else{a.removeAttribute('title');a.removeAttribute('aria-disabled')}});
   links.forEach(a=>{if(+a.dataset.go===n){a.setAttribute('aria-current','page');try{a.scrollIntoView({block:'nearest',inline:'nearest'})}catch(_){}}else a.removeAttribute('aria-current')});
   if(!done[n]){done[n]=true;const art=byN(n);
     renderMath(art);

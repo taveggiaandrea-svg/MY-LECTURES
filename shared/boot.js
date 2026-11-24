@@ -20,7 +20,7 @@ document.querySelectorAll('figure').forEach(f=>{
    Il punto si passa all'altra pagina in localStorage (lezione, sezione, frazione della sezione), senza cancelletto nell'indirizzo:
    così Chrome può usare la pagina già preparata in background (regole di speculazione scritte da build.py) e il cambio è immediato. */
 document.querySelectorAll('.lang a[data-lang]').forEach(a=>a.addEventListener('click',e=>{
-  e.preventDefault();let j=null;const art=document.querySelector('.lesson:not([hidden])');
+  e.preventDefault();if(a.classList.contains('off'))return;let j=null;const art=document.querySelector('.lesson:not([hidden])');
   if(art){const secs=[...art.querySelectorAll(':scope > section')],hd=(document.querySelector('.top')||{offsetHeight:0}).offsetHeight,y=window.scrollY+hd;
     let i=0;secs.forEach((x,k)=>{if(x.getBoundingClientRect().top+window.scrollY<=y+1)i=k});
     const x=secs[i],t=x?x.getBoundingClientRect().top+window.scrollY:0;
@@ -59,6 +59,9 @@ lessons.forEach((l,i)=>{
 });
 function show(n,scroll){
   lessons.forEach(l=>{l.hidden=+l.dataset.n!==n});
+  /* lingua senza questa lezione (per esempio Big Data 10-16 solo in italiano): link spento */
+  document.querySelectorAll('.lang a[data-nums]').forEach(a=>{if(a.hasAttribute('aria-current')||!a.dataset.nums)return;const off=!a.dataset.nums.split(',').includes(String(n));
+    a.classList.toggle('off',off);if(off){a.title=UI.noLang;a.setAttribute('aria-disabled','true')}else{a.removeAttribute('title');a.removeAttribute('aria-disabled')}});
   links.forEach(a=>{if(+a.dataset.go===n){a.setAttribute('aria-current','page');try{a.scrollIntoView({block:'nearest',inline:'nearest'})}catch(_){}}else a.removeAttribute('aria-current')});
   if(!done[n]){done[n]=true;const art=byN(n);
     renderMath(art);

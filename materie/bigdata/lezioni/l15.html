@@ -1,0 +1,166 @@
+<article class="lesson" data-n="15" data-docente="L. Molteni" id="lezione-15" data-title="Come si trasformano le parole in numeri?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 15 · L. Molteni, slide</p>
+  <h1>Come si trasformano le parole in numeri?</h1>
+  <p class="desc">Text analytics in KNIME: perché il linguaggio è difficile per una macchina, come un testo diventa una riga di numeri, tre modi di misurare il sentiment e i topic model, su 14.485 tweet indirizzati a sei compagnie aeree americane.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 14 i dati erano colonne di numeri: saldi, movimenti, anni di rapporto. Ma i clienti spiegano a parole quello che i numeri si limitano a contare. Recensioni, tweet, chat, e-mail, trascrizioni di telefonate, risposte aperte nei questionari: un cliente dice perché è scontento molto prima che lo mostri il tasso di abbandono. La <strong>text analytics</strong> trasforma quelle parole in numeri che si possono seguire nel tempo e su cui si può agire.</p>
+  <p>Le slide danno tre esempi. Uber ha costruito COTA, un assistente che aiuta a gestire oltre il 90% dei ticket di assistenza in arrivo; nel suo test A/B il tempo di gestione è sceso di circa il 10%, con clienti più soddisfatti. In finanza, Loughran e McDonald (2011) hanno mostrato che tre parole su quattro che un dizionario generico classifica come negative non lo sono in un bilancio annuale (il 10-K delle società americane): «liability», per esempio, lì vuol dire solo «passività». E il caso di oggi: 14.485 tweet a sei compagnie aeree in nove giorni.</p>
+  <p>Che cosa è cambiato negli ultimi anni? I modelli linguistici pre-addestrati (BERT, poi i grandi modelli linguistici, gli LLM) capiscono contesto, negazione e ironia molto meglio dei conteggi di parole. Ma la catena classica resta la spina dorsale: è trasparente, economica, veloce, ed è ciò che serve per controllare ciò che produce un LLM. Il vantaggio competitivo non è l'algoritmo, è conoscere il dominio: quali parole contano per una compagnia aerea, una banca o un marchio di moda.</p>
+  <h2>Quattro domande a cui risponde un testo</h2>
+  <div class="scroll"><table><thead><tr><th>Domanda</th><th>Compito</th><th>Esempio</th></tr></thead><tbody>
+    <tr><td>Come si sentono?</td><td><strong>sentiment</strong>: positivo, neutro o negativo; a volte intensità o emozione</td><td>la quota di tweet arrabbiati per compagnia</td></tr>
+    <tr><td>Di che cosa parlano?</td><td><strong>topic</strong>: gruppi di parole che compaiono insieme</td><td>ritardi, bagagli, cancellazioni, personale</td></tr>
+    <tr><td>Dove va?</td><td><strong>classificazione</strong>: assegnare un'etichetta prestabilita</td><td>mandare un tweet al team bagagli o a quello delle riprenotazioni</td></tr>
+    <tr><td>Chi e che cosa è nominato?</td><td><strong>estrazione di entità</strong>: persone, luoghi, prodotti, numeri di volo</td><td>quale aeroporto ha più reclami</td></tr>
+  </tbody></table></div>
+  <p>Gli usi sono ovunque: assistenza clienti (classificare e smistare i ticket, trovare per primo il cliente arrabbiato), finanza (il tono delle conference call e dei bilanci come segnale), social listening (seguire ogni giorno il sentiment sul marchio e accorgersi di una crisi in ore invece che in settimane), recensioni di prodotti e app, ricerche di mercato (codificare migliaia di risposte aperte in pochi minuti), analisi del personale (i commenti nei questionari interni e nei colloqui di uscita). Lo schema è sempre lo stesso: le parole diventano numeri, e i numeri alimentano una decisione che ha un costo.</p>
+  <p>La catena ha cinque passi: <strong>raccogliere</strong> (API dei social, cioè le interfacce con cui un programma scarica i dati, siti di recensioni, CRM, trascrizioni; attenzione al campione: chi scrive non è chi compra), <strong>pulire</strong> (togliere menzioni, link, HTML, sistemare la codifica, decidere che cos'è una «parola»), <strong>rappresentare</strong> (ogni testo diventa una riga di numeri), <strong>modellare</strong> (dizionario, classificatore, topic model o LLM) e <strong>decidere</strong> (cruscotti, allarmi, regole di smistamento; ogni errore ha un costo, un reclamo mancato o un falso allarme).</p>
+  <p class="stmt"><strong>La pulizia e la scelta della rappresentazione decidono quasi tutto il risultato:</strong> un modello semplice su un testo ben preparato batte un modello sofisticato su un testo grezzo.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Perché il linguaggio è più difficile di una tabella</h2>
+  <p>Una colonna di una tabella ha un significato fisso; una parola no. Le slide raccolgono sei difficoltà, tutte presenti nel dataset di oggi.</p>
+  <div class="scroll"><table><thead><tr><th>Difficoltà</th><th>Esempio</th></tr></thead><tbody>
+    <tr><td>Ambiguità: la stessa parola con significati diversi</td><td>«my bag is light» (leggera) e «the seat-belt light is on» (la spia)</td></tr>
+    <tr><td>Parole di dominio</td><td>in un dizionario generico «refund» (rimborso) è positiva, mentre «cancelled», «hold» (in attesa al telefono) e «stranded» (bloccato) non ci sono proprio</td></tr>
+    <tr><td>Negazione</td><td>«not bad at all», «never again»: il sentiment si capovolge per una parolina che le liste di parole vuote tolgono</td></tr>
+    <tr><td>Ironia</td><td>«still no response from AA. great job guys!»: un dizionario conta «great» e dichiara il tweet positivo</td></tr>
+    <tr><td>Rumore</td><td>menzioni, link, hashtag, emoji, errori di battitura, abbreviazioni («flt», «hrs»), artefatti nei dati</td></tr>
+    <tr><td>Contesto</td><td>il significato dipende dalla frase, dalla conversazione, perfino dal tweet precedente: i conteggi di parole non vedono nulla di tutto questo</td></tr>
+  </tbody></table></div>
+  <h3>Dalle parole ai numeri</h3>
+  <p>Le famiglie di rappresentazioni sono due. Nel <strong>bag of words</strong> («sacchetto di parole») c'è una colonna per ogni parola del vocabolario, con 1 se la parola compare nel testo; l'ordine e il contesto si perdono. È trasparente (ogni colonna si legge), ma sparso: migliaia di colonne quasi tutte a zero, e i sinonimi non hanno nulla in comune. Con gli <strong>embedding</strong> (da word2vec, un metodo del 2013 che impara i vettori dalle parole vicine, fino a BERT e agli LLM, basati sull'architettura transformer) ogni parola o frase diventa un vettore denso di qualche centinaio di numeri, e significati simili stanno vicini: catturano i sinonimi e, con i transformer, il contesto, ma sono meno trasparenti e più pesanti da calcolare.</p>
+  <figure>
+    <div class="w" id="b15bow"></div>
+    <figcaption>Nel primo riquadro tre tweet come bag of words: una riga per tweet, una colonna per parola, 1 se la parola c'è. «delayed» e «late» sarebbero due colonne diverse senza alcun legame. Nel secondo una mappa illustrativa a due dimensioni di un embedding: le parole con significati simili («delayed», «late», «hours»; «bag», «luggage», «suitcase»; «great», «love», «thanks») formano gruppi vicini.</figcaption>
+  </figure>
+  <p>Oggi si usa il bag of words: è perfetto per i dizionari, i topic model e i modelli ad albero delle lezioni precedenti.</p>
+  <h3>Di che cosa parlano? I topic model</h3>
+  <p>La <strong>Latent Dirichlet Allocation</strong> (LDA; Blei, Ng e Jordan, 2003) assume che ogni documento sia un miscuglio di topic e che ogni topic sia un miscuglio di parole. Impara gli uni e gli altri solo da quali parole compaiono insieme, senza etichette: è un metodo non supervisionato.</p>
+  <figure>
+    <div class="w" id="b15lda"></div>
+    <figcaption>L'idea dell'LDA con l'esempio illustrativo delle slide. Nella prima colonna tre topic, ciascuno descritto dalle sue parole più probabili. Nella seconda tre tweet, ciascuno con la sua miscela di topic: il secondo parla di ritardi e di bagagli insieme, quindi ha due colori. Dare un nome ai topic tocca a te.</figcaption>
+  </figure>
+  <p>Si scelgono il numero di topic \(k\), \(\alpha\) (quanti topic per documento: piccolo vuol dire pochi) e \(\beta\) (quante parole per topic). Le alternative sono LSA, NMF e BERTopic (embedding più clustering).</p>
+  <h3>Come si sentono? Tre modi di misurare il sentiment</h3>
+  <div class="scroll"><table><thead><tr><th></th><th>Dizionario (lessico)</th><th>Machine learning supervisionato</th><th>Grande modello linguistico</th></tr></thead><tbody>
+    <tr><td>Come funziona</td><td>conta le parole positive e negative</td><td>impara da testi etichettati da persone</td><td>si chiede a un modello pre-addestrato con un prompt</td></tr>
+    <tr><td>Etichette necessarie</td><td>nessuna</td><td>migliaia</td><td>nessuna (qualche esempio aiuta)</td></tr>
+    <tr><td>Trasparenza</td><td>totale: ogni parola è visibile</td><td>buona: quali parole contano</td><td>bassa: una scatola nera</td></tr>
+    <tr><td>Adattamento al dominio</td><td>scarso finché non si regola la lista</td><td>buono, impara il dominio</td><td>buono, ma va controllato</td></tr>
+    <tr><td>Costo e velocità</td><td>gratis, istantaneo</td><td>economico una volta addestrato</td><td>costo per chiamata, più lento</td></tr>
+    <tr><td>Oggi</td><td>sì: il lessico di Hu e Liu</td><td>sì: una random forest</td><td>nelle lezioni successive</td></tr>
+  </tbody></table></div>
+  <p>Oltre la polarità, intensità («pretty good» contro «fantastic») ed emozioni (rabbia, gioia, sorpresa) usano le stesse tre famiglie.</p>
+  <div class="quiz inq" data-quiz="15a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Il testo in KNIME</h2>
+  <p>Serve un'estensione gratuita, KNIME Textprocessing (dal menu, Install Extensions). La logica è la stessa per ogni progetto: una colonna di testo letta con un CSV o Excel Reader, ripulita con String Manipulation finché è ancora una stringa; poi Strings To Document la trasforma in un <strong>documento</strong>, una cella speciale con titolo, testo, categoria e autore, in cui le parole diventano <strong>termini</strong> che possono portare dei tag. I nodi di preprocessing cambiano i termini dentro il documento. Bag Of Words Creator produce una riga per coppia (documento, termine), su cui si calcolano le frequenze. Infine Document Vector fa una colonna per termine per i modelli, Topic Extractor fa l'LDA, Pivot e GroupBy calcolano i punteggi.</p>
+  <p>Ecco un tweet vero attraverso il preprocessing.</p>
+  <div class="scroll"><table><thead><tr><th>Passo</th><th>Testo dopo il passo</th><th>Che cosa fa</th></tr></thead><tbody>
+    <tr><td>Tweet grezzo</td><td>@southwestair I've been on hold for 2 hours to reschedule my Cancelled Flightled flight for the morning. What gives? I need help NOW</td><td></td></tr>
+    <tr><td>String Manipulation</td><td>I've been on hold for 2 hours to reschedule my cancelled flight for the morning. What gives? I need help NOW</td><td>espressioni regolari: menzioni, link, artefatti delle etichette</td></tr>
+    <tr><td>Punctuation Erasure</td><td>Ive been on hold for 2 hours to reschedule my cancelled flight for the morning What gives I need help NOW</td><td>toglie la punteggiatura</td></tr>
+    <tr><td>Number Filter</td><td>Ive been on hold for hours to reschedule my cancelled flight for the morning What gives I need help NOW</td><td>toglie i termini che sono numeri</td></tr>
+    <tr><td>Case Converter</td><td>ive been on hold for hours to reschedule my cancelled flight for the morning what gives i need help now</td><td>minuscolo: «NOW» = «now»</td></tr>
+    <tr><td>Stop Word Filter</td><td>hold hours reschedule cancelled morning gives help</td><td>lista inglese di parole vuote più una lista di dominio («flight», «now»...)</td></tr>
+    <tr><td>N Chars Filter</td><td>hold hours reschedule cancelled morning gives help</td><td>tiene i termini di almeno 3 caratteri</td></tr>
+  </tbody></table></div>
+  <p class="stmt"><strong>L'ordine conta:</strong> le parole del sentiment vanno marcate prima di togliere le parole vuote, altrimenti «not» e «no» spariscono per primi.</p>
+  <p>Il sentiment con il dizionario richiede sette nodi. Due Dictionary Tagger marcano le parole positive e negative del lessico di Hu e Liu (2004: 2.006 parole positive e 4.783 negative), letto da un file CSV. Bag Of Words Creator fa una riga per parola, TF le conta, Tags to String mette il tag in una colonna, Pivot conta per ogni tweet le parole positive e negative, ed Expression calcola il punteggio, da −1 a +1, e la classe:</p>
+  <div class="eq">\[ \text{punteggio} = \frac{\text{positive} - \text{negative}}{\text{positive} + \text{negative}} \qquad (0 \text{ se non ci sono parole del lessico}) \]</div>
+  <p>Punteggio positivo dà «positive», negativo «negative», zero «neutral». Per il sentiment supervisionato invece: dal bag of words si tengono solo i termini usati in almeno 20 tweet (Document Frequency e Frequency Filter: da migliaia di parole a qualche centinaio di colonne); Document Vector fa una riga per tweet con una colonna 0/1 per termine; Category to Class estrae come target l'etichetta umana; poi divisione stratificata 70/30 (le slide riportano 4.147 tweet di test, un po' meno del 30% di 14.485, cioè 4.346, senza spiegare la differenza), Tree Ensemble con 100 alberi e seme 42, Scorer sul test.</p>
+  <p class="stmt"><strong>Quando il testo è diventato una tabella di colonne 0/1, vale tutto ciò che conosci delle lezioni 12-14:</strong> divisione, bilanciamento, insiemi di alberi, ROC, importanza delle variabili. Le parole più importanti sono il dizionario di dominio che il modello ha imparato da solo.</p>
+  <p>I topic li trova il nodo Topic Extractor (Parallel LDA), con \(k = 6\) topic (leggibili e utilizzabili), 10 parole per topic (abbastanza per dare un nome), 1.000 iterazioni (risultato stabile), \(\alpha = 0{,}1\) (pochi topic per tweet), \(\beta = 0{,}01\) (poche parole per topic) e seme 42. Le uscite sono tre: ogni documento con le sue probabilità di topic e il topic assegnato; le parole principali di ogni topic, per dare i nomi; la log-verosimiglianza per iterazione, per controllare la convergenza. Per scegliere \(k\) si prova da 4 a 10 e si tiene la soluzione con topic a cui si sa dare un nome e che si sanno usare.</p>
+  <div class="quiz inq" data-quiz="15b"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Il caso: che cosa twittano i passeggeri</h2>
+  <p>Immagina di gestire l'assistenza sui social di una compagnia aerea americana. Migliaia di clienti scrivono alle compagnie ogni settimana, quasi sempre per lamentarsi, spesso in tempo reale dal gate. La direttrice dell'esperienza clienti fa quattro domande: quanto è negativa la conversazione, e si può misurare ogni giorno senza leggere ogni tweet? Come siamo rispetto ai cinque concorrenti? Di che cosa si lamentano? Si può smistare in automatico, mandando ogni tweet al team giusto e quelli arrabbiati per primi?</p>
+  <p>I dati sono il dataset pubblico Twitter US Airline Sentiment: tweet fra il 16 e il 24 febbraio 2015, 14.485 dopo aver tolto 155 duplicati. Persone vere hanno etichettato ogni tweet come negativo, neutro o positivo, con il grado di accordo fra gli annotatori e, per i negativi, il motivo.</p>
+  <figure>
+    <div class="w" id="b15lab"></div>
+    <figcaption>Nel primo riquadro le etichette umane dei 14.485 tweet, ricontrollate sul file: il 62,7% è negativo, perché si scrive a una compagnia aerea quando qualcosa va storto; i neutri sono soprattutto domande, i positivi soprattutto ringraziamenti. Nel secondo i motivi più frequenti dei tweet negativi.</figcaption>
+  </figure>
+  <p>Prima di modellare, leggi un campione di testi grezzi. Qui c'è una sorpresa: quando il dataset è stato costruito, le parole «late» e «cancelled» dentro i tweet sono state sovrascritte dalle etichette «Late Flight» e «Cancelled Flight». Sono toccati 1.408 tweet, circa uno su dieci: «my flight got Cancelled Flightled 6 hrs before takeoff» invece di «my flight got cancelled». Lasciati così creerebbero parole finte e farebbero trapelare l'etichetta nel testo, un leakage come quelli della lezione 14. Quattro espressioni regolari in String Manipulation tolgono menzioni e link e riportano le parole com'erano. Ogni corpus vero ha i suoi artefatti: firme, modelli, avvisi legali.</p>
+  <p>Il workflow ha 34 nodi in cinque sezioni: leggere e pulire, sentiment con il dizionario, preprocessing, sentiment supervisionato, topic per sentiment. Si esegue tutto in meno di un minuto su un portatile.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Il dizionario: direzione giusta, molti errori</h2>
+  <figure>
+    <div class="w" id="b15cm"></div>
+    <figcaption>Le due matrici di confusione delle slide, in percentuale di ogni riga (classe umana). Nel primo riquadro il dizionario su tutti i 14.485 tweet: il 42% dei tweet negativi sembra «neutro», perché non contiene parole del lessico. Nel secondo la random forest sui 4.147 tweet di test: riconosce bene i negativi (86%), mentre i neutri restano la classe difficile.</figcaption>
+  </figure>
+  <p>Il dizionario azzecca il 50% dei tweet (3 classi), con \(\kappa = 0{,}27\); solo il 62% dei tweet contiene almeno una parola del lessico. Sbaglia per le ragioni che conosci: tweet senza parole di sentiment («on hold 2 hours to rebook» è un reclamo fatto di parole neutre), ironia, parole di dominio («refund» contata come positiva, «cancelled» e «stranded» sconosciute), cortesia («thanks» e «please» dentro tweet arrabbiati). È tipico di un dizionario generico su testi brevi e di dominio. Non richiede etichette e ogni decisione si spiega: un buon primo riferimento, non una risposta finale.</p>
+  <p>Eppure mette le compagnie quasi nello stesso ordine degli annotatori.</p>
+  <figure>
+    <div class="w" id="b15air"></div>
+    <figcaption>La quota di tweet negativi per compagnia secondo le persone (blu, ricontrollata sul file) e secondo il dizionario (giallo, dalle slide). Il dizionario sottostima il livello ovunque, ma l'ordine è quasi lo stesso: US Airways, American e United in cima, Delta e Virgin America in fondo. La correlazione fra le due classifiche (di Spearman, sui ranghi) è 0,94.</figcaption>
+  </figure>
+  <p>Per un indicatore mensile del marchio che confronta i concorrenti, il livello conta meno della tendenza e della classifica.</p>
+  <p>Il <strong>machine learning impara il dominio</strong>: la random forest sul bag of words, con 776 termini come colonne, arriva al 74% di accuratezza sui 4.147 tweet di test (\(\kappa = 0{,}48\)), 24 punti più del dizionario. Il prezzo: migliaia di tweet etichettati, e un modello da riaddestrare quando il linguaggio cambia.</p>
+  <div class="quiz inq" data-quiz="15c"></div>
+  <h3>Sei topic, e quali fanno male</h3>
+  <p>L'LDA con sei topic trova queste parole; i nomi li hanno dati le persone.</p>
+  <div class="scroll"><table><thead><tr><th>Topic (nome dato da noi)</th><th>Parole principali trovate dall'LDA</th><th>Tweet</th></tr></thead><tbody>
+    <tr><td>Ritardi e cancellazioni</td><td>plane, cancelled, delayed, gate, time, hours</td><td>4.519</td></tr>
+    <tr><td>Attesa al telefono e riprenotazioni</td><td>hold, help, call, cancelled, phone, please</td><td>3.690</td></tr>
+    <tr><td>Assistenza e personale</td><td>service, customer, worst, thanks, experience, thank</td><td>2.151</td></tr>
+    <tr><td>Complimenti e promozioni</td><td>thanks, thank, love, guys, destinationdragons, awesome</td><td>1.614</td></tr>
+    <tr><td>Posti, miglia e upgrade</td><td>seat, seats, miles, class, upgrade, boarding</td><td>1.398</td></tr>
+    <tr><td>Bagagli</td><td>bag, lost, baggage, fleek, fleet, luggage</td><td>1.113</td></tr>
+  </tbody></table></div>
+  <p>Senza vedere le etichette, l'LDA separa gli stessi reclami che gli annotatori hanno codificato a mano: il 77% dei tweet con motivo «Late Flight» e il 55% di quelli «Cancelled Flight» finiscono in ritardi e cancellazioni; il 52% dei «Customer Service Issue» e il 49% dei «Flight Booking Problems» in attesa al telefono e riprenotazioni; il 46% dei «Damaged Luggage» e il 35% dei «Lost Luggage» nei bagagli. I bagagli smarriti si dividono fra bagagli e ritardi. Qualche parola curiosa, come «destinationdragons» o «fleek», viene da campagne e mode di quei giorni.</p>
+  <figure>
+    <div class="w" id="b15topic"></div>
+    <figcaption>La quota di tweet negativi dentro ogni topic secondo le persone (blu) e secondo il dizionario (giallo), valori delle slide. I topic più negativi sono ritardi e cancellazioni (72%) e attesa al telefono (70%); complimenti e promozioni sono negativi solo nel 22% dei casi.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Topic, in % dei tweet della compagnia</th><th>American</th><th>Delta</th><th>Southwest</th><th>US Airways</th><th>United</th><th>Virgin America</th></tr></thead><tbody>
+    <tr><td>Ritardi e cancellazioni</td><td>31%</td><td><strong>29%</strong></td><td><strong>26%</strong></td><td><strong>35%</strong></td><td><strong>35%</strong></td><td>21%</td></tr>
+    <tr><td>Attesa al telefono e riprenotazioni</td><td><strong>33%</strong></td><td>17%</td><td><strong>26%</strong></td><td>31%</td><td>22%</td><td>18%</td></tr>
+    <tr><td>Assistenza e personale</td><td>16%</td><td>14%</td><td>13%</td><td>15%</td><td>16%</td><td>10%</td></tr>
+    <tr><td>Complimenti e promozioni</td><td>7%</td><td>19%</td><td>19%</td><td>5%</td><td>7%</td><td><strong>29%</strong></td></tr>
+    <tr><td>Posti, miglia e upgrade</td><td>7%</td><td>10%</td><td>11%</td><td>8%</td><td>11%</td><td>15%</td></tr>
+    <tr><td>Bagagli</td><td>6%</td><td>12%</td><td>5%</td><td>6%</td><td>9%</td><td>7%</td></tr>
+  </tbody></table></div>
+  <p>In grassetto il topic più frequente di ogni compagnia. Topic per sentiment è l'informazione su cui un manager può agire: non solo «non piacciamo», ma che cosa non piace ai clienti, e se è un problema nostro o di tutto il settore. Per American il primo topic è l'attesa al telefono; per Virgin America sono i complimenti.</p>
+  <h3>Dall'informazione all'azione</h3>
+  <p>Quattro azioni. <strong>Smistare</strong>: i tweet su cancellazioni e attese al telefono vanno subito al team delle riprenotazioni, segnalati dal modello in tempo reale. <strong>Seguire</strong>: un punteggio settimanale con il dizionario per topic e per concorrente, economico e trasparente, buono per le tendenze. <strong>Correggere la causa</strong>: i topic più negativi sono processi operativi e di servizio, non comunicazione; vanno condivisi con le operazioni. <strong>Ricordare i limiti</strong>: dati del 2015, solo Stati Uniti, chi twitta non rappresenta tutti i clienti, e ironia e sarcasmo ingannano ancora tutti i metodi.</p>
+  <p class="stmt"><strong>La text analytics non sostituisce la lettura: ti dice quali 50 tweet leggere oggi.</strong></p>
+  <div class="quiz inq" data-quiz="15d"></div>
+</div></section>
+
+<section class="recap"><div class="col">
+  <h2>La lezione 15 in sintesi</h2>
+  <p>Le idee di questa lezione in un solo posto: prima la mappa, poi i tre metodi a confronto sul caso.</p>
+  <figure>
+    <div class="w" data-mappa="15"></div>
+    <figcaption>La mappa della lezione: perché il testo conta, le difficoltà del linguaggio, le rappresentazioni, il sentiment, i topic e il caso dei tweet.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Metodo</th><th>Che cosa serve</th><th>Risultato sui tweet</th></tr></thead><tbody>
+    <tr><td>Dizionario (Hu e Liu)</td><td>una lista di parole, nessuna etichetta</td><td>accuratezza 50%, κ 0,27; classifica delle compagnie corretta (ρ 0,94)</td></tr>
+    <tr><td>Random forest sul bag of words</td><td>migliaia di tweet etichettati</td><td>accuratezza 74%, κ 0,48, 776 termini</td></tr>
+    <tr><td>LDA</td><td>il numero di topic k, nessuna etichetta</td><td>sei topic che ricalcano i motivi degli annotatori</td></tr>
+    <tr><td>Topic per sentiment</td><td>un Joiner sull'identificativo del tweet</td><td>che cosa correggere, e per quale compagnia</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="15"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>i punteggi dicono che qualcosa non va, i testi dicono che cosa</strong>; si pulisce prima di modellare, un dizionario è trasparente ma generico, le etichette comprano accuratezza, e topic incrociati con il sentiment mostrano che cosa correggere.</p>
+  <p>La lezione 16 fa lo stesso viaggio con le immagini: come un'immagine diventa una tabella di numeri che un modello può usare.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

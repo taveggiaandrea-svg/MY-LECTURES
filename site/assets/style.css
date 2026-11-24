@@ -46,6 +46,7 @@ h3{font-size:1.25rem;font-weight:500;margin-top:1.2rem}
 .lang{flex:none;display:flex;gap:2px;padding:2px;border-radius:10px;background:rgba(255,255,255,.08)}
 .lang a{color:#fff;text-decoration:none;font-size:.82rem;font-weight:500;letter-spacing:.04em;padding:.32rem .5rem;border-radius:8px;line-height:1;transition:background .15s}
 .lang a:hover{background:rgba(109,185,244,.14)}
+.lang a.off{opacity:.35;cursor:not-allowed}.lang a.off:hover{background:none}
 .lang a[aria-current]{background:rgba(109,185,244,.24);color:#6db9f4}
 .tog{flex:none;background:none;border:0;color:#fff;cursor:pointer;padding:6px;border-radius:10px;display:grid;place-items:center}
 .tog:hover{background:rgba(109,185,244,.12)}

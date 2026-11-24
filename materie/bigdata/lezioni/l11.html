@@ -1,0 +1,236 @@
+<article class="lesson" data-n="11" data-docente="L. Molteni" id="lezione-11" data-title="Come si preparano i dati per un modello?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Lezione 11 · L. Molteni, slide</p>
+  <h1>Come si preparano i dati per un modello?</h1>
+  <p class="desc">Valori mancanti, valori anomali e nuove variabili: i passi che trasformano i dati grezzi in una tabella pronta per un modello, sul dataset Telco e su un caso vero di 119.390 prenotazioni alberghiere.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Nella lezione 10 hai esplorato il dataset Telco: tipi di variabile, distribuzioni, legami con l'abbandono. Avevi anche notato 11 clienti senza spesa totale. Che cosa se ne fa? E che cosa si fa di un cliente che spende dieci volte più degli altri? Questa lezione risponde, e alla fine applica tutto a un secondo dataset, molto più grande e molto più sporco.</p>
+  <p>Le slide aprono con un'immagine: il modello è il motore, i dati sono il carburante, e un problema di carburante non si risolve regolando il motore. La <strong>preparazione dei dati</strong> raffina gli input grezzi perché l'algoritmo riesca a vedere gli schemi che contengono. È la parte del lavoro che porta via più tempo.</p>
+  <figure>
+    <div class="w" id="b11time"></div>
+    <figcaption>Come i data scientist dividono la loro giornata di lavoro secondo l'indagine di Anaconda, <em>State of Data Science 2020</em>, citata nelle slide. Caricare e ripulire i dati prende circa il 45% del tempo, quasi quattro volte l'addestramento dei modelli. Una regola pratica spesso citata va oltre: esplorazione e preparazione occupano fino al 70-80% di un progetto e pesano per circa l'80% sulla qualità del risultato.</figcaption>
+  </figure>
+  <p>I passi sono sei. I primi tre li hai già visti nella lezione 10; questa lezione si occupa degli ultimi tre.</p>
+  <div class="scroll"><table><thead><tr><th>Passo</th><th>Domanda</th><th>Nodi di KNIME</th></tr></thead><tbody>
+    <tr><td>1. Ruoli e livelli di misura</td><td>quali colonne sono predittori, quale è il target, di che tipo sono?</td><td>CSV Reader</td></tr>
+    <tr><td>2. Analisi univariata</td><td>come si distribuisce ogni variabile?</td><td>Statistics</td></tr>
+    <tr><td>3. Analisi bivariata</td><td>quali variabili sono legate al target, o fra loro?</td><td>Crosstab, Linear Correlation</td></tr>
+    <tr><td>4. Valori mancanti</td><td>perché manca un valore, e che cosa ci metto?</td><td>Missing Value</td></tr>
+    <tr><td>5. Valori anomali</td><td>questo valore è un errore o un caso estremo vero?</td><td>Numeric Outliers, Box Plot</td></tr>
+    <tr><td>6. Feature engineering</td><td>quali nuove variabili aiutano il modello?</td><td>Math Formula, Rule Engine, One to Many, Normalizer</td></tr>
+  </tbody></table></div>
+  <p>Il primo passo distingue i <strong>predittori</strong> (gli input) dal <strong>target</strong> (l'output da prevedere), e mette da parte gli identificativi come il codice cliente, che non predicono nulla. Attenzione al tipo di memorizzazione: una colonna «gioca a cricket» salvata come 0 e 1 è numerica nel file, ma è una variabile categorica. Conta il livello di misura, non il formato.</p>
+  <div class="quiz inq" data-quiz="11a"></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Perché manca questo valore?</h2>
+  <p>Una cella vuota non è solo spazio vuoto: è un segnale. Ignorarla può cambiare le conclusioni. Le slide lo mostrano con otto studenti, il loro genere e se giocano a cricket; per due di loro il genere non è stato registrato.</p>
+  <figure>
+    <div class="w" id="b11cricket"></div>
+    <figcaption>La quota di studenti che giocano a cricket per genere, prima e dopo aver recuperato il genere mancante (dai nomi: Miss Richa e Miss Rashmi). Nel primo riquadro, con il genere mancante trattato come gruppo a parte, maschi e femmine sembrano giocare allo stesso modo (50% e 50%). Nel secondo, recuperati i due valori, le femmine giocano di più (75% contro 50%). Due celle su otto righe bastavano a nascondere una relazione.</figcaption>
+  </figure>
+  <p>I valori mancanti nascono in due momenti. Nell'<strong>estrazione</strong> dei dati, per errori nel prelevarli dalle fonti (join sbagliati, formati, codifiche, stringhe troncate): qui la cura è ricontrollare l'estrazione, con verifiche dei tipi, dello schema e codici di controllo sulle stringhe. Nella <strong>raccolta</strong>, quando i dati vengono generati: mancate risposte, domande saltate, sensori spenti, campi che non si applicano. Qui è più complicato, perché bisogna capire il meccanismo che ha prodotto il buco.</p>
+  <div class="scroll"><table><thead><tr><th>Meccanismo</th><th>Da che cosa dipende la mancanza</th><th>Esempio delle slide</th></tr></thead><tbody>
+    <tr><td><strong>MCAR</strong>, completamente a caso</td><td>da nulla: ogni osservazione ha la stessa probabilità di mancare</td><td>una pagina del questionario persa per posta</td></tr>
+    <tr><td><strong>MAR</strong>, a caso dato ciò che si osserva</td><td>da altre variabili presenti nel dataset</td><td>l'età manca più spesso per le donne che per gli uomini</td></tr>
+    <tr><td><strong>MNAR</strong>, non a caso: predittori non osservati</td><td>da una variabile che non è nel dataset</td><td>pazienti che lasciano uno studio clinico per il disagio</td></tr>
+    <tr><td><strong>MNAR</strong>, non a caso: il valore stesso</td><td>dal valore che manca</td><td>chi ha un reddito basso non lo dichiara</td></tr>
+  </tbody></table></div>
+  <p>La terminologia è dello statistico Donald Rubin (1976). Il meccanismo decide la cura. Se il valore manca a caso (MCAR o MAR) si possono cancellare le righe o stimare il valore mancante; le slide però precisano anche che cancellazione e imputazione semplice sono del tutto sicure solo con MCAR. Se manca in modo sistematico (MNAR) la mancanza stessa è un'informazione: si aggiunge un indicatore «mancante» o una categoria «non dichiarato». C'è poi un terzo caso, il mancante <strong>strutturale</strong>: il valore non è sconosciuto, semplicemente non esiste, e gli si assegna il valore logico.</p>
+  <p>È il caso degli 11 clienti Telco senza spesa totale, l'unica colonna con valori mancanti nel dataset. Hanno tutti permanenza zero: hanno appena firmato e non hanno ancora ricevuto una fattura. La loro spesa non è ignota, è zero. Sostituirla con la media (2.283 dollari) darebbe a un cliente appena arrivato il conto di circa tre anni.</p>
+  <p class="stmt"><strong>Prima di riempire un buco chiediti perché c'è: la conoscenza del dominio batte le regole automatiche.</strong></p>
+  <h3>Cancellare</h3>
+  <p>La soluzione più semplice è togliere le righe incomplete. Ma quali? La <strong>cancellazione listwise</strong> elimina l'intera osservazione appena le manca un valore qualsiasi. La <strong>cancellazione pairwise</strong> la toglie solo dalle analisi che usano proprio la variabile mancante.</p>
+  <figure>
+    <div class="w" id="b11del"></div>
+    <figcaption>Gli otto venditori delle slide, con genere, numero di addetti (<em>Manpower</em>) e vendite; i punti sono i valori mancanti. Nel primo riquadro, listwise: restano solo le 4 righe complete, e ogni analisi ha n = 4. Nel secondo, pairwise: ogni variabile usa tutte le righe in cui è presente, quindi n = 6 per gli addetti e 7 per vendite e genere.</figcaption>
+  </figure>
+  <p>La listwise è la più semplice ma riduce molto il campione; la pairwise conserva più dati, ma ogni analisi lavora su un campione diverso. Tutte e due vanno bene solo se i dati mancano completamente a caso: altrimenti le righe rimaste non somigliano più alla popolazione, e il modello impara una distorsione. In KNIME il nodo Missing Value con il trattamento «Remove Row» fa una cancellazione listwise; molti nodi di statistica lavorano pairwise da soli.</p>
+  <h3>Stimare il valore mancante</h3>
+  <p>L'<strong>imputazione</strong> sostituisce il valore mancante con una stima: la media o la mediana per una variabile numerica (la media se la distribuzione è simmetrica, la mediana se è asimmetrica, perché resiste ai valori estremi), la moda per una categorica. La stima può essere unica per tutti o dipendere da un gruppo.</p>
+  <div class="scroll"><table><thead><tr><th>Genere</th><th>Manpower</th><th>Sostituzione generale</th><th>Sostituzione per genere</th></tr></thead><tbody>
+    <tr><td>M</td><td>25</td><td>25</td><td>25</td></tr>
+    <tr><td>F</td><td>·</td><td><strong>28,33</strong></td><td><strong>25,00</strong></td></tr>
+    <tr><td>M</td><td>33</td><td>33</td><td>33</td></tr>
+    <tr><td>M</td><td>·</td><td><strong>28,33</strong></td><td><strong>29,75</strong></td></tr>
+    <tr><td>F</td><td>25</td><td>25</td><td>25</td></tr>
+    <tr><td>M</td><td>29</td><td>29</td><td>29</td></tr>
+    <tr><td>·</td><td>26</td><td>26</td><td>26</td></tr>
+    <tr><td>M</td><td>32</td><td>32</td><td>32</td></tr>
+  </tbody></table></div>
+  <p>Nella sostituzione generale ogni buco riceve la media dei 6 valori presenti: (25 + 33 + 25 + 29 + 26 + 32) / 6 = 28,33. Nella sostituzione per somiglianza ogni buco riceve la media del suo gruppo: fra gli uomini (25 + 33 + 29 + 32) / 4 = 29,75, fra le donne 25.</p>
+  <div class="quiz inq" data-quiz="11b"></div>
+  <p>Il metodo più raffinato usa un <strong>modello predittivo</strong>: la variabile incompleta diventa il target. Le righe in cui è presente servono da insieme di addestramento, si impara una funzione delle altre variabili, e la si applica alle righe in cui manca. Vanno bene la regressione (lineare o logistica), i k vicini più vicini (k-NN), gli alberi e le random forest, o l'imputazione multipla (MICE), che ripete la stima più volte.</p>
+  <p>Ha tre limiti. I valori stimati da un modello sono più regolari di quelli veri, quindi la varianza viene sottostimata. Se le altre variabili non sono legate a quella incompleta, le stime sono imprecise. E i modelli generativi, che possono riempire i buchi usando il contesto (dedurre la lingua dalla nazionalità), a volte inventano valori plausibili ma falsi. La regola delle slide: non inventare un segnale dove non c'è; imputare solo quando il contesto dà prove forti, tenere un indicatore delle celle imputate e validare su dati veri.</p>
+  <p>In KNIME il nodo Missing Value ha due livelli di impostazioni. Il trattamento per colonna ha la precedenza: per TotalCharges un valore fisso, 0. Il trattamento per tipo di dato vale per tutte le altre colonne: per le stringhe il valore più frequente, per i decimali la media, per gli interi nulla. Le slide aggiungono un dettaglio: la mediana su una colonna di interi la trasforma in decimali, quindi conviene lasciare stare gli interi quando non manca nulla.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando un valore è troppo lontano?</h2>
+  <p>Un <strong>valore anomalo</strong> (<em>outlier</em>) è un'osservazione che sembra lontana dallo schema tipico del campione. Nell'esempio delle slide il reddito medio annuo di 50 clienti è di 0,8 milioni di dollari, ma due clienti guadagnano 4,0 e 4,2 milioni. Se non ci si fa attenzione, un modello predittivo può produrre stime molto sbagliate.</p>
+  <p>Un anomalo può vedersi su una sola variabile (<strong>univariato</strong>) o solo guardando più variabili insieme (<strong>multivariato</strong>): ogni valore sembra normale, la combinazione no.</p>
+  <figure>
+    <div class="w" id="b11multi"></div>
+    <figcaption>Altezza e peso di un gruppo di persone, dati simulati come nelle slide. Nessun valore è anomalo da solo: i punti rossi stanno dentro l'intervallo normale sia sull'asse orizzontale sia su quello verticale. Ma nel piano tre atleti spiccano: due troppo leggeri e uno troppo pesante per la loro altezza.</figcaption>
+  </figure>
+  <p>Per una variabile alla volta la regola più usata è quella del box plot. Si calcolano il primo e il terzo quartile (\(Q_1\) e \(Q_3\), il 25° e il 75° percentile) e lo scarto interquartile IQR = \(Q_3 - Q_1\). Sono anomali i valori oltre le due «staccionate»:</p>
+  <div class="eq">\[ \text{sotto } Q_1 - 1{,}5 \cdot \text{IQR} \qquad\text{oppure sopra } Q_3 + 1{,}5 \cdot \text{IQR} \]</div>
+  <figure>
+    <div class="w" id="b11fence"></div>
+    <figcaption>La regola del box plot sulla spesa totale dei clienti Telco che se ne sono andati, ricalcolata sul dataset. La scatola va da \(Q_1\) a \(Q_3\), la staccionata superiore sta a 1,5 IQR sopra \(Q_3\). I 109 clienti persi oltre la staccionata, in rosso, sono anomali dentro il loro gruppo: clienti fedeli e spendaccioni che se ne sono andati. Quella inferiore è negativa e non trova nessuno.</figcaption>
+  </figure>
+  <p>La regola dell'IQR usa solo la metà centrale dei dati, quindi è robusta e funziona anche con variabili asimmetriche. L'alternativa, lo <strong>z-score</strong>, misura la distanza dalla media in deviazioni standard e presuppone una variabile più o meno normale. Le slide raccolgono le regole pratiche.</p>
+  <div class="scroll"><table><thead><tr><th>Regola</th><th>Che cosa segnala</th></tr></thead><tbody>
+    <tr><td>Percentili</td><td>valori fuori dall'intervallo fra il 5° e il 95° percentile (o fra l'1° e il 99°)</td></tr>
+    <tr><td>Deviazioni standard</td><td>valori a 3 o più deviazioni standard dalla media</td></tr>
+    <tr><td>Distanza di Mahalanobis</td><td>punti lontani dal centro dei dati, tenendo conto delle correlazioni: anomali multivariati</td></tr>
+    <tr><td>Punti influenti</td><td>in una regressione, leva e distanza di Cook dicono quanto una sola osservazione sposta i coefficienti</td></tr>
+    <tr><td>Isolation Forest</td><td>alberi casuali che isolano le osservazioni con tagli a caso: gli anomali, pochi e diversi, si isolano in pochi tagli</td></tr>
+  </tbody></table></div>
+  <p class="stmt"><strong>Un valore anomalo è sempre relativo a un modello di che cosa è «normale»:</strong> a una variabile, a un gruppo, a un modello.</p>
+  <p>Il dataset Telco lo mostra. Su tutto il campione la spesa totale non ha anomali: la staccionata superiore, circa 8.885 dollari, supera il massimo di 8.685. Fra i clienti persi invece la distribuzione è molto più compressa (mediana 704 dollari contro 1.683 di chi resta), e 109 clienti persi sono anomali sulla spesa totale, 23 sulla permanenza. Il nodo Numeric Outliers, con k = 1,5 e le staccionate calcolate separatamente per gruppo di abbandono, li riporta alla staccionata: 5.632 dollari e 69,5 mesi (il valore esatto della staccionata dipende da come si calcolano i quartili; nella figura, con un altro metodo, è circa 5.630).</p>
+  <div class="quiz inq" data-quiz="11c"></div>
+  <p>Da dove vengono gli anomali? Le slide ne elencano sette fonti: errori di inserimento (chi trascrive sbaglia), errori di misura (la più comune: uno strumento difettoso, una bilancia rotta su dieci), errori sperimentali (un evento anomalo altera l'esperimento), anomali intenzionali (sulle domande delicate pochi riportano il valore vero, come il consumo di alcol), errori di elaborazione (manipolare o unire più fonti introduce errori), errori di campionamento (giocatori di basket in un campione di atleti di cui si misura l'altezza) e anomali naturali, valori estremi ma veri, spesso i più interessanti.</p>
+  <h3>Che cosa fa un valore anomalo alle statistiche e ai modelli</h3>
+  <figure>
+    <div class="w" id="b11stat"></div>
+    <figcaption>I dati delle slide: undici valori fra 4 e 7, poi gli stessi con un dodicesimo valore, 300. Per ogni statistica la barra grigia è senza il valore anomalo, quella rossa con. Media e deviazione standard esplodono, mediana e moda quasi non si muovono: sono statistiche robuste.</figcaption>
+  </figure>
+  <p>La regressione lineare e i modelli simili minimizzano la somma degli errori al quadrato, quindi un solo punto lontano pesa moltissimo: può tirare la retta e cambiarne intercetta e pendenza, gonfia la variabilità degli errori (intervalli di confidenza più larghi), altera l'R² (un legame forte sembra debole, o ne compare uno falso) e viola le ipotesi sui residui, rendendo inaffidabili p-value e test t.</p>
+  <figure>
+    <div class="w" id="b11reg"></div>
+    <figcaption>Dati simulati, come l'esempio illustrativo delle slide (in cui la pendenza passa da 2,01 a 1,39). La retta grigia è stimata sui punti bianchi; quella rossa sugli stessi punti più quello rosso, lontano in basso a destra. Le pendenze scritte sotto sono calcolate sui punti disegnati.</figcaption>
+  </figure>
+  <p>Nei modelli di machine learning dipende dall'architettura. Nei modelli basati sulle <strong>distanze</strong> (k-NN, k-means, SVM, le macchine a vettori di supporto) l'impatto è alto: un anomalo può prendersi il vicinato dei punti vicini o spostare il centro di un gruppo. Nei modelli basati sul <strong>gradiente</strong> (reti neurali, regressione logistica) è alto: errori grandi danno gradienti enormi, i pesi si aggiornano troppo e l'addestramento diventa instabile. Negli <strong>alberi</strong> (alberi di decisione, random forest, XGBoost) è basso o moderato: un taglio come «età &gt; 50» non cambia se il valore estremo è 150 o 1.000; il rischio è che un albero profondo crei una foglia per un singolo anomalo.</p>
+  <h3>Che cosa farne</h3>
+  <div class="scroll"><table><thead><tr><th>Trattamento</th><th>Quando</th></tr></thead><tbody>
+    <tr><td>Cancellare (<em>trimming</em>)</td><td>errori di inserimento, o pochi anomali; si possono anche tagliare le code</td></tr>
+    <tr><td>Sostituire</td><td>come per i mancanti: media, mediana, moda o un modello</td></tr>
+    <tr><td>Trasformare</td><td>logaritmo, radice quadrata, classi, o pesi più bassi</td></tr>
+    <tr><td>Limitare (<em>capping</em>, o winsorizzazione)</td><td>riportare i valori a un percentile (1° e 99°, 5° e 95°) o alle staccionate del box plot</td></tr>
+    <tr><td>Trattare a parte</td><td>molti anomali: un modello dedicato, integrato con quello di base</td></tr>
+  </tbody></table></div>
+  <p>Prima di agire bisogna chiedersi se l'anomalo è un errore o un valore naturale: gli errori si correggono, gli anomali naturali spesso portano il segnale. Una coda lunga si può anche addomesticare con una trasformazione, ma quale?</p>
+  <figure>
+    <div class="w" id="b11tr"></div>
+    <figcaption>La spesa totale dei 7.043 clienti Telco (con i mancanti a zero) in tre versioni, ciascuna in 12 classi uguali fra minimo e massimo, con l'asimmetria calcolata sul dataset. Nel primo riquadro i valori originali, con una coda lunga a destra (+0,96). Nel secondo la radice quadrata, quasi simmetrica (+0,31). Nel terzo il logaritmo di (spesa + 1), che corregge troppo (−0,82) per via dei molti clienti recenti con spese piccole.</figcaption>
+  </figure>
+  <p>La trasformazione si sceglie guardando il risultato, non per abitudine. In KNIME la scrive il nodo Math Formula, per esempio <code>ln($TotalCharges$ + 1)</code>; il «+ 1» evita il logaritmo di zero.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Dare al modello le variabili giuste</h2>
+  <p>Un timestamp come «2026-12-24 08:00» non dice nulla a un modello. Scomposto in stagione (inverno), ora (8), fine settimana (no) e festivo (sì), gli dà un contesto che può usare. È la <strong>feature engineering</strong>: usare la conoscenza del dominio per estrarre dai dati grezzi caratteristiche (<em>feature</em>) che fanno funzionare gli algoritmi. «Garbage in, garbage out»: se entrano dati spazzatura, esce spazzatura.</p>
+  <p>Lo scopo è sempre un modello migliore, ma i motivi cambiano con il tipo di modello.</p>
+  <div class="scroll"><table><thead><tr><th>Modelli</th><th>Problema</th><th>Feature engineering</th></tr></thead><tbody>
+    <tr><td rowspan="3">Tradizionali: regressione lineare e logistica, ANOVA</td><td>linearità e normalità: dati asimmetrici rendono inaffidabili previsioni e p-value</td><td>trasformazioni logaritmiche, quadratiche, esponenziali; termini di interazione (se l'effetto del prezzo sulle vendite dipende dalla stagione, prezzo × stagione)</td></tr>
+    <tr><td>multicollinearità: variabili molto correlate (altezza in centimetri e in pollici) si nascondono a vicenda</td><td>selezione delle variabili o riduzione della dimensione (per esempio PCA, l'analisi delle componenti principali)</td></tr>
+    <tr><td>interpretabilità: il coefficiente deve avere senso per una persona</td><td>un indicatore «fine settimana» al posto del timestamp grezzo</td></tr>
+    <tr><td rowspan="3">Machine learning: reti neurali, gradient boosting, random forest</td><td>far emergere il segnale: in teoria imparano tutto, ma con molti dati e molto calcolo</td><td>dalla latitudine e longitudine, la distanza dal centro città</td></tr>
+    <tr><td>stabilità numerica: la discesa del gradiente soffre le scale diverse</td><td>riscalare tutte le variabili</td></tr>
+    <tr><td>sovradattamento: i modelli complessi memorizzano rumore e anomali</td><td>classi (età 18-25, 26-35...) invece dei valori puntuali</td></tr>
+  </tbody></table></div>
+  <p>La cassetta degli attrezzi ha quattro scomparti. Le variabili categoriche diventano numeri con la codifica <strong>one-hot</strong>, una colonna di 0 e 1 per categoria, adatta alle variabili nominali (colore, paese), o con la codifica <strong>ordinale</strong>, interi 1, 2, 3 che conservano l'ordine (basso, medio, alto). In KNIME: One to Many e Category to Number.</p>
+  <figure>
+    <div class="w" id="b11onehot"></div>
+    <figcaption>La codifica one-hot del contratto Telco: una colonna diventa tre colonne di 0 e 1, una per categoria, con un solo 1 per riga. Il modello non deve inventarsi un ordine fra le categorie (con una codifica 1, 2, 3 un contratto biennale varrebbe «il doppio» di uno annuale).</figcaption>
+  </figure>
+  <p>Le variabili numeriche si riscalano, perché nessuna domini solo perché ha numeri più grandi (lo stipendio rispetto all'età). La <strong>normalizzazione min-max</strong> le schiaccia fra 0 e 1, utile per le reti neurali; la <strong>standardizzazione</strong> (z-score) dà media 0 e deviazione standard 1, e regge meglio i valori anomali. In KNIME: Normalizer.</p>
+  <div class="eq">\[ x' = \frac{x - \min}{\max - \min} \qquad\qquad z = \frac{x - \bar{x}}{s} \]</div>
+  <p>Gli ultimi due scomparti creano variabili nuove. Le <strong>interazioni</strong> moltiplicano due variabili per catturarne l'effetto combinato (l'effetto della posizione può dipendere dall'ora del giorno); le <strong>variabili polinomiali</strong>, come \(x^2\), permettono a un modello lineare di seguire una curva. In KNIME: Math Formula ed Expression.</p>
+  <p>Nel workflow Telco della lezione il nodo Math Formula crea il logaritmo della spesa totale e il Rule Engine crea <em>tenure_group</em>, la permanenza in classi pensate per il business; le regole si valutano in ordine e vince la prima vera. One to Many trasforma contratto, servizio internet e classe di permanenza in colonne 0 e 1 (30 colonne in tutto) e Normalizer riscala le variabili numeriche fra 0 e 1.</p>
+  <figure>
+    <div class="w" id="b11tg"></div>
+    <figcaption>Il tasso di abbandono nelle quattro classi di permanenza create con il Rule Engine, ricalcolato sul dataset. La nuova variabile separa bene i clienti: dal 47% nel primo anno al 10% dopo quattro anni.</figcaption>
+  </figure>
+  <div class="quiz inq" data-quiz="11d"></div>
+  <p>Anche l'AI generativa può dare una mano, come un copilota. Descritto il problema e le colonne, un modello linguistico propone variabili di dominio: nell'esempio illustrativo delle slide la spesa media mensile su tutta la relazione (spesa totale / permanenza), un indicatore di aumento della bolletta (spesa mensile meno spesa media), il numero di servizi sottoscritti, il pagamento automatico. Può anche scrivere il codice o le espressioni di KNIME per calcolarle; K-AI lo fa dentro KNIME. Ogni proposta però va controllata: plausibilità, guadagno vero su un insieme di test, e soprattutto <strong>leakage</strong>, cioè variabili che usano il target. Ne parleremo fra poco.</p>
+  <p>Un'altra tentazione è creare righe sintetiche per bilanciare gli eventi rari (frodi, abbandoni, guasti). <strong>SMOTE</strong> crea nuovi casi della classe rara interpolando fra casi vicini (in KNIME c'è un nodo SMOTE); i modelli generativi come GAN e VAE producono righe realistiche. Il rischio è il <em>model collapse</em>: affidarsi troppo ai dati sintetici amplifica le distorsioni esistenti e cancella gli schemi rari ma veri. La regola: si aumenta solo l'insieme di addestramento, mai quello di test, e si valida sempre su dati veri al 100%. Nel Telco i clienti persi sono il 26,5%: uno sbilanciamento moderato, che pesi per classe o SMOTE possono aiutare.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Un caso vero: le prenotazioni che saltano</h2>
+  <p>Gli alberghi vendono le camere mesi prima, ma circa una prenotazione su tre viene cancellata, e una camera liberata all'ultimo momento è difficile da rivendere. Gli alberghi reagiscono con l'<em>overbooking</em> (vendere più camere di quelle che hanno) e con politiche di caparra, costose se sbagliate. L'obiettivo del caso è stimare, nel momento della prenotazione, la probabilità che venga cancellata: per decidere quante camere in più vendere, a chi chiedere un anticipo, a chi mandare un promemoria o un'offerta.</p>
+  <p>I dati sono veri: 119.390 prenotazioni di due alberghi portoghesi, un resort in Algarve (40.060) e un albergo di città a Lisbona (79.330), con arrivo fra luglio 2015 e agosto 2017; 32 colonne del sistema di prenotazione; il 37,0% è stato cancellato (il target, <em>is_canceled</em> = 1). Il dataset è stato pubblicato da Antonio, de Almeida e Nunes nel 2019.</p>
+  <h3>Primo passo: togliere ciò che il modello non potrebbe sapere</h3>
+  <p>Per ogni colonna le slide fanno una domanda: conoscerei questo valore quando serve la previsione? Il <strong>leakage</strong> (fuga di informazione) è un predittore che contiene informazioni sul target non disponibili al momento della previsione: il modello sembra brillante nei test e fallisce in produzione.</p>
+  <figure>
+    <div class="w" id="b11leak"></div>
+    <figcaption>La tabella di contingenza fra lo stato della prenotazione (<em>reservation_status</em>) e il target, ricalcolata sul dataset. Ogni stato corrisponde a un solo valore del target: è il target travestito. Qualsiasi albero arriverebbe al 100% di accuratezza con un solo taglio, e in produzione non servirebbe a nulla, perché lo stato si conosce solo dopo.</figcaption>
+  </figure>
+  <p>Con lo stato escono altre due colonne. La data dello stato si scrive quando l'ospite cancella o parte. Il tipo di camera assegnata si decide all'arrivo: le prenotazioni con la camera cambiata vengono cancellate nel 5,4% dei casi contro il 41,6%, ma solo perché chi cancella non arriva mai. Un caso da discutere è la caparra non rimborsabile: il 99,4% di queste prenotazioni risulta cancellato, un dato sospetto, ma è noto al momento della prenotazione e quindi resta. In KNIME un Column Filter esclude le tre colonne.</p>
+  <h3>Secondo passo: i mancanti travestiti</h3>
+  <p>KNIME dice che non manca nessun valore. Davvero? La colonna dei bambini viene letta come testo, perché 4 celle contengono la scritta «NA»; agente e società di riferimento hanno centinaia di codici, fra cui il testo «NULL». Bisogna sempre guardare il tipo e il numero di valori distinti, non solo il conteggio dei mancanti.</p>
+  <div class="scroll"><table><thead><tr><th>Colonna</th><th>Codice</th><th>Righe</th><th>Perché manca</th><th>Trattamento</th></tr></thead><tbody>
+    <tr><td>children</td><td>«NA»</td><td>4</td><td>lacune casuali di inserimento</td><td>moda, cioè 0</td></tr>
+    <tr><td>meal</td><td>«Undefined»</td><td>1.169</td><td>nel dizionario dei dati vuol dire SC, nessun pasto</td><td>ricodificare in SC</td></tr>
+    <tr><td>country</td><td>«NULL»</td><td>488</td><td>non registrato</td><td>nuova categoria «Unknown»</td></tr>
+    <tr><td>agent</td><td>«NULL»</td><td>16.340</td><td>strutturale: prenotato senza agenzia</td><td>indicatore <em>has_agent</em>, si toglie il codice</td></tr>
+    <tr><td>company</td><td>«NULL»</td><td>112.593</td><td>strutturale: non è una prenotazione aziendale</td><td>indicatore <em>has_company</em>, si toglie il codice</td></tr>
+    <tr><td>segmento e canale</td><td>«Undefined»</td><td>5</td><td>sconosciuto, troppo pochi per contare</td><td>cancellare le righe</td></tr>
+  </tbody></table></div>
+  <p>Cancellare le righe con un valore mancante eliminerebbe quasi tutti i dati: la sola colonna company manca nel 94% delle righe, e le slide parlano del 95%; contando anche agent, paese e bambini, ricalcolando sul dataset, le righe con almeno un mancante sono il 99,8%. E la mancanza qui dice qualcosa.</p>
+  <figure>
+    <div class="w" id="b11flag"></div>
+    <figcaption>La quota di prenotazioni cancellate secondo che il valore sia presente (grigio) o mancante (arancione), per tre colonne, ricalcolata sul dataset. Chi prenota senza agenzia cancella meno (24,7% contro 39,0%), le prenotazioni aziendali molto meno (17,5% contro 38,2%), e quelle con paese sconosciuto solo nel 13,7% dei casi (11,9% dopo la pulizia del terzo passo, come nella figura sui gruppi di paese).</figcaption>
+  </figure>
+  <p>Sono mancanti strutturali o non casuali: un indicatore conserva il segnale, mentre cancellare o imputare lo distruggerebbe. In KNIME un nodo Expression scrive le quattro regole (per esempio <code>if($["agent"] == "NULL", 0, 1)</code> per <em>has_agent</em>); per i bambini, String to Number trasforma «NA» in un vero mancante e Missing Value lo sostituisce con la moda.</p>
+  <h3>Terzo passo: gli errori non sono anomali</h3>
+  <p>Un valore impossibile è un errore e si toglie: 180 prenotazioni con zero ospiti, una notte a 5.400 euro, una tariffa negativa (−6,38 euro), più le 5 righe con segmento indefinito. In tutto 187 righe, lo 0,16%: si passa da 119.390 a 119.203 righe. Un valore estremo ma plausibile invece porta informazione e non si cancella: prenotazioni fatte fino a 737 giorni prima, tariffe fino a 510 euro (suite in alta stagione), gruppi fino a 55 adulti, fino a 391 giorni in lista d'attesa.</p>
+  <p>Per i valori estremi plausibili il workflow usa la regola dell'IQR solo verso l'alto (le staccionate inferiori dell'anticipo in città e della tariffa nel resort sono negative, −188 giorni e −62 euro, e non hanno senso; ricalcolando sul dataset, quella della tariffa in città è invece +9 euro, quindi la scelta di limitare solo in alto è una scelta del workflow, non una necessità) e calcola le staccionate per albergo: 200 euro a notte sono normali nel resort in agosto, estremi in città. Vengono limitati 2.986 valori di anticipo (a circa un anno) e 3.413 tariffe.</p>
+  <p>Non sempre la regola funziona. Il 97% delle prenotazioni non ha passato nemmeno un giorno in lista d'attesa: \(Q_1 = Q_3 = 0\), quindi IQR = 0, e ogni valore diverso da zero (3.693 prenotazioni) verrebbe segnalato come anomalo e azzerato. Meglio trasformare la variabile in un indicatore: ha atteso o no. Chi ha atteso cancella nel 63,9% dei casi, chi non ha atteso nel 36,2%.</p>
+  <p>E gli alberi, che si useranno su questi dati nelle lezioni 13 e 14, hanno bisogno di trattare gli anomali? Poco: un albero taglia su soglie, conta solo l'ordine dei valori, e un valore estremo non tira il modello come in una regressione. Gli errori però vanno tolti comunque, perché falsano statistiche, grafici e ogni altro modello; il limite agli estremi conta soprattutto per regressione lineare e logistica, k-NN e reti neurali.</p>
+  <div class="quiz inq" data-quiz="11e"></div>
+  <h3>Quarto passo: variabili nuove</h3>
+  <p>Un solo nodo Expression aggiunge nove variabili e, con le due del passo precedente, si arriva a undici.</p>
+  <div class="scroll"><table><thead><tr><th>Nuova colonna</th><th>Come si calcola</th><th>Perché</th></tr></thead><tbody>
+    <tr><td>total_nights</td><td>notti nel fine settimana + notti feriali</td><td>durata del soggiorno</td></tr>
+    <tr><td>total_guests</td><td>adulti + bambini + neonati</td><td>dimensione del gruppo</td></tr>
+    <tr><td>has_kids</td><td>1 se bambini + neonati &gt; 0</td><td>le famiglie si comportano in modo diverso</td></tr>
+    <tr><td>adr_per_person</td><td>tariffa media giornaliera / (adulti + bambini)</td><td>prezzo per ospite pagante (i neonati non pagano)</td></tr>
+    <tr><td>prev_cancel_rate</td><td>cancellazioni passate / prenotazioni passate</td><td>la storia del cliente come tasso</td></tr>
+    <tr><td>waiting_list</td><td>1 se i giorni in lista d'attesa sono &gt; 0</td><td>variabile piena di zeri resa binaria</td></tr>
+    <tr><td>country_group</td><td>Portogallo, Europa, resto del mondo, sconosciuto</td><td>178 codici diventano 4 gruppi</td></tr>
+    <tr><td>arrival_weekday</td><td>giorno della settimana dalla data di arrivo</td><td>effetto del calendario</td></tr>
+    <tr><td>canceled</td><td>«Yes» o «No» da is_canceled</td><td>gli alberi in KNIME vogliono una classe di tipo testo</td></tr>
+  </tbody></table></div>
+  <figure>
+    <div class="w" id="b11sig"></div>
+    <figcaption>Le nuove variabili portano segnale? Nel primo riquadro la quota di cancellazioni per gruppo di paese, nel secondo per anticipo della prenotazione in giorni; dati delle slide, ricontrollati sul dataset ripulito. Chi prenota dal Portogallo cancella più della metà delle volte; più la prenotazione è lontana, più è probabile che salti.</figcaption>
+  </figure>
+  <p>Altri due segnali forti: i clienti con cancellazioni passate cancellano nel 91,7% dei casi (33,9% senza), e una richiesta speciale abbassa il rischio dal 47,8% al 22,0%. Prima del modello si tolgono anche le colonne che non devono entrare: la copia numerica del target, l'anno, la settimana e il giorno del mese di arrivo (un anno futuro non compare mai nell'addestramento), i codici di agente, società e paese sostituiti da indicatori e gruppi, e i giorni in lista d'attesa sostituiti dall'indicatore. Il risultato: 119.203 righe, 31 predittori e il target, nessuna cella mancante, 37,1% di cancellazioni.</p>
+</div></section>
+
+<section class="recap"><div class="col">
+  <h2>La lezione 11 in sintesi</h2>
+  <p>Le idee di questa lezione in un solo posto, da ripassare prima del quiz: prima la mappa, poi la tabella delle decisioni.</p>
+  <figure>
+    <div class="w" data-mappa="11"></div>
+    <figcaption>La mappa della lezione: i passi della preparazione, i valori mancanti, gli anomali, la feature engineering e il caso delle prenotazioni alberghiere.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Situazione</th><th>Decisione</th><th>Esempio</th></tr></thead><tbody>
+    <tr><td>valore mancante a caso (MCAR, MAR)</td><td>cancellare la riga o imputare (media, mediana, moda, modello)</td><td>4 «NA» nei bambini: moda</td></tr>
+    <tr><td>valore mancante sistematico (MNAR)</td><td>indicatore o categoria «non dichiarato»</td><td>paese «NULL»: categoria «Unknown»</td></tr>
+    <tr><td>valore mancante strutturale</td><td>valore logico, o indicatore</td><td>spesa totale dei clienti nuovi = 0; has_agent</td></tr>
+    <tr><td>valore impossibile</td><td>correggere o togliere</td><td>zero ospiti, 5.400 euro a notte</td></tr>
+    <tr><td>valore estremo ma plausibile</td><td>tenerlo, limitarlo o trasformarlo, secondo il modello</td><td>anticipo fino a 737 giorni: limite per albergo</td></tr>
+    <tr><td>colonna nota solo dopo l'evento</td><td>toglierla: è leakage</td><td>reservation_status</td></tr>
+    <tr><td>variabile categorica</td><td>one-hot (nominale) o codifica ordinale</td><td>contratto in tre colonne 0/1</td></tr>
+    <tr><td>variabili su scale diverse</td><td>min-max o z-score</td><td>Normalizer su permanenza e spese</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <div class="quiz" data-quiz="11"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se di questa lezione dovesse restarti una sola cosa: <strong>per ogni valore mancante chiediti perché manca, per ogni valore anomalo se è un errore, e per ogni colonna se la conosceresti al momento della previsione</strong>; le risposte decidono se cancellare, stimare, segnalare o tenere, e un modello perfetto in prova è un campanello d'allarme.</p>
+  <p>La lezione 12 risponde alla domanda successiva: costruito un modello, come si misura se prevede bene?</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

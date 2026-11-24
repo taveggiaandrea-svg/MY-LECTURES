@@ -53,11 +53,14 @@ def variants_of(mid):
     base = os.path.join(HERE, 'materie', mid)
     return sorted(d for d in os.listdir(base) if re.fullmatch(r'[a-z]{2}', d) and os.path.isdir(os.path.join(base, d, 'lezioni')))
 
+LANGNUMS = {}  # lingua -> numeri delle lezioni presenti, per la materia in costruzione (riempito da build_subject)
+
 def lang_bar(mid, cur, langs):
-    """Selettore di lingua nella barra superiore. langs: [(codice, nome, percorso relativo dalla pagina corrente)]."""
+    """Selettore di lingua nella barra superiore. langs: [(codice, nome, percorso relativo dalla pagina corrente)].
+    data-nums elenca le lezioni presenti in quella lingua: boot.js spegne il link sulle lezioni che lì non ci sono."""
     if len(langs) < 2:
         return ''
-    links = ''.join('<a href="%s" data-lang="%s" data-mid="%s"%s>%s</a>' % (href, code, mid, ' aria-current="true"' if code == cur else '', name)
+    links = ''.join('<a href="%s" data-lang="%s" data-mid="%s" data-nums="%s"%s>%s</a>' % (href, code, mid, ','.join(map(str, LANGNUMS.get(code, []))), ' aria-current="true"' if code == cur else '', name)
                     for code, name, href in langs)
     return '<div class="lang" role="group" aria-label="Lingua / Language">' + links + '</div>\n  '
 
@@ -66,11 +69,13 @@ def lang_redirect(mid, cur, langs):
     if len(langs) < 2:
         return ''
     m = ','.join("%s:'%s'" % (code, href) for code, _, href in langs)
+    ln = ','.join("%s:[%s]" % (code, ','.join(map(str, LANGNUMS.get(code, [])))) for code, _, _ in langs)
     # una pagina preparata in background (prerender) non deve reindirizzarsi; le regole di speculazione chiedono a Chrome
     # di preparare in anticipo l'altra lingua, così il cambio dal selettore è immediato
-    return ("<script>try{var p=localStorage.getItem('lingua-%s'),m={%s};"
-            "if(!document.prerendering&&p&&p!=='%s'&&m[p])location.replace(m[p]+location.hash)}catch(e){}</script>\n"
-            '<script type="speculationrules">{"prerender":[{"where":{"selector_matches":".lang a:not([aria-current])"},"eagerness":"eager"}]}</script>\n') % (mid, m, cur)
+    # non si cambia lingua se la lezione dell'indirizzo in quella lingua non c'è
+    return ("<script>try{var p=localStorage.getItem('lingua-%s'),m={%s},L={%s},h=location.hash.match(/lezione-(\\d+)/);"
+            "if(!document.prerendering&&p&&p!=='%s'&&m[p]&&!(h&&L[p].indexOf(+h[1])<0))location.replace(m[p]+location.hash)}catch(e){}</script>\n"
+            '<script type="speculationrules">{"prerender":[{"where":{"selector_matches":".lang a:not([aria-current])"},"eagerness":"eager"}]}</script>\n') % (mid, m, ln, cur)
 
 def build_page(mid, meta, src, out, up, cur, langs):
     """Costruisce una pagina della materia dalla cartella src (la materia o una sua lingua) in site/<out>/.
@@ -117,6 +122,9 @@ def build_subject(mid):
     codes = [(cur, meta.get('nome_lingua', cur.upper()), '')] + [(v, m.get('nome_lingua', v.upper()), v + '/') for v, m in vars_]
     # percorsi relativi: dalla pagina principale './' e 'en/'; da una lingua '../' e './'
     rel = lambda here: [(c, n, ('./' if p == here else (p if here == '' else '../' + p))) for c, n, p in codes]
+    LANGNUMS.clear(); LANGNUMS[cur] = lessons_of(main)
+    for v, _ in vars_:
+        LANGNUMS[v] = lessons_of(os.path.join(main, v))
     nums, titles = build_page(mid, meta, main, mid, '../', cur, rel(''))
     for v, m in vars_:
         build_page(mid, m, os.path.join(main, v), os.path.join(mid, v), '../../', v, rel(v + '/'))

@@ -52,7 +52,7 @@ Una materia può avere una seconda lingua in una sottocartella di due lettere (o
 
 Le due versioni sono copie separate: testo, figure (le etichette stanno dentro `js/lN.js`) e quiz. Una correzione a una figura o a un dato va fatta in entrambe le cartelle. Nella versione italiana i numeri seguono le convenzioni italiane (virgola decimale; punto delle migliaia dalle cinque cifre in su; in `js/macro.js` la funzione `fi`), mentre codice SQL e Spark, contenuto delle tabelle e risultati delle query restano con il punto decimale (funzione `fe`).
 
-**Big Data: le lezioni nuove si scrivono prima in italiano** (in `materie/bigdata/`). La versione inglese in `materie/bigdata/en/` si aggiunge solo su richiesta; finché manca, la pagina inglese semplicemente non ha quella lezione e il selettore apre la prima lezione disponibile.
+**Big Data: le lezioni nuove si scrivono prima in italiano** (in `materie/bigdata/`). La versione inglese in `materie/bigdata/en/` si aggiunge solo su richiesta; finché manca, la pagina inglese non ha quella lezione: sulle lezioni che esistono solo in italiano il link EN del selettore è spento (`build.py` scrive in `data-nums` le lezioni di ogni lingua, `boot.js` lo legge), e il reindirizzamento automatico alla lingua scelta non scatta se la lezione dell'indirizzo in quella lingua non c'è. Oggi: lezioni 1-9 in italiano e inglese, 10-16 solo in italiano. Le lezioni 10-16 usano anche i dati veri dei dataset pubblici del corso (Telco, Hotel Booking Demand, tweet, immagini di fusioni), salvati come piccoli estratti dentro `js/l10.js`, `js/l11.js` e `js/l16.js`; gli helper `st10`, `gauss10`, `vbars11` e `cm12` definiti in una lezione sono riusati dalle successive.
 
 ## Pubblicazione
 
