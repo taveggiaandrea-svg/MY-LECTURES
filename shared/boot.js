@@ -31,11 +31,31 @@ document.querySelectorAll('.lang a[data-lang]').forEach(a=>a.addEventListener('c
 const lessons=[...document.querySelectorAll('.lesson')],links=[...document.querySelectorAll('.top nav a')];
 /* le lezioni si cercano per numero (data-n), così una materia può cominciare da una lezione 0 */
 const NUMS=lessons.map(l=>+l.dataset.n),byN=n=>lessons[NUMS.indexOf(n)],done={};
+/* stacco fra docenti: se data-docente cambia fra una lezione e la successiva, etichetta nell'apertura, riquadro di chiusura e segno nel menu */
+const fill=(t,o)=>t.replace(/\{(\w+)\}/g,(_,k)=>String(o[k]).replace(/\. /g,'.\u00a0'));
+(function(){let p=1,from=0;const parts=[];
+  lessons.forEach((l,i)=>{const d=l.dataset.docente;if(!d)return;
+    if(i>0&&lessons[i-1].dataset.docente&&lessons[i-1].dataset.docente!==d){p++;parts.push({i,p})}
+    l.dataset.parte=p});
+  if(!parts.length)return;
+  const first={};lessons.forEach((l,i)=>{const q=l.dataset.parte;if(q&&!(q in first))first[q]=i});
+  lessons.forEach((l,i)=>{const q=+l.dataset.parte;if(!q)return;const d=l.dataset.docente,col=l.querySelector('section.hero .col');
+    if(col&&!col.querySelector('.parttag')){const t=el('p','parttag'+(q>1?' p'+Math.min(q,3):''),fill(UI.partTag,{p:q,d}));col.prepend(t)}
+    const lk=links.find(a=>+a.dataset.go===+l.dataset.n);
+    if(lk&&first[q]===i&&i>0){lk.classList.add('after','p'+Math.min(q,3));lk.title=fill(UI.partNav,{p:q,d})}
+    const nx=lessons[i+1];
+    if(nx&&nx.dataset.parte&&nx.dataset.parte!=l.dataset.parte){const ne=l.querySelector('.navend');
+      if(ne&&!l.querySelector('.partend')){const a=+lessons[first[q]].dataset.n,b=+l.dataset.n;
+        const box=el('div','partend','<b>'+fill(UI.partEnd,{d})+'</b>'+fill(UI.partEndTxt,{a,b,d,n:+nx.dataset.n,d2:nx.dataset.docente}));ne.before(box)}}
+    if(first[q]===i&&i>0){const sec=l.querySelector('section.hero')?.nextElementSibling?.querySelector('.col');
+      if(sec&&!sec.querySelector('.partstart')){const box=el('div','partstart p'+Math.min(q,3),'<b>'+fill(UI.partStart,{d})+'</b>'+fill(UI.partStartTxt,{p:q,d}));sec.prepend(box)}}
+  })})();
 lessons.forEach((l,i)=>{
   const nav=l.querySelector('.navend');if(!nav)return;
   const card=(m,cls,lab)=>{const t=byN(m).dataset.title;
     return '<a class="'+cls+'" href="#lezione-'+m+'" data-go="'+m+'"><span class="th" aria-hidden="true">'+(THUMB[m]||'')+'</span><span class="tx"><small>'+lab+'</small>'+m+' · '+t+'</span></a>'};
-  nav.innerHTML=(i>0?card(NUMS[i-1],'prev',UI.prev):'')+(i<NUMS.length-1?card(NUMS[i+1],'next',UI.next):'');
+  const nx=lessons[i+1],cross=nx&&l.dataset.parte&&nx.dataset.parte&&nx.dataset.parte!==l.dataset.parte;
+  nav.innerHTML=(i>0?card(NUMS[i-1],'prev',UI.prev):'')+(i<NUMS.length-1?card(NUMS[i+1],'next'+(cross?' cross':''),cross?fill(UI.partStart,{d:nx.dataset.docente}):UI.next):'');
 });
 function show(n,scroll){
   lessons.forEach(l=>{l.hidden=+l.dataset.n!==n});
@@ -173,7 +193,7 @@ var paintProgress=(function(){
   /* testo pulito di un nodo: niente figure, pulsanti o quiz; le formule già disegnate tornano in TeX */
   const BLK='p,h1,h2,h3,h4,li,div,figcaption,summary,tr,td,th,br,section,details';
   function clean(node){const c=node.cloneNode(true);
-    c.querySelectorAll('.stage,svg,canvas,script,style,button,input,select,.navend,.toc,.q,.ctl').forEach(x=>x.remove());
+    c.querySelectorAll('.stage,svg,canvas,script,style,button,input,select,.navend,.toc,.parttag,.partend,.partstart,.q,.ctl').forEach(x=>x.remove());
     c.querySelectorAll('.katex-display,.katex').forEach(k=>{if(!k.isConnected&&!c.contains(k))return;
       const a=k.querySelector('annotation'),d=k.classList.contains('katex-display');
       k.replaceWith(a?(d?'\\['+a.textContent+'\\]':'\\('+a.textContent+'\\)'):k.textContent)});

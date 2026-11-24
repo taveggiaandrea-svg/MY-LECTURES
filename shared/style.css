@@ -308,3 +308,13 @@ html.lp .askbtn,html.lp .askp{right:27px}
 @media (max-width:560px){.tocl{grid-template-columns:1fr}}
 /* passaggio fra le pagine (per esempio fra le lingue) in dissolvenza, dove il browser lo permette */
 @view-transition{navigation:auto}
+
+/* stacco fra docenti (data-docente sulle lezioni): parte 1 blu, parte 2 arancione, parte 3 verde */
+.hero .parttag{display:inline-block;margin:0 auto .2rem;padding:.22rem .8rem;border:1.5px solid var(--blue);color:var(--blue);border-radius:999px;font:500 .85rem/1.4 var(--sans);letter-spacing:.02em}
+.hero .parttag.p2{border-color:var(--orange);color:var(--orange)}.hero .parttag.p3{border-color:var(--green);color:var(--green)}
+.top nav a.after.p3{border-left-color:var(--green)}
+.partend,.partstart{width:100%;border:2px solid var(--blue);background:color-mix(in srgb,var(--blue) 10%,transparent);padding:1.1rem 1.3rem;font-family:var(--sans);line-height:1.5;text-align:center;border-radius:10px}
+.partend b,.partstart b{display:block;font-size:1.15rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.partstart.p2{border-color:var(--orange);background:color-mix(in srgb,var(--orange) 10%,transparent)}.partstart.p2 b{color:var(--orange)}
+.partstart.p3{border-color:var(--green);background:color-mix(in srgb,var(--green) 10%,transparent)}.partstart.p3 b{color:var(--green)}
+.navend a.cross{outline:2px solid var(--orange);outline-offset:-2px}.navend a.cross small{color:var(--orange)}

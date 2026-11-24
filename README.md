@@ -44,6 +44,8 @@ site/                il sito pubblicato: si genera con build.py, non si modifica
 
 Aggiungere `lezioni/lN.html` e `js/lN.js`, un link in `top.html`, una miniatura in `js/thumbs.js`, poi ricostruire e testare.
 
+Se il corso è diviso fra più docenti, ogni `<article class="lesson">` porta `data-docente="L. Molteni"` (stesso valore per tutte le lezioni di un docente). Dove il valore cambia, `shared/boot.js` aggiunge da solo lo stacco: etichetta «Parte N · docente» nell'apertura di ogni lezione, riquadro «Fine della parte di …» prima dei link in fondo all'ultima lezione del docente, riquadro «Inizia la parte di …» e segno colorato nel menu sulla prima lezione del docente successivo (parte 1 blu, 2 arancione, 3 verde). Big Data: lezioni 1-8 A. Rezzani, 9-16 L. Molteni, 17-24 Tonini.
+
 ### Materie in più lingue
 
 Una materia può avere una seconda lingua in una sottocartella di due lettere (oggi solo `materie/bigdata/en/`). `build.py` costruisce una pagina per lingua (`site/bigdata/` e `site/bigdata/en/`), aggiunge nella barra superiore il selettore delle lingue e uno script che ricorda la scelta (`localStorage`, chiave `lingua-<id>`) e riapre la stessa lezione nell'altra lingua, nello stesso punto (lezione, sezione e posizione passano in `localStorage`, chiave `salto-lingua`). Le regole di speculazione scritte da `build.py` fanno preparare a Chrome l'altra lingua in background, così il cambio è immediato; il passaggio fra le pagine è in dissolvenza (`@view-transition`). Dalla pagina iniziale il link della materia porta direttamente alla lingua scelta. `test.py` prova anche le pagine delle lingue.
