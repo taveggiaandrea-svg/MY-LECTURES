@@ -283,3 +283,7 @@ html::-webkit-scrollbar-thumb:hover{background:var(--fg)}
   pointer-events:none;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:top .08s linear}
 .prog.low{top:auto;right:auto;left:14px;bottom:14px}
 .prog[hidden]{display:none}
+/* mappe mentali dei riepiloghi: disegno largo o stretto secondo lo schermo */
+.mmap{width:100%;max-width:46rem;margin:0 auto}.mmap svg{display:block;width:100%}
+.mmap .mm-n{display:none}
+@media (max-width:560px){.mmap .mm-w{display:none}.mmap .mm-n{display:block;max-width:24rem;margin:0 auto}}

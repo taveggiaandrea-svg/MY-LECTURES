@@ -115,7 +115,34 @@ function quiz(root,qs){
     if(v!==null&&+v>=0&&+v<bsq.length){sel=+v;verify(false)}
   });
 }
-const INIT={},QZ={},THUMB={};
+const INIT={},QZ={},THUMB={},MAPPA={};
+/* mappa mentale per i riepiloghi: MAPPA[k]={c:'centro', r:[{t:'ramo', c:COLORE, v:['voce','voce']}]}, nell'HTML <div class="w" data-mappa="k"></div>.
+   Due disegni: largo (centro in mezzo, rami a destra e a sinistra) e stretto per i telefoni (centro in alto, rami in colonna); il CSS mostra quello giusto. */
+function mappa(root,m){
+  /* a capo stimando la larghezza del testo a 13 px: maiuscole più larghe, punteggiatura e lettere sottili più strette; n è la larghezza in caratteri medi */
+  const wid=t=>[...t].reduce((a,c)=>a+(/[A-Z]/.test(c)?1.32:/[mwMW]/.test(c)?1.45:/[ilj.,:;'!|() frt]/.test(c)?.62:1),0);
+  const wrap=(t,n)=>{const o=[];let l='';String(t).split(' ').forEach(w=>{if(l&&wid(l+' '+w)>n){o.push(l);l=w}else l=l?l+' '+w:w});if(l)o.push(l);return o};
+  const card=(x,y,w,b,n)=>{const ls=b.v.map(v=>wrap(v,n));const h=40+ls.reduce((a,l)=>a+l.length*18+6,0)+4;
+    let s='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="9" fill="#0d0d0d" stroke="'+b.c+'" stroke-width="1.6"/>'+tx(x+14,y+25,b.t,{s:14.5,a:'start',f:b.c,w:600});
+    let yy=y+48;ls.forEach(l=>{s+='<circle cx="'+(x+17)+'" cy="'+(yy-4.5)+'" r="2.6" fill="'+b.c+'"/>';l.forEach((t,j)=>s+=tx(x+28,yy+j*18,t,{s:13,a:'start',f:'#e6e6e6'}));yy+=l.length*18+6});
+    return {s,h}};
+  const hdr=(cx,cy,w,cw)=>{const h=26+cw.length*19;let s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="12" fill="#1c1c1c" stroke="#fff" stroke-width="1.8"/>';
+    cw.forEach((t,j)=>s+=tx(cx,cy-h/2+30+j*19,t,{s:15,f:'#fff',w:600}));return {s,h}};
+  /* largo: rami divisi fra destra e sinistra in modo da pareggiare le altezze, in senso orario */
+  const W=720,cwid=236,g=14,hs=m.r.map(b=>card(0,0,cwid,b,28).h);let k=Math.ceil(m.r.length/2),best=1e9;
+  for(let i=1;i<m.r.length;i++){const a=hs.slice(0,i).reduce((p,q)=>p+q+g,0),b=hs.slice(i).reduce((p,q)=>p+q+g,0);if(Math.abs(a-b)<best){best=Math.abs(a-b);k=i}}
+  const R=m.r.slice(0,k),Lf=m.r.slice(k).reverse(),col=bs=>bs.reduce((p,b)=>p+card(0,0,cwid,b,28).h+g,-g);
+  const H=Math.max(col(R),col(Lf),120)+20,cy=H/2,ce=hdr(W/2,cy,176,wrap(m.c,17)),sp=(i,n)=>n>1?(i/(n-1)-.5)*Math.min(ce.h-20,n*12):0;let s='',lines='';
+  [[R,W-cwid-8,W/2+88,1],[Lf,8,W/2-88,-1]].forEach(([bs,x,ex,d])=>{let y=(H-col(bs))/2;bs.forEach((b,i)=>{const c=card(x,y,cwid,b,28),my=y+c.h/2,tx_=d>0?x:x+cwid,sy=cy+sp(d>0?i:bs.length-1-i,bs.length)*(d>0?1:-1);
+    lines+='<path d="M'+ex+' '+sy+' C'+(ex+d*30)+' '+sy+','+(tx_-d*30)+' '+my+','+tx_+' '+my+'" fill="none" stroke="'+b.c+'" stroke-width="2" stroke-opacity=".8"/>';s+=c.s;y+=c.h+g})});
+  const a=el('div','mm-w');a.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Mappa mentale: '+m.c+'">'+lines+ce.s+s+'</svg>';
+  /* stretto: centro in alto, un tronco a sinistra, rami in colonna */
+  const N=360,ch=hdr(N/2,0,N-24,wrap(m.c,34));let y=ch.h+22,sn='',ln='',lastY=0;
+  m.r.forEach(b=>{const c=card(40,y,N-50,b,38);ln+='<path d="M22 '+(y+21)+' H40" stroke="'+b.c+'" stroke-width="2"/>';sn+=c.s;lastY=y;y+=c.h+12});
+  ln='<path d="M22 '+(ch.h+4)+' V'+(lastY+21)+'" stroke="#777" stroke-width="2"/>'+ln;
+  const b2=el('div','mm-n');b2.innerHTML='<svg viewBox="0 0 '+N+' '+(y-6)+'" role="img" aria-label="Mappa mentale: '+m.c+'">'+ln+'<g transform="translate(0,'+(ch.h/2+4)+')">'+ch.s+'</g>'+sn+'</svg>';
+  const box=el('div','mmap');box.append(a,b2);root.append(box);
+}
 
 /* strumenti condivisi dalle lezioni sul consumatore (7 e 8): piano dei panieri */
 const NS='http://www.w3.org/2000/svg',S=400,x0=46,y0=14,L=340;
@@ -430,6 +457,15 @@ QZ['1']=()=>[
   {q:'L\'ERP elenca 5 clienti; il CRM ne elenca 6, perché Mary Jane compare due volte, a Manchester e a Londra. In quale passo dell\'ETL si fondono i due record, e quanti clienti dovrebbe contare il warehouse?',o:['Extract; 6','Load; 11','Transform; 6','Transform; 5'],a:3,
    e:'L\'eliminazione dei duplicati e l\'integrazione sono regole di business e controlli di qualità, applicati nel passo Transform; entrambi i sistemi descrivono le stesse cinque persone, quindi il warehouse ne conta 5.',h:'Abbina ogni cliente del CRM a uno dell\'ERP.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[1]={c:'Perché non basta il database operativo?',r:[
+  {t:'Il problema',c:RED,v:['Gli stessi dati in più sistemi, con formati e versioni diversi','Progettato per scrivere singoli record, non per leggere milioni di righe','Report e transazioni si contendono la stessa macchina']},
+  {t:'Cinque fasi',c:ORG,v:['RDBMS e SQL, anni Ottanta','Data warehouse, anni Novanta','OLAP, fine anni Novanta','Data mining, dal 2000','Big Data, dal 2012']},
+  {t:'Report',c:YEL,v:['Operativo: ogni giorno, dettaglio più totali','Tattico: totali giornalieri o settimanali','Strategico: sintesi settimanale o mensile']},
+  {t:'Data warehouse',c:BLUE,v:['Database analitico separato, unica fonte di verità','ETL: extract, transform, load, con un\'area di staging','Base della Business Intelligence']},
+  {t:'OLAP',c:TEAL,v:['Cubi multidimensionali con metadati','Somme, medie e conteggi senza scrivere SQL','Report dinamici, come un\'enorme pivot']},
+  {t:'Analisi',c:PINK,v:['Descrittiva: riassume il passato','Predittiva: stima la probabilità di esiti futuri','Data mining e machine learning']},
+  {t:'Big Data',c:GRN,v:['Tre V: volume, velocità, varietà','Dati che un RDBMS non analizza in modo conveniente','Hadoop e Spark','Strutturati, semi-strutturati, non strutturati']}]};
 
 /* Lezione 2: che cos'è esattamente una tabella */
 INIT[2]=function(){
@@ -574,6 +610,14 @@ QZ['2']=()=>[
   {q:'Con la tabella Sales definita nella lezione e i clienti da 1 a 5, quanti vincoli viola <code>INSERT INTO Sales VALUES (7, \'2018-09-04\', 9, \'abc\', 0, 2.00)</code>?',o:['Nessuno','Uno','Due','Tre'],a:2,
    e:'Il cliente 9 non esiste, quindi la chiave esterna (integrità referenziale) non è rispettata; la quantità 0 viola CHECK (quantity &gt; 0) (integrità del dominio). sales_id 7 è nuovo, quindi la chiave primaria va bene: due vincoli.',h:'Controlla la riga nuova colonna per colonna rispetto al CREATE TABLE.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[2]={c:'Che cos\'è esattamente una tabella?',r:[
+  {t:'Struttura',c:BLUE,v:['Tabella (relazione): record per righe, campi per colonne','Ogni campo: nome, tipo di dato, vincolo NULL','Tipi: CHAR, VARCHAR, DATE, INT, FLOAT, DECIMAL','Indice: trova un record senza leggere tutto']},
+  {t:'Integrità',c:YEL,v:['Entità: chiave primaria, niente duplicati','Referenziale: chiave esterna, valore esistente o NULL','Dominio: tipi di dato, NULL e CHECK']},
+  {t:'Normalizzazione',c:GRN,v:['Ogni fatto in un solo posto','Prima forma normale: valori atomici e chiave primaria','Terza forma normale: niente dipendenze transitive']},
+  {t:'OLTP e data warehouse',c:ORG,v:['OLTP: normalizzato, transazioni senza errori','DWH: tabelle dei fatti (misure) e dimensioni (attributi)','Chiave surrogata dall\'ETL, chiave di business conservata']},
+  {t:'SQL',c:PINK,v:['Dichiarativo: dici che cosa, l\'ottimizzatore sceglie come','Sottolinguaggi DQL, DDL, DCL, DML','UPDATE e DELETE senza WHERE toccano tutte le righe']},
+  {t:'SELECT',c:TEAL,v:['Ordine: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY','Espressioni, alias, funzioni, DISTINCT','CASE: vince la prima condizione vera']}]};
 
 /* Lezione 3: come si combinano due tabelle */
 INIT[3]=function(){
@@ -699,6 +743,14 @@ QZ['3']=()=>[
   {q:'Sul terzo ordine di Trujillo, quanto vale il totale progressivo <code>SUM(TotalAmount) OVER (PARTITION BY customerid ORDER BY OrderDate ROWS UNBOUNDED PRECEDING)</code>, e che quota è di <code>SUM(TotalAmount) OVER (PARTITION BY customerid)</code> sulla stessa riga?',o:['7038,2, circa il 74%','5593,4, circa il 59%','7038,2, circa il 52%','9528,7, il 100%'],a:0,
    e:'Totale progressivo: 1863,4 + 3730 + 1444,8 = 7038,2. Il totale della partizione è l\'intero 9528,7 di Trujillo, e 7038,2 / 9528,7 ≈ 0,74.',h:'La prima finestra si ferma alla riga corrente; la seconda copre tutta la partizione.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[3]={c:'Come si combinano due tabelle?',r:[
+  {t:'Join',c:BLUE,v:['Prodotto cartesiano: tutte le coppie di righe','INNER JOIN: solo le coppie con ON vero','LEFT, RIGHT, FULL: anche le righe senza partner, con NULL']},
+  {t:'UNION',c:GRN,v:['Aggiunge righe, non colonne','UNION elimina i duplicati, UNION ALL li tiene']},
+  {t:'NULL',c:PUR,v:['Ogni confronto con NULL è UNKNOWN','ON, WHERE e HAVING tengono solo TRUE','IS NULL per verificare, COALESCE per sostituire']},
+  {t:'Raggruppare',c:YEL,v:['SUM, AVG, COUNT, MIN, MAX: molte righe, un valore','GROUP BY: una riga per gruppo','WHERE filtra le righe prima, HAVING i gruppi dopo']},
+  {t:'Sottoquery',c:PINK,v:['Una query dentro un\'altra: valore, elenco o tabella','Indipendente: eseguita una volta','Correlata: eseguita per ogni riga esterna','EXISTS: c\'è almeno una riga?']},
+  {t:'Funzioni analitiche',c:TEAL,v:['Calcolano sul gruppo ma tengono ogni riga','OVER: PARTITION BY, ORDER BY, finestra','ROW_NUMBER, LAG e LEAD, media mobile, totale progressivo']}]};
 
 /* Lezione 4: gli strumenti dei Big Data */
 INIT[4]=function(){
@@ -834,6 +886,14 @@ QZ['4']=()=>[
   {q:'Quale abbinamento fra dati e modello di coerenza è in linea con la discussione della lezione?',o:['Saldi bancari: BASE; like sui social: ACID','Saldi bancari: ACID; un contatore di like su un social network: BASE','Entrambi richiedono BASE','Entrambi richiedono ACID, altrimenti i dati vanno persi'],a:1,
    e:'Un bonifico deve essere tutto o niente e sempre coerente (ACID); un contatore di like può essere per un attimo non aggiornato su alcuni nodi e diventare coerente dopo (BASE), in cambio di disponibilità e scala.',h:'Chiediti dove un valore temporaneamente sbagliato sarebbe accettabile.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[4]={c:'E se una macchina non basta?',r:[
+  {t:'Sistemi distribuiti',c:BLUE,v:['Nodo, rack, cluster','Scalabilità orizzontale: più server invece di uno più grande','Gli strumenti: Hadoop, Spark, NoSQL']},
+  {t:'NoSQL',c:ORG,v:['Distribuiti, senza schema, scalabili','ACID: atomicità, coerenza, isolamento, durabilità','BASE: sempre disponibile, a coerenza finale']},
+  {t:'Quattro famiglie',c:GRN,v:['Chiave-valore: DynamoDB','Documenti JSON o XML: MongoDB','A colonne: HBase, Cassandra','A grafo: Neo4j']},
+  {t:'Compressione per colonne',c:YEL,v:['Una colonna: un solo tipo, valori ripetuti','Dizionario: ⌈log₂ k⌉ bit per codice','Run-length: terne, meglio se la colonna è ordinata']},
+  {t:'Grafi',c:PINK,v:['Property graph: nodi e relazioni con proprietà','Relazioni orientate e con un nome','Cypher: si seguono gli archi invece dei join']},
+  {t:'Database vettoriali',c:TEAL,v:['Embedding: significati simili, vettori vicini','Similarità del coseno','Indici ANN: HNSW, IVF','Ricerca semantica, raccomandazioni, RAG']}]};
 
 /* Lezione 5: Hadoop, HDFS e MapReduce */
 /* rack aware placement of four blocks, three copies each: one rack holds one copy, another rack two */
@@ -966,6 +1026,13 @@ QZ['5']=()=>[
   {q:'Nella direzione moderna descritta nella lezione, che cosa prende il posto di HDFS e di MapReduce?',o:['YARN e Hive','Kafka e Zookeeper','HBase e Pig','L\'object storage, e motori come Spark, Trino o Flink'],a:3,
    e:'Il percorso moderno è object storage → Spark / Trino / Flink → Iceberg / Delta: lo storage nel cloud sostituisce HDFS, i motori più recenti sostituiscono MapReduce.',h:'Confronta i due riquadri della figura sugli stack strato per strato.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[5]={c:'Come si memorizza un file più grande di qualunque disco?',r:[
+  {t:'Hadoop',c:BLUE,v:['HDFS per memorizzare, MapReduce per calcolare','Open source, migliaia di nodi, hardware comune','Tollerante ai guasti']},
+  {t:'HDFS',c:GRN,v:['File tagliati in blocchi da 64 o 128 MB','Ogni blocco replicato 3 volte, su rack diversi','Name node: metadati; data node: letture e scritture','Erasure coding: sovraccarico del 50% invece del 200%']},
+  {t:'MapReduce',c:YEL,v:['Map: coppie chiave/valore vicino ai dati','Shuffle: stessa chiave, stesso reducer','Reduce: calcolo per chiave, risultato in HDFS','Per job batch, non per query interattive']},
+  {t:'Ecosistema',c:ORG,v:['Base: HDFS, YARN, MapReduce, Tez, Spark','Dati: Hive, Pig, HBase, Sqoop, Flume','Operativi: Ambari, Oozie, Zookeeper','Analisi: Mahout, Kylin, Spark, KNIME']},
+  {t:'Oggi',c:PINK,v:['Hadoop: infrastruttura già installata','Object storage con Spark, Trino, Flink','Formati di tabella: Iceberg, Delta Lake','Da imparare: i concetti, non MapReduce']}]};
 
 /* Lezione 6: Spark, RDD, DataFrame */
 const kvT=(k,v)=>'<tspan style="fill:#ccc">(</tspan><tspan style="fill:'+YEL+'">'+k+'</tspan><tspan style="fill:#ccc">, </tspan><tspan style="fill:'+BLUE+'">'+v+'</tspan><tspan style="fill:#ccc">)</tspan>';
@@ -1112,6 +1179,13 @@ QZ['6']=()=>[
   {q:'Un ingegnere filtra un RDD di oggetti User con una lambda su u.age; un altro filtra un DataFrame con df["age"] > 40. Perché Spark può ottimizzare solo il secondo?',o:['I DataFrame sono sempre memorizzati su disco','Spark conosce lo schema del DataFrame, mentre gli elementi di un RDD sono oggetti opachi','Gli RDD non si possono filtrare','Le lambda girano solo sul driver'],a:1,
    e:'Un DataFrame è una collezione con uno schema noto a Spark SQL, quindi Spark può vedere quale colonna viene usata; dentro un RDD di oggetti User Spark non vede la struttura.',h:'Ricorda i due riquadri della figura RDD contro DataFrame.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[6]={c:'Che cosa rende Spark così veloce?',r:[
+  {t:'In memoria',c:BLUE,v:['Legge una volta e tiene in memoria i risultati intermedi','Veloce anche su disco','Regressione logistica: oltre 100 volte più veloce']},
+  {t:'Cluster',c:ORG,v:['Driver: le istruzioni e la SparkSession','Cluster manager: YARN, Mesos, standalone','Worker ed executor eseguono i task','Shuffle: dati scambiati fra executor']},
+  {t:'RDD',c:TEAL,v:['Collezione immutabile e distribuita','Partizioni elaborate in parallelo','Creato da un file system o da una collezione']},
+  {t:'Esecuzione pigra',c:PINK,v:['Trasformazioni: aggiungono passi al DAG','Azioni: eseguono il DAG, come collect()','Stage tagliati a ogni shuffle']},
+  {t:'DataFrame e Spark SQL',c:YEL,v:['Colonne con un nome e uno schema noto','select, filter, groupBy, sum','Vista temporanea o tabella persistente','Fonti: CSV, JSON, JDBC, Parquet']}]};
 
 /* Lezione 7: Structured Streaming, grafi, MLlib */
 const GV={a:['Alice',34],b:['Bob',36],c:['Charlie',30],d:['David',29],e:['Esther',32],f:['Fanny',36],g:['Gabby',60]};
@@ -1248,6 +1322,13 @@ QZ['7']=()=>[
   {q:'Nel secondo esempio del corso, VectorAssembler, LinearRegression e RegressionEvaluator sono, in quest\'ordine,',o:['estimator, transformer, evaluator','transformer, transformer, estimator','evaluator, estimator, transformer','transformer, estimator, evaluator'],a:3,
    e:'VectorAssembler trasforma un DataFrame in un altro aggiungendo la colonna features (transformer); LinearRegression adatta un modello (estimator); RegressionEvaluator calcola una metrica delle previsioni (evaluator).',h:'Chiediti di ciascuno: aggiunge una colonna, impara dai dati, o dà un punteggio alle previsioni?'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[7]={c:'Come gestisce Spark i dati che non smettono di arrivare?',r:[
+  {t:'Structured Streaming',c:BLUE,v:['Un flusso è una tabella illimitata','La query si scrive una volta, come in batch','A ogni trigger si aggiorna la tabella dei risultati','readStream, window, writeStream']},
+  {t:'Grafi',c:PINK,v:['Property graph: vertici e archi con proprietà','GraphX su RDD, GraphFrames su DataFrame','Gradi e sottografi','PageRank, componenti connesse, triangoli']},
+  {t:'MLlib',c:GRN,v:['Regressione, classificazione, clustering, raccomandazione','Training set e test set','Preparare, addestrare, provare su dati nuovi']},
+  {t:'Pipeline',c:YEL,v:['Transformer: aggiunge una colonna','Estimator: impara un modello','Evaluator: misura la qualità','Stessi passi per addestramento e prova']},
+  {t:'Regressione logistica',c:TEAL,v:['Punteggio z = intercetta + somma dei pesi','Probabilità p = 1/(1 + e^(−z))','Sopra 0,5: etichetta 1']}]};
 
 /* Lezione 8: architetture con data lake */
 const HOT=ORG,COLD=BLUE;
@@ -1392,6 +1473,14 @@ QZ['8']=()=>[
   {q:'Nell\'era del data lake, che cosa contiene il data warehouse secondo la lezione?',o:['Tutti i dati grezzi, strutturati e non strutturati','Solo i dati freddi','I dati caldi dei processi ETL e i risultati distillati delle analisi eseguite sul lago','Niente: è sostituito dal lago'],a:2,
    e:'Il warehouse esiste ancora e contiene i dati caldi (dall\'ETL, direttamente dalle fonti o dal lago) e i dati distillati dalle analisi del lago, mantenendo le query a bassa latenza e i report esistenti.',h:'Il lago tiene i dati grezzi e quelli freddi.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[8]={c:'Dove vanno i dati grezzi?',r:[
+  {t:'Data lake',c:BLUE,v:['Dati grezzi nel formato nativo, più dati elaborati','Strutturati, semistrutturati, non strutturati','Basato su Hadoop e Spark']},
+  {t:'Lago e warehouse',c:ORG,v:['Warehouse: schema on write; lago: schema on read','Dati caldi nel warehouse, freddi nel lago','Il lago costa molto meno per terabyte']},
+  {t:'Adozione in quattro passi',c:GRN,v:['Area di staging dei dati grezzi','Laboratorio di data science','Offloading dei dati freddi','Componente principale']},
+  {t:'BI 2.0',c:YEL,v:['Le nuove fonti entrano direttamente nel lago','Parte dell\'ETL si sposta nel lago','Distillazione: risultati piccoli nel warehouse']},
+  {t:'Governance',c:PINK,v:['Governance, qualità, metadati, formazione','I metadati rendono il lago ricercabile','Qualità: etichettare, non filtrare in ingresso']},
+  {t:'Virtualizzazione',c:TEAL,v:['Uno strato logico, nessuna copia dei dati','Pro: costi minori, governance centrale','Contro: carica fonti e rete, lenta sui compiti complessi']}]};
 
 /* Lezione 9: AI predittiva e generativa, strutture di dati, casi d'uso */
 const PREDC=BLUE,GENC=PINK;
@@ -1552,6 +1641,14 @@ QZ['9']=()=>[
   {q:'Una banca vuole segnalare le transazioni con carta fraudolente, che sono circa lo 0,1% di tutte le transazioni. Quale impostazione corrisponde alla tabella della lezione?',o:['Regressione sull\'importo di ogni transazione','Clustering dei clienti in segmenti','Classificazione su dati molto sbilanciati, con individuazione delle anomalie e tecniche come SMOTE','Previsione su serie storiche delle transazioni della settimana prossima'],a:2,
    e:'L\'individuazione delle frodi è una classificazione con una classe positiva molto rara: modelli come i gradient boosted trees, con SMOTE per creare frodi sintetiche, e individuazione delle anomalie.',h:'Guarda l\'ultima tabella della lezione.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[9]={c:'Perché un modello predittivo ha bisogno di un data warehouse?',r:[
+  {t:'Predittiva e generativa',c:BLUE,v:['Predittiva: prevede un target dalle feature','Generativa: crea contenuti nuovi','Il valore viene ancora soprattutto dalla predittiva','Usano l\'AI l\'89%, high performer il 6%']},
+  {t:'BI e data warehouse',c:YEL,v:['Raccogliere, ripulire, trasformare, presentare','Garbage in, garbage out','Inmon: integrato, orientato ai soggetti, non volatile, variabile nel tempo','Data mart, data mesh, lakehouse']},
+  {t:'Big Data',c:GRN,v:['Cinque V: volume, varietà, velocità, valore, veridicità','Non solo volume, non solo web, non tutti','Fonti tradizionali ed emergenti, IoT','Fattori abilitanti e fattori scatenanti']},
+  {t:'Dalla domanda al modello',c:PINK,v:['Ciclo: dati, analisi, conoscenze, decisioni','Target, dati storici, modello validato, KPI','Undici casi aziendali']},
+  {t:'Insegnamenti dei casi',c:ORG,v:['Confrontarsi sempre con una baseline','Etica e diritto: GDPR, AI Act','Riaddestrare i modelli nel tempo']},
+  {t:'Compiti tipici',c:TEAL,v:['Abbandono: classificazione binaria','Frodi: dati sbilanciati, anomalie','Vendite: regressione e serie storiche','Guasti: classificazione e sopravvivenza']}]};
 
 /* ---------- Riquadri: ogni figura in un fotogramma nero ---------- */
 document.querySelectorAll('figure').forEach(f=>{
@@ -1592,6 +1689,7 @@ function show(n,scroll){
     renderMath(art);
     try{if(INIT[n])INIT[n]()}catch(e){console.error(e)}
     art.querySelectorAll('[data-quiz]').forEach(q=>{const f=QZ[q.dataset.quiz];if(f)quiz(q,f())});
+    art.querySelectorAll('[data-mappa]').forEach(q=>{const m=MAPPA[q.dataset.mappa];if(m)try{mappa(q,m)}catch(e){console.error(e)}});
   }
   if(scroll)window.scrollTo(0,0);
   if(typeof paintBar==='function')paintBar();

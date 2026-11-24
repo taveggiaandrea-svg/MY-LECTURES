@@ -157,3 +157,11 @@ QZ['9']=()=>[
   {q:'Una banca vuole segnalare le transazioni con carta fraudolente, che sono circa lo 0,1% di tutte le transazioni. Quale impostazione corrisponde alla tabella della lezione?',o:['Regressione sull\'importo di ogni transazione','Clustering dei clienti in segmenti','Classificazione su dati molto sbilanciati, con individuazione delle anomalie e tecniche come SMOTE','Previsione su serie storiche delle transazioni della settimana prossima'],a:2,
    e:'L\'individuazione delle frodi è una classificazione con una classe positiva molto rara: modelli come i gradient boosted trees, con SMOTE per creare frodi sintetiche, e individuazione delle anomalie.',h:'Guarda l\'ultima tabella della lezione.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[9]={c:'Perché un modello predittivo ha bisogno di un data warehouse?',r:[
+  {t:'Predittiva e generativa',c:BLUE,v:['Predittiva: prevede un target dalle feature','Generativa: crea contenuti nuovi','Il valore viene ancora soprattutto dalla predittiva','Usano l\'AI l\'89%, high performer il 6%']},
+  {t:'BI e data warehouse',c:YEL,v:['Raccogliere, ripulire, trasformare, presentare','Garbage in, garbage out','Inmon: integrato, orientato ai soggetti, non volatile, variabile nel tempo','Data mart, data mesh, lakehouse']},
+  {t:'Big Data',c:GRN,v:['Cinque V: volume, varietà, velocità, valore, veridicità','Non solo volume, non solo web, non tutti','Fonti tradizionali ed emergenti, IoT','Fattori abilitanti e fattori scatenanti']},
+  {t:'Dalla domanda al modello',c:PINK,v:['Ciclo: dati, analisi, conoscenze, decisioni','Target, dati storici, modello validato, KPI','Undici casi aziendali']},
+  {t:'Insegnamenti dei casi',c:ORG,v:['Confrontarsi sempre con una baseline','Etica e diritto: GDPR, AI Act','Riaddestrare i modelli nel tempo']},
+  {t:'Compiti tipici',c:TEAL,v:['Abbandono: classificazione binaria','Frodi: dati sbilanciati, anomalie','Vendite: regressione e serie storiche','Guasti: classificazione e sopravvivenza']}]};

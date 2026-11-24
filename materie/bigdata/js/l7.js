@@ -133,3 +133,10 @@ QZ['7']=()=>[
   {q:'Nel secondo esempio del corso, VectorAssembler, LinearRegression e RegressionEvaluator sono, in quest\'ordine,',o:['estimator, transformer, evaluator','transformer, transformer, estimator','evaluator, estimator, transformer','transformer, estimator, evaluator'],a:3,
    e:'VectorAssembler trasforma un DataFrame in un altro aggiungendo la colonna features (transformer); LinearRegression adatta un modello (estimator); RegressionEvaluator calcola una metrica delle previsioni (evaluator).',h:'Chiediti di ciascuno: aggiunge una colonna, impara dai dati, o dà un punteggio alle previsioni?'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[7]={c:'Come gestisce Spark i dati che non smettono di arrivare?',r:[
+  {t:'Structured Streaming',c:BLUE,v:['Un flusso è una tabella illimitata','La query si scrive una volta, come in batch','A ogni trigger si aggiorna la tabella dei risultati','readStream, window, writeStream']},
+  {t:'Grafi',c:PINK,v:['Property graph: vertici e archi con proprietà','GraphX su RDD, GraphFrames su DataFrame','Gradi e sottografi','PageRank, componenti connesse, triangoli']},
+  {t:'MLlib',c:GRN,v:['Regressione, classificazione, clustering, raccomandazione','Training set e test set','Preparare, addestrare, provare su dati nuovi']},
+  {t:'Pipeline',c:YEL,v:['Transformer: aggiunge una colonna','Estimator: impara un modello','Evaluator: misura la qualità','Stessi passi per addestramento e prova']},
+  {t:'Regressione logistica',c:TEAL,v:['Punteggio z = intercetta + somma dei pesi','Probabilità p = 1/(1 + e^(−z))','Sopra 0,5: etichetta 1']}]};

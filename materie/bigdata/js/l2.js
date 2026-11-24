@@ -141,3 +141,11 @@ QZ['2']=()=>[
   {q:'Con la tabella Sales definita nella lezione e i clienti da 1 a 5, quanti vincoli viola <code>INSERT INTO Sales VALUES (7, \'2018-09-04\', 9, \'abc\', 0, 2.00)</code>?',o:['Nessuno','Uno','Due','Tre'],a:2,
    e:'Il cliente 9 non esiste, quindi la chiave esterna (integrità referenziale) non è rispettata; la quantità 0 viola CHECK (quantity &gt; 0) (integrità del dominio). sales_id 7 è nuovo, quindi la chiave primaria va bene: due vincoli.',h:'Controlla la riga nuova colonna per colonna rispetto al CREATE TABLE.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[2]={c:'Che cos\'è esattamente una tabella?',r:[
+  {t:'Struttura',c:BLUE,v:['Tabella (relazione): record per righe, campi per colonne','Ogni campo: nome, tipo di dato, vincolo NULL','Tipi: CHAR, VARCHAR, DATE, INT, FLOAT, DECIMAL','Indice: trova un record senza leggere tutto']},
+  {t:'Integrità',c:YEL,v:['Entità: chiave primaria, niente duplicati','Referenziale: chiave esterna, valore esistente o NULL','Dominio: tipi di dato, NULL e CHECK']},
+  {t:'Normalizzazione',c:GRN,v:['Ogni fatto in un solo posto','Prima forma normale: valori atomici e chiave primaria','Terza forma normale: niente dipendenze transitive']},
+  {t:'OLTP e data warehouse',c:ORG,v:['OLTP: normalizzato, transazioni senza errori','DWH: tabelle dei fatti (misure) e dimensioni (attributi)','Chiave surrogata dall\'ETL, chiave di business conservata']},
+  {t:'SQL',c:PINK,v:['Dichiarativo: dici che cosa, l\'ottimizzatore sceglie come','Sottolinguaggi DQL, DDL, DCL, DML','UPDATE e DELETE senza WHERE toccano tutte le righe']},
+  {t:'SELECT',c:TEAL,v:['Ordine: SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY','Espressioni, alias, funzioni, DISTINCT','CASE: vince la prima condizione vera']}]};

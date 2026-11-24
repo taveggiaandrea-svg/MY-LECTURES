@@ -143,3 +143,10 @@ QZ['6']=()=>[
   {q:'Un ingegnere filtra un RDD di oggetti User con una lambda su u.age; un altro filtra un DataFrame con df["age"] > 40. Perché Spark può ottimizzare solo il secondo?',o:['I DataFrame sono sempre memorizzati su disco','Spark conosce lo schema del DataFrame, mentre gli elementi di un RDD sono oggetti opachi','Gli RDD non si possono filtrare','Le lambda girano solo sul driver'],a:1,
    e:'Un DataFrame è una collezione con uno schema noto a Spark SQL, quindi Spark può vedere quale colonna viene usata; dentro un RDD di oggetti User Spark non vede la struttura.',h:'Ricorda i due riquadri della figura RDD contro DataFrame.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[6]={c:'Che cosa rende Spark così veloce?',r:[
+  {t:'In memoria',c:BLUE,v:['Legge una volta e tiene in memoria i risultati intermedi','Veloce anche su disco','Regressione logistica: oltre 100 volte più veloce']},
+  {t:'Cluster',c:ORG,v:['Driver: le istruzioni e la SparkSession','Cluster manager: YARN, Mesos, standalone','Worker ed executor eseguono i task','Shuffle: dati scambiati fra executor']},
+  {t:'RDD',c:TEAL,v:['Collezione immutabile e distribuita','Partizioni elaborate in parallelo','Creato da un file system o da una collezione']},
+  {t:'Esecuzione pigra',c:PINK,v:['Trasformazioni: aggiungono passi al DAG','Azioni: eseguono il DAG, come collect()','Stage tagliati a ogni shuffle']},
+  {t:'DataFrame e Spark SQL',c:YEL,v:['Colonne con un nome e uno schema noto','select, filter, groupBy, sum','Vista temporanea o tabella persistente','Fonti: CSV, JSON, JDBC, Parquet']}]};

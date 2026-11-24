@@ -129,3 +129,10 @@ QZ['5']=()=>[
   {q:'Nella direzione moderna descritta nella lezione, che cosa prende il posto di HDFS e di MapReduce?',o:['YARN e Hive','Kafka e Zookeeper','HBase e Pig','L\'object storage, e motori come Spark, Trino o Flink'],a:3,
    e:'Il percorso moderno è object storage → Spark / Trino / Flink → Iceberg / Delta: lo storage nel cloud sostituisce HDFS, i motori più recenti sostituiscono MapReduce.',h:'Confronta i due riquadri della figura sugli stack strato per strato.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[5]={c:'Come si memorizza un file più grande di qualunque disco?',r:[
+  {t:'Hadoop',c:BLUE,v:['HDFS per memorizzare, MapReduce per calcolare','Open source, migliaia di nodi, hardware comune','Tollerante ai guasti']},
+  {t:'HDFS',c:GRN,v:['File tagliati in blocchi da 64 o 128 MB','Ogni blocco replicato 3 volte, su rack diversi','Name node: metadati; data node: letture e scritture','Erasure coding: sovraccarico del 50% invece del 200%']},
+  {t:'MapReduce',c:YEL,v:['Map: coppie chiave/valore vicino ai dati','Shuffle: stessa chiave, stesso reducer','Reduce: calcolo per chiave, risultato in HDFS','Per job batch, non per query interattive']},
+  {t:'Ecosistema',c:ORG,v:['Base: HDFS, YARN, MapReduce, Tez, Spark','Dati: Hive, Pig, HBase, Sqoop, Flume','Operativi: Ambari, Oozie, Zookeeper','Analisi: Mahout, Kylin, Spark, KNIME']},
+  {t:'Oggi',c:PINK,v:['Hadoop: infrastruttura già installata','Object storage con Spark, Trino, Flink','Formati di tabella: Iceberg, Delta Lake','Da imparare: i concetti, non MapReduce']}]};

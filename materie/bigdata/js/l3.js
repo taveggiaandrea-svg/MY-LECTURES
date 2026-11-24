@@ -122,3 +122,11 @@ QZ['3']=()=>[
   {q:'Sul terzo ordine di Trujillo, quanto vale il totale progressivo <code>SUM(TotalAmount) OVER (PARTITION BY customerid ORDER BY OrderDate ROWS UNBOUNDED PRECEDING)</code>, e che quota è di <code>SUM(TotalAmount) OVER (PARTITION BY customerid)</code> sulla stessa riga?',o:['7038,2, circa il 74%','5593,4, circa il 59%','7038,2, circa il 52%','9528,7, il 100%'],a:0,
    e:'Totale progressivo: 1863,4 + 3730 + 1444,8 = 7038,2. Il totale della partizione è l\'intero 9528,7 di Trujillo, e 7038,2 / 9528,7 ≈ 0,74.',h:'La prima finestra si ferma alla riga corrente; la seconda copre tutta la partizione.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[3]={c:'Come si combinano due tabelle?',r:[
+  {t:'Join',c:BLUE,v:['Prodotto cartesiano: tutte le coppie di righe','INNER JOIN: solo le coppie con ON vero','LEFT, RIGHT, FULL: anche le righe senza partner, con NULL']},
+  {t:'UNION',c:GRN,v:['Aggiunge righe, non colonne','UNION elimina i duplicati, UNION ALL li tiene']},
+  {t:'NULL',c:PUR,v:['Ogni confronto con NULL è UNKNOWN','ON, WHERE e HAVING tengono solo TRUE','IS NULL per verificare, COALESCE per sostituire']},
+  {t:'Raggruppare',c:YEL,v:['SUM, AVG, COUNT, MIN, MAX: molte righe, un valore','GROUP BY: una riga per gruppo','WHERE filtra le righe prima, HAVING i gruppi dopo']},
+  {t:'Sottoquery',c:PINK,v:['Una query dentro un\'altra: valore, elenco o tabella','Indipendente: eseguita una volta','Correlata: eseguita per ogni riga esterna','EXISTS: c\'è almeno una riga?']},
+  {t:'Funzioni analitiche',c:TEAL,v:['Calcolano sul gruppo ma tengono ogni riga','OVER: PARTITION BY, ORDER BY, finestra','ROW_NUMBER, LAG e LEAD, media mobile, totale progressivo']}]};

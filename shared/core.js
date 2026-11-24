@@ -114,7 +114,34 @@ function quiz(root,qs){
     if(v!==null&&+v>=0&&+v<bsq.length){sel=+v;verify(false)}
   });
 }
-const INIT={},QZ={},THUMB={};
+const INIT={},QZ={},THUMB={},MAPPA={};
+/* mappa mentale per i riepiloghi: MAPPA[k]={c:'centro', r:[{t:'ramo', c:COLORE, v:['voce','voce']}]}, nell'HTML <div class="w" data-mappa="k"></div>.
+   Due disegni: largo (centro in mezzo, rami a destra e a sinistra) e stretto per i telefoni (centro in alto, rami in colonna); il CSS mostra quello giusto. */
+function mappa(root,m){
+  /* a capo stimando la larghezza del testo a 13 px: maiuscole più larghe, punteggiatura e lettere sottili più strette; n è la larghezza in caratteri medi */
+  const wid=t=>[...t].reduce((a,c)=>a+(/[A-Z]/.test(c)?1.32:/[mwMW]/.test(c)?1.45:/[ilj.,:;'!|() frt]/.test(c)?.62:1),0);
+  const wrap=(t,n)=>{const o=[];let l='';String(t).split(' ').forEach(w=>{if(l&&wid(l+' '+w)>n){o.push(l);l=w}else l=l?l+' '+w:w});if(l)o.push(l);return o};
+  const card=(x,y,w,b,n)=>{const ls=b.v.map(v=>wrap(v,n));const h=40+ls.reduce((a,l)=>a+l.length*18+6,0)+4;
+    let s='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="9" fill="#0d0d0d" stroke="'+b.c+'" stroke-width="1.6"/>'+tx(x+14,y+25,b.t,{s:14.5,a:'start',f:b.c,w:600});
+    let yy=y+48;ls.forEach(l=>{s+='<circle cx="'+(x+17)+'" cy="'+(yy-4.5)+'" r="2.6" fill="'+b.c+'"/>';l.forEach((t,j)=>s+=tx(x+28,yy+j*18,t,{s:13,a:'start',f:'#e6e6e6'}));yy+=l.length*18+6});
+    return {s,h}};
+  const hdr=(cx,cy,w,cw)=>{const h=26+cw.length*19;let s='<rect x="'+(cx-w/2)+'" y="'+(cy-h/2)+'" width="'+w+'" height="'+h+'" rx="12" fill="#1c1c1c" stroke="#fff" stroke-width="1.8"/>';
+    cw.forEach((t,j)=>s+=tx(cx,cy-h/2+30+j*19,t,{s:15,f:'#fff',w:600}));return {s,h}};
+  /* largo: rami divisi fra destra e sinistra in modo da pareggiare le altezze, in senso orario */
+  const W=720,cwid=236,g=14,hs=m.r.map(b=>card(0,0,cwid,b,28).h);let k=Math.ceil(m.r.length/2),best=1e9;
+  for(let i=1;i<m.r.length;i++){const a=hs.slice(0,i).reduce((p,q)=>p+q+g,0),b=hs.slice(i).reduce((p,q)=>p+q+g,0);if(Math.abs(a-b)<best){best=Math.abs(a-b);k=i}}
+  const R=m.r.slice(0,k),Lf=m.r.slice(k).reverse(),col=bs=>bs.reduce((p,b)=>p+card(0,0,cwid,b,28).h+g,-g);
+  const H=Math.max(col(R),col(Lf),120)+20,cy=H/2,ce=hdr(W/2,cy,176,wrap(m.c,17)),sp=(i,n)=>n>1?(i/(n-1)-.5)*Math.min(ce.h-20,n*12):0;let s='',lines='';
+  [[R,W-cwid-8,W/2+88,1],[Lf,8,W/2-88,-1]].forEach(([bs,x,ex,d])=>{let y=(H-col(bs))/2;bs.forEach((b,i)=>{const c=card(x,y,cwid,b,28),my=y+c.h/2,tx_=d>0?x:x+cwid,sy=cy+sp(d>0?i:bs.length-1-i,bs.length)*(d>0?1:-1);
+    lines+='<path d="M'+ex+' '+sy+' C'+(ex+d*30)+' '+sy+','+(tx_-d*30)+' '+my+','+tx_+' '+my+'" fill="none" stroke="'+b.c+'" stroke-width="2" stroke-opacity=".8"/>';s+=c.s;y+=c.h+g})});
+  const a=el('div','mm-w');a.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Mappa mentale: '+m.c+'">'+lines+ce.s+s+'</svg>';
+  /* stretto: centro in alto, un tronco a sinistra, rami in colonna */
+  const N=360,ch=hdr(N/2,0,N-24,wrap(m.c,34));let y=ch.h+22,sn='',ln='',lastY=0;
+  m.r.forEach(b=>{const c=card(40,y,N-50,b,38);ln+='<path d="M22 '+(y+21)+' H40" stroke="'+b.c+'" stroke-width="2"/>';sn+=c.s;lastY=y;y+=c.h+12});
+  ln='<path d="M22 '+(ch.h+4)+' V'+(lastY+21)+'" stroke="#777" stroke-width="2"/>'+ln;
+  const b2=el('div','mm-n');b2.innerHTML='<svg viewBox="0 0 '+N+' '+(y-6)+'" role="img" aria-label="Mappa mentale: '+m.c+'">'+ln+'<g transform="translate(0,'+(ch.h/2+4)+')">'+ch.s+'</g>'+sn+'</svg>';
+  const box=el('div','mmap');box.append(a,b2);root.append(box);
+}
 
 /* strumenti condivisi dalle lezioni sul consumatore (7 e 8): piano dei panieri */
 const NS='http://www.w3.org/2000/svg',S=400,x0=46,y0=14,L=340;

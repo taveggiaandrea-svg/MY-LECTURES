@@ -37,6 +37,7 @@ function show(n,scroll){
     renderMath(art);
     try{if(INIT[n])INIT[n]()}catch(e){console.error(e)}
     art.querySelectorAll('[data-quiz]').forEach(q=>{const f=QZ[q.dataset.quiz];if(f)quiz(q,f())});
+    art.querySelectorAll('[data-mappa]').forEach(q=>{const m=MAPPA[q.dataset.mappa];if(m)try{mappa(q,m)}catch(e){console.error(e)}});
   }
   if(scroll)window.scrollTo(0,0);
   if(typeof paintBar==='function')paintBar();

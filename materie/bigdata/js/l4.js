@@ -132,3 +132,11 @@ QZ['4']=()=>[
   {q:'Quale abbinamento fra dati e modello di coerenza è in linea con la discussione della lezione?',o:['Saldi bancari: BASE; like sui social: ACID','Saldi bancari: ACID; un contatore di like su un social network: BASE','Entrambi richiedono BASE','Entrambi richiedono ACID, altrimenti i dati vanno persi'],a:1,
    e:'Un bonifico deve essere tutto o niente e sempre coerente (ACID); un contatore di like può essere per un attimo non aggiornato su alcuni nodi e diventare coerente dopo (BASE), in cambio di disponibilità e scala.',h:'Chiediti dove un valore temporaneamente sbagliato sarebbe accettabile.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[4]={c:'E se una macchina non basta?',r:[
+  {t:'Sistemi distribuiti',c:BLUE,v:['Nodo, rack, cluster','Scalabilità orizzontale: più server invece di uno più grande','Gli strumenti: Hadoop, Spark, NoSQL']},
+  {t:'NoSQL',c:ORG,v:['Distribuiti, senza schema, scalabili','ACID: atomicità, coerenza, isolamento, durabilità','BASE: sempre disponibile, a coerenza finale']},
+  {t:'Quattro famiglie',c:GRN,v:['Chiave-valore: DynamoDB','Documenti JSON o XML: MongoDB','A colonne: HBase, Cassandra','A grafo: Neo4j']},
+  {t:'Compressione per colonne',c:YEL,v:['Una colonna: un solo tipo, valori ripetuti','Dizionario: ⌈log₂ k⌉ bit per codice','Run-length: terne, meglio se la colonna è ordinata']},
+  {t:'Grafi',c:PINK,v:['Property graph: nodi e relazioni con proprietà','Relazioni orientate e con un nome','Cypher: si seguono gli archi invece dei join']},
+  {t:'Database vettoriali',c:TEAL,v:['Embedding: significati simili, vettori vicini','Similarità del coseno','Indici ANN: HNSW, IVF','Ricerca semantica, raccomandazioni, RAG']}]};

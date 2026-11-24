@@ -141,3 +141,11 @@ QZ['8']=()=>[
   {q:'Nell\'era del data lake, che cosa contiene il data warehouse secondo la lezione?',o:['Tutti i dati grezzi, strutturati e non strutturati','Solo i dati freddi','I dati caldi dei processi ETL e i risultati distillati delle analisi eseguite sul lago','Niente: è sostituito dal lago'],a:2,
    e:'Il warehouse esiste ancora e contiene i dati caldi (dall\'ETL, direttamente dalle fonti o dal lago) e i dati distillati dalle analisi del lago, mantenendo le query a bassa latenza e i report esistenti.',h:'Il lago tiene i dati grezzi e quelli freddi.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[8]={c:'Dove vanno i dati grezzi?',r:[
+  {t:'Data lake',c:BLUE,v:['Dati grezzi nel formato nativo, più dati elaborati','Strutturati, semistrutturati, non strutturati','Basato su Hadoop e Spark']},
+  {t:'Lago e warehouse',c:ORG,v:['Warehouse: schema on write; lago: schema on read','Dati caldi nel warehouse, freddi nel lago','Il lago costa molto meno per terabyte']},
+  {t:'Adozione in quattro passi',c:GRN,v:['Area di staging dei dati grezzi','Laboratorio di data science','Offloading dei dati freddi','Componente principale']},
+  {t:'BI 2.0',c:YEL,v:['Le nuove fonti entrano direttamente nel lago','Parte dell\'ETL si sposta nel lago','Distillazione: risultati piccoli nel warehouse']},
+  {t:'Governance',c:PINK,v:['Governance, qualità, metadati, formazione','I metadati rendono il lago ricercabile','Qualità: etichettare, non filtrare in ingresso']},
+  {t:'Virtualizzazione',c:TEAL,v:['Uno strato logico, nessuna copia dei dati','Pro: costi minori, governance centrale','Contro: carica fonti e rete, lenta sui compiti complessi']}]};

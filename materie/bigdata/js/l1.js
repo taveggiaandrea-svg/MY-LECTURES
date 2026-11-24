@@ -142,3 +142,12 @@ QZ['1']=()=>[
   {q:'L\'ERP elenca 5 clienti; il CRM ne elenca 6, perché Mary Jane compare due volte, a Manchester e a Londra. In quale passo dell\'ETL si fondono i due record, e quanti clienti dovrebbe contare il warehouse?',o:['Extract; 6','Load; 11','Transform; 6','Transform; 5'],a:3,
    e:'L\'eliminazione dei duplicati e l\'integrazione sono regole di business e controlli di qualità, applicati nel passo Transform; entrambi i sistemi descrivono le stesse cinque persone, quindi il warehouse ne conta 5.',h:'Abbina ogni cliente del CRM a uno dell\'ERP.'}
 ];
+/* mappa mentale del riepilogo */
+MAPPA[1]={c:'Perché non basta il database operativo?',r:[
+  {t:'Il problema',c:RED,v:['Gli stessi dati in più sistemi, con formati e versioni diversi','Progettato per scrivere singoli record, non per leggere milioni di righe','Report e transazioni si contendono la stessa macchina']},
+  {t:'Cinque fasi',c:ORG,v:['RDBMS e SQL, anni Ottanta','Data warehouse, anni Novanta','OLAP, fine anni Novanta','Data mining, dal 2000','Big Data, dal 2012']},
+  {t:'Report',c:YEL,v:['Operativo: ogni giorno, dettaglio più totali','Tattico: totali giornalieri o settimanali','Strategico: sintesi settimanale o mensile']},
+  {t:'Data warehouse',c:BLUE,v:['Database analitico separato, unica fonte di verità','ETL: extract, transform, load, con un\'area di staging','Base della Business Intelligence']},
+  {t:'OLAP',c:TEAL,v:['Cubi multidimensionali con metadati','Somme, medie e conteggi senza scrivere SQL','Report dinamici, come un\'enorme pivot']},
+  {t:'Analisi',c:PINK,v:['Descrittiva: riassume il passato','Predittiva: stima la probabilità di esiti futuri','Data mining e machine learning']},
+  {t:'Big Data',c:GRN,v:['Tre V: volume, velocità, varietà','Dati che un RDBMS non analizza in modo conveniente','Hadoop e Spark','Strutturati, semi-strutturati, non strutturati']}]};
