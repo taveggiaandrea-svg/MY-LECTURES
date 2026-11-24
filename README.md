@@ -11,7 +11,7 @@ Leggere prima `METODO.md`: contiene tutte le regole di scrittura, di stile, di d
 ```
 shared/style.css     foglio di stile comune (non duplicarlo nelle materie)
 shared/core.js       colori, macro KaTeX, funzioni di base, quiz (le risposte verificate restano salvate nel browser), player, componenti (piani, alberi, matrici), mappe mentali dei riepiloghi (`MAPPA[N]` nel js della lezione, `<div class="w" data-mappa="N"></div>` nella sezione `recap`)
-shared/boot.js       riquadri neri, tema, navigazione fra le lezioni, montaggio pigro, assistente «Chiedi all'AI» (Gemini in streaming, lezione aperta + mappa del corso + estratti delle altre lezioni), barra di scorrimento come mappa della lezione (quiz in azzurro velato, sezioni `recap` in ambra velato), percentuale di avanzamento a decine accanto al cursore, calcolata solo sul testo da studiare (esclusi quiz e navigazione)
+shared/boot.js       riquadri neri, tema, navigazione fra le lezioni, montaggio pigro, assistente «Chiedi all'AI» (Gemini in streaming, lezione aperta + mappa del corso + estratti delle altre lezioni), barra di scorrimento come mappa della lezione (quiz in azzurro velato, sezioni `recap` in ambra velato), barra disegnata dal sito al posto di quella del browser (clic o tocco = salto esatto al punto, cursore trascinabile), indice iniziale di ogni lezione generato dai titoli h2 (UI.toc), percentuale di avanzamento a decine accanto al cursore, calcolata solo sul testo da studiare (esclusi quiz e navigazione)
 shared/home.js       tema della pagina iniziale
 shared/topgrid.js    griglia animata nella barra superiore (una griglia che subisce lente trasformazioni lineari), in tutte le pagine
 materie/<id>/
@@ -46,7 +46,7 @@ Aggiungere `lezioni/lN.html` e `js/lN.js`, un link in `top.html`, una miniatura 
 
 ### Materie in più lingue
 
-Una materia può avere una seconda lingua in una sottocartella di due lettere (oggi solo `materie/bigdata/en/`). `build.py` costruisce una pagina per lingua (`site/bigdata/` e `site/bigdata/en/`), aggiunge nella barra superiore il selettore delle lingue e uno script che ricorda la scelta (`localStorage`, chiave `lingua-<id>`) e riapre la stessa lezione nell'altra lingua. `test.py` prova anche le pagine delle lingue.
+Una materia può avere una seconda lingua in una sottocartella di due lettere (oggi solo `materie/bigdata/en/`). `build.py` costruisce una pagina per lingua (`site/bigdata/` e `site/bigdata/en/`), aggiunge nella barra superiore il selettore delle lingue e uno script che ricorda la scelta (`localStorage`, chiave `lingua-<id>`) e riapre la stessa lezione nell'altra lingua, nello stesso punto (lezione, sezione e posizione passano in `localStorage`, chiave `salto-lingua`). Le regole di speculazione scritte da `build.py` fanno preparare a Chrome l'altra lingua in background, così il cambio è immediato; il passaggio fra le pagine è in dissolvenza (`@view-transition`). Dalla pagina iniziale il link della materia porta direttamente alla lingua scelta. `test.py` prova anche le pagine delle lingue.
 
 Le due versioni sono copie separate: testo, figure (le etichette stanno dentro `js/lN.js`) e quiz. Una correzione a una figura o a un dato va fatta in entrambe le cartelle. Nella versione italiana i numeri seguono le convenzioni italiane (virgola decimale; punto delle migliaia dalle cinque cifre in su; in `js/macro.js` la funzione `fi`), mentre codice SQL e Spark, contenuto delle tabelle e risultati delle query restano con il punto decimale (funzione `fe`).
 

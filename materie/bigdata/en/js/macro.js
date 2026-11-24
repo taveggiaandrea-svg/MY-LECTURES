@@ -1,6 +1,6 @@
 /* Big Data and Databases: interface in English and small drawing helpers shared by the four lessons */
 Object.assign(UI,{check:'Check',pickFirst:'Pick an answer first.',right:'Correct.',wrong:'Not quite.',play:'Play',pause:'Pause',seek:'Position in the animation',
-  prev:'Previous lesson',next:'Next lesson',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
+  prev:'Previous lesson',next:'Next lesson',toc:'In this lesson',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
   askSys:'You are a tutor. Answer in English, briefly and clearly, based on the lessons provided: first the open lesson, then the course map and the excerpts from other lessons. When you use another lesson, say which one. If the question goes beyond the course, say so.',
   askSlow:'no reply in time, trying the next model.',
   askFmt:'Write formulas in LaTeX between \\( \\) or \\[ \\], never with dollar signs.'});

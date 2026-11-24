@@ -47,7 +47,7 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
   askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
   askSlow:'nessuna risposta in tempo, provo il modello successivo.',
@@ -1319,10 +1319,17 @@ document.querySelectorAll('figure').forEach(f=>{
   try{new MutationObserver(paint).observe(root,{attributes:true,attributeFilter:['data-theme']})}catch(e){}
   paint();
 })();
-/* ---------- Lingua: nelle materie con più lingue il selettore ricorda la scelta e porta alla stessa lezione ---------- */
+/* ---------- Lingua: nelle materie con più lingue il selettore ricorda la scelta e riapre la stessa lezione nello stesso punto ----------
+   Il punto si passa all'altra pagina in localStorage (lezione, sezione, frazione della sezione), senza cancelletto nell'indirizzo:
+   così Chrome può usare la pagina già preparata in background (regole di speculazione scritte da build.py) e il cambio è immediato. */
 document.querySelectorAll('.lang a[data-lang]').forEach(a=>a.addEventListener('click',e=>{
-  e.preventDefault();try{localStorage.setItem('lingua-'+a.dataset.mid,a.dataset.lang)}catch(_){}
-  location.href=a.getAttribute('href')+location.hash}));
+  e.preventDefault();let j=null;const art=document.querySelector('.lesson:not([hidden])');
+  if(art){const secs=[...art.querySelectorAll(':scope > section')],hd=(document.querySelector('.top')||{offsetHeight:0}).offsetHeight,y=window.scrollY+hd;
+    let i=0;secs.forEach((x,k)=>{if(x.getBoundingClientRect().top+window.scrollY<=y+1)i=k});
+    const x=secs[i],t=x?x.getBoundingClientRect().top+window.scrollY:0;
+    j={mid:a.dataset.mid,n:+art.dataset.n,i,f:x&&x.offsetHeight?Math.max(0,Math.min(1,(y-t)/x.offsetHeight)):0,at:Date.now()}}
+  try{localStorage.setItem('lingua-'+a.dataset.mid,a.dataset.lang);if(j)localStorage.setItem('salto-lingua',JSON.stringify(j))}catch(_){j=null}
+  location.href=a.getAttribute('href')+(j?'':location.hash)}));
 /* ---------- Navigazione fra le lezioni: una alla volta, figure montate alla prima apertura ---------- */
 const lessons=[...document.querySelectorAll('.lesson')],links=[...document.querySelectorAll('.top nav a')];
 /* le lezioni si cercano per numero (data-n), così una materia può cominciare da una lezione 0 */
@@ -1344,6 +1351,7 @@ function show(n,scroll){
   }
   if(scroll)window.scrollTo(0,0);
   if(typeof paintBar==='function')paintBar();
+  if(typeof paintThumb==='function')paintThumb();
   if(typeof paintProgress==='function')paintProgress();
 }
 document.addEventListener('click',e=>{
@@ -1352,14 +1360,34 @@ document.addEventListener('click',e=>{
   try{history.replaceState(null,'','#lezione-'+n)}catch(_){}
   show(n,true);
 });
+/* ---------- Indice iniziale di ogni lezione: i titoli delle sezioni (h2), cliccabili, sotto il titolo della lezione ---------- */
+lessons.forEach(l=>{
+  const hs=[...l.querySelectorAll('h2')].filter(h=>!h.closest('.hero')),col=l.querySelector('section.hero .col');if(hs.length<2||!col)return;
+  const t=el('nav','toc');t.setAttribute('aria-label',UI.toc);
+  t.innerHTML='<div class="toch">'+UI.toc+'</div><div class="tocl">'+hs.map((h,k)=>'<a href="#" data-sec="'+k+'"><b>'+(k+1)+'</b><span>'+h.innerHTML+'</span></a>').join('')+'</div>';
+  col.append(t);
+  t.addEventListener('click',e=>{const a=e.target.closest('[data-sec]');if(!a)return;e.preventDefault();hs[+a.dataset.sec].scrollIntoView({behavior:'smooth',block:'start'})});
+});
 (function(){const m=location.hash.match(/lezione-(\d+)/);show(m&&NUMS.includes(+m[1])?+m[1]:NUMS[0],false)})();
 renderMath(document.querySelector('footer'));
+/* arrivo dal selettore di lingua: stessa lezione, stesso punto (subito, o quando la pagina preparata in background diventa visibile) */
+function applyJump(){let j=null;try{j=JSON.parse(localStorage.getItem('salto-lingua')||'null')}catch(_){}
+  const me=(document.querySelector('.lang a[data-mid]')||{dataset:{}}).dataset.mid;
+  if(!j||j.mid!==me||Date.now()-j.at>20000||!NUMS.includes(j.n))return;
+  try{localStorage.removeItem('salto-lingua')}catch(_){}
+  show(j.n,false);try{history.replaceState(null,'','#lezione-'+j.n)}catch(_){}
+  const sec=byN(j.n).querySelectorAll(':scope > section')[j.i];if(!sec)return;
+  const go=()=>{const hd=(document.querySelector('.top')||{offsetHeight:0}).offsetHeight;
+    window.scrollTo({top:Math.max(0,sec.getBoundingClientRect().top+window.scrollY+j.f*sec.offsetHeight-hd),behavior:'instant'})};
+  go();requestAnimationFrame(go);setTimeout(go,120)}
+if(document.prerendering)document.addEventListener('prerenderingchange',applyJump,{once:true});else applyJump();
 
 /* blocchi di esercizi di una lezione: i quiz nel testo e la sezione del quiz finale («Mettiti alla prova»), che conta tutta */
 function exerciseBlocks(art){return [...art.querySelectorAll('.quiz')].map(q=>{const s=q.closest('section');
   return !q.classList.contains('inq')&&s&&s.querySelectorAll('.quiz').length===1&&!s.querySelector('figure')?s:q})}
 /* ---------- Barra di scorrimento come mappa: domande in azzurro molto velato, riepiloghi in ambra velato, teoria nel colore della barra ----------
-   La barra rappresenta tutta la pagina: un punto a quota y sta a y/altezza della pagina lungo la barra, la stessa regola del cursore. */
+   La barra rappresenta tutta la pagina: un punto a quota y sta a y/altezza della pagina lungo la barra, la stessa regola del cursore.
+   È una barra disegnata dal sito (.sbar, al posto di quella del browser): un clic o un tocco porta esattamente al punto toccato, il cursore si trascina. */
 var paintBar=(function(){
   let raf=0;const root=document.documentElement;
   function paint(){raf=0;
@@ -1374,12 +1402,32 @@ var paintBar=(function(){
     parts.forEach(([a,b,c])=>{if(a>at)g.push(T+' '+f(at),T+' '+f(a));g.push(c+' '+f(Math.max(a,at)),c+' '+f(b));at=Math.max(at,b)});
     g.push(T+' '+f(at),T+' 100%');
     root.style.setProperty('--sbar','linear-gradient(to bottom,'+g.join(',')+')');
-    /* Chrome non ridisegna la barra quando cambia solo la variabile: un cambio di overflow la forza */
-    const y=window.scrollY;root.style.overflowY='hidden';void root.offsetWidth;root.style.overflowY='';if(window.scrollY!==y)window.scrollTo(0,y)}
+}
   const go=()=>{if(!raf)raf=requestAnimationFrame(paint)};
   try{new ResizeObserver(go).observe(document.body)}catch(e){}
   window.addEventListener('resize',go);
   try{new MutationObserver(go).observe(root,{attributes:true,attributeFilter:['data-theme']})}catch(e){}
+  return go})();
+
+var paintThumb=(function(){
+  const root=document.documentElement;root.classList.add('lp');
+  const bar=el('div','sbar'),th=el('div','sbth');bar.append(th);bar.setAttribute('aria-hidden','true');document.body.append(bar);
+  let raf=0,drag=null;
+  const geo=()=>{const H=root.scrollHeight,vh=window.innerHeight;return {H,vh,h:Math.min(vh,Math.max(40,vh*vh/H))}};
+  function pos(){raf=0;const {H,vh,h}=geo();bar.hidden=H<=vh+1;if(bar.hidden)return;
+    th.style.height=h+'px';th.style.transform='translateY('+Math.min(vh-h,window.scrollY/H*vh)+'px)'}
+  const go=()=>{if(!raf)raf=requestAnimationFrame(pos)};
+  window.addEventListener('scroll',go,{passive:true});window.addEventListener('resize',go);
+  try{new ResizeObserver(go).observe(document.body)}catch(e){}
+  /* il cursore con il bordo alto a quota top (in pixel dello schermo) corrisponde allo scorrimento top/altezza schermo × altezza pagina */
+  const to=(top,smooth)=>{const {H,vh,h}=geo();top=Math.min(vh-h,Math.max(0,top));window.scrollTo({top:top/vh*H,behavior:smooth?'smooth':'instant'})};
+  bar.addEventListener('pointerdown',e=>{e.preventDefault();try{bar.setPointerCapture(e.pointerId)}catch(_){}
+    const r=th.getBoundingClientRect();
+    if(e.clientY>=r.top&&e.clientY<=r.bottom)drag={off:e.clientY-r.top};
+    else{drag={off:r.height/2,x:e.clientY};to(e.clientY-r.height/2,true)}
+    bar.classList.add('on')});
+  bar.addEventListener('pointermove',e=>{if(!drag)return;if(drag.x!==undefined){if(Math.abs(e.clientY-drag.x)<4)return;drag.x=undefined}to(e.clientY-drag.off,false)});
+  const end=()=>{drag=null;bar.classList.remove('on')};bar.addEventListener('pointerup',end);bar.addEventListener('pointercancel',end);
   return go})();
 
 /* ---------- Avanzamento della lezione: percentuale a decine (0%, 10%, … 100%) ----------
@@ -1428,7 +1476,7 @@ var paintProgress=(function(){
   /* testo pulito di un nodo: niente figure, pulsanti o quiz; le formule già disegnate tornano in TeX */
   const BLK='p,h1,h2,h3,h4,li,div,figcaption,summary,tr,td,th,br,section,details';
   function clean(node){const c=node.cloneNode(true);
-    c.querySelectorAll('.stage,svg,canvas,script,style,button,input,select,.navend,.q,.ctl').forEach(x=>x.remove());
+    c.querySelectorAll('.stage,svg,canvas,script,style,button,input,select,.navend,.toc,.q,.ctl').forEach(x=>x.remove());
     c.querySelectorAll('.katex-display,.katex').forEach(k=>{if(!k.isConnected&&!c.contains(k))return;
       const a=k.querySelector('annotation'),d=k.classList.contains('katex-display');
       k.replaceWith(a?(d?'\\['+a.textContent+'\\]':'\\('+a.textContent+'\\)'):k.textContent)});

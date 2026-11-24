@@ -66,8 +66,11 @@ def lang_redirect(mid, cur, langs):
     if len(langs) < 2:
         return ''
     m = ','.join("%s:'%s'" % (code, href) for code, _, href in langs)
+    # una pagina preparata in background (prerender) non deve reindirizzarsi; le regole di speculazione chiedono a Chrome
+    # di preparare in anticipo l'altra lingua, così il cambio dal selettore è immediato
     return ("<script>try{var p=localStorage.getItem('lingua-%s'),m={%s};"
-            "if(p&&p!=='%s'&&m[p])location.replace(m[p]+location.hash)}catch(e){}</script>\n") % (mid, m, cur)
+            "if(!document.prerendering&&p&&p!=='%s'&&m[p])location.replace(m[p]+location.hash)}catch(e){}</script>\n"
+            '<script type="speculationrules">{"prerender":[{"where":{"selector_matches":".lang a:not([aria-current])"},"eagerness":"eager"}]}</script>\n') % (mid, m, cur)
 
 def build_page(mid, meta, src, out, up, cur, langs):
     """Costruisce una pagina della materia dalla cartella src (la materia o una sua lingua) in site/<out>/.
@@ -86,6 +89,8 @@ def build_page(mid, meta, src, out, up, cur, langs):
     if extra:
         write(os.path.join(SITE, out, 'style.css'), rf(css))
     extra += lang_redirect(mid, cur, langs)
+    # pagine delle lezioni: la barra di scorrimento la disegna boot.js; la classe va messa subito, così la pagina non cambia larghezza al caricamento
+    extra += "<script>document.documentElement.classList.add('lp')</script>\n"
     page = (head(meta['titolo'], up, meta.get('lingua', 'it'), extra) + body +
             '<script src="' + up + 'assets/katex/katex.min.js"></script>\n'
             '<script src="' + up + 'assets/katex/contrib/auto-render.min.js"></script>\n'
@@ -135,10 +140,15 @@ def thumb_svg(mid, k):
     finally:
         os.remove(tmp)
 
+# pagina iniziale: le materie con più lingue portano direttamente alla lingua scelta l'ultima volta (niente doppio caricamento)
+LANGLINKS = ("document.querySelectorAll('.subj[data-alt]').forEach(function(a){try{var p=localStorage.getItem('lingua-'+a.dataset.mid),"
+             "m=JSON.parse(a.dataset.alt);if(p&&m[p])a.href=a.dataset.mid+'/'+m[p]}catch(e){}});")
+
 def build_home(subjects):
     cards = ''
     for mid, meta, nums, titles in subjects:
-        cards += ('<a class="subj" href="' + mid + '/">'
+        alt = {v: v + '/' for v in variants_of(mid)}
+        cards += ('<a class="subj" href="' + mid + '/"' + (' data-mid="' + mid + '" data-alt=\'' + json.dumps(alt) + '\'' if alt else '') + '>'
                   '<span class="th" aria-hidden="true">' + thumb_svg(mid, meta.get('miniatura', 1)) + '</span>'
                   '<span class="tx"><b>' + html.escape(meta['titolo']) + '</b>'
                   '<span>' + html.escape(meta['descrizione']) + '</span>'
@@ -153,7 +163,7 @@ def build_home(subjects):
             '<p class="domlink"><a href="domande/">Le domande fatte a «Chiedi all\'AI»</a></p>\n</div></section>\n</main>\n'
             '<footer><div class="col"><p>Rielaborazioni a scopo di studio personale. Le fonti di ogni materia sono indicate in fondo alle sue lezioni; '
             'alcune licenze non permettono di distribuire opere derivate, quindi questo sito non va reso pubblico.</p></div></footer>\n'
-            '<script>' + rd('shared', 'home.js') + rd('shared', 'topgrid.js') + '</script>\n</body>\n</html>\n')
+            '<script>' + rd('shared', 'home.js') + rd('shared', 'topgrid.js') + LANGLINKS + '</script>\n</body>\n</html>\n')
     write(os.path.join(SITE, 'index.html'), page)
 
 def build_questions():
