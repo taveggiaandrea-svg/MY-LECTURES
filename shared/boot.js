@@ -51,6 +51,9 @@ document.addEventListener('click',e=>{
 (function(){const m=location.hash.match(/lezione-(\d+)/);show(m&&NUMS.includes(+m[1])?+m[1]:NUMS[0],false)})();
 renderMath(document.querySelector('footer'));
 
+/* blocchi di esercizi di una lezione: i quiz nel testo e la sezione del quiz finale («Mettiti alla prova»), che conta tutta */
+function exerciseBlocks(art){return [...art.querySelectorAll('.quiz')].map(q=>{const s=q.closest('section');
+  return !q.classList.contains('inq')&&s&&s.querySelectorAll('.quiz').length===1&&!s.querySelector('figure')?s:q})}
 /* ---------- Barra di scorrimento come mappa: domande in azzurro molto velato, riepiloghi in ambra velato, teoria nel colore della barra ----------
    La barra rappresenta tutta la pagina: un punto a quota y sta a y/altezza della pagina lungo la barra, la stessa regola del cursore. */
 var paintBar=(function(){
@@ -61,9 +64,7 @@ var paintBar=(function(){
     const H=root.scrollHeight,sy=window.scrollY,parts=[];
     const add=(e,c)=>{const r=e.getBoundingClientRect();if(r.height>0)parts.push([(r.top+sy)/H*100,(r.bottom+sy)/H*100,c])};
     art.querySelectorAll(':scope > section.recap').forEach(s=>add(s,R));
-    art.querySelectorAll('.quiz').forEach(q=>{const s=q.closest('section');
-      /* il quiz finale colora tutta la sua sezione («Mettiti alla prova»), quelli nel testo solo il proprio blocco */
-      add(!q.classList.contains('inq')&&s&&s.querySelectorAll('.quiz').length===1&&!s.querySelector('figure')?s:q,Q)});
+    exerciseBlocks(art).forEach(e=>add(e,Q));
     parts.sort((a,b)=>a[0]-b[0]);
     let g=[],at=0;const f=v=>v.toFixed(3)+'%';
     parts.forEach(([a,b,c])=>{if(a>at)g.push(T+' '+f(at),T+' '+f(a));g.push(c+' '+f(Math.max(a,at)),c+' '+f(b));at=Math.max(at,b)});
@@ -79,14 +80,20 @@ var paintBar=(function(){
 
 /* ---------- Avanzamento della lezione: percentuale a decine (0%, 10%, … 100%) ----------
    Su schermi larghi l'etichetta segue il cursore della barra di scorrimento; su telefono sta in basso a sinistra.
-   La percentuale misura quanto della lezione aperta è passato sopra il bordo inferiore dello schermo. */
+   La percentuale conta solo il testo da studiare: della lezione aperta si tolgono i quiz, la sezione del quiz finale
+   e i riquadri «lezione precedente / successiva», poi si misura quanta parte del resto è passata sopra il bordo inferiore dello schermo. */
 var paintProgress=(function(){
   const tag=el('div','prog');tag.setAttribute('aria-hidden','true');document.body.append(tag);
   let raf=0;const root=document.documentElement;
   function paint(){raf=0;
     const art=lessons.find(l=>!l.hidden);if(!art){tag.hidden=true;return}tag.hidden=false;
-    const sy=window.scrollY,vh=window.innerHeight,H=root.scrollHeight,top=art.getBoundingClientRect().top+sy,h=art.offsetHeight;
-    let p=Math.min(1,Math.max(0,(sy+vh-top)/h));if(sy+vh>=H-2)p=1;
+    const sy=window.scrollY,vh=window.innerHeight,H=root.scrollHeight,r=art.getBoundingClientRect(),top=r.top+sy,bot=r.bottom+sy;
+    /* tratti da escludere, uniti se si sovrappongono */
+    const cut=[...exerciseBlocks(art),...art.querySelectorAll('.navend')].map(e=>{const b=e.getBoundingClientRect();return [b.top+sy,b.bottom+sy]})
+      .filter(x=>x[1]>x[0]).sort((a,b)=>a[0]-b[0]).reduce((m,x)=>{const l=m[m.length-1];if(l&&x[0]<=l[1])l[1]=Math.max(l[1],x[1]);else m.push(x.slice());return m},[]);
+    const study=y=>{const Y=Math.min(Math.max(y,top),bot);let v=Y-top;cut.forEach(([a,b])=>{v-=Math.max(0,Math.min(b,Y)-Math.max(a,top))});return v};
+    const tot=study(bot),line=sy+vh;
+    let p=tot>0?Math.min(1,Math.max(0,study(line)/tot)):0;if(line>=H-2)p=1;
     tag.textContent=Math.floor(p*10+1e-9)*10+'%';
     if(window.innerWidth>=900){
       /* centro del cursore: (scroll + metà schermo) / altezza pagina, riportato all'altezza dello schermo */
