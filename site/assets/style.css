@@ -324,3 +324,5 @@ html.lp .askbtn,html.lp .askp{right:27px}
 .q .qn{font-family:var(--sans);font-weight:600;color:var(--theme)}
 .fb .expl{margin-top:.45rem;padding-top:.45rem;border-top:1px solid var(--frame)}
 .fb .rev{font:500 .85rem var(--sans);background:none;border:0;color:var(--theme);text-decoration:underline;cursor:pointer;padding:0;margin-left:.2rem}
+
+.top nav a.xlang small{font-size:.62rem;font-weight:600;letter-spacing:.04em;padding:.05rem .3rem;border-radius:5px;background:rgba(255,255,255,.12);margin-left:.2rem;vertical-align:1px}

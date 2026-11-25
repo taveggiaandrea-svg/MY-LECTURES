@@ -87,6 +87,14 @@ def build_page(mid, meta, src, out, up, cur, langs):
     nums = lessons_of(src)
     body = rf(pick('top.html'))
     body = body.replace('<button class="tog"', lang_bar(mid, cur, langs) + '<button class="tog"', 1)
+    if src != main:
+        # lezioni che esistono solo nella lingua principale: nel menu di questa lingua, link alla pagina principale (badge con la lingua)
+        mtop, mcode = rf(os.path.join(main, 'top.html')), meta.get('_main_code', 'it')
+        extra_links = ''
+        for m in re.finditer(r'<a href="#lezione-(\d+)" data-go="\d+"[^>]*>([^<]*)</a>', mtop):
+            if int(m.group(1)) not in nums:
+                extra_links += '    <a class="xlang" href="%s#lezione-%s" title="%s">%s <small>%s</small></a>\n' % (up[3:] if up.startswith('../') else up, m.group(1), meta.get('only_main', 'Only in Italian'), m.group(2), mcode.upper())
+        body = body.replace('  </nav>', extra_links + '  </nav>', 1)
     for n in nums:
         body += '<!-- ===================== LEZIONE %d ===================== -->\n' % n + rf(os.path.join(src, 'lezioni', 'l%d.html' % n))
     body += rf(pick('foot.html'))
@@ -128,7 +136,7 @@ def build_subject(mid):
         LANGNUMS[v] = lessons_of(os.path.join(main, v))
     nums, titles = build_page(mid, meta, main, mid, '../', cur, rel(''))
     for v, m in vars_:
-        build_page(mid, m, os.path.join(main, v), os.path.join(mid, v), '../../', v, rel(v + '/'))
+        build_page(mid, dict(m, _main_code=cur), os.path.join(main, v), os.path.join(mid, v), '../../', v, rel(v + '/'))
     return meta, nums, titles
 
 def thumb_svg(mid, k):
