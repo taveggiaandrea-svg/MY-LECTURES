@@ -54,6 +54,10 @@ Alla fine del gruppo di lezioni di ogni docente c'è una lezione di riepilogo (m
 
 Le domande del quiz finale sono numerate («Domanda 1.»). Con la risposta giusta compare la spiegazione («Perché.»); con una sbagliata il suggerimento e il pulsante «Mostra la soluzione», che rivela la risposta e la spiegazione. «Chiedi all'AI» riceve anche i quiz della lezione aperta: domande, opzioni, risposta giusta, spiegazione e risposta già data dallo studente (letta da `localStorage`), con l'istruzione di guidare con indizi se lo studente non ha ancora risposto. L'indice iniziale della lezione è compatto, su una colonna.
 
+### Scaricare le lezioni
+
+Il pulsante con la freccia in basso nella barra superiore (accanto al sole/luna) scarica tutte le lezioni della materia, nella lingua della pagina, in un file Markdown (`bigdata-it.md`, `micro-it.md`...): testo, tabelle, codice, formule in LaTeX, didascalie delle figure, mappe mentali e quiz con risposta giusta e spiegazione. Serve per usare le lezioni come fonte in strumenti che non possono entrare nel sito protetto, come NotebookLM. Il file si genera nel browser dalla pagina (codice in fondo a `shared/boot.js`): è sempre aggiornato e non passa da nessun server.
+
 ### Materie in più lingue
 
 Una materia può avere una seconda lingua in una sottocartella di due lettere (oggi solo `materie/bigdata/en/`). `build.py` costruisce una pagina per lingua (`site/bigdata/` e `site/bigdata/en/`), aggiunge nella barra superiore il selettore delle lingue e uno script che ricorda la scelta (`localStorage`, chiave `lingua-<id>`) e riapre la stessa lezione nell'altra lingua, nello stesso punto (lezione, sezione e posizione passano in `localStorage`, chiave `salto-lingua`). Le regole di speculazione scritte da `build.py` fanno preparare a Chrome l'altra lingua in background, così il cambio è immediato; il passaggio fra le pagine è in dissolvenza (`@view-transition`). Dalla pagina iniziale il link della materia porta direttamente alla lingua scelta. `test.py` prova anche le pagine delle lingue.

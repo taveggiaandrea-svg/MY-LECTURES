@@ -47,7 +47,7 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',qnum:'Domanda',reveal:'Mostra la soluzione',expl:'Perché',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',dl:'Scarica le lezioni (Markdown, per NotebookLM)',dlFig:'Figura',dlMap:'Mappa mentale',dlQuiz:'Quiz',dlAns:'Risposta giusta',dlExp:'Spiegazione',dlHint:'Suggerimento',dlLesson:'Lezione',dlInq:'Quiz nel testo',qnum:'Domanda',reveal:'Mostra la soluzione',expl:'Perché',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
   askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
   askSlow:'nessuna risposta in tempo, provo il modello successivo.',
@@ -6234,6 +6234,57 @@ var paintProgress=(function(){
     save(q,cur,txt,used,txt?'':err)
     if(!sig.aborted)go.disabled=false};
   ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();go.click()}});
+})();
+
+/* ---------- Scarica le lezioni in Markdown (fonte per NotebookLM e simili, che non possono entrare nel sito protetto) ----------
+   Testo, tabelle, codice, formule in LaTeX, didascalie delle figure, mappe mentali e quiz con risposta e spiegazione. */
+(function(){
+  const tog=document.getElementById('tog');if(!tog||!lessons.length)return;
+  const b=document.createElement('button');b.type='button';b.className='tog dlbtn';b.title=UI.dl;b.setAttribute('aria-label',UI.dl);
+  b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 19h14"/></svg>';
+  tog.parentNode.insertBefore(b,tog);
+  const sp=t=>t.replace(/[ \t ]+/g,' ');
+  function inl(n){let o='';n.childNodes.forEach(c=>{
+    if(c.nodeType===3){o+=c.nodeValue;return}if(c.nodeType!==1)return;
+    if(c.classList.contains('katex')||c.classList.contains('katex-display')){const a=c.querySelector('annotation');o+=a?(c.classList.contains('katex-display')?'\\['+a.textContent+'\\]':'\\('+a.textContent+'\\)'):c.textContent;return}
+    const t=c.tagName;if(t==='BR'){o+='\n';return}
+    const x=inl(c),w=(m)=>x.trim()?x.match(/^\s*/)[0]+m+x.trim()+m+x.match(/\s*$/)[0]:x;if(t==='STRONG'||t==='B')o+=w('**');else if(t==='EM'||t==='I')o+=w('*');else if(t==='CODE')o+='`'+c.textContent+'`';
+    else if(t==='SUB')o+='_'+x;else if(t==='SUP')o+='^'+x;else o+=x});return sp(o)}
+  const plain=h=>{const d=document.createElement('div');d.innerHTML=h;return inl(d).replace(/\s+/g,' ').trim()};
+  function quizMd(r){const f=QZ[r.dataset.quiz];if(!f)return '';let qs;try{qs=f()}catch(_){return ''}const fin=!r.classList.contains('inq'),L='ABCDEFGH';
+    return qs.map((q,i)=>'**'+(fin?UI.qnum+' '+(i+1):UI.dlInq)+'.** '+plain(q.q)+'\n\n'+q.o.map((o,j)=>L[j]+') '+plain(o)).join('\n')+'\n\n'+UI.dlAns+': '+L[q.a]+') '+plain(q.o[q.a])+'\n\n'+UI.dlExp+': '+plain(q.e)+'\n').join('\n')}
+  function mapMd(k){const m=MAPPA[k];if(!m)return '';return '**'+UI.dlMap+': '+plain(m.c)+'**\n\n'+m.r.map(r=>'- '+plain(r.t)+'\n'+r.v.map(v=>'  - '+plain(v)).join('\n')).join('\n')+'\n'}
+  function tableMd(t){const rows=[...t.querySelectorAll('tr')].map(r=>[...r.children].map(c=>inl(c).replace(/\|/g,'/').replace(/\s+/g,' ').trim()));if(!rows.length)return '';
+    const w=Math.max(...rows.map(r=>r.length));rows.forEach(r=>{while(r.length<w)r.push('')});
+    return ['| '+rows[0].join(' | ')+' |','|'+rows[0].map(()=>' --- |').join('')].concat(rows.slice(1).map(r=>'| '+r.join(' | ')+' |')).join('\n')+'\n'}
+  function block(n){let o='';[...n.children].forEach(c=>{const t=c.tagName,cl=c.classList;
+    if(cl.contains('toc')||cl.contains('parttag')||cl.contains('navend')||cl.contains('partstart')||cl.contains('partend')||t==='SCRIPT')return;
+    if(/^H[1-4]$/.test(t)){o+='#'.repeat(+t[1]+1)+' '+inl(c).trim()+'\n\n';return}
+    if(t==='P'){const x=inl(c).trim();if(x)o+=x+'\n\n';return}
+    if(t==='PRE'){o+='```\n'+c.textContent.replace(/\n+$/,'')+'\n```\n\n';return}
+    if(t==='TABLE'){o+=tableMd(c)+'\n';return}
+    if(t==='FIGURE'){const m=c.querySelector('[data-mappa]'),cap=c.querySelector('figcaption');if(m)o+=mapMd(m.dataset.mappa)+'\n';
+      if(cap)o+='> '+(m?'':UI.dlFig+': ')+inl(cap).trim()+'\n\n';return}
+    if(cl.contains('quiz')){o+=quizMd(c)+'\n';return}
+    if(cl.contains('eq')){o+=inl(c).trim()+'\n\n';return}
+    if(t==='DETAILS'){const s=c.querySelector('summary');o+=(s?'**'+inl(s).trim()+'**\n\n':'')+block(c);return}
+    if(t==='SUMMARY')return;
+    if(c.querySelector('table')&&cl.contains('scroll')){c.querySelectorAll('table').forEach(x=>o+=tableMd(x)+'\n');return}
+    if(cl.contains('examend')){o+='> '+inl(c).trim()+'\n\n';return}
+    o+=block(c)});return o}
+  b.addEventListener('click',()=>{
+    let md='# '+document.title+'\n\n';const fo=document.querySelector('footer');
+    lessons.forEach(l=>{const lab=l.dataset.label||(UI.dlLesson+' '+l.dataset.n),d=l.dataset.docente;
+      md+='\n---\n\n## '+lab+' · '+l.dataset.title+(d?' ('+d+')':'')+'\n\n';
+      l.querySelectorAll(':scope > section').forEach(s=>{const c=s.querySelector('.col')||s;
+        const h=s.classList.contains('hero');if(h){const ch=c.querySelector('.chap'),de=c.querySelector('.desc');md+=(ch?'*'+inl(ch).trim()+'*\n\n':'')+(de?inl(de).trim()+'\n\n':'');return}
+        md+=block(c)})});
+    if(fo)md+='\n---\n\n'+block(fo.querySelector('.col')||fo);
+    md=md.replace(/\n{3,}/g,'\n\n');
+    const mid=(document.querySelector('.lang a[data-mid]')||{dataset:{}}).dataset.mid||location.pathname.split('/').filter(Boolean)[0]||'lezioni';
+    const lang=document.documentElement.lang||'it',a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown;charset=utf-8'}));a.download=mid+'-'+lang+'.md';document.body.append(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)});
 })();
 
 /* griglia animata nella barra: una griglia che subisce lentamente trasformazioni lineari */
