@@ -52,8 +52,8 @@ const fill=(t,o)=>t.replace(/\{(\w+)\}/g,(_,k)=>String(o[k]).replace(/\. /g,'.\u
   })})();
 lessons.forEach((l,i)=>{
   const nav=l.querySelector('.navend');if(!nav)return;
-  const card=(m,cls,lab)=>{const t=byN(m).dataset.title;
-    return '<a class="'+cls+'" href="#lezione-'+m+'" data-go="'+m+'"><span class="th" aria-hidden="true">'+(THUMB[m]||'')+'</span><span class="tx"><small>'+lab+'</small>'+m+' · '+t+'</span></a>'};
+  const card=(m,cls,lab)=>{const t=byN(m).dataset.title,num=byN(m).dataset.label||m;
+    return '<a class="'+cls+'" href="#lezione-'+m+'" data-go="'+m+'"><span class="th" aria-hidden="true">'+(THUMB[m]||'')+'</span><span class="tx"><small>'+lab+'</small>'+num+' · '+t+'</span></a>'};
   const nx=lessons[i+1],cross=nx&&l.dataset.parte&&nx.dataset.parte&&nx.dataset.parte!==l.dataset.parte;
   nav.innerHTML=(i>0?card(NUMS[i-1],'prev',UI.prev):'')+(i<NUMS.length-1?card(NUMS[i+1],'next'+(cross?' cross':''),cross?fill(UI.partStart,{d:nx.dataset.docente}):UI.next):'');
 });
@@ -215,8 +215,18 @@ var paintProgress=(function(){
     const df={};CH.forEach(c=>{c.w=c.w||new Set(words(c.t));qs.forEach(w=>{if(c.w.has(w))df[w]=(df[w]||0)+1})});
     return CH.filter(c=>c.n!==cur).map(c=>({c,s:qs.reduce((a,w)=>a+(c.w.has(w)?Math.log(1+CH.length/df[w]):0),0)/Math.sqrt(1+c.t.length/1500)}))
       .filter(x=>x.s>0).sort((a,b)=>b.s-a.s).filter(x=>(budget-=x.c.t.length)>0).map(x=>x.c)}
+  /* i quiz della lezione aperta, con risposta giusta, spiegazione e risposta già data dallo studente (localStorage) */
+  const plain=h=>{const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.katex').forEach(k=>{const a=k.querySelector('annotation');k.replaceWith(a?'\\('+a.textContent+'\\)':k.textContent)});return d.textContent.replace(/\s+/g,' ').trim()};
+  function quizText(art){const out=[];let inq=0;
+    art.querySelectorAll('[data-quiz]').forEach(r=>{const f=QZ[r.dataset.quiz];if(!f)return;let qs;try{qs=f()}catch(_){return}
+      const fin=!r.classList.contains('inq'),sec=r.closest('section'),h=sec&&sec.querySelector('h2,h3');
+      qs.forEach((x,i)=>{let v=null;try{v=localStorage.getItem(quizKey(r,i,x))}catch(_){}
+        const L='ABCDEFGH',st=v===null?'not answered yet':('answered '+L[+v]+(+v===x.a?' (correct)':' (wrong)'));
+        out.push((fin?'FINAL QUIZ, '+UI.qnum+' '+(i+1):'IN-TEXT QUIZ '+(++inq)+(h?' (section «'+plain(h.innerHTML)+'»)':''))+': '+plain(x.q)+'\n'+
+          x.o.map((o,j)=>L[j]+') '+plain(o)).join('\n')+'\nCorrect: '+L[x.a]+'. Explanation: '+plain(x.e)+' Hint: '+plain(x.h||'')+'\nStudent: '+st)})});
+    return out.length?'QUIZZES OF THE OPEN LESSON (the student sees final-quiz questions numbered as below). If the student asks about a quiz they have not answered yet, guide them with hints and reasoning first and give the answer only if they explicitly ask for it; if they already answered, explain why the correct option is right and why theirs is wrong.\n'+out.join('\n\n'):''}
   function context(q,cur){index();
-    const art=byN(cur),parts=['COURSE: '+document.title+'\nLESSONS:\n'+MAP,'OPEN LESSON '+cur+':\n'+clean(art).slice(0,40000)];
+    const art=byN(cur),parts=['COURSE: '+document.title+'\nLESSONS:\n'+MAP,'OPEN LESSON '+cur+':\n'+clean(art).slice(0,40000)],qt=quizText(art);if(qt)parts.push(qt.slice(0,20000));
     /* lezioni citate per numero nella domanda: intere */
     const named=[...new Set([...q.matchAll(/\b(?:lezione|lezioni|lesson|lessons|lez\.?|l)\s*(\d{1,2})\b/gi)].map(m=>+m[1]))].filter(n=>n!==cur&&NUMS.includes(n)).slice(0,3);
     named.forEach(n=>parts.push('LESSON '+n+':\n'+clean(byN(n)).slice(0,30000)));

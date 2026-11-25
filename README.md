@@ -46,6 +46,14 @@ Aggiungere `lezioni/lN.html` e `js/lN.js`, un link in `top.html`, una miniatura 
 
 Se il corso è diviso fra più docenti, ogni `<article class="lesson">` porta `data-docente="L. Molteni"` (stesso valore per tutte le lezioni di un docente). Dove il valore cambia, `shared/boot.js` aggiunge da solo lo stacco: etichetta «Parte N · docente» nell'apertura di ogni lezione, riquadro «Fine della parte di …» prima dei link in fondo all'ultima lezione del docente, riquadro «Inizia la parte di …» e segno colorato nel menu sulla prima lezione del docente successivo (parte 1 blu, 2 arancione, 3 verde). Big Data: lezioni 1-8 A. Rezzani, 9-16 L. Molteni, 17-24 Tonini.
 
+### Lezioni di riepilogo
+
+Alla fine del gruppo di lezioni di ogni docente c'è una lezione di riepilogo (mappe mentali, definizioni pratiche, tabelle per scegliere lo strumento, quiz misto). Il file si chiama `l1NN.html` con NN = ultima lezione del gruppo (Big Data: `l108.html` dopo la lezione 8, `l116.html` dopo la 16): `build.py` la mette subito dopo quella lezione. L'articolo porta `data-label="Riepilogo 1-8"`, usato al posto del numero nei link in fondo alle lezioni, e lo stesso `data-docente` del gruppo. Le mappe multiple usano chiavi come `MAPPA['108a']`.
+
+### Quiz e assistente
+
+Le domande del quiz finale sono numerate («Domanda 1.»). Con la risposta giusta compare la spiegazione («Perché.»); con una sbagliata il suggerimento e il pulsante «Mostra la soluzione», che rivela la risposta e la spiegazione. «Chiedi all'AI» riceve anche i quiz della lezione aperta: domande, opzioni, risposta giusta, spiegazione e risposta già data dallo studente (letta da `localStorage`), con l'istruzione di guidare con indizi se lo studente non ha ancora risposto. L'indice iniziale della lezione è compatto, su una colonna.
+
 ### Materie in più lingue
 
 Una materia può avere una seconda lingua in una sottocartella di due lettere (oggi solo `materie/bigdata/en/`). `build.py` costruisce una pagina per lingua (`site/bigdata/` e `site/bigdata/en/`), aggiunge nella barra superiore il selettore delle lingue e uno script che ricorda la scelta (`localStorage`, chiave `lingua-<id>`) e riapre la stessa lezione nell'altra lingua, nello stesso punto (lezione, sezione e posizione passano in `localStorage`, chiave `salto-lingua`). Le regole di speculazione scritte da `build.py` fanno preparare a Chrome l'altra lingua in background, così il cambio è immediato; il passaggio fra le pagine è in dissolvenza (`@view-transition`). Dalla pagina iniziale il link della materia porta direttamente alla lingua scelta. `test.py` prova anche le pagine delle lingue.

@@ -46,7 +46,7 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',qnum:'Domanda',reveal:'Mostra la soluzione',expl:'Perché',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
   askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
   askSlow:'nessuna risposta in tempo, provo il modello successivo.',
@@ -100,13 +100,17 @@ const quizKey=(root,i,q)=>{let h=5381;for(const c of q.q+'|'+q.o.join('|'))h=(h*
   return 'quiz|'+(location.pathname.split('/').filter(Boolean)[0]||'')+'|'+(root.dataset.quiz||'')+'|'+i+'|'+h.toString(36)};
 function quiz(root,qs){
   qs.forEach((q,qi)=>{
-    const box=el('div','q');box.append(el('p','',q.q));
+    const box=el('div','q'),fin=!root.classList.contains('inq');box.append(el('p','',(fin?'<b class="qn">'+UI.qnum+' '+(qi+1)+'.</b> ':'')+q.q));
     const opts=el('div','opts'),fb=el('div','fb'),chk=btn(UI.check);chk.classList.add('solid','chk');fb.setAttribute('aria-live','polite');
     let sel=null;const key=quizKey(root,qi,q);
     const bsq=q.o.map((t,i)=>{const b=btn(t,true);b.onclick=()=>{sel=i;bsq.forEach((x,j)=>{press(x,j===i);x.classList.remove('right','wrong')});fb.innerHTML=''};opts.append(b);return b});
     const verify=save=>{if(sel===null){fb.innerHTML=UI.pickFirst;return}
       press(bsq[sel],false);bsq[sel].classList.add(sel===q.a?'right':'wrong');box.classList.add('done');
-      fb.innerHTML=sel===q.a?'<b>'+UI.right+'</b> '+q.e:'<b>'+UI.wrong+'</b> '+q.h;
+      const ex='<div class="expl"><b>'+UI.expl+'.</b> '+q.e+'</div>';
+      if(sel===q.a)fb.innerHTML='<b>'+UI.right+'</b>'+ex;
+      else{fb.innerHTML='<b>'+UI.wrong+'</b> '+q.h+' ';const rv=el('button','rev',UI.reveal);rv.type='button';
+        rv.onclick=()=>{bsq[q.a].classList.add('right');fb.innerHTML='<b>'+UI.wrong+'</b> '+q.h+ex;renderMath(fb)};fb.append(rv)}
+      if(typeof renderMath==='function')renderMath(fb);
       if(save)try{localStorage.setItem(key,String(sel))}catch(e){}};
     chk.onclick=()=>verify(true);
     box.append(opts,chk,fb);root.append(box);

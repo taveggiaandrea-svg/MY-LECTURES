@@ -300,13 +300,13 @@ html.lp .askbtn,html.lp .askp{right:27px}
 .mmap .mm-n{display:none}
 @media (max-width:560px){.mmap .mm-w{display:none}.mmap .mm-n{display:block;max-width:24rem;margin:0 auto}}
 /* indice iniziale della lezione, nella fascia del titolo */
-.toc{width:100%;max-width:38rem;margin-top:1.1rem;text-align:left;font-family:var(--sans);border:1px solid var(--frame);border-radius:12px;padding:.75rem .9rem;background:color-mix(in srgb,var(--bg) 35%,transparent)}
-.toch{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);margin-bottom:.35rem}
-.tocl{display:grid;grid-template-columns:1fr 1fr;gap:.1rem .9rem}
-.tocl a{display:flex;gap:.55rem;align-items:baseline;color:var(--fg);text-decoration:none;font-size:.9rem;line-height:1.35;padding:.32rem .4rem;border-radius:8px;transition:background .15s}
+.toc{width:100%;max-width:26rem;margin-top:.8rem;text-align:left;font-family:var(--sans);border:1px solid var(--frame);border-radius:10px;padding:.5rem .65rem;background:color-mix(in srgb,var(--bg) 35%,transparent)}
+.toch{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);margin-bottom:.35rem}
+.tocl{display:flex;flex-direction:column;gap:0}
+.tocl a{display:flex;gap:.55rem;align-items:baseline;color:var(--fg);text-decoration:none;font-size:.8rem;line-height:1.3;padding:.14rem .35rem;border-radius:6px;transition:background .15s}
 .tocl a:hover{background:color-mix(in srgb,var(--theme) 14%,transparent)}
 .tocl a b{flex:none;font-weight:600;color:var(--theme);font-variant-numeric:tabular-nums;min-width:1.1em}
-@media (max-width:560px){.tocl{grid-template-columns:1fr}}
+
 /* passaggio fra le pagine (per esempio fra le lingue) in dissolvenza, dove il browser lo permette */
 @view-transition{navigation:auto}
 
@@ -319,3 +319,8 @@ html.lp .askbtn,html.lp .askp{right:27px}
 .partstart.p2{border-color:var(--orange);background:color-mix(in srgb,var(--orange) 10%,transparent)}.partstart.p2 b{color:var(--orange)}
 .partstart.p3{border-color:var(--green);background:color-mix(in srgb,var(--green) 10%,transparent)}.partstart.p3 b{color:var(--green)}
 .navend a.cross{outline:2px solid var(--orange);outline-offset:-2px}.navend a.cross small{color:var(--orange)}
+
+/* quiz: numero delle domande finali, spiegazione dopo la risposta, soluzione a richiesta */
+.q .qn{font-family:var(--sans);font-weight:600;color:var(--theme)}
+.fb .expl{margin-top:.45rem;padding-top:.45rem;border-top:1px solid var(--frame)}
+.fb .rev{font:500 .85rem var(--sans);background:none;border:0;color:var(--theme);text-decoration:underline;cursor:pointer;padding:0;margin-left:.2rem}

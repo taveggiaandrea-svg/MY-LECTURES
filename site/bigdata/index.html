@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&display=swap">
 <link rel="stylesheet" href="../assets/katex/katex.min.css">
 <link rel="stylesheet" href="../assets/style.css">
-<script>try{var p=localStorage.getItem('lingua-bigdata'),m={it:'./',en:'en/'},L={it:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],en:[1,2,3,4,5,6,7,8,9]},h=location.hash.match(/lezione-(\d+)/);if(!document.prerendering&&p&&p!=='it'&&m[p]&&!(h&&L[p].indexOf(+h[1])<0))location.replace(m[p]+location.hash)}catch(e){}</script>
+<script>try{var p=localStorage.getItem('lingua-bigdata'),m={it:'./',en:'en/'},L={it:[1,2,3,4,5,6,7,8,108,9,10,11,12,13,14,15,16,116],en:[1,2,3,4,5,6,7,8,9]},h=location.hash.match(/lezione-(\d+)/);if(!document.prerendering&&p&&p!=='it'&&m[p]&&!(h&&L[p].indexOf(+h[1])<0))location.replace(m[p]+location.hash)}catch(e){}</script>
 <script type="speculationrules">{"prerender":[{"where":{"selector_matches":".lang a:not([aria-current])"},"eagerness":"eager"}]}</script>
 <script>document.documentElement.classList.add('lp')</script>
 <script>try{if(localStorage.getItem('tema')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
@@ -29,6 +29,7 @@
     <a href="#lezione-6" data-go="6">6 · Spark</a>
     <a href="#lezione-7" data-go="7">7 · Stack di Spark</a>
     <a href="#lezione-8" data-go="8">8 · Data lake</a>
+    <a href="#lezione-108" data-go="108">Riepilogo 1-8</a>
     <a href="#lezione-9" data-go="9">9 · AI e dati</a>
     <a href="#lezione-10" data-go="10">10 · KNIME</a>
     <a href="#lezione-11" data-go="11">11 · Preparazione</a>
@@ -37,8 +38,9 @@
     <a href="#lezione-14" data-go="14">14 · Casi applicati</a>
     <a href="#lezione-15" data-go="15">15 · Testi</a>
     <a href="#lezione-16" data-go="16">16 · Immagini</a>
+    <a href="#lezione-116" data-go="116">Riepilogo 9-16</a>
   </nav>
-  <div class="lang" role="group" aria-label="Lingua / Language"><a href="./" data-lang="it" data-mid="bigdata" data-nums="1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16" aria-current="true">IT</a><a href="en/" data-lang="en" data-mid="bigdata" data-nums="1,2,3,4,5,6,7,8,9">EN</a></div>
+  <div class="lang" role="group" aria-label="Lingua / Language"><a href="./" data-lang="it" data-mid="bigdata" data-nums="1,2,3,4,5,6,7,8,108,9,10,11,12,13,14,15,16,116" aria-current="true">IT</a><a href="en/" data-lang="en" data-mid="bigdata" data-nums="1,2,3,4,5,6,7,8,9">EN</a></div>
   <button class="tog" id="tog" type="button"></button>
   </div>
 </header>
@@ -1314,7 +1316,178 @@ query = (streamingCountsDF.writeStream.format("memory")
 
 <section><div class="col">
   <p>Se di questa lezione dovesse restarti una sola cosa: <strong>il lago tiene tutto, grezzo ed economico, con lo schema deciso al momento della lettura; il warehouse tiene i dati caldi e distillati per le query veloci</strong>, e la governance decide se il lago resta utilizzabile.</p>
-  <p>La lezione 9 fa un passo indietro per chiedersi perché tutto questo conti per il business: come i data warehouse e i Big Data alimentano l'AI predittiva e generativa.</p>
+  <p>Prima della lezione 9 c'è una pagina di riepilogo delle lezioni da 1 a 8. La lezione 9 fa poi un passo indietro per chiedersi perché tutto questo conti per il business: come i data warehouse e i Big Data alimentano l'AI predittiva e generativa.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>
+<!-- ===================== LEZIONE 108 ===================== -->
+<article class="lesson" data-n="108" data-label="Riepilogo 1-8" data-docente="A. Rezzani" id="lezione-108" data-title="Che cosa serve sapere della prima parte del corso?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Riepilogo · lezioni 1-8 di A. Rezzani</p>
+  <h1>Che cosa serve sapere della prima parte del corso?</h1>
+  <p class="desc">Le lezioni da 1 a 8 in una pagina da tenere aperta mentre ripassi: mappe mentali, definizioni pratiche, i modelli di SQL e Spark da riusare, le tabelle per scegliere lo strumento giusto e un quiz finale che mescola tutto.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Questa pagina non introduce nulla di nuovo: rimette in ordine quello che hai visto, in forma da usare. Ogni sezione si apre con una mappa e prosegue con le definizioni e gli strumenti; il numero fra parentesi rimanda alla lezione in cui l'argomento è spiegato con calma.</p>
+  <h2>Il percorso in una mappa</h2>
+  <p>La prima parte del corso segue una sola domanda: dove stanno i dati di un'azienda, e come si interrogano quando diventano troppi o troppo vari per un database classico?</p>
+  <figure>
+    <div class="w" data-mappa="108"></div>
+    <figcaption>Le otto lezioni della prima parte come rami di una mappa: dai report sui database operativi al data warehouse, SQL, i database NoSQL, Hadoop, Spark e il data lake.</figcaption>
+  </figure>
+  <p class="stmt"><strong>Il filo:</strong> il database operativo registra, il data warehouse integra per decidere, SQL interroga; quando i dati superano una macchina si distribuiscono (NoSQL, HDFS) e si elaborano in parallelo (MapReduce, poi Spark); i dati grezzi finiscono nel data lake, accanto al warehouse.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Dati per decidere</h2>
+  <figure>
+    <div class="w" data-mappa="108a"></div>
+    <figcaption>Dove vivono i dati e a che cosa servono: sistemi operativi, warehouse con ETL e BI, data lake.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Termine</th><th>Definizione pratica</th><th>Lezione</th></tr></thead><tbody>
+    <tr><td>Database operativo (OLTP)</td><td>registra in tempo reale l'attività quotidiana (ERP, CRM); progettato per scrivere in fretta singoli record, completamente normalizzato</td><td>1, 2</td></tr>
+    <tr><td>Data warehouse (DWH)</td><td>database analitico separato, integrato e ripulito, con dati a più livelli di aggregazione: l'unica fonte di verità per le decisioni</td><td>1, 2</td></tr>
+    <tr><td>ETL</td><td>estrarre dalle fonti, trasformare con regole di business e controlli di qualità (in un'area di staging), caricare nel warehouse</td><td>1</td></tr>
+    <tr><td>Tabella dei fatti e dimensioni</td><td>fatti: misure più chiavi verso le dimensioni; dimensioni: descrizioni denormalizzate (chi, che cosa, dove, quando)</td><td>2</td></tr>
+    <tr><td>OLAP</td><td>cubi multidimensionali per aggregare trascinando i campi, senza scrivere SQL</td><td>1</td></tr>
+    <tr><td>Business Intelligence</td><td>tecnologie e pratiche per raccogliere, integrare, analizzare e presentare i dati a chi decide</td><td>1</td></tr>
+    <tr><td>Data lake</td><td>archivio di dati grezzi in formato nativo (strutturati e no) più dati elaborati, economico, su Hadoop e Spark</td><td>8</td></tr>
+    <tr><td>Schema on write / on read</td><td>warehouse: lo schema si decide prima di inserire; lago: si decide quando si legge</td><td>8</td></tr>
+    <tr><td>Distillazione dei dati</td><td>analisi pesanti nel lago che producono risultati piccoli, caricati nel warehouse</td><td>8</td></tr>
+  </tbody></table></div>
+  <p>Strumento pratico: dove metto questi dati?</p>
+  <div class="scroll"><table><thead><tr><th>Situazione</th><th>Dove</th><th>Perché</th></tr></thead><tbody>
+    <tr><td>giacenza aggiornata a ogni vendita</td><td>database operativo</td><td>serve il dato attuale, riga per riga</td></tr>
+    <tr><td>vendite mensili di dieci anni per regione</td><td>data warehouse</td><td>storico integrato, query di aggregazione veloci</td></tr>
+    <tr><td>log dei clic, immagini, recensioni in testo libero</td><td>data lake</td><td>grezzi e vari, lo schema si decide dopo</td></tr>
+    <tr><td>dati vecchi del warehouse consultati di rado</td><td>data lake (offloading)</td><td>memorizzazione economica per i dati freddi</td></tr>
+  </tbody></table></div>
+  <p>I fattori di successo del lago, secondo la lezione 8, sono quattro: governance dei dati, processo di qualità, gestione dei metadati, formazione. Senza, il lago diventa una palude.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>SQL da usare</h2>
+  <figure>
+    <div class="w" data-mappa="108b"></div>
+    <figcaption>Il modello relazionale e SQL: tabelle e chiavi, integrità e normalizzazione, interrogazioni, join, gruppi e funzioni finestra.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Vincolo</th><th>Che cosa impedisce</th></tr></thead><tbody>
+    <tr><td>Chiave primaria (integrità dell'entità)</td><td>righe duplicate o senza identificativo</td></tr>
+    <tr><td>Chiave esterna (integrità referenziale)</td><td>un riferimento a una riga che non esiste: il valore è NULL o presente nella chiave primaria collegata</td></tr>
+    <tr><td>Tipo, NOT NULL, CHECK (integrità del dominio)</td><td>valori fuori dalle regole dichiarate, per esempio una quantità negativa</td></tr>
+    <tr><td>Normalizzazione (1NF, 3NF)</td><td>ridondanza e anomalie di inserimento, aggiornamento, cancellazione: ogni fatto si scrive una volta sola</td></tr>
+  </tbody></table></div>
+  <p>Una query si scrive in un ordine e si legge, logicamente, in un altro. Tenere a mente l'ordine logico (un riepilogo aggiunto qui) spiega quasi tutti gli errori tipici: perché WHERE non vede le aggregazioni, perché un alias di SELECT non si può usare in WHERE.</p>
+  <div class="scroll"><table><thead><tr><th>Ordine logico</th><th>Clausola</th><th>Che cosa fa</th></tr></thead><tbody>
+    <tr><td>1</td><td>FROM, JOIN ... ON</td><td>prodotto cartesiano delle tabelle, filtrato dal predicato del join</td></tr>
+    <tr><td>2</td><td>WHERE</td><td>tiene le righe con condizione TRUE (non UNKNOWN)</td></tr>
+    <tr><td>3</td><td>GROUP BY</td><td>una riga per combinazione dei valori di raggruppamento</td></tr>
+    <tr><td>4</td><td>HAVING</td><td>tiene i gruppi; può usare le aggregazioni</td></tr>
+    <tr><td>5</td><td>SELECT (e OVER)</td><td>calcola le colonne, comprese le funzioni finestra</td></tr>
+    <tr><td>6</td><td>ORDER BY</td><td>ordina il risultato</td></tr>
+  </tbody></table></div>
+  <p>I modelli da riusare, con le tabelle Customers e Sales della lezione 2:</p>
+<pre class="code">-- clienti con il totale venduto, anche chi non ha comprato nulla
+SELECT c.customer_id, c.last_name, COALESCE(SUM(s.quantity * s.price), 0) AS total
+FROM Customers c
+LEFT JOIN Sales s ON s.customer_id = c.customer_id
+GROUP BY c.customer_id, c.last_name
+HAVING COALESCE(SUM(s.quantity * s.price), 0) &lt; 100
+ORDER BY total DESC;
+
+-- clienti che non hanno mai comprato (anti-join)
+SELECT c.* FROM Customers c
+WHERE NOT EXISTS (SELECT 1 FROM Sales s WHERE s.customer_id = c.customer_id);
+
+-- totale progressivo e media mobile su 3 righe, senza perdere il dettaglio
+SELECT sales_date, quantity,
+       SUM(quantity) OVER (ORDER BY sales_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running,
+       AVG(quantity) OVER (ORDER BY sales_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg,
+       LAG(quantity) OVER (ORDER BY sales_date) AS previous
+FROM Sales;</pre>
+  <div class="scroll"><table><thead><tr><th>Domanda</th><th>Strumento</th></tr></thead><tbody>
+    <tr><td>solo le coppie che combaciano</td><td>INNER JOIN</td></tr>
+    <tr><td>tutte le righe di una tabella, anche senza partner</td><td>LEFT (o RIGHT) JOIN, poi i NULL della parte mancante</td></tr>
+    <tr><td>tutte le righe di entrambe</td><td>FULL OUTER JOIN</td></tr>
+    <tr><td>righe di due query una sotto l'altra</td><td>UNION (senza duplicati), UNION ALL (con)</td></tr>
+    <tr><td>c'è almeno una riga collegata?</td><td>EXISTS, NOT EXISTS</td></tr>
+    <tr><td>un totale per gruppo</td><td>GROUP BY con SUM, COUNT, AVG...</td></tr>
+    <tr><td>un totale per gruppo senza perdere le righe</td><td>funzione finestra: SUM(...) OVER (PARTITION BY ...)</td></tr>
+    <tr><td>il valore della riga precedente</td><td>LAG; la successiva LEAD</td></tr>
+  </tbody></table></div>
+  <p class="stmt"><strong>Tre regole sui NULL:</strong> ogni confronto con NULL è UNKNOWN, quindi si usa IS NULL e mai = NULL; le aggregazioni ignorano i NULL, tranne COUNT(*); COALESCE(x, valore) li sostituisce.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando una macchina non basta</h2>
+  <figure>
+    <div class="w" data-mappa="108c"></div>
+    <figcaption>Sistemi distribuiti: scalabilità orizzontale, ACID e BASE, le quattro famiglie NoSQL, HDFS e MapReduce.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Famiglia NoSQL</th><th>Come memorizza</th><th>Quando sceglierla</th><th>Esempio della lezione</th></tr></thead><tbody>
+    <tr><td>Key-value</td><td>coppie chiave-valore</td><td>letture e scritture velocissime per chiave (sessioni, carrelli)</td><td></td></tr>
+    <tr><td>Documenti</td><td>documenti JSON o XML senza schema fisso</td><td>oggetti con campi variabili (profili, cataloghi)</td><td></td></tr>
+    <tr><td>Colonne</td><td>dati per colonna, righe con colonne variabili</td><td>tabelle enormi e sparse, analisi per colonna</td><td>HBase su HDFS</td></tr>
+    <tr><td>Grafo</td><td>nodi e relazioni con proprietà</td><td>relazioni fitte da attraversare (reti sociali, frodi)</td><td>Neo4j, linguaggio Cypher</td></tr>
+  </tbody></table></div>
+  <div class="scroll"><table><thead><tr><th></th><th>ACID (relazionale)</th><th>BASE (molti NoSQL)</th></tr></thead><tbody>
+    <tr><td>Promessa</td><td>atomicità, coerenza, isolamento, durabilità</td><td>sempre disponibile, stato non sempre coerente, coerenza alla fine</td></tr>
+    <tr><td>Quando</td><td>soldi, ordini, tutto ciò che non può essere a metà</td><td>grandi volumi distribuiti dove una lettura un po' vecchia è accettabile</td></tr>
+  </tbody></table></div>
+  <p>Il conto che torna sempre su HDFS (lezione 5): un file di 1 GB con blocchi da 128 MB diventa 8 blocchi; con il fattore di replica 3 i blocchi memorizzati sono 24 e lo spazio occupato è 3 GB. Con l'erasure coding di Hadoop 3 il sovraccarico scende dal 200% al 50%: 1,5 GB.</p>
+  <div class="eq">\[ \text{blocchi} = \left\lceil \frac{\text{dimensione}}{\text{blocco}} \right\rceil \qquad \text{spazio} = \text{dimensione} \times \text{replica} \]</div>
+  <div class="scroll"><table><thead><tr><th>Pezzo</th><th>Ruolo</th></tr></thead><tbody>
+    <tr><td>Name node</td><td>il master: metadati di file e blocchi, gestisce la replica</td></tr>
+    <tr><td>Data node</td><td>gli slave: leggono e scrivono i blocchi</td></tr>
+    <tr><td>Map</td><td>trasforma i dati in coppie chiave/valore, sui nodi che li contengono (località dei dati)</td></tr>
+    <tr><td>Shuffle e ordinamento</td><td>il sistema raccoglie i valori della stessa chiave attraverso la rete</td></tr>
+    <tr><td>Reduce</td><td>calcola per chiave e scrive il risultato in HDFS</td></tr>
+    <tr><td>YARN</td><td>assegna le risorse del cluster ai job</td></tr>
+    <tr><td>Hive, Pig</td><td>linguaggi di alto livello (HiveQL simile a SQL) tradotti in job</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Spark in pratica</h2>
+  <figure>
+    <div class="w" data-mappa="108d"></div>
+    <figcaption>Spark: architettura, RDD ed esecuzione pigra, DataFrame e SQL, streaming, grafi e MLlib.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Concetto</th><th>Da ricordare</th></tr></thead><tbody>
+    <tr><td>Perché è veloce</td><td>tiene i risultati intermedi in memoria invece di scriverli su HDFS a ogni passo come MapReduce</td></tr>
+    <tr><td>Driver, executor, task</td><td>il driver contiene il programma e la SparkSession; gli executor sui worker eseguono i task sulle partizioni</td></tr>
+    <tr><td>Trasformazione</td><td>crea un nuovo RDD o DataFrame e allunga il DAG, senza calcolare (map, flatMap, filter, reduceByKey)</td></tr>
+    <tr><td>Azione</td><td>fa partire il calcolo e restituisce un risultato (collect, count, show)</td></tr>
+    <tr><td>Stage e shuffle</td><td>il DAG si taglia in stage dove serve uno shuffle, cioè quando si aggrega o si ordina per chiave</td></tr>
+    <tr><td>DataFrame</td><td>colonne con nome e schema: si filtra, aggrega e unisce per colonna, anche in SQL con una vista temporanea</td></tr>
+    <tr><td>Structured Streaming</td><td>il flusso come tabella illimitata a cui si aggiungono righe; readStream, writeStream, trigger</td></tr>
+    <tr><td>GraphFrames</td><td>un DataFrame di vertici (id) e uno di archi (src, dst); gradi, PageRank, componenti connesse, triangoli</td></tr>
+    <tr><td>MLlib</td><td>pipeline di transformer (Tokenizer, HashingTF) ed estimator (LogisticRegression), valutate su dati di test</td></tr>
+  </tbody></table></div>
+<pre class="code"># il word count in PySpark: trasformazioni pigre, poi un'azione
+rdd = spark.sparkContext.textFile("testo.txt")
+counts = (rdd.flatMap(lambda line: line.split())
+             .map(lambda w: (w, 1))
+             .reduceByKey(lambda a, b: a + b))   # shuffle: nuovo stage
+counts.collect()                                  # azione: parte il calcolo
+
+# la stessa logica sui DataFrame e in SQL
+df = spark.read.csv("sales.csv", header=True, inferSchema=True)
+df.filter(df.quantity &gt; 2).groupBy("product").sum("quantity").show()
+df.createOrReplaceTempView("sales")
+spark.sql("SELECT product, SUM(quantity) FROM sales GROUP BY product").show()</pre>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <p>Otto domande che mescolano le lezioni da 1 a 8, come in un esame.</p>
+  <div class="quiz" data-quiz="108"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se della prima parte dovesse restarti una sola cosa: <strong>ogni strumento nasce dal limite del precedente</strong>; il warehouse dal disordine dei sistemi operativi, NoSQL e HDFS dai limiti di una macchina, Spark dalla lentezza di MapReduce, il data lake dalla rigidità dello schema.</p>
+  <p>La lezione 9 apre la parte di L. Molteni: a che cosa servono tutti questi dati, cioè a modelli che prevedono.</p>
   <nav class="navend" aria-label="Altre lezioni"></nav>
 </div></section>
 </article>
@@ -2883,7 +3056,182 @@ query = (streamingCountsDF.writeStream.format("memory")
 
 <section><div class="col">
   <p>Se di questa lezione dovesse restarti una sola cosa: <strong>con l'approccio classico sei tu a decidere quali numeri estrarre da un'immagine (soglia, segmenti, luminosità, tessitura)</strong>; dopo, l'immagine è una riga come un'altra, e la soglia del modello si sceglie sul prezzo dei due errori.</p>
-  <p>Qui finisce la parte di L. Molteni. La lezione successiva, con le reti neurali, apre la parte di Tonini.</p>
+  <p>Qui finiscono le lezioni di L. Molteni: la pagina successiva le riassume tutte in una cassetta degli attrezzi. Poi, con le reti neurali, comincia la parte di Tonini.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>
+<!-- ===================== LEZIONE 116 ===================== -->
+<article class="lesson" data-n="116" data-label="Riepilogo 9-16" data-docente="L. Molteni" id="lezione-116" data-title="Che cosa serve sapere della seconda parte del corso?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Riepilogo · lezioni 9-16 di L. Molteni</p>
+  <h1>Che cosa serve sapere della seconda parte del corso?</h1>
+  <p class="desc">Le lezioni da 9 a 16 come cassetta degli attrezzi: dalla domanda di business alla decisione, con le tabelle per scegliere il test, il trattamento dei dati, l'indice di valutazione e il modello, le formule da ricordare, i nodi di KNIME e un quiz finale misto.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Questa pagina non aggiunge argomenti: ordina quelli della seconda parte nella sequenza in cui li userai in un progetto vero. Il numero fra parentesi rimanda alla lezione in cui ogni cosa è spiegata.</p>
+  <h2>Il percorso in una mappa</h2>
+  <figure>
+    <div class="w" data-mappa="116"></div>
+    <figcaption>Le fasi di un progetto di modellazione predittiva come rami di una mappa, ciascuno con le lezioni che lo trattano.</figcaption>
+  </figure>
+  <p class="stmt"><strong>Il filo:</strong> una domanda di business diventa un target; i dati si esplorano, si preparano e si controllano contro il leakage; i modelli si addestrano e si giudicano solo su dati mai visti; la soglia si sceglie sui costi; testi e immagini entrano nella stessa catena una volta trasformati in colonne.</p>
+  <p>Una lista di controllo per qualsiasi progetto, nell'ordine in cui serve:</p>
+  <div class="scroll"><table><thead><tr><th>Passo</th><th>Domanda da farsi</th><th>Lezione</th></tr></thead><tbody>
+    <tr><td>1. Target</td><td>che cosa prevedo, quale decisione ne dipende, con quale KPI la misuro?</td><td>9</td></tr>
+    <tr><td>2. Esplorazione</td><td>di che tipo è ogni variabile, come si distribuisce, quali sono legate al target?</td><td>10</td></tr>
+    <tr><td>3. Leakage</td><td>conoscerei questa colonna al momento della previsione?</td><td>11, 14</td></tr>
+    <tr><td>4. Mancanti e anomali</td><td>perché manca? È un errore o un valore estremo vero?</td><td>11</td></tr>
+    <tr><td>5. Feature</td><td>quali variabili nuove portano segnale? Vanno codificate o riscalate?</td><td>11</td></tr>
+    <tr><td>6. Divisione</td><td>ho diviso in modo stratificato, con il seme fisso, prima di bilanciare?</td><td>12, 14</td></tr>
+    <tr><td>7. Modelli</td><td>albero leggibile, foresta robusta o boosting regolato?</td><td>13</td></tr>
+    <tr><td>8. Valutazione</td><td>quali indici, sul test, contro quale riferimento ingenuo?</td><td>12</td></tr>
+    <tr><td>9. Sospetti</td><td>il risultato è troppo bello? Che cosa c'è nel primo taglio?</td><td>14</td></tr>
+    <tr><td>10. Decisione</td><td>quale soglia minimizza il costo atteso? Quanti casi posso trattare?</td><td>14, 16</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Leggere i dati: quale test?</h2>
+  <figure>
+    <div class="w" data-mappa="116a"></div>
+    <figcaption>L'analisi dei dati della lezione 10: tipi di variabile, statistiche di una variabile, test d'ipotesi e i tre casi bivariati.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Due variabili</th><th>Grafico</th><th>Test</th><th>Forza</th><th>Nodi di KNIME</th></tr></thead><tbody>
+    <tr><td>qualitativa e qualitativa</td><td>barre per categoria</td><td>\(\chi^2\) di indipendenza</td><td>V di Cramér: sotto 10% bassa, 10-25% media, sopra 25% alta</td><td>Crosstab</td></tr>
+    <tr><td>quantitativa e quantitativa</td><td>scatter plot</td><td>test t su \(\rho = 0\)</td><td>r di Pearson, da −1 a +1 (solo legami lineari)</td><td>Linear Correlation, Scatter Plot</td></tr>
+    <tr><td>quantitativa e qualitativa</td><td>box plot</td><td>ANOVA, test F</td><td>quanto differiscono le medie</td><td>One-way ANOVA, Box Plot</td></tr>
+  </tbody></table></div>
+  <div class="scroll"><table><thead><tr><th>Formula</th><th>A che cosa serve</th></tr></thead><tbody>
+    <tr><td>\(\bar{x} = \frac{1}{n}\sum x_i\)</td><td>media; la mediana resiste meglio ai valori estremi</td></tr>
+    <tr><td>\(s = \sqrt{\sum (x_i-\bar{x})^2/(n-1)}\), \(CV = s/\bar{x}\)</td><td>dispersione; il CV confronta grandezze diverse</td></tr>
+    <tr><td>IQR \(= Q_3 - Q_1\); anomalo oltre \(Q_3 + 1{,}5\,\text{IQR}\) o sotto \(Q_1 - 1{,}5\,\text{IQR}\)</td><td>dispersione robusta e regola del box plot (lezione 11)</td></tr>
+    <tr><td>\(E = \text{riga} \times \text{colonna} / N\), \(\chi^2 = \sum (O-E)^2/E\)</td><td>frequenze attese con indipendenza e distanza da esse</td></tr>
+    <tr><td>\(V = \sqrt{\chi^2 / (N(k-1))}\)</td><td>forza di un legame fra qualitative</td></tr>
+    <tr><td>\(r = \text{Cov}(X,Y)/(s_X s_Y)\)</td><td>legame lineare fra quantitative</td></tr>
+    <tr><td>\(F = \text{MSB}/\text{MSW}\)</td><td>variabilità fra gruppi contro dentro i gruppi</td></tr>
+  </tbody></table></div>
+  <p class="stmt"><strong>Regola del test:</strong> p-value minore di \(\alpha\), si rifiuta \(H_0\). Il p-value dice se un legame esiste; un indice come V o r dice quanto è forte; con campioni grandi conta anche l'ampiezza.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Preparare i dati: che cosa faccio di questo valore?</h2>
+  <figure>
+    <div class="w" data-mappa="116b"></div>
+    <figcaption>La preparazione dei dati della lezione 11: mancanti, anomali, leakage, feature engineering.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Situazione</th><th>Decisione</th><th>Nodo di KNIME</th></tr></thead><tbody>
+    <tr><td>mancante completamente a caso (MCAR)</td><td>cancellare o imputare: media (simmetrica), mediana (asimmetrica), moda (categorica)</td><td>Missing Value</td></tr>
+    <tr><td>mancante legato ad altre variabili (MAR)</td><td>imputare per gruppo o con un modello</td><td>Missing Value, learner e predictor</td></tr>
+    <tr><td>mancante che dipende dal valore (MNAR)</td><td>indicatore o categoria «non dichiarato»</td><td>Expression, Rule Engine</td></tr>
+    <tr><td>mancante strutturale</td><td>valore logico (spesa dei clienti nuovi = 0) o indicatore (has_agent)</td><td>Missing Value (valore fisso), Expression</td></tr>
+    <tr><td>mancante travestito («NA», «NULL», «Undefined»)</td><td>controllare tipo e valori distinti, poi ricodificare</td><td>String to Number, Expression</td></tr>
+    <tr><td>valore impossibile</td><td>correggere o togliere la riga</td><td>Row Filter, Expression Row Filter</td></tr>
+    <tr><td>valore estremo plausibile</td><td>tenerlo, limitarlo alla staccionata o trasformarlo (radice, logaritmo), secondo il modello</td><td>Numeric Outliers, Math Formula</td></tr>
+    <tr><td>colonna nota solo dopo l'evento</td><td>toglierla: è leakage</td><td>Column Filter</td></tr>
+    <tr><td>colonne duplicate (z-score delle grezze)</td><td>toglierle: dividono l'importanza</td><td>Column Filter</td></tr>
+    <tr><td>categorica nominale</td><td>one-hot (una colonna 0/1 per categoria)</td><td>One to Many</td></tr>
+    <tr><td>numeriche su scale diverse</td><td>min-max fra 0 e 1, o z-score</td><td>Normalizer</td></tr>
+    <tr><td>variabile piena di zeri</td><td>indicatore (ha atteso sì o no)</td><td>Rule Engine</td></tr>
+  </tbody></table></div>
+  <p>Quanto pesano gli anomali dipende dal modello: molto per regressione, k-NN, k-means e reti neurali; poco per gli alberi, che guardano solo l'ordine dei valori. Gli errori però si tolgono sempre.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Valutare: quale indice?</h2>
+  <figure>
+    <div class="w" data-mappa="116c"></div>
+    <figcaption>La valutazione della lezione 12: divisione dei dati, indici dei classificatori, soglia e classifica, indici della regressione.</figcaption>
+  </figure>
+  <p>Una scheda da riusare. Con una matrice di confusione di esempio (aggiunta qui) su 200 casi, TP = 40, FN = 10, FP = 20, TN = 130, gli indici sono:</p>
+  <div class="scroll"><table><thead><tr><th>Indice</th><th>Formula</th><th>Esempio</th><th>Domanda</th></tr></thead><tbody>
+    <tr><td>Accuratezza</td><td>(TP + TN) / N</td><td>170 / 200 = 0,85</td><td>quante previsioni sono giuste?</td></tr>
+    <tr><td>Sensibilità (recall)</td><td>TP / (TP + FN)</td><td>40 / 50 = 0,80</td><td>quanti positivi trovo?</td></tr>
+    <tr><td>Specificità</td><td>TN / (TN + FP)</td><td>130 / 150 = 0,867</td><td>quanti negativi riconosco?</td></tr>
+    <tr><td>Precisione</td><td>TP / (TP + FP)</td><td>40 / 60 = 0,667</td><td>dei segnalati, quanti sono veri?</td></tr>
+    <tr><td>F1</td><td>2 · P · R / (P + R)</td><td>0,727</td><td>precisione e recall insieme</td></tr>
+    <tr><td>Accuratezza bilanciata</td><td>(sensibilità + specificità) / 2</td><td>0,833</td><td>regge le classi sbilanciate</td></tr>
+    <tr><td>κ di Cohen</td><td>(p<sub>o</sub> − p<sub>e</sub>) / (1 − p<sub>e</sub>)</td><td>p<sub>e</sub> = (50·60 + 150·140) / 200² = 0,60; κ = 0,625</td><td>meglio del caso?</td></tr>
+    <tr><td>AUC</td><td>area sotto la curva ROC</td><td></td><td>quanto bene ordina, a ogni soglia? 0,5 casuale, 1 perfetto</td></tr>
+    <tr><td>Lift del decile</td><td>% positivi nel decile / % positivi totale</td><td></td><td>quanto conviene agire sul primo k%?</td></tr>
+    <tr><td>MAE, RMSE</td><td>media di |e|; radice della media di e²</td><td></td><td>errore tipico nell'unità del target; RMSE pesa gli errori grandi</td></tr>
+    <tr><td>MAPE, MPE</td><td>media di |e/y| e di e/y, in %</td><td></td><td>errore in percentuale, distorsione; mai con y vicino a zero</td></tr>
+    <tr><td>R²</td><td>1 − SSE / SST</td><td></td><td>varianza spiegata; sul test può essere negativo</td></tr>
+    <tr><td>MASE</td><td>MAE / MAE della previsione ingenua</td><td></td><td>sotto 1 il modello batte la previsione ingenua</td></tr>
+  </tbody></table></div>
+  <p class="stmt"><strong>Tre regole:</strong> si valuta solo sul test, usato una volta; con una classe rara l'accuratezza inganna; si riportano sempre più indici, tradotti in termini di business.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Scegliere il modello</h2>
+  <figure>
+    <div class="w" data-mappa="116d"></div>
+    <figcaption>Gli alberi della lezione 13: criteri di taglio, distorsione e varianza, foresta e boosting, importanza delle variabili.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th></th><th>Albero di decisione</th><th>Random forest</th><th>Gradient boosting, XGBoost</th></tr></thead><tbody>
+    <tr><td>Idea</td><td>tagli ricorsivi che rendono i gruppi più puri</td><td>media di molti alberi profondi su campioni bootstrap, √p variabili per taglio</td><td>alberi bassi in sequenza, ciascuno sui residui, con tasso di apprendimento</td></tr>
+    <tr><td>Riduce</td><td></td><td>la varianza</td><td>la distorsione</td></tr>
+    <tr><td>Parametri chiave</td><td>misura (Gini, gain ratio), minimo di righe per nodo, potatura MDL</td><td>numero di alberi, variabili per taglio</td><td>tasso (0,1), profondità (4-6), numero di alberi scelto sulla validazione</td></tr>
+    <tr><td>Quando</td><td>serve spiegare le regole</td><td>riferimento robusto con poca regolazione</td><td>gli ultimi punti di accuratezza, dopo la regolazione</td></tr>
+    <tr><td>Nodo di KNIME</td><td>Decision Tree Learner</td><td>Tree Ensemble Learner</td><td>Gradient Boosted Trees Learner, XGBoost Tree Ensemble Learner</td></tr>
+  </tbody></table></div>
+  <div class="eq">\[ \text{Gini} = 1 - \sum_j p_j^2 \qquad H = -\sum_j p_j \log_2 p_j \qquad \text{gain ratio} = \frac{\text{IG}}{\text{SplitINFO}} \]</div>
+  <div class="scroll"><table><thead><tr><th>Domanda sull'importanza</th><th>Strumento</th></tr></thead><tbody>
+    <tr><td>che cosa usa il modello?</td><td>primi tagli dell'albero, statistiche dei tagli della foresta</td></tr>
+    <tr><td>perché questa previsione?</td><td>valori SHAP della singola riga (sommano alla previsione)</td></tr>
+    <tr><td>come cambia la previsione con una variabile?</td><td>dipendenza parziale</td></tr>
+  </tbody></table></div>
+  <p>Importanza non vuol dire causalità: dice che cosa il modello usa, non che cosa succederebbe cambiando il mondo.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Dal modello alla decisione</h2>
+  <figure>
+    <div class="w" data-mappa="116e"></div>
+    <figcaption>Dalla probabilità alla decisione (lezioni 14 e 16) e i due tipi di dati non tabellari (lezioni 15 e 16).</figcaption>
+  </figure>
+  <p>La soglia si sceglie confrontando il costo atteso dei due errori, come nella lezione 16. Con \(c_{FN}\) il costo di un caso mancato e \(c_{FP}\) quello di un falso allarme:</p>
+  <div class="eq">\[ \text{costo atteso} = FN \cdot c_{FN} + FP \cdot c_{FP} \]</div>
+  <p>Se il caso mancato costa molto più del falso allarme (un cliente perso contro una telefonata, un difetto contro un controllo a mano), la soglia scende sotto 0,5. Se si possono trattare solo k casi, si ordina per probabilità e si taglia a k: la lunghezza della lista la decide la capacità.</p>
+  <div class="scroll"><table><thead><tr><th>Sintomo</th><th>Che cosa controllare</th></tr></thead><tbody>
+    <tr><td>accuratezza o sensibilità vicine al 100%</td><td>il primo taglio dell'albero: una colonna misurata dopo l'evento?</td></tr>
+    <tr><td>l'albero singolo batte la foresta</td><td>una colonna fa tutto il lavoro: leakage</td></tr>
+    <tr><td>risultati che cambiano a ogni esecuzione</td><td>semi non fissati nella divisione e nel campionamento</td></tr>
+    <tr><td>parametri scelti guardando il test</td><td>stima ottimista: regolare sulla validazione</td></tr>
+    <tr><td>test bilanciato</td><td>il bilanciamento va fatto solo sul training</td></tr>
+  </tbody></table></div>
+  <div class="scroll"><table><thead><tr><th>Passo</th><th>Testi (lezione 15)</th><th>Immagini (lezione 16)</th></tr></thead><tbody>
+    <tr><td>Pulire</td><td>menzioni, link, artefatti; minuscolo, parole vuote (dopo aver marcato le negazioni)</td><td>luce e posizione costanti, scala di grigi, ridimensionare</td></tr>
+    <tr><td>Rappresentare</td><td>bag of words (una colonna per termine) o embedding</td><td>soglia di Otsu, componenti connesse, feature di primo ordine, geometria, tessitura (Haralick)</td></tr>
+    <tr><td>Modellare</td><td>dizionario, random forest sul bag of words, LDA per i topic</td><td>random forest sulle 45 feature</td></tr>
+    <tr><td>Decidere</td><td>topic per sentiment, smistamento, quali testi leggere</td><td>soglia sul costo atteso, ispettore nel giro</td></tr>
+    <tr><td>Nodi</td><td>Strings To Document, preprocessing, Bag Of Words Creator, Document Vector, Topic Extractor</td><td>Image Reader, Global Thresholder, Connected Component Analysis, Image Segment Features, Image Features</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>KNIME in una tabella</h2>
+  <div class="scroll"><table><thead><tr><th>Compito</th><th>Nodi</th></tr></thead><tbody>
+    <tr><td>leggere</td><td>CSV Reader, Excel Reader, List Files/Folders, Image Reader</td></tr>
+    <tr><td>esplorare</td><td>Statistics, Histogram, Crosstab, Linear Correlation, Box Plot, One-way ANOVA</td></tr>
+    <tr><td>pulire e trasformare</td><td>Missing Value, Numeric Outliers, Row Filter, Column Filter, Expression, Math Formula, Rule Engine, String Manipulation</td></tr>
+    <tr><td>codificare e riscalare</td><td>One to Many, Category to Number, Normalizer</td></tr>
+    <tr><td>dividere e bilanciare</td><td>Table Partitioner (stratificato), X-Partitioner e X-Aggregator, Equal Size Sampling, SMOTE</td></tr>
+    <tr><td>modellare</td><td>Decision Tree, Tree Ensemble, Gradient Boosted Trees, XGBoost, H2O GBM (Learner e Predictor)</td></tr>
+    <tr><td>valutare</td><td>Scorer, Numeric Scorer, ROC Curve, Lift Chart, Binary Classification Inspector</td></tr>
+    <tr><td>regolare e spiegare</td><td>Parameter Optimization Loop, SHAP Loop, GroupBy, Cross Joiner</td></tr>
+    <tr><td>organizzare</td><td>metanodi e componenti; file .knwf (workflow) e .knar (cartelle)</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <p>Otto domande che mescolano le lezioni da 9 a 16, come in un esame.</p>
+  <div class="quiz" data-quiz="116"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se della seconda parte dovesse restarti una sola cosa: <strong>un modello vale quanto i suoi dati e quanto è onesta la sua valutazione</strong>; si prepara con la conoscenza del dominio, si giudica solo su dati mai visti, e si consegna come una decisione pesata sui costi veri.</p>
   <nav class="navend" aria-label="Altre lezioni"></nav>
 </div></section>
 </article>

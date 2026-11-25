@@ -47,7 +47,7 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',qnum:'Domanda',reveal:'Mostra la soluzione',expl:'Perché',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
   askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
   askSlow:'nessuna risposta in tempo, provo il modello successivo.',
@@ -101,13 +101,17 @@ const quizKey=(root,i,q)=>{let h=5381;for(const c of q.q+'|'+q.o.join('|'))h=(h*
   return 'quiz|'+(location.pathname.split('/').filter(Boolean)[0]||'')+'|'+(root.dataset.quiz||'')+'|'+i+'|'+h.toString(36)};
 function quiz(root,qs){
   qs.forEach((q,qi)=>{
-    const box=el('div','q');box.append(el('p','',q.q));
+    const box=el('div','q'),fin=!root.classList.contains('inq');box.append(el('p','',(fin?'<b class="qn">'+UI.qnum+' '+(qi+1)+'.</b> ':'')+q.q));
     const opts=el('div','opts'),fb=el('div','fb'),chk=btn(UI.check);chk.classList.add('solid','chk');fb.setAttribute('aria-live','polite');
     let sel=null;const key=quizKey(root,qi,q);
     const bsq=q.o.map((t,i)=>{const b=btn(t,true);b.onclick=()=>{sel=i;bsq.forEach((x,j)=>{press(x,j===i);x.classList.remove('right','wrong')});fb.innerHTML=''};opts.append(b);return b});
     const verify=save=>{if(sel===null){fb.innerHTML=UI.pickFirst;return}
       press(bsq[sel],false);bsq[sel].classList.add(sel===q.a?'right':'wrong');box.classList.add('done');
-      fb.innerHTML=sel===q.a?'<b>'+UI.right+'</b> '+q.e:'<b>'+UI.wrong+'</b> '+q.h;
+      const ex='<div class="expl"><b>'+UI.expl+'.</b> '+q.e+'</div>';
+      if(sel===q.a)fb.innerHTML='<b>'+UI.right+'</b>'+ex;
+      else{fb.innerHTML='<b>'+UI.wrong+'</b> '+q.h+' ';const rv=el('button','rev',UI.reveal);rv.type='button';
+        rv.onclick=()=>{bsq[q.a].classList.add('right');fb.innerHTML='<b>'+UI.wrong+'</b> '+q.h+ex;renderMath(fb)};fb.append(rv)}
+      if(typeof renderMath==='function')renderMath(fb);
       if(save)try{localStorage.setItem(key,String(sel))}catch(e){}};
     chk.onclick=()=>verify(true);
     box.append(opts,chk,fb);root.append(box);
@@ -226,7 +230,7 @@ function gameMatrix(rows,cols,cells,o){
 
 /* Big Data and Databases: interface in English and small drawing helpers shared by the four lessons */
 Object.assign(UI,{check:'Check',pickFirst:'Pick an answer first.',right:'Correct.',wrong:'Not quite.',play:'Play',pause:'Pause',seek:'Position in the animation',
-  prev:'Previous lesson',next:'Next lesson',toc:'In this lesson',noLang:'This lesson is not available in this language yet',partTag:'Part {p} · {d}',partEnd:'End of {d}\'s part',partEndTxt:'Lessons {a} to {b} are by {d}. From lesson {n} the course moves on to {d2}.',partStart:'{d}\'s part begins',partStartTxt:'Part {p} of the course starts here, taught by {d}.',partNav:'Part {p}: {d}',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
+  prev:'Previous lesson',next:'Next lesson',toc:'In this lesson',qnum:'Question',reveal:'Show the solution',expl:'Why',noLang:'This lesson is not available in this language yet',partTag:'Part {p} · {d}',partEnd:'End of {d}\'s part',partEndTxt:'Lessons {a} to {b} are by {d}. From lesson {n} the course moves on to {d2}.',partStart:'{d}\'s part begins',partStartTxt:'Part {p} of the course starts here, taught by {d}.',partNav:'Part {p}: {d}',toLight:'Switch to light theme',toDark:'Switch to dark theme',ask:'Ask AI',askSend:'Ask',askKey:'Change key',askPrompt:'Gemini API key (kept only in this browser):',
   askSys:'You are a tutor. Answer in English, briefly and clearly, based on the lessons provided: first the open lesson, then the course map and the excerpts from other lessons. When you use another lesson, say which one. If the question goes beyond the course, say so.',
   askSlow:'no reply in time, trying the next model.',
   askFmt:'Write formulas in LaTeX between \\( \\) or \\[ \\], never with dollar signs.'});
@@ -319,6 +323,8 @@ const wideFigs=n=>$('#lezione-'+n).querySelectorAll('figure .w > div').forEach(d
   THUMB[14]=sv('<line x1="10" y1="62" x2="100" y2="62" stroke="#555"/>'+[[.942,'#8a8a8a'],[.682,GRN],[.911,'#8a8a8a'],[.752,GRN],[.754,'#8a8a8a'],[.762,GRN]].map(([v,c],i)=>'<rect x="'+(14+i*14+(i>>1)*4)+'" y="'+(62-(v-.4)*90)+'" width="11" height="'+((v-.4)*90)+'" fill="'+c+'"/>').join(''));
   THUMB[15]=sv('<rect x="10" y="12" width="56" height="8" fill="#666"/><rect x="10" y="26" width="76" height="8" fill="#666"/><rect x="10" y="40" width="44" height="8" fill="#666"/>'+'<rect x="72" y="12" width="26" height="8" fill="'+RED+'"/><rect x="60" y="40" width="20" height="8" fill="'+GRN+'"/><rect x="10" y="54" width="64" height="8" fill="'+BLUE+'"/>');
   THUMB[16]=sv('<circle cx="54" cy="36" r="26" fill="none" stroke="#bbb" stroke-width="5"/><circle cx="54" cy="36" r="11" fill="none" stroke="#bbb" stroke-width="4"/><circle cx="74" cy="24" r="3" fill="'+RED+'"/><circle cx="40" cy="54" r="2.4" fill="'+RED+'"/>');
+  THUMB[108]=sv('<circle cx="54" cy="36" r="10" fill="none" stroke="#ddd" stroke-width="2"/>'+[0,1,2,3,4,5].map(i=>{const a=i*Math.PI/3,x=54+30*Math.cos(a),y=36+24*Math.sin(a);return '<line x1="'+(54+10*Math.cos(a))+'" y1="'+(36+10*Math.sin(a))+'" x2="'+x+'" y2="'+y+'" stroke="#666"/><rect x="'+(x-7)+'" y="'+(y-4)+'" width="14" height="8" rx="2" fill="'+[BLUE,YEL,PINK,ORG,GRN,TEAL][i]+'"/>'}).join(''));
+  THUMB[116]=sv('<circle cx="54" cy="36" r="10" fill="none" stroke="#ddd" stroke-width="2"/>'+[0,1,2,3,4,5,6].map(i=>{const a=i*2*Math.PI/7,x=54+30*Math.cos(a),y=36+24*Math.sin(a);return '<line x1="'+(54+10*Math.cos(a))+'" y1="'+(36+10*Math.sin(a))+'" x2="'+x+'" y2="'+y+'" stroke="#666"/><rect x="'+(x-7)+'" y="'+(y-4)+'" width="14" height="8" rx="2" fill="'+[BLUE,YEL,PUR,GRN,PINK,ORG,TEAL][i]+'"/>'}).join(''));
 })();
 
 /* Lesson 1: the data analytics timeline */
@@ -1642,8 +1648,8 @@ const fill=(t,o)=>t.replace(/\{(\w+)\}/g,(_,k)=>String(o[k]).replace(/\. /g,'.\u
   })})();
 lessons.forEach((l,i)=>{
   const nav=l.querySelector('.navend');if(!nav)return;
-  const card=(m,cls,lab)=>{const t=byN(m).dataset.title;
-    return '<a class="'+cls+'" href="#lezione-'+m+'" data-go="'+m+'"><span class="th" aria-hidden="true">'+(THUMB[m]||'')+'</span><span class="tx"><small>'+lab+'</small>'+m+' · '+t+'</span></a>'};
+  const card=(m,cls,lab)=>{const t=byN(m).dataset.title,num=byN(m).dataset.label||m;
+    return '<a class="'+cls+'" href="#lezione-'+m+'" data-go="'+m+'"><span class="th" aria-hidden="true">'+(THUMB[m]||'')+'</span><span class="tx"><small>'+lab+'</small>'+num+' · '+t+'</span></a>'};
   const nx=lessons[i+1],cross=nx&&l.dataset.parte&&nx.dataset.parte&&nx.dataset.parte!==l.dataset.parte;
   nav.innerHTML=(i>0?card(NUMS[i-1],'prev',UI.prev):'')+(i<NUMS.length-1?card(NUMS[i+1],'next'+(cross?' cross':''),cross?fill(UI.partStart,{d:nx.dataset.docente}):UI.next):'');
 });
@@ -1805,8 +1811,18 @@ var paintProgress=(function(){
     const df={};CH.forEach(c=>{c.w=c.w||new Set(words(c.t));qs.forEach(w=>{if(c.w.has(w))df[w]=(df[w]||0)+1})});
     return CH.filter(c=>c.n!==cur).map(c=>({c,s:qs.reduce((a,w)=>a+(c.w.has(w)?Math.log(1+CH.length/df[w]):0),0)/Math.sqrt(1+c.t.length/1500)}))
       .filter(x=>x.s>0).sort((a,b)=>b.s-a.s).filter(x=>(budget-=x.c.t.length)>0).map(x=>x.c)}
+  /* i quiz della lezione aperta, con risposta giusta, spiegazione e risposta già data dallo studente (localStorage) */
+  const plain=h=>{const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.katex').forEach(k=>{const a=k.querySelector('annotation');k.replaceWith(a?'\\('+a.textContent+'\\)':k.textContent)});return d.textContent.replace(/\s+/g,' ').trim()};
+  function quizText(art){const out=[];let inq=0;
+    art.querySelectorAll('[data-quiz]').forEach(r=>{const f=QZ[r.dataset.quiz];if(!f)return;let qs;try{qs=f()}catch(_){return}
+      const fin=!r.classList.contains('inq'),sec=r.closest('section'),h=sec&&sec.querySelector('h2,h3');
+      qs.forEach((x,i)=>{let v=null;try{v=localStorage.getItem(quizKey(r,i,x))}catch(_){}
+        const L='ABCDEFGH',st=v===null?'not answered yet':('answered '+L[+v]+(+v===x.a?' (correct)':' (wrong)'));
+        out.push((fin?'FINAL QUIZ, '+UI.qnum+' '+(i+1):'IN-TEXT QUIZ '+(++inq)+(h?' (section «'+plain(h.innerHTML)+'»)':''))+': '+plain(x.q)+'\n'+
+          x.o.map((o,j)=>L[j]+') '+plain(o)).join('\n')+'\nCorrect: '+L[x.a]+'. Explanation: '+plain(x.e)+' Hint: '+plain(x.h||'')+'\nStudent: '+st)})});
+    return out.length?'QUIZZES OF THE OPEN LESSON (the student sees final-quiz questions numbered as below). If the student asks about a quiz they have not answered yet, guide them with hints and reasoning first and give the answer only if they explicitly ask for it; if they already answered, explain why the correct option is right and why theirs is wrong.\n'+out.join('\n\n'):''}
   function context(q,cur){index();
-    const art=byN(cur),parts=['COURSE: '+document.title+'\nLESSONS:\n'+MAP,'OPEN LESSON '+cur+':\n'+clean(art).slice(0,40000)];
+    const art=byN(cur),parts=['COURSE: '+document.title+'\nLESSONS:\n'+MAP,'OPEN LESSON '+cur+':\n'+clean(art).slice(0,40000)],qt=quizText(art);if(qt)parts.push(qt.slice(0,20000));
     /* lezioni citate per numero nella domanda: intere */
     const named=[...new Set([...q.matchAll(/\b(?:lezione|lezioni|lesson|lessons|lez\.?|l)\s*(\d{1,2})\b/gi)].map(m=>+m[1]))].filter(n=>n!==cur&&NUMS.includes(n)).slice(0,3);
     named.forEach(n=>parts.push('LESSON '+n+':\n'+clean(byN(n)).slice(0,30000)));

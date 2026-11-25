@@ -74,6 +74,7 @@ Lo schema ricalca le lezioni scritte di 3b1b sulle reti neurali.
 - **Ogni lezione ha una miniatura**: un piccolo SVG 108x72 su fondo nero che richiama la sua figura principale.
 - **Mappa mentale nel riepilogo**: la sezione `recap` di ogni lezione si apre con una mappa mentale (funzione `mappa` di `shared/core.js`, dati in `MAPPA[N]`): al centro la domanda della lezione, intorno da quattro a sette temi con un colore ciascuno, sotto ogni tema da due a cinque voci brevi (una riga o due). Semplice ma completa: ogni concetto delle tabelle del riepilogo deve comparire in una voce. Su telefono la mappa si dispone in colonna da sola.
 - **Tabella riassuntiva** (lezione, concetto, idea, formula) alla fine di ogni blocco di lezioni e comunque nell'ultima.
+- **Lezione di riepilogo** alla fine del gruppo di lezioni di ogni docente: una mappa del percorso, una mappa per tema, definizioni pratiche, tabelle «situazione, strumento», formule e modelli di codice da riusare, un quiz finale misto. Nessun argomento nuovo.
 - **Piè di pagina**: fonti complete per lezione, licenze, e la dicitura che si tratta di una rielaborazione per studio personale quando la licenza della fonte vieta opere derivate.
 - **Confini di programma** (opzionale, utile per gli esami): un riquadro arancione «Fine del programma di ...» alla fine dell'ultima lezione inclusa, un'etichetta «Oltre il programma» sotto il titolo delle lezioni successive, una linea arancione nella barra fra le due parti.
 
@@ -200,7 +201,7 @@ Tutto ciò che avanza a passi si mostra con i **controlli da video** (funzione `
 
 ## 8. Quiz
 
-- **Quiz finale**: quattro-sei domande per lezione nella sezione «Mettiti alla prova». **Quiz nel testo**: una domanda ciascuno, subito dopo il concetto.
+- **Quiz finale**: quattro-sei domande per lezione nella sezione «Mettiti alla prova», numerate (Domanda 1, 2...) così si possono citare all'assistente. Dopo la risposta giusta si mostra sempre la spiegazione; dopo una sbagliata il suggerimento e, a richiesta, la soluzione con la spiegazione. **Quiz nel testo**: una domanda ciascuno, subito dopo il concetto.
 - Si sceglie un'opzione (pulsanti a tutta larghezza, testo allineato a sinistra), poi si preme **«Verifica»**. Giusta: opzione in verde e spiegazione breve. Sbagliata: opzione in rosso e un **suggerimento che non svela la soluzione**.
 - Le alternative sbagliate sono plausibili e nessuna deve poter essere corretta anch'essa. La posizione della risposta giusta varia (non sempre la prima).
 - Almeno una domanda per lezione chiede un calcolo con i numeri di un esempio della lezione. Le domande della fonte («Is X true?», «Which one would you choose?») diventano quiz.

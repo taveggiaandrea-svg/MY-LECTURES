@@ -46,7 +46,8 @@ def katex_assets():
 
 def lessons_of(src):
     d = os.path.join(src, 'lezioni')
-    return sorted((int(re.match(r'l(\d+)\.html$', f).group(1)) for f in os.listdir(d) if re.match(r'l\d+\.html$', f)))
+    # le lezioni di riepilogo hanno numero 100 + l'ultima lezione che riassumono (l108 = riepilogo dopo la lezione 8) e vanno subito dopo di lei
+    return sorted((int(re.match(r'l(\d+)\.html$', f).group(1)) for f in os.listdir(d) if re.match(r'l\d+\.html$', f)), key=lambda n: n - 99.5 if n >= 100 else n)
 
 def variants_of(mid):
     """Altre lingue della materia: sottocartelle di due lettere con una propria cartella lezioni/ (per esempio materie/bigdata/en/)."""

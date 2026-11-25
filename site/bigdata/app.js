@@ -47,7 +47,7 @@ function renderMath(root){
 }
 /* testi fissi dell'interfaccia: una materia in un'altra lingua li sovrascrive con Object.assign(UI,{...}) nel suo js/macro.js */
 const UI={check:'Verifica',pickFirst:'Scegli prima una risposta.',right:'Esatto.',wrong:'Non proprio.',play:'Riproduci',pause:'Pausa',seek:'Posizione nell\'animazione',
-  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
+  prev:'Lezione precedente',next:'Lezione successiva',toc:'In questa lezione',qnum:'Domanda',reveal:'Mostra la soluzione',expl:'Perché',noLang:'Questa lezione non è ancora disponibile in questa lingua',partTag:'Parte {p} · {d}',partEnd:'Fine della parte di {d}',partEndTxt:'Le lezioni da {a} a {b} sono di {d}. Dalla lezione {n} il corso passa a {d2}.',partStart:'Inizia la parte di {d}',partStartTxt:'Qui comincia la parte {p} del corso, tenuta da {d}.',partNav:'Parte {p}: {d}',toLight:'Passa al tema chiaro',toDark:'Passa al tema scuro',
   ask:'Chiedi all\'AI',askSend:'Chiedi',askKey:'Cambia chiave',askPrompt:'Chiave API di Gemini (resta solo in questo browser):',
   askSys:'Sei un tutor. Rispondi in italiano, in modo breve e chiaro, basandoti sulle lezioni fornite: prima la lezione aperta, poi la mappa del corso e gli estratti delle altre lezioni. Quando usi un\'altra lezione, indica quale. Se la domanda esce dal corso, dillo.',
   askSlow:'nessuna risposta in tempo, provo il modello successivo.',
@@ -101,13 +101,17 @@ const quizKey=(root,i,q)=>{let h=5381;for(const c of q.q+'|'+q.o.join('|'))h=(h*
   return 'quiz|'+(location.pathname.split('/').filter(Boolean)[0]||'')+'|'+(root.dataset.quiz||'')+'|'+i+'|'+h.toString(36)};
 function quiz(root,qs){
   qs.forEach((q,qi)=>{
-    const box=el('div','q');box.append(el('p','',q.q));
+    const box=el('div','q'),fin=!root.classList.contains('inq');box.append(el('p','',(fin?'<b class="qn">'+UI.qnum+' '+(qi+1)+'.</b> ':'')+q.q));
     const opts=el('div','opts'),fb=el('div','fb'),chk=btn(UI.check);chk.classList.add('solid','chk');fb.setAttribute('aria-live','polite');
     let sel=null;const key=quizKey(root,qi,q);
     const bsq=q.o.map((t,i)=>{const b=btn(t,true);b.onclick=()=>{sel=i;bsq.forEach((x,j)=>{press(x,j===i);x.classList.remove('right','wrong')});fb.innerHTML=''};opts.append(b);return b});
     const verify=save=>{if(sel===null){fb.innerHTML=UI.pickFirst;return}
       press(bsq[sel],false);bsq[sel].classList.add(sel===q.a?'right':'wrong');box.classList.add('done');
-      fb.innerHTML=sel===q.a?'<b>'+UI.right+'</b> '+q.e:'<b>'+UI.wrong+'</b> '+q.h;
+      const ex='<div class="expl"><b>'+UI.expl+'.</b> '+q.e+'</div>';
+      if(sel===q.a)fb.innerHTML='<b>'+UI.right+'</b>'+ex;
+      else{fb.innerHTML='<b>'+UI.wrong+'</b> '+q.h+' ';const rv=el('button','rev',UI.reveal);rv.type='button';
+        rv.onclick=()=>{bsq[q.a].classList.add('right');fb.innerHTML='<b>'+UI.wrong+'</b> '+q.h+ex;renderMath(fb)};fb.append(rv)}
+      if(typeof renderMath==='function')renderMath(fb);
       if(save)try{localStorage.setItem(key,String(sel))}catch(e){}};
     chk.onclick=()=>verify(true);
     box.append(opts,chk,fb);root.append(box);
@@ -318,6 +322,8 @@ const wideFigs=n=>$('#lezione-'+n).querySelectorAll('figure .w > div').forEach(d
   THUMB[14]=sv('<line x1="10" y1="62" x2="100" y2="62" stroke="#555"/>'+[[.942,'#8a8a8a'],[.682,GRN],[.911,'#8a8a8a'],[.752,GRN],[.754,'#8a8a8a'],[.762,GRN]].map(([v,c],i)=>'<rect x="'+(14+i*14+(i>>1)*4)+'" y="'+(62-(v-.4)*90)+'" width="11" height="'+((v-.4)*90)+'" fill="'+c+'"/>').join(''));
   THUMB[15]=sv('<rect x="10" y="12" width="56" height="8" fill="#666"/><rect x="10" y="26" width="76" height="8" fill="#666"/><rect x="10" y="40" width="44" height="8" fill="#666"/>'+'<rect x="72" y="12" width="26" height="8" fill="'+RED+'"/><rect x="60" y="40" width="20" height="8" fill="'+GRN+'"/><rect x="10" y="54" width="64" height="8" fill="'+BLUE+'"/>');
   THUMB[16]=sv('<circle cx="54" cy="36" r="26" fill="none" stroke="#bbb" stroke-width="5"/><circle cx="54" cy="36" r="11" fill="none" stroke="#bbb" stroke-width="4"/><circle cx="74" cy="24" r="3" fill="'+RED+'"/><circle cx="40" cy="54" r="2.4" fill="'+RED+'"/>');
+  THUMB[108]=sv('<circle cx="54" cy="36" r="10" fill="none" stroke="#ddd" stroke-width="2"/>'+[0,1,2,3,4,5].map(i=>{const a=i*Math.PI/3,x=54+30*Math.cos(a),y=36+24*Math.sin(a);return '<line x1="'+(54+10*Math.cos(a))+'" y1="'+(36+10*Math.sin(a))+'" x2="'+x+'" y2="'+y+'" stroke="#666"/><rect x="'+(x-7)+'" y="'+(y-4)+'" width="14" height="8" rx="2" fill="'+[BLUE,YEL,PINK,ORG,GRN,TEAL][i]+'"/>'}).join(''));
+  THUMB[116]=sv('<circle cx="54" cy="36" r="10" fill="none" stroke="#ddd" stroke-width="2"/>'+[0,1,2,3,4,5,6].map(i=>{const a=i*2*Math.PI/7,x=54+30*Math.cos(a),y=36+24*Math.sin(a);return '<line x1="'+(54+10*Math.cos(a))+'" y1="'+(36+10*Math.sin(a))+'" x2="'+x+'" y2="'+y+'" stroke="#666"/><rect x="'+(x-7)+'" y="'+(y-4)+'" width="14" height="8" rx="2" fill="'+[BLUE,YEL,PUR,GRN,PINK,ORG,TEAL][i]+'"/>'}).join(''));
 })();
 
 /* Lezione 1: l'evoluzione dell'analisi dei dati */
@@ -1489,6 +1495,56 @@ MAPPA[8]={c:'Dove vanno i dati grezzi?',r:[
   {t:'Governance',c:PINK,v:['Governance, qualità, metadati, formazione','I metadati rendono il lago ricercabile','Qualità: etichettare, non filtrare in ingresso']},
   {t:'Virtualizzazione',c:TEAL,v:['Uno strato logico, nessuna copia dei dati','Pro: costi minori, governance centrale','Contro: carica fonti e rete, lenta sui compiti complessi']}]};
 
+/* Riepilogo delle lezioni 1-8 (A. Rezzani): mappe mentali e quiz misto */
+INIT[108]=function(){codeHL($('#lezione-108'))};
+MAPPA['108']={c:'Dove stanno i dati, e come si interrogano?',r:[
+  {t:'1 · Evoluzione',c:BLUE,v:['Report sul database operativo','Warehouse, OLAP, data mining, Big Data','ETL e BI']},
+  {t:'2-3 · SQL',c:YEL,v:['Tabelle, chiavi, normalizzazione','SELECT, join, GROUP BY','NULL, sottoquery, funzioni finestra']},
+  {t:'4 · NoSQL',c:PINK,v:['Scalare in orizzontale','ACID contro BASE','Key-value, documenti, colonne, grafi']},
+  {t:'5 · Hadoop',c:ORG,v:['HDFS: blocchi e repliche','MapReduce: map, shuffle, reduce','YARN, Hive, l\'ecosistema']},
+  {t:'6-7 · Spark',c:GRN,v:['In memoria, DAG pigro','RDD e DataFrame','Streaming, grafi, MLlib']},
+  {t:'8 · Data lake',c:TEAL,v:['Dati grezzi, schema on read','Accanto al warehouse','Governance o palude']}]};
+MAPPA['108a']={c:'Dati per decidere',r:[
+  {t:'Operativo',c:BLUE,v:['ERP, CRM','Scritture veloci, normalizzato','Dato attuale']},
+  {t:'Warehouse',c:YEL,v:['Integrato e ripulito','Fatti e dimensioni','Unica fonte di verità']},
+  {t:'ETL e BI',c:ORG,v:['Estrarre, trasformare, caricare','Report, OLAP, cruscotti']},
+  {t:'Data lake',c:TEAL,v:['Grezzo, ogni formato','Schema on read','Distillazione verso il warehouse']}]};
+MAPPA['108b']={c:'SQL',r:[
+  {t:'Tabelle',c:YEL,v:['Chiave primaria ed esterna','NOT NULL, CHECK','1NF, 3NF']},
+  {t:'Interrogare',c:BLUE,v:['FROM, WHERE, GROUP BY','HAVING, SELECT, ORDER BY']},
+  {t:'Combinare',c:PINK,v:['INNER, LEFT, RIGHT, FULL','UNION e UNION ALL','EXISTS']},
+  {t:'NULL',c:PUR,v:['Confronti: UNKNOWN','IS NULL, COALESCE','COUNT(*) conta tutto']},
+  {t:'Finestre',c:TEAL,v:['OVER (PARTITION BY, ORDER BY)','ROWS BETWEEN','LAG, LEAD, ROW_NUMBER']}]};
+MAPPA['108c']={c:'Quando una macchina non basta',r:[
+  {t:'Distribuire',c:BLUE,v:['Nodi, rack, cluster','Scalabilità orizzontale']},
+  {t:'Garanzie',c:YEL,v:['ACID: tutto o niente','BASE: coerenza alla fine']},
+  {t:'NoSQL',c:PINK,v:['Key-value, documenti','Colonne (HBase), grafi (Neo4j)']},
+  {t:'HDFS',c:ORG,v:['Blocchi da 128 MB','Replica 3, rack awareness','Name node e data node']},
+  {t:'MapReduce',c:GRN,v:['Map, shuffle, reduce','Il calcolo va dai dati','Batch, non interattivo']}]};
+MAPPA['108d']={c:'Spark',r:[
+  {t:'Architettura',c:BLUE,v:['Driver e SparkSession','Executor e task','YARN, local[*]']},
+  {t:'RDD',c:YEL,v:['Partizioni immutabili','Trasformazioni pigre, azioni','DAG, stage, shuffle']},
+  {t:'DataFrame e SQL',c:GRN,v:['Colonne con schema','filter, groupBy, vista temporanea']},
+  {t:'Stack',c:PINK,v:['Structured Streaming','GraphFrames','MLlib e pipeline']}]};
+QZ['108']=()=>[
+  {q:'Un\'analista vuole confrontare le vendite mensili degli ultimi dieci anni per regione, senza rallentare il sistema degli ordini. Dove dovrebbe lavorare?',o:['Sul database operativo, che ha i dati più aggiornati','Sul data warehouse, integrato e pensato per l\'analisi','Su un key-value store','Su un file CSV esportato a mano ogni mese'],a:1,
+   e:'Il warehouse contiene lo storico integrato e ripulito, con dati aggregati, ed è separato dal sistema operativo: le analisi non competono con le transazioni.',h:'Ricorda i tre problemi dell\'analisi sul database operativo (lezione 1).'},
+  {q:'Una query ha WHERE SUM(quantity) &gt; 10 e dà errore. Perché?',o:['SUM non esiste in SQL','WHERE filtra le righe prima del raggruppamento: una condizione su un\'aggregazione va in HAVING','Manca ORDER BY','quantity è NULL'],a:1,
+   e:'Nell\'ordine logico WHERE viene prima di GROUP BY, quindi non può vedere le aggregazioni; HAVING filtra i gruppi dopo.',h:'Guarda la tabella dell\'ordine logico.'},
+  {q:'La tabella Customers ha 5 clienti, di cui 2 senza vendite. Quante righe di clienti restituisce SELECT ... FROM Customers c INNER JOIN Sales s ON ... GROUP BY c.customer_id?',o:['5','3','2','0'],a:1,
+   e:'L\'inner join tiene solo i clienti con almeno una vendita: 3. Per tenere tutti e 5 serve un LEFT JOIN, con i totali NULL (o 0 con COALESCE) per gli altri due.',h:'Che cosa fa l\'inner join alle righe senza partner?'},
+  {q:'Che cosa restituisce SELECT COUNT(*), COUNT(city) su una tabella di 6 righe in cui city è NULL in 2 righe?',o:['6 e 6','4 e 4','6 e 4','4 e 6'],a:2,
+   e:'COUNT(*) conta le righe, NULL compresi; COUNT(colonna) ignora i NULL.',h:'Solo una delle due forme ignora i NULL.'},
+  {q:'Un file di 640 MB va in HDFS con blocchi da 128 MB e replica 3. Quanti blocchi vengono memorizzati in tutto, e quanto spazio occupano?',o:['5 blocchi, 640 MB','15 blocchi, 1.920 MB','15 blocchi, 640 MB','3 blocchi, 384 MB'],a:1,
+   e:'640 / 128 = 5 blocchi, ciascuno copiato 3 volte: 15 blocchi, 640 × 3 = 1.920 MB.',h:'Prima i blocchi, poi moltiplica per la replica.'},
+  {q:'In un programma Spark, quale riga fa partire davvero il calcolo?',o:['rdd.flatMap(...)','rdd.map(...)','counts.reduceByKey(...)','counts.collect()'],a:3,
+   e:'flatMap, map e reduceByKey sono trasformazioni: allungano il DAG senza calcolare. collect è un\'azione e lo esegue.',h:'Trasformazioni o azioni?'},
+  {q:'Una banca deve registrare un bonifico che toglie da un conto e aggiunge a un altro. Quale garanzia serve, e quale famiglia di database?',o:['BASE, un database di documenti','ACID, un database relazionale (o un sistema con transazioni ACID)','Nessuna, basta la replica di HDFS','Eventual consistency, un key-value store'],a:1,
+   e:'Un bonifico non può restare a metà: serve l\'atomicità (tutto o niente) e la durabilità delle garanzie ACID.',h:'Che cosa succede se il sistema si ferma fra le due operazioni?'},
+  {q:'Un\'azienda vuole conservare per anni log dei clic, immagini e recensioni, senza sapere ancora come li analizzerà. Che cosa propone la lezione 8?',o:['Normalizzarli in 3NF nel warehouse','Un data lake, con schema on read, accanto al warehouse','Cancellarli dopo un mese','Un cubo OLAP'],a:1,
+   e:'Il lago tiene dati grezzi di ogni formato a basso costo e lascia decidere lo schema al momento della lettura; i risultati distillati possono poi passare nel warehouse.',h:'Schema on write o schema on read?'}
+];
+
 /* Lezione 9: AI predittiva e generativa, strutture di dati, casi d'uso */
 const PREDC=BLUE,GENC=PINK;
 const gauss9=r=>{const u=Math.max(r(),1e-9),v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
@@ -2612,6 +2668,60 @@ MAPPA[16]={c:'Come si trasforma un\'immagine in una tabella?',r:[
   {t:'Il caso fonderia',c:GRN,v:['300 immagini, 45 feature','Accuratezza circa 90%, AUC 0,97','In cima: cluster prominence']},
   {t:'Decidere',c:ORG,v:['Soglia 0,35: costo −35%','Persona nel giro, monitoraggio','Limiti: luce, risoluzione, campione']}]};
 
+/* Riepilogo delle lezioni 9-16 (L. Molteni): mappe mentali e quiz misto */
+MAPPA['116']={c:'Dalla domanda di business alla decisione',r:[
+  {t:'Domanda e dati (9)',c:BLUE,v:['Target e KPI','Warehouse affidabile','Predittiva e generativa']},
+  {t:'Esplorare (10)',c:YEL,v:['Tipi di variabile','χ², r, ANOVA','KNIME']},
+  {t:'Preparare (11)',c:PUR,v:['Mancanti, anomali','Leakage','Feature, codifica, scala']},
+  {t:'Modellare (13)',c:GRN,v:['Albero, foresta, boosting','Importanza: tagli, SHAP, PD']},
+  {t:'Valutare (12, 14)',c:PINK,v:['Test mai visto','Matrice, AUC, lift','Risultati troppo belli']},
+  {t:'Decidere (14, 16)',c:ORG,v:['Soglia sui costi','Lista grande quanto la capacità']},
+  {t:'Testi e immagini (15, 16)',c:TEAL,v:['Bag of words, LDA','Otsu, segmenti, tessitura']}]};
+MAPPA['116a']={c:'Leggere i dati',r:[
+  {t:'Tipi',c:PINK,v:['Nominali, ordinali','Discrete, continue','Intervalli, rapporti']},
+  {t:'Una variabile',c:YEL,v:['Media, mediana, moda','IQR, deviazione standard, CV','Asimmetria, curtosi']},
+  {t:'Test',c:ORG,v:['H₀ e H₁','p-value minore di α: rifiuto','Errori di I e II tipo']},
+  {t:'Due variabili',c:GRN,v:['Qualitative: χ², V','Quantitative: r, test t','Miste: ANOVA, F']}]};
+MAPPA['116b']={c:'Preparare i dati',r:[
+  {t:'Mancanti',c:PUR,v:['MCAR, MAR, MNAR, strutturali','Cancellare, imputare, segnalare','Travestiti: NA, NULL']},
+  {t:'Anomali',c:RED,v:['Errore o valore vero?','Regola 1,5 IQR, per gruppo','Limitare o trasformare']},
+  {t:'Leakage',c:ORG,v:['Quando è misurata la colonna?','Modello perfetto: allarme']},
+  {t:'Feature',c:GRN,v:['One-hot, ordinale','Min-max, z-score','Indicatori, gruppi, tassi']}]};
+MAPPA['116c']={c:'Valutare',r:[
+  {t:'Dati',c:BLUE,v:['Training, validazione, test','Stratificare, fissare il seme','Validazione incrociata']},
+  {t:'Classi',c:GRN,v:['Sensibilità, specificità','Precisione, F1','κ, MCC, acc. bilanciata']},
+  {t:'Classifica',c:PINK,v:['Soglia','ROC e AUC','Gain e lift']},
+  {t:'Numeri',c:YEL,v:['MAE, RMSE','MAPE, MPE','R², MASE']}]};
+MAPPA['116d']={c:'Scegliere il modello',r:[
+  {t:'Albero',c:GRN,v:['Gini, entropia, gain ratio','Potatura MDL','Regole leggibili, instabile']},
+  {t:'Foresta',c:BLUE,v:['Bootstrap, √p variabili','Media: meno varianza']},
+  {t:'Boosting',c:PINK,v:['Alberi sui residui','Tasso 0,1, profondità 4-6','Meno distorsione, va regolato']},
+  {t:'Importanza',c:ORG,v:['Statistiche dei tagli','SHAP','Dipendenza parziale']}]};
+MAPPA['116e']={c:'Dal modello alla decisione',r:[
+  {t:'Soglia',c:ORG,v:['Costo = FN·c(FN) + FP·c(FP)','Caso mancato caro: soglia bassa']},
+  {t:'Capacità',c:YEL,v:['Ordinare per probabilità','Tagliare a k casi','Gruppo di controllo']},
+  {t:'Sospetti',c:RED,v:['Primo taglio','Semi, bilanciamento, test usato']},
+  {t:'Testi',c:TEAL,v:['Pulire, bag of words','Dizionario, foresta, LDA']},
+  {t:'Immagini',c:BLUE,v:['Otsu, segmenti','Primo ordine, forma, tessitura']}]};
+QZ['116']=()=>[
+  {q:'Vuoi sapere se il tipo di contratto (mensile, annuale, biennale) è legato all\'abbandono (sì o no). Quale strumento usi, e come misuri la forza del legame?',o:['Correlazione di Pearson e r','Tabella di contingenza con test χ², e V di Cramér','ANOVA e F','Regressione lineare e R²'],a:1,
+   e:'Due variabili qualitative: tabella di contingenza e test χ² per l\'esistenza del legame, V di Cramér per la forza (nel caso Telco 0,41, alta).',h:'Di che tipo sono le due variabili?'},
+  {q:'In un dataset il reddito manca soprattutto per chi guadagna poco, che non vuole dichiararlo. Che cosa conviene fare?',o:['Cancellare le righe senza reddito','Imputare la media del reddito','Aggiungere un indicatore o una categoria «non dichiarato»: la mancanza è MNAR e porta informazione','Imputare zero'],a:2,
+   e:'La probabilità di mancare dipende dal valore stesso: cancellare o imputare la media distorcerebbe il quadro, l\'indicatore conserva il segnale.',h:'Da che cosa dipende la mancanza?'},
+  {q:'Un modello di abbandono ha accuratezza 0,97 sul test, e il primo taglio dell\'albero è «numero di conti chiusi nell\'ultimo mese». Che cosa pensi?',o:['Ottimo modello, si può usare subito','Leakage: la colonna è misurata dopo l\'evento che si vuole prevedere','Serve più potatura','Bisogna aumentare il numero di alberi'],a:1,
+   e:'Un conto chiuso è parte dell\'abbandono stesso: il modello legge la risposta. È il caso delle colonne post-evento della banca nella lezione 14.',h:'Quando è misurata quella colonna?'},
+  {q:'Con TP = 40, FN = 10, FP = 20, TN = 130, quanto valgono sensibilità e precisione?',o:['0,80 e 0,667','0,667 e 0,80','0,85 e 0,867','0,80 e 0,867'],a:0,
+   e:'Sensibilità = 40 / (40 + 10) = 0,80; precisione = 40 / (40 + 20) = 0,667. 0,85 è l\'accuratezza, 0,867 la specificità.',h:'Sensibilità guarda i positivi veri, precisione i previsti positivi.'},
+  {q:'Su un dataset con il 2% di frodi, un modello dichiara tutto «legittimo». Quali indici smascherano subito che è inutile?',o:['Accuratezza e tasso di errore','Sensibilità, accuratezza bilanciata e κ di Cohen','Solo la specificità','Il MAPE'],a:1,
+   e:'Accuratezza 98%, ma sensibilità 0, accuratezza bilanciata 0,5 e κ 0: gli indici robusti alle classi sbilanciate rivelano che non trova nessuna frode.',h:'Quali indici guardano la classe rara?'},
+  {q:'Quale coppia descrive correttamente random forest e gradient boosting?',o:['Foresta: alberi in sequenza sui residui; boosting: media di alberi indipendenti','Foresta: media di alberi profondi su campioni bootstrap, riduce la varianza; boosting: alberi bassi in sequenza sui residui, riduce la distorsione','Tutti e due riducono solo la distorsione','Il boosting non ha parametri da regolare'],a:1,
+   e:'È la distinzione centrale della lezione 13: parallelo e media contro sequenza e correzioni.',h:'Quale errore attacca ciascuno?'},
+  {q:'Un pezzo difettoso non scoperto costa 150 euro, un controllo a mano 5 euro. Abbassando la soglia da 0,5 a 0,35 i difetti mancati per 1.000 pezzi scendono da circa 6,7 a 2,2, i controlli salgono da circa 107 a 132. Conviene?',o:['No, i controlli aumentano','Sì: il costo scende da circa 1.533 a circa 994 euro','È indifferente','Non si può dire senza l\'AUC'],a:1,
+   e:'0,5: 6,7 × 150 + 107 × 5 ≈ 1.000 + 533 = 1.533 euro. 0,35: 2,2 × 150 + 132 × 5 ≈ 333 + 661 = 994 euro. Il costo atteso scende del 35%.',h:'Moltiplica ogni errore per il suo costo e somma.'},
+  {q:'Che cosa hanno in comune l\'analisi dei tweet e quella delle immagini dei pezzi?',o:['Usano entrambe le reti convoluzionali','Trasformano i dati non tabellari in una tabella di colonne numeriche, su cui valgono i modelli e gli indici delle lezioni 12-14','Non richiedono etichette','Usano entrambe il test χ²'],a:1,
+   e:'Bag of words per i testi, feature di primo ordine, forma e tessitura per le immagini: poi è una tabella come le altre, con divisione, random forest, Scorer e soglia.',h:'Che cosa diventa un testo o un\'immagine prima del modello?'}
+];
+
 /* ---------- Riquadri: ogni figura in un fotogramma nero ---------- */
 document.querySelectorAll('figure').forEach(f=>{
   const kids=[...f.children].filter(c=>c.tagName!=='FIGCAPTION'&&!c.classList.contains('scroll'));
@@ -2666,8 +2776,8 @@ const fill=(t,o)=>t.replace(/\{(\w+)\}/g,(_,k)=>String(o[k]).replace(/\. /g,'.\u
   })})();
 lessons.forEach((l,i)=>{
   const nav=l.querySelector('.navend');if(!nav)return;
-  const card=(m,cls,lab)=>{const t=byN(m).dataset.title;
-    return '<a class="'+cls+'" href="#lezione-'+m+'" data-go="'+m+'"><span class="th" aria-hidden="true">'+(THUMB[m]||'')+'</span><span class="tx"><small>'+lab+'</small>'+m+' · '+t+'</span></a>'};
+  const card=(m,cls,lab)=>{const t=byN(m).dataset.title,num=byN(m).dataset.label||m;
+    return '<a class="'+cls+'" href="#lezione-'+m+'" data-go="'+m+'"><span class="th" aria-hidden="true">'+(THUMB[m]||'')+'</span><span class="tx"><small>'+lab+'</small>'+num+' · '+t+'</span></a>'};
   const nx=lessons[i+1],cross=nx&&l.dataset.parte&&nx.dataset.parte&&nx.dataset.parte!==l.dataset.parte;
   nav.innerHTML=(i>0?card(NUMS[i-1],'prev',UI.prev):'')+(i<NUMS.length-1?card(NUMS[i+1],'next'+(cross?' cross':''),cross?fill(UI.partStart,{d:nx.dataset.docente}):UI.next):'');
 });
@@ -2829,8 +2939,18 @@ var paintProgress=(function(){
     const df={};CH.forEach(c=>{c.w=c.w||new Set(words(c.t));qs.forEach(w=>{if(c.w.has(w))df[w]=(df[w]||0)+1})});
     return CH.filter(c=>c.n!==cur).map(c=>({c,s:qs.reduce((a,w)=>a+(c.w.has(w)?Math.log(1+CH.length/df[w]):0),0)/Math.sqrt(1+c.t.length/1500)}))
       .filter(x=>x.s>0).sort((a,b)=>b.s-a.s).filter(x=>(budget-=x.c.t.length)>0).map(x=>x.c)}
+  /* i quiz della lezione aperta, con risposta giusta, spiegazione e risposta già data dallo studente (localStorage) */
+  const plain=h=>{const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.katex').forEach(k=>{const a=k.querySelector('annotation');k.replaceWith(a?'\\('+a.textContent+'\\)':k.textContent)});return d.textContent.replace(/\s+/g,' ').trim()};
+  function quizText(art){const out=[];let inq=0;
+    art.querySelectorAll('[data-quiz]').forEach(r=>{const f=QZ[r.dataset.quiz];if(!f)return;let qs;try{qs=f()}catch(_){return}
+      const fin=!r.classList.contains('inq'),sec=r.closest('section'),h=sec&&sec.querySelector('h2,h3');
+      qs.forEach((x,i)=>{let v=null;try{v=localStorage.getItem(quizKey(r,i,x))}catch(_){}
+        const L='ABCDEFGH',st=v===null?'not answered yet':('answered '+L[+v]+(+v===x.a?' (correct)':' (wrong)'));
+        out.push((fin?'FINAL QUIZ, '+UI.qnum+' '+(i+1):'IN-TEXT QUIZ '+(++inq)+(h?' (section «'+plain(h.innerHTML)+'»)':''))+': '+plain(x.q)+'\n'+
+          x.o.map((o,j)=>L[j]+') '+plain(o)).join('\n')+'\nCorrect: '+L[x.a]+'. Explanation: '+plain(x.e)+' Hint: '+plain(x.h||'')+'\nStudent: '+st)})});
+    return out.length?'QUIZZES OF THE OPEN LESSON (the student sees final-quiz questions numbered as below). If the student asks about a quiz they have not answered yet, guide them with hints and reasoning first and give the answer only if they explicitly ask for it; if they already answered, explain why the correct option is right and why theirs is wrong.\n'+out.join('\n\n'):''}
   function context(q,cur){index();
-    const art=byN(cur),parts=['COURSE: '+document.title+'\nLESSONS:\n'+MAP,'OPEN LESSON '+cur+':\n'+clean(art).slice(0,40000)];
+    const art=byN(cur),parts=['COURSE: '+document.title+'\nLESSONS:\n'+MAP,'OPEN LESSON '+cur+':\n'+clean(art).slice(0,40000)],qt=quizText(art);if(qt)parts.push(qt.slice(0,20000));
     /* lezioni citate per numero nella domanda: intere */
     const named=[...new Set([...q.matchAll(/\b(?:lezione|lezioni|lesson|lessons|lez\.?|l)\s*(\d{1,2})\b/gi)].map(m=>+m[1]))].filter(n=>n!==cur&&NUMS.includes(n)).slice(0,3);
     named.forEach(n=>parts.push('LESSON '+n+':\n'+clean(byN(n)).slice(0,30000)));

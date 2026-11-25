@@ -1,0 +1,174 @@
+<article class="lesson" data-n="116" data-label="Riepilogo 9-16" data-docente="L. Molteni" id="lezione-116" data-title="Che cosa serve sapere della seconda parte del corso?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Riepilogo · lezioni 9-16 di L. Molteni</p>
+  <h1>Che cosa serve sapere della seconda parte del corso?</h1>
+  <p class="desc">Le lezioni da 9 a 16 come cassetta degli attrezzi: dalla domanda di business alla decisione, con le tabelle per scegliere il test, il trattamento dei dati, l'indice di valutazione e il modello, le formule da ricordare, i nodi di KNIME e un quiz finale misto.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Questa pagina non aggiunge argomenti: ordina quelli della seconda parte nella sequenza in cui li userai in un progetto vero. Il numero fra parentesi rimanda alla lezione in cui ogni cosa è spiegata.</p>
+  <h2>Il percorso in una mappa</h2>
+  <figure>
+    <div class="w" data-mappa="116"></div>
+    <figcaption>Le fasi di un progetto di modellazione predittiva come rami di una mappa, ciascuno con le lezioni che lo trattano.</figcaption>
+  </figure>
+  <p class="stmt"><strong>Il filo:</strong> una domanda di business diventa un target; i dati si esplorano, si preparano e si controllano contro il leakage; i modelli si addestrano e si giudicano solo su dati mai visti; la soglia si sceglie sui costi; testi e immagini entrano nella stessa catena una volta trasformati in colonne.</p>
+  <p>Una lista di controllo per qualsiasi progetto, nell'ordine in cui serve:</p>
+  <div class="scroll"><table><thead><tr><th>Passo</th><th>Domanda da farsi</th><th>Lezione</th></tr></thead><tbody>
+    <tr><td>1. Target</td><td>che cosa prevedo, quale decisione ne dipende, con quale KPI la misuro?</td><td>9</td></tr>
+    <tr><td>2. Esplorazione</td><td>di che tipo è ogni variabile, come si distribuisce, quali sono legate al target?</td><td>10</td></tr>
+    <tr><td>3. Leakage</td><td>conoscerei questa colonna al momento della previsione?</td><td>11, 14</td></tr>
+    <tr><td>4. Mancanti e anomali</td><td>perché manca? È un errore o un valore estremo vero?</td><td>11</td></tr>
+    <tr><td>5. Feature</td><td>quali variabili nuove portano segnale? Vanno codificate o riscalate?</td><td>11</td></tr>
+    <tr><td>6. Divisione</td><td>ho diviso in modo stratificato, con il seme fisso, prima di bilanciare?</td><td>12, 14</td></tr>
+    <tr><td>7. Modelli</td><td>albero leggibile, foresta robusta o boosting regolato?</td><td>13</td></tr>
+    <tr><td>8. Valutazione</td><td>quali indici, sul test, contro quale riferimento ingenuo?</td><td>12</td></tr>
+    <tr><td>9. Sospetti</td><td>il risultato è troppo bello? Che cosa c'è nel primo taglio?</td><td>14</td></tr>
+    <tr><td>10. Decisione</td><td>quale soglia minimizza il costo atteso? Quanti casi posso trattare?</td><td>14, 16</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Leggere i dati: quale test?</h2>
+  <figure>
+    <div class="w" data-mappa="116a"></div>
+    <figcaption>L'analisi dei dati della lezione 10: tipi di variabile, statistiche di una variabile, test d'ipotesi e i tre casi bivariati.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Due variabili</th><th>Grafico</th><th>Test</th><th>Forza</th><th>Nodi di KNIME</th></tr></thead><tbody>
+    <tr><td>qualitativa e qualitativa</td><td>barre per categoria</td><td>\(\chi^2\) di indipendenza</td><td>V di Cramér: sotto 10% bassa, 10-25% media, sopra 25% alta</td><td>Crosstab</td></tr>
+    <tr><td>quantitativa e quantitativa</td><td>scatter plot</td><td>test t su \(\rho = 0\)</td><td>r di Pearson, da −1 a +1 (solo legami lineari)</td><td>Linear Correlation, Scatter Plot</td></tr>
+    <tr><td>quantitativa e qualitativa</td><td>box plot</td><td>ANOVA, test F</td><td>quanto differiscono le medie</td><td>One-way ANOVA, Box Plot</td></tr>
+  </tbody></table></div>
+  <div class="scroll"><table><thead><tr><th>Formula</th><th>A che cosa serve</th></tr></thead><tbody>
+    <tr><td>\(\bar{x} = \frac{1}{n}\sum x_i\)</td><td>media; la mediana resiste meglio ai valori estremi</td></tr>
+    <tr><td>\(s = \sqrt{\sum (x_i-\bar{x})^2/(n-1)}\), \(CV = s/\bar{x}\)</td><td>dispersione; il CV confronta grandezze diverse</td></tr>
+    <tr><td>IQR \(= Q_3 - Q_1\); anomalo oltre \(Q_3 + 1{,}5\,\text{IQR}\) o sotto \(Q_1 - 1{,}5\,\text{IQR}\)</td><td>dispersione robusta e regola del box plot (lezione 11)</td></tr>
+    <tr><td>\(E = \text{riga} \times \text{colonna} / N\), \(\chi^2 = \sum (O-E)^2/E\)</td><td>frequenze attese con indipendenza e distanza da esse</td></tr>
+    <tr><td>\(V = \sqrt{\chi^2 / (N(k-1))}\)</td><td>forza di un legame fra qualitative</td></tr>
+    <tr><td>\(r = \text{Cov}(X,Y)/(s_X s_Y)\)</td><td>legame lineare fra quantitative</td></tr>
+    <tr><td>\(F = \text{MSB}/\text{MSW}\)</td><td>variabilità fra gruppi contro dentro i gruppi</td></tr>
+  </tbody></table></div>
+  <p class="stmt"><strong>Regola del test:</strong> p-value minore di \(\alpha\), si rifiuta \(H_0\). Il p-value dice se un legame esiste; un indice come V o r dice quanto è forte; con campioni grandi conta anche l'ampiezza.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Preparare i dati: che cosa faccio di questo valore?</h2>
+  <figure>
+    <div class="w" data-mappa="116b"></div>
+    <figcaption>La preparazione dei dati della lezione 11: mancanti, anomali, leakage, feature engineering.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Situazione</th><th>Decisione</th><th>Nodo di KNIME</th></tr></thead><tbody>
+    <tr><td>mancante completamente a caso (MCAR)</td><td>cancellare o imputare: media (simmetrica), mediana (asimmetrica), moda (categorica)</td><td>Missing Value</td></tr>
+    <tr><td>mancante legato ad altre variabili (MAR)</td><td>imputare per gruppo o con un modello</td><td>Missing Value, learner e predictor</td></tr>
+    <tr><td>mancante che dipende dal valore (MNAR)</td><td>indicatore o categoria «non dichiarato»</td><td>Expression, Rule Engine</td></tr>
+    <tr><td>mancante strutturale</td><td>valore logico (spesa dei clienti nuovi = 0) o indicatore (has_agent)</td><td>Missing Value (valore fisso), Expression</td></tr>
+    <tr><td>mancante travestito («NA», «NULL», «Undefined»)</td><td>controllare tipo e valori distinti, poi ricodificare</td><td>String to Number, Expression</td></tr>
+    <tr><td>valore impossibile</td><td>correggere o togliere la riga</td><td>Row Filter, Expression Row Filter</td></tr>
+    <tr><td>valore estremo plausibile</td><td>tenerlo, limitarlo alla staccionata o trasformarlo (radice, logaritmo), secondo il modello</td><td>Numeric Outliers, Math Formula</td></tr>
+    <tr><td>colonna nota solo dopo l'evento</td><td>toglierla: è leakage</td><td>Column Filter</td></tr>
+    <tr><td>colonne duplicate (z-score delle grezze)</td><td>toglierle: dividono l'importanza</td><td>Column Filter</td></tr>
+    <tr><td>categorica nominale</td><td>one-hot (una colonna 0/1 per categoria)</td><td>One to Many</td></tr>
+    <tr><td>numeriche su scale diverse</td><td>min-max fra 0 e 1, o z-score</td><td>Normalizer</td></tr>
+    <tr><td>variabile piena di zeri</td><td>indicatore (ha atteso sì o no)</td><td>Rule Engine</td></tr>
+  </tbody></table></div>
+  <p>Quanto pesano gli anomali dipende dal modello: molto per regressione, k-NN, k-means e reti neurali; poco per gli alberi, che guardano solo l'ordine dei valori. Gli errori però si tolgono sempre.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Valutare: quale indice?</h2>
+  <figure>
+    <div class="w" data-mappa="116c"></div>
+    <figcaption>La valutazione della lezione 12: divisione dei dati, indici dei classificatori, soglia e classifica, indici della regressione.</figcaption>
+  </figure>
+  <p>Una scheda da riusare. Con una matrice di confusione di esempio (aggiunta qui) su 200 casi, TP = 40, FN = 10, FP = 20, TN = 130, gli indici sono:</p>
+  <div class="scroll"><table><thead><tr><th>Indice</th><th>Formula</th><th>Esempio</th><th>Domanda</th></tr></thead><tbody>
+    <tr><td>Accuratezza</td><td>(TP + TN) / N</td><td>170 / 200 = 0,85</td><td>quante previsioni sono giuste?</td></tr>
+    <tr><td>Sensibilità (recall)</td><td>TP / (TP + FN)</td><td>40 / 50 = 0,80</td><td>quanti positivi trovo?</td></tr>
+    <tr><td>Specificità</td><td>TN / (TN + FP)</td><td>130 / 150 = 0,867</td><td>quanti negativi riconosco?</td></tr>
+    <tr><td>Precisione</td><td>TP / (TP + FP)</td><td>40 / 60 = 0,667</td><td>dei segnalati, quanti sono veri?</td></tr>
+    <tr><td>F1</td><td>2 · P · R / (P + R)</td><td>0,727</td><td>precisione e recall insieme</td></tr>
+    <tr><td>Accuratezza bilanciata</td><td>(sensibilità + specificità) / 2</td><td>0,833</td><td>regge le classi sbilanciate</td></tr>
+    <tr><td>κ di Cohen</td><td>(p<sub>o</sub> − p<sub>e</sub>) / (1 − p<sub>e</sub>)</td><td>p<sub>e</sub> = (50·60 + 150·140) / 200² = 0,60; κ = 0,625</td><td>meglio del caso?</td></tr>
+    <tr><td>AUC</td><td>area sotto la curva ROC</td><td></td><td>quanto bene ordina, a ogni soglia? 0,5 casuale, 1 perfetto</td></tr>
+    <tr><td>Lift del decile</td><td>% positivi nel decile / % positivi totale</td><td></td><td>quanto conviene agire sul primo k%?</td></tr>
+    <tr><td>MAE, RMSE</td><td>media di |e|; radice della media di e²</td><td></td><td>errore tipico nell'unità del target; RMSE pesa gli errori grandi</td></tr>
+    <tr><td>MAPE, MPE</td><td>media di |e/y| e di e/y, in %</td><td></td><td>errore in percentuale, distorsione; mai con y vicino a zero</td></tr>
+    <tr><td>R²</td><td>1 − SSE / SST</td><td></td><td>varianza spiegata; sul test può essere negativo</td></tr>
+    <tr><td>MASE</td><td>MAE / MAE della previsione ingenua</td><td></td><td>sotto 1 il modello batte la previsione ingenua</td></tr>
+  </tbody></table></div>
+  <p class="stmt"><strong>Tre regole:</strong> si valuta solo sul test, usato una volta; con una classe rara l'accuratezza inganna; si riportano sempre più indici, tradotti in termini di business.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Scegliere il modello</h2>
+  <figure>
+    <div class="w" data-mappa="116d"></div>
+    <figcaption>Gli alberi della lezione 13: criteri di taglio, distorsione e varianza, foresta e boosting, importanza delle variabili.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th></th><th>Albero di decisione</th><th>Random forest</th><th>Gradient boosting, XGBoost</th></tr></thead><tbody>
+    <tr><td>Idea</td><td>tagli ricorsivi che rendono i gruppi più puri</td><td>media di molti alberi profondi su campioni bootstrap, √p variabili per taglio</td><td>alberi bassi in sequenza, ciascuno sui residui, con tasso di apprendimento</td></tr>
+    <tr><td>Riduce</td><td></td><td>la varianza</td><td>la distorsione</td></tr>
+    <tr><td>Parametri chiave</td><td>misura (Gini, gain ratio), minimo di righe per nodo, potatura MDL</td><td>numero di alberi, variabili per taglio</td><td>tasso (0,1), profondità (4-6), numero di alberi scelto sulla validazione</td></tr>
+    <tr><td>Quando</td><td>serve spiegare le regole</td><td>riferimento robusto con poca regolazione</td><td>gli ultimi punti di accuratezza, dopo la regolazione</td></tr>
+    <tr><td>Nodo di KNIME</td><td>Decision Tree Learner</td><td>Tree Ensemble Learner</td><td>Gradient Boosted Trees Learner, XGBoost Tree Ensemble Learner</td></tr>
+  </tbody></table></div>
+  <div class="eq">\[ \text{Gini} = 1 - \sum_j p_j^2 \qquad H = -\sum_j p_j \log_2 p_j \qquad \text{gain ratio} = \frac{\text{IG}}{\text{SplitINFO}} \]</div>
+  <div class="scroll"><table><thead><tr><th>Domanda sull'importanza</th><th>Strumento</th></tr></thead><tbody>
+    <tr><td>che cosa usa il modello?</td><td>primi tagli dell'albero, statistiche dei tagli della foresta</td></tr>
+    <tr><td>perché questa previsione?</td><td>valori SHAP della singola riga (sommano alla previsione)</td></tr>
+    <tr><td>come cambia la previsione con una variabile?</td><td>dipendenza parziale</td></tr>
+  </tbody></table></div>
+  <p>Importanza non vuol dire causalità: dice che cosa il modello usa, non che cosa succederebbe cambiando il mondo.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Dal modello alla decisione</h2>
+  <figure>
+    <div class="w" data-mappa="116e"></div>
+    <figcaption>Dalla probabilità alla decisione (lezioni 14 e 16) e i due tipi di dati non tabellari (lezioni 15 e 16).</figcaption>
+  </figure>
+  <p>La soglia si sceglie confrontando il costo atteso dei due errori, come nella lezione 16. Con \(c_{FN}\) il costo di un caso mancato e \(c_{FP}\) quello di un falso allarme:</p>
+  <div class="eq">\[ \text{costo atteso} = FN \cdot c_{FN} + FP \cdot c_{FP} \]</div>
+  <p>Se il caso mancato costa molto più del falso allarme (un cliente perso contro una telefonata, un difetto contro un controllo a mano), la soglia scende sotto 0,5. Se si possono trattare solo k casi, si ordina per probabilità e si taglia a k: la lunghezza della lista la decide la capacità.</p>
+  <div class="scroll"><table><thead><tr><th>Sintomo</th><th>Che cosa controllare</th></tr></thead><tbody>
+    <tr><td>accuratezza o sensibilità vicine al 100%</td><td>il primo taglio dell'albero: una colonna misurata dopo l'evento?</td></tr>
+    <tr><td>l'albero singolo batte la foresta</td><td>una colonna fa tutto il lavoro: leakage</td></tr>
+    <tr><td>risultati che cambiano a ogni esecuzione</td><td>semi non fissati nella divisione e nel campionamento</td></tr>
+    <tr><td>parametri scelti guardando il test</td><td>stima ottimista: regolare sulla validazione</td></tr>
+    <tr><td>test bilanciato</td><td>il bilanciamento va fatto solo sul training</td></tr>
+  </tbody></table></div>
+  <div class="scroll"><table><thead><tr><th>Passo</th><th>Testi (lezione 15)</th><th>Immagini (lezione 16)</th></tr></thead><tbody>
+    <tr><td>Pulire</td><td>menzioni, link, artefatti; minuscolo, parole vuote (dopo aver marcato le negazioni)</td><td>luce e posizione costanti, scala di grigi, ridimensionare</td></tr>
+    <tr><td>Rappresentare</td><td>bag of words (una colonna per termine) o embedding</td><td>soglia di Otsu, componenti connesse, feature di primo ordine, geometria, tessitura (Haralick)</td></tr>
+    <tr><td>Modellare</td><td>dizionario, random forest sul bag of words, LDA per i topic</td><td>random forest sulle 45 feature</td></tr>
+    <tr><td>Decidere</td><td>topic per sentiment, smistamento, quali testi leggere</td><td>soglia sul costo atteso, ispettore nel giro</td></tr>
+    <tr><td>Nodi</td><td>Strings To Document, preprocessing, Bag Of Words Creator, Document Vector, Topic Extractor</td><td>Image Reader, Global Thresholder, Connected Component Analysis, Image Segment Features, Image Features</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>KNIME in una tabella</h2>
+  <div class="scroll"><table><thead><tr><th>Compito</th><th>Nodi</th></tr></thead><tbody>
+    <tr><td>leggere</td><td>CSV Reader, Excel Reader, List Files/Folders, Image Reader</td></tr>
+    <tr><td>esplorare</td><td>Statistics, Histogram, Crosstab, Linear Correlation, Box Plot, One-way ANOVA</td></tr>
+    <tr><td>pulire e trasformare</td><td>Missing Value, Numeric Outliers, Row Filter, Column Filter, Expression, Math Formula, Rule Engine, String Manipulation</td></tr>
+    <tr><td>codificare e riscalare</td><td>One to Many, Category to Number, Normalizer</td></tr>
+    <tr><td>dividere e bilanciare</td><td>Table Partitioner (stratificato), X-Partitioner e X-Aggregator, Equal Size Sampling, SMOTE</td></tr>
+    <tr><td>modellare</td><td>Decision Tree, Tree Ensemble, Gradient Boosted Trees, XGBoost, H2O GBM (Learner e Predictor)</td></tr>
+    <tr><td>valutare</td><td>Scorer, Numeric Scorer, ROC Curve, Lift Chart, Binary Classification Inspector</td></tr>
+    <tr><td>regolare e spiegare</td><td>Parameter Optimization Loop, SHAP Loop, GroupBy, Cross Joiner</td></tr>
+    <tr><td>organizzare</td><td>metanodi e componenti; file .knwf (workflow) e .knar (cartelle)</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <p>Otto domande che mescolano le lezioni da 9 a 16, come in un esame.</p>
+  <div class="quiz" data-quiz="116"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se della seconda parte dovesse restarti una sola cosa: <strong>un modello vale quanto i suoi dati e quanto è onesta la sua valutazione</strong>; si prepara con la conoscenza del dominio, si giudica solo su dati mai visti, e si consegna come una decisione pesata sui costi veri.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>

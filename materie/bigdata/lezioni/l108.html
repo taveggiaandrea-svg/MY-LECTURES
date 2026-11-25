@@ -1,0 +1,170 @@
+<article class="lesson" data-n="108" data-label="Riepilogo 1-8" data-docente="A. Rezzani" id="lezione-108" data-title="Che cosa serve sapere della prima parte del corso?" hidden>
+<section class="hero"><div class="col">
+  <p class="chap">Riepilogo · lezioni 1-8 di A. Rezzani</p>
+  <h1>Che cosa serve sapere della prima parte del corso?</h1>
+  <p class="desc">Le lezioni da 1 a 8 in una pagina da tenere aperta mentre ripassi: mappe mentali, definizioni pratiche, i modelli di SQL e Spark da riusare, le tabelle per scegliere lo strumento giusto e un quiz finale che mescola tutto.</p>
+</div></section>
+
+<section><div class="col">
+  <p>Questa pagina non introduce nulla di nuovo: rimette in ordine quello che hai visto, in forma da usare. Ogni sezione si apre con una mappa e prosegue con le definizioni e gli strumenti; il numero fra parentesi rimanda alla lezione in cui l'argomento è spiegato con calma.</p>
+  <h2>Il percorso in una mappa</h2>
+  <p>La prima parte del corso segue una sola domanda: dove stanno i dati di un'azienda, e come si interrogano quando diventano troppi o troppo vari per un database classico?</p>
+  <figure>
+    <div class="w" data-mappa="108"></div>
+    <figcaption>Le otto lezioni della prima parte come rami di una mappa: dai report sui database operativi al data warehouse, SQL, i database NoSQL, Hadoop, Spark e il data lake.</figcaption>
+  </figure>
+  <p class="stmt"><strong>Il filo:</strong> il database operativo registra, il data warehouse integra per decidere, SQL interroga; quando i dati superano una macchina si distribuiscono (NoSQL, HDFS) e si elaborano in parallelo (MapReduce, poi Spark); i dati grezzi finiscono nel data lake, accanto al warehouse.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Dati per decidere</h2>
+  <figure>
+    <div class="w" data-mappa="108a"></div>
+    <figcaption>Dove vivono i dati e a che cosa servono: sistemi operativi, warehouse con ETL e BI, data lake.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Termine</th><th>Definizione pratica</th><th>Lezione</th></tr></thead><tbody>
+    <tr><td>Database operativo (OLTP)</td><td>registra in tempo reale l'attività quotidiana (ERP, CRM); progettato per scrivere in fretta singoli record, completamente normalizzato</td><td>1, 2</td></tr>
+    <tr><td>Data warehouse (DWH)</td><td>database analitico separato, integrato e ripulito, con dati a più livelli di aggregazione: l'unica fonte di verità per le decisioni</td><td>1, 2</td></tr>
+    <tr><td>ETL</td><td>estrarre dalle fonti, trasformare con regole di business e controlli di qualità (in un'area di staging), caricare nel warehouse</td><td>1</td></tr>
+    <tr><td>Tabella dei fatti e dimensioni</td><td>fatti: misure più chiavi verso le dimensioni; dimensioni: descrizioni denormalizzate (chi, che cosa, dove, quando)</td><td>2</td></tr>
+    <tr><td>OLAP</td><td>cubi multidimensionali per aggregare trascinando i campi, senza scrivere SQL</td><td>1</td></tr>
+    <tr><td>Business Intelligence</td><td>tecnologie e pratiche per raccogliere, integrare, analizzare e presentare i dati a chi decide</td><td>1</td></tr>
+    <tr><td>Data lake</td><td>archivio di dati grezzi in formato nativo (strutturati e no) più dati elaborati, economico, su Hadoop e Spark</td><td>8</td></tr>
+    <tr><td>Schema on write / on read</td><td>warehouse: lo schema si decide prima di inserire; lago: si decide quando si legge</td><td>8</td></tr>
+    <tr><td>Distillazione dei dati</td><td>analisi pesanti nel lago che producono risultati piccoli, caricati nel warehouse</td><td>8</td></tr>
+  </tbody></table></div>
+  <p>Strumento pratico: dove metto questi dati?</p>
+  <div class="scroll"><table><thead><tr><th>Situazione</th><th>Dove</th><th>Perché</th></tr></thead><tbody>
+    <tr><td>giacenza aggiornata a ogni vendita</td><td>database operativo</td><td>serve il dato attuale, riga per riga</td></tr>
+    <tr><td>vendite mensili di dieci anni per regione</td><td>data warehouse</td><td>storico integrato, query di aggregazione veloci</td></tr>
+    <tr><td>log dei clic, immagini, recensioni in testo libero</td><td>data lake</td><td>grezzi e vari, lo schema si decide dopo</td></tr>
+    <tr><td>dati vecchi del warehouse consultati di rado</td><td>data lake (offloading)</td><td>memorizzazione economica per i dati freddi</td></tr>
+  </tbody></table></div>
+  <p>I fattori di successo del lago, secondo la lezione 8, sono quattro: governance dei dati, processo di qualità, gestione dei metadati, formazione. Senza, il lago diventa una palude.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>SQL da usare</h2>
+  <figure>
+    <div class="w" data-mappa="108b"></div>
+    <figcaption>Il modello relazionale e SQL: tabelle e chiavi, integrità e normalizzazione, interrogazioni, join, gruppi e funzioni finestra.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Vincolo</th><th>Che cosa impedisce</th></tr></thead><tbody>
+    <tr><td>Chiave primaria (integrità dell'entità)</td><td>righe duplicate o senza identificativo</td></tr>
+    <tr><td>Chiave esterna (integrità referenziale)</td><td>un riferimento a una riga che non esiste: il valore è NULL o presente nella chiave primaria collegata</td></tr>
+    <tr><td>Tipo, NOT NULL, CHECK (integrità del dominio)</td><td>valori fuori dalle regole dichiarate, per esempio una quantità negativa</td></tr>
+    <tr><td>Normalizzazione (1NF, 3NF)</td><td>ridondanza e anomalie di inserimento, aggiornamento, cancellazione: ogni fatto si scrive una volta sola</td></tr>
+  </tbody></table></div>
+  <p>Una query si scrive in un ordine e si legge, logicamente, in un altro. Tenere a mente l'ordine logico (un riepilogo aggiunto qui) spiega quasi tutti gli errori tipici: perché WHERE non vede le aggregazioni, perché un alias di SELECT non si può usare in WHERE.</p>
+  <div class="scroll"><table><thead><tr><th>Ordine logico</th><th>Clausola</th><th>Che cosa fa</th></tr></thead><tbody>
+    <tr><td>1</td><td>FROM, JOIN ... ON</td><td>prodotto cartesiano delle tabelle, filtrato dal predicato del join</td></tr>
+    <tr><td>2</td><td>WHERE</td><td>tiene le righe con condizione TRUE (non UNKNOWN)</td></tr>
+    <tr><td>3</td><td>GROUP BY</td><td>una riga per combinazione dei valori di raggruppamento</td></tr>
+    <tr><td>4</td><td>HAVING</td><td>tiene i gruppi; può usare le aggregazioni</td></tr>
+    <tr><td>5</td><td>SELECT (e OVER)</td><td>calcola le colonne, comprese le funzioni finestra</td></tr>
+    <tr><td>6</td><td>ORDER BY</td><td>ordina il risultato</td></tr>
+  </tbody></table></div>
+  <p>I modelli da riusare, con le tabelle Customers e Sales della lezione 2:</p>
+<pre class="code">-- clienti con il totale venduto, anche chi non ha comprato nulla
+SELECT c.customer_id, c.last_name, COALESCE(SUM(s.quantity * s.price), 0) AS total
+FROM Customers c
+LEFT JOIN Sales s ON s.customer_id = c.customer_id
+GROUP BY c.customer_id, c.last_name
+HAVING COALESCE(SUM(s.quantity * s.price), 0) &lt; 100
+ORDER BY total DESC;
+
+-- clienti che non hanno mai comprato (anti-join)
+SELECT c.* FROM Customers c
+WHERE NOT EXISTS (SELECT 1 FROM Sales s WHERE s.customer_id = c.customer_id);
+
+-- totale progressivo e media mobile su 3 righe, senza perdere il dettaglio
+SELECT sales_date, quantity,
+       SUM(quantity) OVER (ORDER BY sales_date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running,
+       AVG(quantity) OVER (ORDER BY sales_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg,
+       LAG(quantity) OVER (ORDER BY sales_date) AS previous
+FROM Sales;</pre>
+  <div class="scroll"><table><thead><tr><th>Domanda</th><th>Strumento</th></tr></thead><tbody>
+    <tr><td>solo le coppie che combaciano</td><td>INNER JOIN</td></tr>
+    <tr><td>tutte le righe di una tabella, anche senza partner</td><td>LEFT (o RIGHT) JOIN, poi i NULL della parte mancante</td></tr>
+    <tr><td>tutte le righe di entrambe</td><td>FULL OUTER JOIN</td></tr>
+    <tr><td>righe di due query una sotto l'altra</td><td>UNION (senza duplicati), UNION ALL (con)</td></tr>
+    <tr><td>c'è almeno una riga collegata?</td><td>EXISTS, NOT EXISTS</td></tr>
+    <tr><td>un totale per gruppo</td><td>GROUP BY con SUM, COUNT, AVG...</td></tr>
+    <tr><td>un totale per gruppo senza perdere le righe</td><td>funzione finestra: SUM(...) OVER (PARTITION BY ...)</td></tr>
+    <tr><td>il valore della riga precedente</td><td>LAG; la successiva LEAD</td></tr>
+  </tbody></table></div>
+  <p class="stmt"><strong>Tre regole sui NULL:</strong> ogni confronto con NULL è UNKNOWN, quindi si usa IS NULL e mai = NULL; le aggregazioni ignorano i NULL, tranne COUNT(*); COALESCE(x, valore) li sostituisce.</p>
+</div></section>
+
+<section><div class="col">
+  <h2>Quando una macchina non basta</h2>
+  <figure>
+    <div class="w" data-mappa="108c"></div>
+    <figcaption>Sistemi distribuiti: scalabilità orizzontale, ACID e BASE, le quattro famiglie NoSQL, HDFS e MapReduce.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Famiglia NoSQL</th><th>Come memorizza</th><th>Quando sceglierla</th><th>Esempio della lezione</th></tr></thead><tbody>
+    <tr><td>Key-value</td><td>coppie chiave-valore</td><td>letture e scritture velocissime per chiave (sessioni, carrelli)</td><td></td></tr>
+    <tr><td>Documenti</td><td>documenti JSON o XML senza schema fisso</td><td>oggetti con campi variabili (profili, cataloghi)</td><td></td></tr>
+    <tr><td>Colonne</td><td>dati per colonna, righe con colonne variabili</td><td>tabelle enormi e sparse, analisi per colonna</td><td>HBase su HDFS</td></tr>
+    <tr><td>Grafo</td><td>nodi e relazioni con proprietà</td><td>relazioni fitte da attraversare (reti sociali, frodi)</td><td>Neo4j, linguaggio Cypher</td></tr>
+  </tbody></table></div>
+  <div class="scroll"><table><thead><tr><th></th><th>ACID (relazionale)</th><th>BASE (molti NoSQL)</th></tr></thead><tbody>
+    <tr><td>Promessa</td><td>atomicità, coerenza, isolamento, durabilità</td><td>sempre disponibile, stato non sempre coerente, coerenza alla fine</td></tr>
+    <tr><td>Quando</td><td>soldi, ordini, tutto ciò che non può essere a metà</td><td>grandi volumi distribuiti dove una lettura un po' vecchia è accettabile</td></tr>
+  </tbody></table></div>
+  <p>Il conto che torna sempre su HDFS (lezione 5): un file di 1 GB con blocchi da 128 MB diventa 8 blocchi; con il fattore di replica 3 i blocchi memorizzati sono 24 e lo spazio occupato è 3 GB. Con l'erasure coding di Hadoop 3 il sovraccarico scende dal 200% al 50%: 1,5 GB.</p>
+  <div class="eq">\[ \text{blocchi} = \left\lceil \frac{\text{dimensione}}{\text{blocco}} \right\rceil \qquad \text{spazio} = \text{dimensione} \times \text{replica} \]</div>
+  <div class="scroll"><table><thead><tr><th>Pezzo</th><th>Ruolo</th></tr></thead><tbody>
+    <tr><td>Name node</td><td>il master: metadati di file e blocchi, gestisce la replica</td></tr>
+    <tr><td>Data node</td><td>gli slave: leggono e scrivono i blocchi</td></tr>
+    <tr><td>Map</td><td>trasforma i dati in coppie chiave/valore, sui nodi che li contengono (località dei dati)</td></tr>
+    <tr><td>Shuffle e ordinamento</td><td>il sistema raccoglie i valori della stessa chiave attraverso la rete</td></tr>
+    <tr><td>Reduce</td><td>calcola per chiave e scrive il risultato in HDFS</td></tr>
+    <tr><td>YARN</td><td>assegna le risorse del cluster ai job</td></tr>
+    <tr><td>Hive, Pig</td><td>linguaggi di alto livello (HiveQL simile a SQL) tradotti in job</td></tr>
+  </tbody></table></div>
+</div></section>
+
+<section><div class="col">
+  <h2>Spark in pratica</h2>
+  <figure>
+    <div class="w" data-mappa="108d"></div>
+    <figcaption>Spark: architettura, RDD ed esecuzione pigra, DataFrame e SQL, streaming, grafi e MLlib.</figcaption>
+  </figure>
+  <div class="scroll"><table><thead><tr><th>Concetto</th><th>Da ricordare</th></tr></thead><tbody>
+    <tr><td>Perché è veloce</td><td>tiene i risultati intermedi in memoria invece di scriverli su HDFS a ogni passo come MapReduce</td></tr>
+    <tr><td>Driver, executor, task</td><td>il driver contiene il programma e la SparkSession; gli executor sui worker eseguono i task sulle partizioni</td></tr>
+    <tr><td>Trasformazione</td><td>crea un nuovo RDD o DataFrame e allunga il DAG, senza calcolare (map, flatMap, filter, reduceByKey)</td></tr>
+    <tr><td>Azione</td><td>fa partire il calcolo e restituisce un risultato (collect, count, show)</td></tr>
+    <tr><td>Stage e shuffle</td><td>il DAG si taglia in stage dove serve uno shuffle, cioè quando si aggrega o si ordina per chiave</td></tr>
+    <tr><td>DataFrame</td><td>colonne con nome e schema: si filtra, aggrega e unisce per colonna, anche in SQL con una vista temporanea</td></tr>
+    <tr><td>Structured Streaming</td><td>il flusso come tabella illimitata a cui si aggiungono righe; readStream, writeStream, trigger</td></tr>
+    <tr><td>GraphFrames</td><td>un DataFrame di vertici (id) e uno di archi (src, dst); gradi, PageRank, componenti connesse, triangoli</td></tr>
+    <tr><td>MLlib</td><td>pipeline di transformer (Tokenizer, HashingTF) ed estimator (LogisticRegression), valutate su dati di test</td></tr>
+  </tbody></table></div>
+<pre class="code"># il word count in PySpark: trasformazioni pigre, poi un'azione
+rdd = spark.sparkContext.textFile("testo.txt")
+counts = (rdd.flatMap(lambda line: line.split())
+             .map(lambda w: (w, 1))
+             .reduceByKey(lambda a, b: a + b))   # shuffle: nuovo stage
+counts.collect()                                  # azione: parte il calcolo
+
+# la stessa logica sui DataFrame e in SQL
+df = spark.read.csv("sales.csv", header=True, inferSchema=True)
+df.filter(df.quantity &gt; 2).groupBy("product").sum("quantity").show()
+df.createOrReplaceTempView("sales")
+spark.sql("SELECT product, SUM(quantity) FROM sales GROUP BY product").show()</pre>
+</div></section>
+
+<section><div class="col">
+  <h2>Mettiti alla prova</h2>
+  <p>Otto domande che mescolano le lezioni da 1 a 8, come in un esame.</p>
+  <div class="quiz" data-quiz="108"></div>
+</div></section>
+
+<section><div class="col">
+  <p>Se della prima parte dovesse restarti una sola cosa: <strong>ogni strumento nasce dal limite del precedente</strong>; il warehouse dal disordine dei sistemi operativi, NoSQL e HDFS dai limiti di una macchina, Spark dalla lentezza di MapReduce, il data lake dalla rigidità dello schema.</p>
+  <p>La lezione 9 apre la parte di L. Molteni: a che cosa servono tutti questi dati, cioè a modelli che prevedono.</p>
+  <nav class="navend" aria-label="Altre lezioni"></nav>
+</div></section>
+</article>
